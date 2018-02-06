@@ -1,0 +1,79 @@
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-solid">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-3">
+                                <!--common.js初始化该select以及处理选中事件-->
+                                <select name="default_dept2" id="default_dept2" class="form-control select2">
+                                    <option value="">--所有业态--</option>
+                                    <%{volist name="Dept2" id="_dpt2"}%>
+                                    <%{if condition="session('default_dept1.dept_id') == $_dpt2.parent_id"}%>
+                                    <option value="<%{$_dpt2.dept_id}%>"<%{if condition="session('default_dept2.dept_id') == $_dpt2.dept_id"}%> selected="selected"<%{/if}%>><%{$_dpt2.dept_name}%></option>
+                                    <%{/if}%>
+                                    <%{/volist}%>
+                                </select>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-offset-6 col-sm-3">
+                                <div class="btn-group pull-right">
+                                    <a href="<%{:url('chat/list')}%>" class="btn btn-primary"><i class="fa fa-arrow-circle-o-left"></i> 返回互聊列表</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h4 class="box-title">互聊信息</h4>
+            </div>
+            <form action="<%{:url('chat/create')}%>" class="form-horizontal" id="chatAdd">
+                <div class="box-body">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">互聊分组：</label>
+                        <div class="col-sm-5">
+                            <select name="Chat[chat_group_id]" id="chat_group_id" class="form-control select2">
+                                <option value="">--请选择分组--</option>
+                                <%{volist name="chat_group" id="item"}%>
+                                    <option value="<%{$item.id}%>"><%{$item.name}%></option>
+                                <%{/volist}%>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">内容(发)：</label>
+                        <div class="col-sm-5">
+                            <textarea id="send" rows=4 class="form-control" name="Chat[send]" placeholder="互聊发出的内容，可使用emoji字符"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">内容(回)：</label>
+                        <div class="col-sm-5">
+                            <textarea id="reply" rows=4 class="form-control" name="Chat[reply]" placeholder="互聊回复的内容，可使用emoji字符"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">备注信息：</label>
+                        <div class="col-sm-5">
+                            <textarea id="remark" rows=3 class="form-control" name="Chat[remark]" placeholder="备注信息，可选"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <div class="row">
+                        <div class="col-sm-offset-3 col-sm-5"><button type="submit" class="btn btn-success pull-right btn-submit">新增</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

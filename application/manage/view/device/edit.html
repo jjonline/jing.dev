@@ -1,0 +1,67 @@
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h4 class="box-title">设备信息</h4>
+            </div>
+            <form action="<%{:url('device/edit')}%>" class="form-horizontal" id="deviceEdit">
+                <div class="box-body">
+                    <div class="form-group" id="level2_container">
+                        <label class="col-sm-2 control-label">设备分组：</label>
+                        <div class="col-sm-5">
+                            <select name="Device[device_group_id]" id="Device" class="form-control select2">
+                                <option value="">--选择设备分组--</option>
+                                <%{volist name="device_group" id="grp"}%>
+                                    <option value="<%{$grp.id}%>"<%{if condition="$grp.id == $device.device_group_id"}%> selected="selected"<%{/if}%>><%{$grp.name}%></option>
+                                <%{/volist}%>
+                            </select>
+                        </div>
+                    </div>
+                    <input type="hidden" name="Device[id]" value="<%{$device.id}%>">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">自定义编号：</label>
+                        <div class="col-sm-5"><input type="text" id="device_no" class="form-control" name="Device[device_no]" placeholder="自定义设备编号，便于识别" value="<%{$device.device_no}%>">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">网络：</label>
+                        <div class="col-sm-5">
+                            <select name="Device[network]" id="network" class="form-control select2">
+                                <option value="wifi"<%{if condition="$device.network EQ 'wifi'"}%> selected="selected"<%{/if}%>>wifi</option>
+                                <option value="流量"<%{if condition="$device.network EQ '流量'"}%> selected="selected"<%{/if}%>>流量</option>
+                                <option value="有线"<%{if condition="$device.network EQ '有线'"}%> selected="selected"<%{/if}%>>有线</option>
+                                <option value="其他"<%{if condition="$device.network EQ '其他'"}%> selected="selected"<%{/if}%>>其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">任务间隔时间最小值：</label>
+                        <div class="col-sm-5">
+                            <input type="number" id="interval_begin" class="form-control" name="Device[interval_begin]" placeholder="执行任务的随机间隔时间最小值，填入数字，单位：秒" value="<%{$device.interval_begin}%>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">任务间隔时间最大值：</label>
+                        <div class="col-sm-5">
+                            <input type="number" id="interval_end" class="form-control" name="Device[interval_end]" placeholder="执行任务的随机间隔时间最大值，填入数字，单位：秒" value="<%{$device.interval_end}%>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">备注信息：</label>
+                        <div class="col-sm-5">
+                            <textarea id="remark" rows=3 class="form-control" name="Device[remark]" placeholder="备注信息，可选"><%{$device.remark}%></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <div class="row">
+                        <div class="col-sm-offset-2 col-sm-5"><button type="submit" class="btn btn-success pull-right btn-submit">提交</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

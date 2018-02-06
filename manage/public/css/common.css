@@ -1,0 +1,58 @@
+.dl-horizontal dd {margin-top:8px;margin-bottom: 8px;}
+
+.btn-upload-file {position: relative;overflow: hidden;display: inline-block;}
+.btn-upload-file  input {position: absolute;top: 0;right: 0;margin: 0;opacity: 0;-ms-filter: 'alpha(opacity=0)';font-size: 200px !important;direction: ltr;cursor: pointer;}
+
+
+.btn-box-tool {box-shadow: none !important;}
+
+
+#dropdown-menu-dept {width:auto;min-width:160px;max-width:360px;margin-top:3px;border-radius: 2px;box-shadow: 0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.22);}
+#dropdown-menu-dept:before {
+    position: absolute;
+    top: -7px;
+    right: 12px;
+    display: inline-block !important;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid #eee;
+    border-left: 6px solid transparent;
+    border-bottom-color: rgba(255, 255, 255, 1);
+    content: '';
+}
+#dropdown-menu-dept>li>a {
+    padding:7px 15px;
+    color:#555;
+}
+#dropdown-menu-dept>li>a.active {background-color:#e1e3e9;color:#333;}
+#dropdown-menu-dept>li>a:hover {background-color:#e1e3e9;color:#333;}
+
+
+.alert, .badge, .btn, .btn-group>.btn, .btn.btn-link:hover, .icon-btn, .label, .list-group1, .md-shadow-z-1, .note, .panel, .social-icons li>a, .social-icons.social-icons-color>li>a, .well {box-shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.18);}
+
+.alert-danger{
+    background-color: #fbe1e3 !important;
+    border-color: #fbe1e3;
+    color: #e73d4a !important;
+}
+
+.btn-green {color: #FFF;
+    background-color: #32c5d2;
+    border-color: #32c5d2;
+}
+
+.btn {box-shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.18);
+    transition: box-shadow .28s cubic-bezier(.4,0,.2,1);}
+.btn-circle {
+    color: #666;
+    background-color: #fff;
+    border-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.18);
+    transition: box-shadow .28s cubic-bezier(.4,0,.2,1);
+}
+.btn:hover {
+    box-shadow:0 3px 6px rgba(0,0,0,.2),0 3px 6px rgba(0,0,0,.26)
+}
+
+
+.main-footer .version {color:#ccc;}

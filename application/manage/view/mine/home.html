@@ -1,0 +1,84 @@
+<div class="row">
+    <div class="col-md-6">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h4 class="box-title">个人信息</h4>
+            </div>
+            <div class="box-body">
+                <dl class="dl-horizontal">
+                    <dt>登录账号：</dt>
+                    <dd><%{$user_info.username}%></dd>
+
+                    <dt>真实姓名：</dt>
+                    <dd><%{$user_info.real_name}%></dd>
+
+                    <dt>手机号：</dt>
+                    <dd><%{$user_info.phone}%></dd>
+
+                    <dt>邮箱：</dt>
+                    <dd><%{$user_info.email}%></dd>
+
+                    <dt>设备总额度：</dt>
+                    <dd><%{$user_info.device_quota}%></dd>
+
+                    <dt>所属角色：</dt>
+                    <dd><%{$user_info.role_name}%></dd>
+
+                    <dt>所属公司：</dt>
+                    <%{volist name="dept1" id="dp1" key="k"}%>
+                        <dd><%{$k}%>、<%{$dp1.dept_name}%></dd>
+                    <%{/volist}%>
+
+                    <dt>所属业态(部门)：</dt>
+                    <%{volist name="dept2" id="dp2" key="k"}%>
+                        <dd><%{$k}%>、<%{$dp2.dept_name}%></dd>
+                    <%{/volist}%>
+                </dl>
+            </div>
+            <div class="box-footer"></div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h4 class="box-title">更新个人信息</h4>
+            </div>
+            <form class="form-horizontal" id="Edit" action="/mine/edit">
+            <div class="box-body">
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">姓名：</label>
+                    <div class="col-sm-8"><input type="text" id="real_name" class="form-control" name="real_name" placeholder="姓名，请填写真实姓名" value="<%{$user_info.real_name}%>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">密码：</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="password" class="form-control" name="password" placeholder="字母、数字构成，6至18位，不修改请留空">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">手机号：</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="phone" class="form-control" name="phone" placeholder="手机号，可选" value="<%{$user_info.phone}%>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">邮箱：</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="email" class="form-control" name="email" placeholder="邮箱，可选" value="<%{$user_info.email}%>">
+                    </div>
+                </div>
+
+            </div>
+            <div class="box-footer">
+                <div class="row">
+                    <div class="col-sm-12"><button type="submit" class="btn btn-success btn-block btn-submit">提交修改</button></div>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+
+</div>

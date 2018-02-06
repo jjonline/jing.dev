@@ -1,0 +1,83 @@
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h4 class="box-title">菜单信息</h4>
+            </div>
+            <form action="<%{:url('menu/edit')}%>" class="form-horizontal" id="menuEdit">
+                <div class="box-body">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">一级菜单：</label>
+                        <div class="col-sm-5">
+                            <select name="Menu[level1]" id="level1" class="form-control select2">
+                                <option value="">--新建一级菜单--</option>
+                                <%{volist name="list" id="item"}%>
+                                    <%{if condition="$item.level EQ 1"}%>
+                                        <option value="<%{$item.name}%>"<%{if condition="$menu_edit.level EQ 1 && $menu_edit.name EQ $item.name"}%> selected="selected"<%{/if}%>><%{$item.title}%></option>
+                                    <%{/if}%>
+                                <%{/volist}%>
+                            </select>
+                        </div>
+                    </div>
+                    <input type="hidden" name="Menu[origin_name]" value="<%{$menu_edit.name}%>">
+                    <div class="form-group" id="level2_container">
+                        <label class="col-sm-2 control-label">二级菜单：</label>
+                        <div class="col-sm-5">
+                            <select name="Menu[level2]" id="level2" class="form-control select2">
+                                <option value="">--新建二级菜单--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">菜单名称：</label>
+                        <div class="col-sm-5"><input type="text" id="title" class="form-control" name="Menu[title]" placeholder="菜单名称，将显示在左侧导航栏，例如：工作台" value="<%{$menu_edit.title}%>">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">菜单标签：</label>
+                        <div class="col-sm-5">
+                            <input type="text" id="name" class="form-control" name="Menu[name]" placeholder="菜单标签，不得超过50字符，全局唯一，例如：MenuAction" value="<%{$menu_edit.name}%>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">导航链接：</label>
+                        <div class="col-sm-5">
+                            <input type="text" id="url" class="form-control" name="Menu[url]" placeholder="菜单点击后打开的网址，格式如下：menu/list" value="<%{$menu_edit.url}%>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">fontawesome图标：</label>
+                        <div class="col-sm-5">
+                            <input type="text" id="fontawesome" class="form-control" name="Menu[fontawesome]" placeholder="fontawesome图标类名，例如：fa fa-cog" value="<%{$menu_edit.fontawesome}%>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">菜单排序：</label>
+                        <div class="col-sm-5">
+                            <input type="number" id="sort" class="form-control" name="Menu[sort]" placeholder="该级别的排序，大于0的整数，数字越小越靠前" value="<%{$menu_edit.sort}%>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">备注信息：</label>
+                        <div class="col-sm-5">
+                            <textarea id="remark" rows=3 class="form-control" name="Menu[remark]" placeholder="菜单备注信息，便于管理员识别，可选"><%{$menu_edit.remark}%></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <div class="row">
+                        <div class="col-sm-offset-2 col-sm-5"><button type="submit" class="btn btn-success pull-right btn-submit">提交</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var level = <%{$menu_edit.level}%>;
+    var item  = <%{:json_encode($menu_edit)}%>;
+    var menu  = <%{:json_encode($list)}%>;
+</script>

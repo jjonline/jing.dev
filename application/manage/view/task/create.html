@@ -1,0 +1,36 @@
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h4 class="box-title">选择任务类型</h4>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12">
+                    <h4 style="padding: 15px 0;">初始化任务</h4>
+                        <%{volist name="initTask" id="menu1"}%>
+                            <%{if condition="in_array($menu1.url,$task_menus)"}%>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <a href="<%{:url($menu1.url)}%>" class="btn btn-block btn-danger"><i class="fa fa-plus-square"></i> 新建<%{$menu1.name}%>任务</a>
+                                    </div>
+                                </div>
+                            <%{/if}%>
+                        <%{/volist}%>
+                </div>
+                <div class="col-sm-12">
+                    <h4 style="padding: 15px 0;">日常任务</h4>
+                    <%{volist name="commonTask" id="menu2"}%>
+                        <%{if condition="in_array($menu1.url,$task_menus)"}%>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <a href="<%{:url($menu2.url)}%>" class="btn btn-block btn-primary"><i class="fa fa-plus"></i> 新建<%{$menu2.name}%>任务</a>
+                                </div>
+                            </div>
+                        <%{/if}%>
+                    <%{/volist}%>
+                </div>
+            </div>
+            <div class="box-footer"></div>
+        </div>
+    </div>
+</div>

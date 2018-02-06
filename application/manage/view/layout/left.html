@@ -1,0 +1,43 @@
+<aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- search form -->
+        <form action="#" method="get" class="sidebar-form">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="功能搜索" autocomplete="off">
+                <span class="input-group-btn">
+                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                </button>
+              </span>
+            </div>
+        </form>
+        <!-- /.search form -->
+        <!-- sidebar menu-->
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="header">主导航</li>
+
+            <%{volist name="UserAuthMenu" id= "menu"}%>
+                <%{if condition="!empty($menu.url)"}%>
+                    <!--一级导航直接链接-->
+                    <li class="<%{$menu.active ? 'active' : ' '}%> <%{$menu.open_menu ? 'open-menu' : ' '}%>"><a href="<%{:url($menu.url)}%>"><i class="<%{$menu.fontawesome}%>"></i> <span><%{$menu.title}%></span></a></li>
+                <%{else/}%>
+                    <!--二级导航无链接，有二级子菜单-->
+                    <li class="treeview <%{$menu.active ? 'active' : ' '}%> <%{$menu.open_menu ? 'open-menu' : ' '}%>">
+                        <a href="#">
+                            <i class="<%{$menu.fontawesome}%>"></i> <span><%{$menu.title}%></span>
+                            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                        </a>
+                        <%{if condition="!empty($menu.children)"}%>
+                        <ul class="treeview-menu">
+                            <%{volist name="$menu.children" id="menu_child"}%>
+                                <li class="<%{$menu_child.active ? 'active' : ' '}%>"><a href="<%{:url($menu_child.url)}%>"><i class="<%{$menu_child.fontawesome}%>"></i> <%{$menu_child.title}%></a></li>
+                            <%{/volist}%>
+                        </ul>
+                        <%{/if}%>
+                    </li>
+                <%{/if}%>
+            <%{/volist}%>
+        </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>

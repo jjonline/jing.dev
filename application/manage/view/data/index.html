@@ -1,0 +1,139 @@
+<div class="row">
+
+    <div class="col-md-6">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">饼图展示</h3>
+
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="chart" style="height: 250px;" id="chart">
+                    <div class="col-xs-6" id="phone-data-chart1" style="height: 250px; width: 50%;"></div>
+                    <div class="col-xs-6" id="phone-data-chart2" style="height: 250px; width: 50%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">数据维护</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="chart" style="height: 250px;padding-top: 15px;">
+                    <div class="col-sm-4">
+                        <div class="form-group center-block text-center">
+                            <a href="/data/downloadtemplate" class="btn btn-info" id="download-csv" target="_blank"><i class="fa fa-download"></i> 下载导入模板</a>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group center-block text-center">
+                                <a href="javascript:;" class="btn btn-success" id="upload-csv">
+                                    <label for="js_upload_file" style="font-weight: normal;margin:0;cursor: pointer;">
+                                        <i class="fa fa-upload"></i> 导入手机号数据
+                                    </label>
+                                </a>
+                        </div>
+                        <form>
+                            <input type="file" id="js_upload_file" name="csvFile" style="position: absolute;clip: rect(0,0,0,0);" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                        </form>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group center-block text-center">
+                            <a href="javascript:;" class="btn btn-warning" id="data-migrate"><i class="fa fa-arrows-alt"></i> 迁移已使用数据</a>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group center-block text-center">
+                            <a href="/data/list" class="btn btn-info"><i class="fa fa-eye"></i> 查看详细列表</a>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group center-block text-center">
+                            <a href="/data/allocationInfo" class="btn btn-success"><i class="fa fa-list-ol"></i> 业务员分配详情</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">数据分配</h3>
+
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <form class="form-horizontal" action="/data/allocation" id="allocation">
+                <div class="box-body">
+                    <div class="manage">
+                        <h5 style="padding-bottom: 15px;border-bottom: 1px solid #f4f4f4;">第一步：选择分配手机号的业务员账号</h5>
+                        <div id="treeDemo" class="ztree" style="padding-left:25px;"></div>
+                        <h5 style="margin-top:25px;padding-bottom: 15px;border-bottom: 1px solid #f4f4f4;">第二步：设定分配规则</h5>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">分配方式：</label>
+                            <div class="col-sm-8">
+                                <div class="btn-group js-select-container select-allocation-type">
+                                    <button type="button" class="btn btn-white btn-primary" data-val="1" id="fix-allocation">指定分配</button>
+                                    <button type="button" class="btn btn-white" data-val="2" id="avg-allocation">平均分配</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">分配数量：</label>
+                            <div class="col-sm-7">
+                                <input type="number" class="form-control" name="Allocation[number]" id="number" placeholder="可分配数量见 数据统计 中表格">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">&nbsp;</label>
+                            <div class="col-sm-7"><button type="submit" class="btn btn-success btn-submit">提交</button></div>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">数据统计</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <table class="table table-bordered table-hover" id="table">
+                    <tr>
+                        <th>#</th>
+                        <th>数量</th>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var treeData = <%{:json_encode($dept2_with_users)}%>;
+</script>
+<script src="__STATIC__/plugin/echarts/echarts.common.min.js" type="text/javascript"></script>

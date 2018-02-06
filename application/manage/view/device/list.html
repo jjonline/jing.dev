@@ -1,0 +1,122 @@
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="box box-solid">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-3">
+                                <!--common.js初始化该select以及处理选中事件-->
+                                    <select name="default_dept2" id="default_dept2" class="form-control select2">
+                                        <option value="">--所有业态--</option>
+                                        <%{volist name="Dept2" id="_dpt2"}%>
+                                        <%{if condition="session('default_dept1.dept_id') == $_dpt2.parent_id"}%>
+                                            <option value="<%{$_dpt2.dept_id}%>"<%{if condition="session('default_dept2.dept_id') == $_dpt2.dept_id"}%> selected="selected"<%{/if}%>><%{$_dpt2.dept_name}%></option>
+                                        <%{/if}%>
+                                        <%{/volist}%>
+                                    </select>
+                            </div>
+                            <div class="col-xs-12 col-sm-3">
+                                <div class="has-feedback">
+                                    <input id="txt_search" type="text" class="form-control" placeholder="搜索手机编号、分组、备注">
+                                    <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-3">
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input readonly id="search_begin_date" data-key="search_begin_date" type="text" class="form-control pull-right search_date" placeholder="开始过滤时间">
+                                    <div class="input-group-addon clear-begin-data" style="cursor: pointer;">
+                                        <i class="fa fa-times"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-3">
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input readonly id="search_end_date" data-key="search_end_date" type="text" class="form-control pull-right search_date" placeholder="结束过滤时间">
+                                    <div class="input-group-addon clear-end-data" style="cursor: pointer;">
+                                        <i class="fa fa-times"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="box box-primary">
+            <!--<div class="box-header with-border">-->
+            <!--<h4 class="box-title">部门列表</h4>-->
+            <!--</div>-->
+            <div class="box-body">
+                <table id="mainTable" data-order='[[ 5, "asc" ]]' class="table table-bordered table-striped table-hover display responsive nowrap" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th data-priority="1">手机编号</th>
+                        <th data-priority="3" data-orderable="false">设备分组</th>
+                        <th data-priority="5" data-orderable="false">网络</th>
+                        <th data-priority="6" data-orderable="false">所属用户</th>
+                        <th data-priority="7" data-orderable="false">备注</th>
+                        <th data-priority="8">初始化时间</th>
+                        <th data-priority="2" data-orderable="false">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+            <!--<div class="box-footer">-->
+
+            <!--</div>-->
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="task" tabindex="-1" role="basic" aria-hidden="true" style="display: none;overflow-y: auto!important;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">选择任务类型</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12" id="task_item">
+                        <div class="col-sm-12">
+                            <h4 style="padding:5px 0 15px 0;">初始化任务</h4>
+                            <%{volist name="initTask" id="menu1"}%>
+                            <%{if condition="in_array($menu1.url,$task_menus)"}%>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <a href="" data-href="<%{:url($menu1.url)}%>" class="btn btn-block btn-danger"><i class="fa fa-plus-square"></i> 新建<%{$menu1.name}%>任务</a>
+                                </div>
+                            </div>
+                            <%{/if}%>
+                            <%{/volist}%>
+                        </div>
+                        <div class="col-sm-12">
+                            <h4 style="padding: 15px 0;">日常任务</h4>
+                            <%{volist name="commonTask" id="menu2"}%>
+                            <%{if condition="in_array($menu1.url,$task_menus)"}%>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <a href="" data-href="<%{:url($menu2.url)}%>" class="btn btn-block btn-primary"><i class="fa fa-plus"></i> 新建<%{$menu2.name}%>任务</a>
+                                </div>
+                            </div>
+                            <%{/if}%>
+                            <%{/volist}%>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

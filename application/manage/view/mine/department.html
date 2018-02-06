@@ -1,0 +1,72 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-solid">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-3">
+                                <div class="has-feedback">
+                                    <input id="txt_search" type="text" class="form-control" placeholder="搜索业态部门、备注">
+                                    <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-3">
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input readonly id="search_begin_date" data-key="search_begin_date" type="text" class="form-control pull-right search_date" placeholder="开始过滤时间">
+                                    <div class="input-group-addon clear-begin-data" style="cursor: pointer;">
+                                        <i class="fa fa-times"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-3">
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input readonly id="search_end_date" data-key="search_end_date" type="text" class="form-control pull-right search_date" placeholder="结束过滤时间">
+                                    <div class="input-group-addon clear-end-data" style="cursor: pointer;">
+                                        <i class="fa fa-times"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-3">
+                                <a href="<%{:url('mine/departmentcreate')}%>" class="btn btn-block btn-success"><i class="fa fa-plus"></i> 新增业态部门</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary">
+            <!--<div class="box-header with-border">-->
+            <!--<h4 class="box-title">部门列表</h4>-->
+            <!--</div>-->
+            <div class="box-body">
+                <table id="mainTable" data-order='[[ 1, "asc" ]]' class="table table-bordered table-striped table-hover display responsive nowrap" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th data-priority="1">部门（业态）</th>
+                        <th data-priority="5">排序</th>
+                        <th data-priority="6" data-orderable="false">部门人数</th>
+                        <th data-priority="7" data-orderable="false">备注</th>
+                        <th data-priority="8">创建时间</th>
+                        <th data-priority="2" data-orderable="false">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+            <!--<div class="box-footer">-->
+
+            <!--</div>-->
+        </div>
+
+    </div>
+</div>

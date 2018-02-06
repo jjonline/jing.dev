@@ -1,0 +1,66 @@
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-solid">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-3">
+                                <!--common.js初始化该select以及处理选中事件-->
+                                <select name="default_dept2" id="default_dept2" class="form-control select2">
+                                    <option value="">--所有业态--</option>
+                                    <%{volist name="Dept2" id="_dpt2"}%>
+                                    <%{if condition="session('default_dept1.dept_id') == $_dpt2.parent_id"}%>
+                                    <option value="<%{$_dpt2.dept_id}%>"<%{if condition="session('default_dept2.dept_id') == $_dpt2.dept_id"}%> selected="selected"<%{/if}%>><%{$_dpt2.dept_name}%></option>
+                                    <%{/if}%>
+                                    <%{/volist}%>
+                                </select>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-offset-6 col-sm-3">
+                                <div class="btn-group pull-right">
+                                    <a href="<%{:url('chat/group')}%>" class="btn btn-primary"><i class="fa fa-arrow-circle-o-left"></i> 返回分组列表</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h4 class="box-title">分组信息</h4>
+            </div>
+            <form action="<%{:url('chat/groupcreate')}%>" class="form-horizontal" id="groupAdd">
+                <div class="box-body">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">分组名称：</label>
+                        <div class="col-sm-5"><input type="text" id="name" class="form-control" name="Group[name]" placeholder="互聊分组名称">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">分组排序：</label>
+                        <div class="col-sm-5">
+                            <input type="number" id="sort" class="form-control" name="Group[sort]" placeholder="自定义排序，大于0的整数，数字越小越靠前">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">备注信息：</label>
+                        <div class="col-sm-5">
+                            <textarea id="remark" rows=3 class="form-control" name="Group[remark]" placeholder="备注信息，便于识别，可选"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <div class="row">
+                        <div class="col-sm-offset-2 col-sm-5"><button type="submit" class="btn btn-success pull-right btn-submit">新增</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

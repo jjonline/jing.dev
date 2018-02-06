@@ -1,0 +1,65 @@
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h4 class="box-title">素材信息</h4>
+            </div>
+            <form action="<%{:url('resource/create')}%>" class="form-horizontal" id="resourceAdd">
+                <div class="box-body">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">素材标签：</label>
+                        <div class="col-sm-5">
+                            <div class="row" id="tag-tips">
+                                <div class="col-xs-6">
+                                    <select name="tags" id="tags" class="form-control select2">
+                                        <option value="">--选择已有标签--</option>
+                                        <%{volist name="tags" id="tag"}%>
+                                            <option value="<%{$tag.tag}%>"><%{$tag.tag}%></option>
+                                        <%{/volist}%>
+                                    </select>
+                                </div>
+                                <div class="col-xs-6">
+                                    <input type="text" id="tag" class="form-control" name="Resource[tag]" placeholder="或直接输入标签">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">资源名称：</label>
+                        <div class="col-sm-5"><input type="text" id="name" class="form-control" name="Resource[name]" placeholder="资源自定义名称，用于资源快速检索和识别">
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="UploadPreview" style="display: none;">
+                        <label class="col-sm-2 control-label">资源预览：</label>
+                        <div class="col-sm-5 image"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">上传资源：</label>
+                        <div class="col-sm-5">
+                            <div id="upload_container">
+                               <div class="uploader btn btn-primary btn-sm btn-upload-file" id="uploader">
+                                   <i class="fa fa-upload"></i>
+                                   <span>点此选择素材并上传</span>
+                                   <input type="file" id="FileUpload" name="FileUpload" multiple="multiple" title="点此上传Excel文档">
+                               </div>
+                                <input type="hidden" name="Resource[file]" id="file">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="box-footer">
+                    <div class="row">
+                        <div class="col-sm-offset-2 col-sm-5"><button type="submit" class="btn btn-success pull-right btn-submit">新增</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
