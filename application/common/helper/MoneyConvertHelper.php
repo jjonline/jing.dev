@@ -6,7 +6,7 @@
  * @file BaseController.php
  */
 
-namespace app\common\helpers;
+namespace app\common\helper;
 
 class MoneyConvertHelper {
 

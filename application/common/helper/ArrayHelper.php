@@ -6,7 +6,7 @@
  *
  */
 
-namespace app\common\helpers;
+namespace app\common\helper;
 
 class ArrayHelper {
 
