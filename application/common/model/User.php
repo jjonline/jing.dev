@@ -8,7 +8,8 @@
 
 namespace app\common\model;
 
-use app\common\helpers\GenerateHelper;
+use app\common\helper\FilterValidHelper;
+use app\common\helper\GenerateHelper;
 use think\exception\DbException;
 use think\Model;
 
@@ -16,11 +17,11 @@ class User extends Model
 {
     /**
      * 用户ID查找用户信息
-     * @param $user_id string 用户ID
+     * @param $user_id
+     * @return array
      * @throws DbException
-     * @return []
      */
-    public function getDataById($user_id)
+    public function getUserInfoById($user_id)
     {
         $data = $this->get(['id' => $user_id]);
         return $data ? $data->toArray() : [];
@@ -28,29 +29,57 @@ class User extends Model
 
     /**
      * 用户名查询用户信息
-     * @param $user_name string
-     * @throws
-     * @return []
+     * @param $user_name
+     * @return array
+     * @throws DbException
      */
-    public function getDataByUserName($user_name)
+    public function getUserInfoByUserName($user_name)
     {
         $data = $this->get(['username' => $user_name]);
         return $data ? $data->toArray() : [];
     }
 
     /**
-     * 重新生成|更新用户auth_code值并保存
-     * @param $User []|UserModel
+     * 邮箱地址查找用户信息
+     * @param $email
+     * @return array
+     * @throws DbException
      */
-    public function updateUserAuthCode($User)
+    public function getUserInfoByEmail($email)
     {
-        if(empty($User['id']))
+        $data = $this->get(['email' => $email]);
+        return $data ? $data->toArray() : [];
+    }
+
+    /**
+     * 手机号查找用户信息
+     * @param $mobile
+     * @return array
+     * @throws DbException
+     */
+    public function getUserInfoByMobile($mobile)
+    {
+        $data = $this->get(['mobile' => $mobile]);
+        return $data ? $data->toArray() : [];
+    }
+
+    /**
+     * 智能判断参数值是用户名、邮箱还是手机号自动查找用户信息
+     * @param $user_unique_key_field_value
+     * @return array
+     * @throws DbException
+     */
+    public function getUserInfoAutoByUniqueKey($user_unique_key_field_value)
+    {
+        if(FilterValidHelper::is_mail_valid($user_unique_key_field_value))
         {
-            return false;
+            return $this->getUserInfoByEmail($user_unique_key_field_value);
         }
-        $_user              = [];
-        $_user['auth_code'] = GenerateHelper::makeNonceStr(8);
-        return $this->update($_user,['id' => $User['id']]);
+        if(FilterValidHelper::is_phone_valid($user_unique_key_field_value))
+        {
+            return $this->getUserInfoByMobile($user_unique_key_field_value);
+        }
+        return $this->getUserInfoByUserName($user_unique_key_field_value);
     }
 
     /**
@@ -62,37 +91,22 @@ class User extends Model
      */
     public function getFullUserInfoById($user_id)
     {
-        /*
-        $data = $this->db()->name('user user')
-              ->leftJoin('user_role user_role','user_role.user_id = user.id')
-              ->leftJoin('role role','role.name = user_role.role_name')
-              ->leftJoin('user_department user_dept','user_dept.user_id')
-              ->leftJoin('department dept','dept.id = user_dept.dept_id1 OR dept.id = user_dept.dept_id2')
-              ->order(['dept.level' => 'ASC'])
-              ->where(['user.id' => $user_id])
-              ->field(['user.*','role.name as role_name','dept.name as dept_name','dept.id as dept_id'])
-              ->select();
-        */
-        $user = $this->getDataById($user_id);
-        if(empty($user))
+
+    }
+
+    /**
+     * 重新生成|更新用户auth_code值并保存
+     * @param mixed $user_id
+     * @return bool|static
+     */
+    public function updateUserAuthCode($user_id)
+    {
+        if(empty($user_id))
         {
-            return [];
+            return false;
         }
-        $user['role'] = $this->db()->name('user_role')
-            ->where(['user_id' => $user_id])
-            ->field(['id','role_name'])
-            ->find()->toArray();//一个用户只能有一个角色
-        if(!empty($user['role']))
-        {
-            $user['role_name'] = $user['role']['role_name'];
-        }else {
-            $user['role_name'] = '[无角色]';
-        }
-        $user['department'] = $this->db()->name('user_department')
-            ->where(['user_id' => $user_id])
-            ->order(['dept_id2' => 'DESC'])
-            ->field(['id','dept_id1','dept_id2'])
-            ->select()->toArray();
-        return $user;
+        $_user              = [];
+        $_user['auth_code'] = GenerateHelper::makeNonceStr(8);
+        return $this->update($_user,['id' => $user_id]);
     }
 }

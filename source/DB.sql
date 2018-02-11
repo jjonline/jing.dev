@@ -35,7 +35,9 @@ CREATE TABLE `com_user` (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_name` (`user_name`,`mobile`,`email`)
+  UNIQUE KEY `user_name` (`user_name`)
+  KEY `user_name` (`mobile`)
+  KEY `user_name` (``email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台用户表：与职员表对应(staff中存在user中可不存在，user中存在staff中绝对要存在)';
 
 
