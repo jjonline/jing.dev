@@ -12,12 +12,9 @@
 // [ 应用入口文件 ]
 namespace think;
 
-// 加载基础文件
+// 使用绝对路径加载基础文件
 $app_root = realpath(__DIR__ . '/../');
-
 require $app_root . '/thinkphp/base.php';
 
-// 支持事先使用静态方法设置Request对象和Config对象
-
-// 入口文件绑定manage模块并执行应用和响应
-Container::get('app')->bind('manage')->run()->send();
+// 入口文件init--多模块设计，默认模块manage
+Container::get('app')->run()->send();
