@@ -102,6 +102,10 @@ class UserService
         {
             throw new Exception('账号不存在，用户名、手机号或邮箱任意一者均可作为账号',500);
         }
+        if(empty($user_exist['enable']))
+        {
+            throw new Exception('该账号已禁用，若需重新开通请联系平台管理员',500);
+        }
         // 检查密码是否正确
         if($this->checkUserPassword($user['password'],$user_exist['password']))
         {
@@ -251,7 +255,7 @@ class UserService
      */
     protected function generateUserPassword($pwd_text)
     {
-        return password_hash(config('local.auth_key').$pwd_text,PASSWORD_BCRYPT);
+        return password_hash(config('local.auth_key').trim($pwd_text),PASSWORD_BCRYPT);
     }
 
     /**

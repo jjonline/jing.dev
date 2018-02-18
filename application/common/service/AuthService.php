@@ -150,7 +150,7 @@ class AuthService
      */
     public function userHasPermission($url = null)
     {
-        // 未登录直接返回无权限
+        // 未登录直接抛异常终止执行
         $user_id = Session::get('user_id');
         if(empty($user_id))
         {

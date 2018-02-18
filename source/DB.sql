@@ -27,7 +27,7 @@ CREATE TABLE `com_user` (
   `email` varchar(128) NOT NULL DEFAULT '' COMMENT '电子邮箱',
   `telephone` varchar(20) NOT NULL DEFAULT '' COMMENT '座机号码',
   `auth_code` char(32) NOT NULL COMMENT '授权code，用于cookie加密(可变)',
-  `is_leader` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否领导：1是0不是 用于部门内部审批、数据权限等识别',
+  `is_leader` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否本部门的领导：1是0不是 用于直属部门内部审批、数据权限等识别',
   `dept_id` int(11) NOT NULL DEFAULT 0 COMMENT '所属部门ID',
   `role_id` int(11) NOT NULL DEFAULT 0 COMMENT '所属角色ID',
   `enable` tinyint(1) NOT NULL DEFAULT 0 COMMENT '启用禁用标记：1启用0禁用',
@@ -35,9 +35,9 @@ CREATE TABLE `com_user` (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_name` (`user_name`)
-  KEY `user_name` (`mobile`)
-  KEY `user_name` (``email`)
+  UNIQUE KEY `user_name` (`user_name`),
+  KEY `mobile` (`mobile`),
+  KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台用户表：与职员表对应(staff中存在user中可不存在，user中存在staff中绝对要存在)';
 
 
@@ -112,7 +112,7 @@ CREATE TABLE `com_role_menu` (
 -----用户操作动作的详细日志，每个请求都记录
 CREATE TABLE `com_log` (
   `id` char(36) NOT NULL COMMENT 'ID，UUID形式',
-  `user_id` char(36) NOT NULL COMMENT '用户ID',
+  `user_id` int(11) NOT NULL COMMENT '用户ID',
   `ip` varchar(32) NOT NULL DEFAULT '' COMMENT '动作记录的ip地址',
   `user_agent` varchar(512) NOT NULL DEFAULT '' COMMENT '请求头信息，浏览器头信息',
   `action` varchar(100) NOT NULL COMMENT '请求的操作，对应menu表的url字段值',
@@ -120,6 +120,7 @@ CREATE TABLE `com_log` (
   `method` varchar(8) NOT NULL COMMENT '请求方式 GET、POST、PUT、DELETE等',
   `request_data` text COMMENT '请求体数据',
   `extra_data` text COMMENT '主动保存进日志的数据',
+  `memory_usage` decimal(20,2) NOT NULL DEFAULT '0.00' COMMENT '内存小号（kb）',
   `execute_millisecond` int(11) NOT NULL DEFAULT '0' COMMENT '执行耗时（毫秒）',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',

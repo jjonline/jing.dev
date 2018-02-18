@@ -10,6 +10,7 @@ namespace app\common\model;
 
 use app\common\helper\FilterValidHelper;
 use app\common\helper\GenerateHelper;
+use think\Db;
 use think\exception\DbException;
 use think\Model;
 
@@ -91,7 +92,13 @@ class User extends Model
      */
     public function getFullUserInfoById($user_id)
     {
-
+        $data = Db::name('user u')
+              ->join('department dept','dept.id = u.dept_id')
+              ->join('role r','r.id = u.role_id')
+              ->field(['u.*','dept.name as dept_name','role.name as role_name','role.permissions'])
+              ->where('id',$user_id)
+              ->find();
+        return $data ? $data->toArray() : [];
     }
 
     /**

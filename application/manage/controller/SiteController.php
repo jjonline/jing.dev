@@ -8,6 +8,8 @@
 
 namespace app\manage\controller;
 
+use app\common\controller\BaseController;
+
 class SiteController extends BaseController
 {
 
@@ -16,6 +18,8 @@ class SiteController extends BaseController
      */
     public function loginAction()
     {
+        $this->logRecorder();
+        return;
         // 检查是否登录
         if($this->isUserLogin())
         {

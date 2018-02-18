@@ -76,7 +76,13 @@ class BaseAuthController extends Controller
             {
                 $response = Response::create(['error_code' => -1,'error_msg' => '没有操作权限'], 'json');
             }else {
-                $error = $this->fetch('error/error',['title' => '没有操作权限','msg' => '抱歉，您没有操作该页面的权限！']);
+                $error = $this->fetch(
+                    '../application/common/view/error.html',
+                    [
+                        'title' => '没有操作权限',
+                        'msg'   => '抱歉，您没有操作该页面的权限！'
+                    ]
+                );
                 $response->data($error);
             }
             //抛出异常并输出，终止后续业务代码执行

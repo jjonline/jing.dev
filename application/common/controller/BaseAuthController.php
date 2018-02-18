@@ -35,10 +35,6 @@ class BaseAuthController extends BasicController
      * @var AuthService
      */
     protected $AuthService;
-    /**
-     * @var LogService
-     */
-    protected $LogService;
 
     /**
      * 初始化认证、鉴权
@@ -58,7 +54,6 @@ class BaseAuthController extends BasicController
         //初始化用户服务、权限效验服务、操作日志服务
         $this->UserService = Container::get('app\common\service\UserService');
         $this->AuthService = Container::get('app\common\service\AuthService');
-        $this->LogService  = Container::get('app\common\service\LogService');
         // 检查是否登录
         if(!$this->isUserLogin())
         {
