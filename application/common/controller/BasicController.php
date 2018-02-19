@@ -17,7 +17,6 @@ use app\common\service\LogService;
 use think\Container;
 use think\Controller;
 use think\facade\Hook;
-use think\facade\Session;
 use think\Response;
 
 class BasicController extends Controller
@@ -35,8 +34,7 @@ class BasicController extends Controller
 
         // 闭包传参执行钩子行为的最终写入Db或其他永久存储
         Hook::add('response_end',function () use ($LogService) {
-            $LogService->logRecorder('normal');
-            $LogService->save();
+            $LogService->save('normal');
         });
     }
 

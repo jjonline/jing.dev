@@ -65,8 +65,12 @@ class LogService
      * 执行日志批量写入
      * @return bool
      */
-    public function save()
+    public function save($data = null)
     {
+        if(!empty($data))
+        {
+            $this->logRecorder($data);
+        }
         if(empty($this->LogData))
         {
             return false;
