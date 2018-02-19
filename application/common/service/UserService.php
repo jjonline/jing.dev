@@ -106,14 +106,14 @@ class UserService
         $user_exist = $this->User->getUserInfoAutoByUniqueKey(trim($user['user_name']));
         if(empty($user_exist))
         {
-            throw new Exception('账号不存在，用户名、手机号或邮箱任意一者均可作为账号',500);
+            throw new Exception('账号不存在',500);
         }
         if(empty($user_exist['enable']))
         {
             throw new Exception('该账号已禁用，若需重新开通请联系平台管理员',500);
         }
         // 检查密码是否正确
-        if($this->checkUserPassword($user['password'],$user_exist['password']))
+        if(!$this->checkUserPassword($user['password'],$user_exist['password']))
         {
             // 密码错误之后不详细提示是账号错误还是密码错误
             throw new Exception('账号或密码错误',500);
@@ -207,7 +207,7 @@ class UserService
             throw new Exception('姓名不得为空或大于50个字符',500);
         }
         // 用户名作为主要登录条件，必须
-        if(empty($User['username']) || mb_strlen($User['real_name'],'utf8') >= 32)
+        if(empty($User['user_name']) || mb_strlen($User['user_name'],'utf8') >= 32)
         {
             throw new Exception('用户名不得为空或大于50个字符',500);
         }
@@ -228,6 +228,7 @@ class UserService
         {
             throw new Exception('拟分配用户的角色信息不存在',500);
         }
+        $_User['user_name'] = trim($User['user_name']);
         $_User['real_name'] = trim($User['real_name']);
         $_User['mobile']    = $User['mobile'];
         $_User['email']     = trim($User['email']);
@@ -235,7 +236,7 @@ class UserService
         $_User['password']  = $this->generateUserPassword(trim($User['password']));
         $_User['dept_id']   = $User['dept_id'];
         $_User['role_id']   = $User['role_id'];
-        $_User['remark']    = trim($User['remark']);
+        $_User['remark']    = !empty($User['remark']) ? trim($User['remark']) : '';
 
         return $_User;
     }

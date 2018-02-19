@@ -10,6 +10,7 @@ namespace app\manage\controller;
 
 use app\common\controller\BaseController;
 use think\Exception;
+use think\facade\Session;
 
 class SiteController extends BaseController
 {
@@ -46,9 +47,16 @@ class SiteController extends BaseController
     protected function doLogin()
     {
         try{
+            // 令牌效验
+            if(Session::get('__token__') != $this->request->post('__token__'))
+            {
+                return ['error_code' => -2,'error_msg' => '页面已过期，请刷新页面后再试'];
+            }
             $this->UserService->checkUserLogin($this->request->post());
             return $this->renderJson('登录成功');
         }catch (Exception $e) {
+            // 密码错误的时候令牌使用期限的问题
+            Session::set('__token__',null);//清空令牌
             return $this->renderJson($e->getMessage(),400);
         }
     }

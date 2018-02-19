@@ -185,5 +185,5 @@
     background-repeat: no-repeat!important;
     text-indent: -10000px;
     outline: 0;
-    background-image: url(/static/images/remove-icon-small.png)!important;
+    background-image: url(/public/images/remove-icon-small.png)!important;
 }

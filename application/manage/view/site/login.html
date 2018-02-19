@@ -34,7 +34,7 @@
 
 <div class="content">
     <!-- BEGIN LOGIN FORM -->
-    <form class="login-form" action="/site/login" method="post" autocomplete="off">
+    <form class="login-form" action="<%{:url('site/login')}%>" method="post" autocomplete="off">
         <h3 class="form-title font-green">登录管理平台</h3>
         <div class="alert alert-danger hide" id="login-tips">
             <button type="button" class="btn close" data-widget="remove"><i class="fa fa-times"></i></button>
@@ -43,7 +43,7 @@
         <div class="form-group">
             <%{:token()}%>
             <label class="control-label visible-ie8 visible-ie9">用户名</label>
-            <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="请输入用户名" name="username" value="" /> </div>
+            <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="用户名、手机号或邮箱" name="username" value="" /> </div>
         <div class="form-group">
             <label class="control-label visible-ie8 visible-ie9">密码</label>
             <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="请输入密码" name="password" /> </div>

@@ -28,55 +28,11 @@
 <body class="hold-transition skin-blue sidebar-mini" id="app">
 <div class="wrapper">
 <header class="main-header">
-    <a class="logo" href="/"><span class="logo-mini">YunK</span><span class="logo-lg"><b><%{:config('local.site_name')}%></b>管理平台</span></a>
+    <a class="logo" href="/"><span class="logo-mini">ERP</span><span class="logo-lg"><b><%{:config('local.site_name')}%></b>管理平台</span></a>
     <nav class="navbar navbar-static-top" role="navigation">
         <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
             <span class="sr-only">隐藏/显示侧边栏</span>
         </a>
 
-        <div class="navbar-custom-menu">
-            <ul class="nav navbar-nav">
-                <li class="dropdown dropdown-user user-menu" id="default_dept1">
-                    <a href="javascript:;" data-toggle="dropdown">
-                        <img src="__IMG__/default_company.png" class="user-image" alt="公司figure">
-                        <span class="hidden-xs"><%{:session('default_dept1.dept_name')}%></span>
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-default dropdown-menu-xs" id="dropdown-menu-dept">
-                        <%{volist name="Dept1" id="_dpt1"}%>
-                            <li data-dept="<%{$_dpt1.dept_id}%>" class="dept1-item">
-                                <a href="javascript:;" data-dept="<%{$_dpt1.dept_id}%>"<%{if condition="$_dpt1.dept_id == session('default_dept1.dept_id')"}%> class="active"<%{/if}%>><%{$_dpt1.dept_name}%></a>
-                            </li>
-                        <%{/volist}%>
-                    </ul>
-                </li>
-                <li class="dropdown user user-menu">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <img src="__IMG__/default_avatar.jpg" class="user-image" alt="用户figure">
-                        <span class="hidden-xs"><%{:session('user_info.username')}%></span>
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li class="user-header">
-                            <img src="__IMG__/default_avatar.jpg" class="img-circle" alt="User Image">
-                            <p>
-                                <%{:session('user_info.real_name')}%>
-                                <small style="font-size:15px;">[<%{:session('user_info.role_name')}%>]</small>
-                                <small><%{:session('user_info.update_time')}%></small>
-                            </p>
-                        </li>
-                        <li class="user-footer">
-                            <div class="pull-left">
-                                <a href="<%{:url('mine/home')}%>" class="btn btn-default btn-flat">个人中心</a>
-                            </div>
-                            <div class="pull-right">
-                                <a href="<%{:url('site/logout')}%>" class="btn btn-default btn-flat">注销</a>
-                            </div>
-                        </li>
-                    </ul>
-                </li>
-                <!--<li><a href="<%{:url('site/logout')}%>"><i class="glyphicon glyphicon-off"></i></a></li>-->
-            </ul>
-        </div>
     </nav>
 </header>

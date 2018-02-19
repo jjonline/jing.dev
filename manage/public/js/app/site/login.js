@@ -10,15 +10,15 @@ $(function () {
         var btnLogin = $('#btnLogin');
         var data = {
             '__token__':utils.getToken(),
-            'username':$("input[name='username']").val(),
+            'user_name':$("input[name='username']").val(),
             'password':$("input[name='password']").val()
         };
-        if(utils.isEmpty(data.username))
+        if(utils.isEmpty(data.user_name))
         {
             $('#login-tips').removeClass('hide').find('span').empty().text('请输入用户名');
             return false;
         }
-        utils.cookie('UserName',data.username);//cookie记住登录用户名
+        utils.cookie('UserName',data.user_name);//cookie记住登录用户名
         if(utils.isEmpty(data.password))
         {
             $('#login-tips').removeClass('hide').find('span').empty().text('请输入密码');

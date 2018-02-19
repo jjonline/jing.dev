@@ -58,11 +58,13 @@ class AuthService
     public function __construct(LogService $logService,
                                 User $User,
                                 Role $Role,
+                                Menu $Menu,
                                 Department $Department)
     {
         $this->User           = $User;
         $this->Department     = $Department;
         $this->Role           = $Role;
+        $this->Menu           = $Menu;
         $this->LogService     = $logService;
     }
 
@@ -81,7 +83,7 @@ class AuthService
         // 导航栏高亮、一级导航默认展开标记处理
         $highLight = false;//当前高亮的层级
         $request   = request();
-        $now_url   = strtolower($request->controller().'/'.$request->action());
+        $now_url   = strtolower($request->module().'/'.$request->controller().'/'.$request->action());
         foreach ($data as $key => $value)
         {
             $value['active']    = false;//高亮
@@ -123,14 +125,14 @@ class AuthService
                 $_menu3 = [];
                 foreach ($menu3 as $key3 => $value3)
                 {
-                    if($value2['name'] == $value3['parent_name'])
+                    if($value2['id'] == $value3['parent_id'])
                     {
                         $_menu3[] = $value3;
                     }
                 }
                 $value2['children'] = $_menu3;
 
-                if($value1['name'] == $value2['parent_name'])
+                if($value1['id'] == $value2['parent_id'])
                 {
                     $_menu2[] = $value2;
                 }
@@ -233,7 +235,7 @@ class AuthService
             ->leftJoin('user_role user_role','user_role.role_name = role.name')
             ->leftJoin('user user','user.id = user_role.user_id')
             ->where(['user.id' => $user_id])
-            ->group('menu.name')
+            ->group('menu.tag')
             ->order(['menu.sort' => 'ASC','menu.level' => 'ASC'])
             ->select()->toArray();
         // 将结果集缓存
@@ -260,7 +262,7 @@ class AuthService
         if($highLight['level'] == 1)
         {
             foreach ($UserAuthMenu as $key => $value) {
-                if($value['name'] == $highLight['name'])
+                if($value['id'] == $highLight['id'])
                 {
                     $UserAuthMenu[$key]['menu_open'] = true;
                     $UserAuthMenu[$key]['active']    = true;
@@ -272,7 +274,7 @@ class AuthService
         if($highLight['level'] == 2)
         {
             foreach ($UserAuthMenu as $key => $value) {
-                if($value['name'] == $highLight['parent_name'])
+                if($value['id'] == $highLight['parent_id'])
                 {
                     $UserAuthMenu[$key]['menu_open'] = true;
                     $UserAuthMenu[$key]['active']    = true;
@@ -292,7 +294,7 @@ class AuthService
                         if(!empty($value2['children']))
                         {
                             foreach ($value2['children'] as $key3 => $value3) {
-                                if($highLight['name'] == $value3['name'])
+                                if($highLight['id'] == $value3['id'])
                                 {
                                     // 1级
                                     $UserAuthMenu[$key1]['menu_open'] = true;

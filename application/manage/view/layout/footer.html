@@ -9,28 +9,28 @@
 </div>
 <!--End div wrapper-->
 </body>
-<script src="__STATIC__/plugin/jquery/jquery-2.2.4/jquery.min.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/select2/js/select2.full.min.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/select2/js/zh-CN.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/bootstrap-datetimepicker/js/bootstrap-datetimepicker.zh-CN.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/fastclick/fastclick.min.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/bootstrap-switch/js/bootstrap-switch.min.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/bootbox/bootbox.min.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/simpletemplate/simpletemplate.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/datatables/js/jquery.dataTables.min.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/datatables/js/dataTables.bootstrap.min.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/datatables/extensions/Responsive/js/dataTables.responsive.min.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/ajaxfileupload/ajaxfileupload.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/ueditor/ueditor.config.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/ueditor/ueditor.all.min.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/AdminLTE/js/adminlte.min.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/layer/layer.js" type="text/javascript"></script>
-<script src="__STATIC__/plugin/zTree/js/jquery.ztree.all.min.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/jquery/jquery-2.2.4/jquery.min.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/select2/js/select2.full.min.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/select2/js/zh-CN.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/bootstrap-datetimepicker/js/bootstrap-datetimepicker.zh-CN.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/fastclick/fastclick.min.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/bootstrap-switch/js/bootstrap-switch.min.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/bootbox/bootbox.min.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/simpletemplate/simpletemplate.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/datatables/js/jquery.dataTables.min.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/datatables/js/dataTables.bootstrap.min.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/datatables/extensions/Responsive/js/dataTables.responsive.min.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/ajaxfileupload/ajaxfileupload.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/ueditor/ueditor.config.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/ueditor/ueditor.all.min.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/AdminLTE/js/adminlte.min.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/layer/layer.js" type="text/javascript"></script>
+<script src="__PUBLIC__/plugin/zTree/js/jquery.ztree.all.min.js" type="text/javascript"></script>
 <script src="__JS__/utils.js?ver=<%{:config('local.version')}%>" type="text/javascript"></script>
 <script src="__JS__/common.js?ver=<%{:config('local.version')}%>" type="text/javascript"></script>
 <%{if condition="!empty($load_layout_js)" }%>
-<script src="__STATIC__/js/app/<%{:strtolower(request()->controller())}%>/<%{:strtolower(request()->action())}%>.js?ver=<%{:config('local.version')}%>" type="text/javascript"></script>
+<script src="__PUBLIC__/js/app/<%{:strtolower(request()->controller())}%>/<%{:strtolower(request()->action())}%>.js?ver=<%{:config('local.version')}%>" type="text/javascript"></script>
 <%{/if}%>
 </html>

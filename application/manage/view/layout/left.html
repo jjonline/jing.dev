@@ -14,23 +14,43 @@
         <!-- /.search form -->
         <!-- sidebar menu-->
         <ul class="sidebar-menu" data-widget="tree">
-            <li class="header">主导航</li>
+            <li class="header">导航区域</li>
 
             <%{volist name="UserAuthMenu" id= "menu"}%>
                 <%{if condition="!empty($menu.url)"}%>
                     <!--一级导航直接链接-->
-                    <li class="<%{$menu.active ? 'active' : ' '}%> <%{$menu.open_menu ? 'open-menu' : ' '}%>"><a href="<%{:url($menu.url)}%>"><i class="<%{$menu.fontawesome}%>"></i> <span><%{$menu.title}%></span></a></li>
+                    <li class="<%{$menu.active ? 'active' : ' '}%> <%{$menu.open_menu ? 'open-menu' : ' '}%>">
+                        <a href="<%{:url($menu.url)}%>" id="LeftMenu_<%{$menu.tag}%>">
+                            <i class="<%{$menu.icon}%>"></i>
+                            <span><%{$menu.name}%></span>
+                            <%{if condition="!empty($menu.is_badge)"}%>
+                            <span class="pull-right-container">
+                                <small class="is-badge label pull-right bg-green">0</small>
+                            </span>
+                            <%{/if}%>
+                        </a>
+                    </li>
                 <%{else/}%>
                     <!--二级导航无链接，有二级子菜单-->
                     <li class="treeview <%{$menu.active ? 'active' : ' '}%> <%{$menu.open_menu ? 'open-menu' : ' '}%>">
-                        <a href="#">
-                            <i class="<%{$menu.fontawesome}%>"></i> <span><%{$menu.title}%></span>
+                        <a href="#" id="LeftMenu_<%{$menu.tag}%>">
+                            <i class="<%{$menu.icon}%>"></i> <span><%{$menu.name}%></span>
                             <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                         </a>
                         <%{if condition="!empty($menu.children)"}%>
                         <ul class="treeview-menu">
                             <%{volist name="$menu.children" id="menu_child"}%>
-                                <li class="<%{$menu_child.active ? 'active' : ' '}%>"><a href="<%{:url($menu_child.url)}%>"><i class="<%{$menu_child.fontawesome}%>"></i> <%{$menu_child.title}%></a></li>
+                                <li class="<%{$menu_child.active ? 'active' : ' '}%>">
+                                    <a href="<%{:url($menu_child.url)}%>" id="LeftMenu_<%{$menu_child.tag}%>">
+                                        <i class="<%{$menu_child.icon}%>"></i>
+                                        <span><%{$menu_child.name}%></span>
+                                        <%{if condition="!empty($menu_child.is_badge)"}%>
+                                            <span class="pull-right-container">
+                                                <small class="is-badge label pull-right bg-red">0</small>
+                                            </span>
+                                        <%{/if}%>
+                                    </a>
+                                </li>
                             <%{/volist}%>
                         </ul>
                         <%{/if}%>

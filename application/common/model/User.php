@@ -36,7 +36,7 @@ class User extends Model
      */
     public function getUserInfoByUserName($user_name)
     {
-        $data = $this->get(['username' => $user_name]);
+        $data = $this->get(['user_name' => $user_name]);
         return $data ? $data->toArray() : [];
     }
 
@@ -95,10 +95,10 @@ class User extends Model
         $data = Db::name('user u')
               ->join('department dept','dept.id = u.dept_id')
               ->join('role r','r.id = u.role_id')
-              ->field(['u.*','dept.name as dept_name','role.name as role_name','role.permissions'])
-              ->where('id',$user_id)
+              ->field(['u.*','dept.name as dept_name','r.name as role_name'])
+              ->where('u.id',$user_id)
               ->find();
-        return $data ? $data->toArray() : [];
+        return $data ? $data : [];
     }
 
     /**

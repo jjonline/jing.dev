@@ -67,10 +67,10 @@ CREATE TABLE `com_staff` (
 CREATE TABLE `com_menu` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `tag` varchar(64) NOT NULL COMMENT '菜单名称Tag，唯一的字符串',
-  `name` varchar(64) NOT NULL COMMENT '菜单名称Tag',
+  `name` varchar(64) NOT NULL COMMENT '菜单名称',
   `icon` varchar(64) NOT NULL DEFAULT '' COMMENT 'fontawesome、glyphicon或ionicons图标的class',
   `url` varchar(100) NOT NULL DEFAULT '' COMMENT '菜单Url：无前缀斜线',
-  `parent_id` int(11) NOT NULL DEFAULT 0 COMMENT '父菜单ID',
+  `parent_id` int(11) NOT NULL DEFAULT '0' COMMENT '父菜单ID',
   `is_required` tinyint(1) NOT NULL DEFAULT 0 COMMENT '标记是否必选，即所有登录用户均可使用，1必选0权限控制，为1时选择角色菜单权限的时候默认勾选且不可取消',
   `is_badge` tinyint(1) NOT NULL DEFAULT 0 COMMENT '菜单所标识的功能中是否需要使用badge统计，显示待办事项等badge',
   `level` int(11) NOT NULL COMMENT '当前层级 1为一级导航2为二级导航3为二级导航页面中的功能按钮',

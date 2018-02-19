@@ -18,6 +18,7 @@ use app\common\service\AuthService;
 use app\common\service\UserService;
 use think\exception\HttpResponseException;
 use think\Response;
+use think\facade\Session;
 
 
 class BaseAuthController extends BasicController
@@ -25,7 +26,7 @@ class BaseAuthController extends BasicController
     /**
      * @var []
      */
-    protected $User;
+    protected $UserInfo;
     /**
      * @var UserService
      */
@@ -68,7 +69,31 @@ class BaseAuthController extends BasicController
             }
         }
         // 检查权限
-
+        if(!$this->AuthService->userHasPermission())
+        {
+            $request  = app('request');//读取单例
+            $response = app('response');//读取单例
+            $response->code(404);
+            $this->view->engine->layout(false);//关闭layout 防止死循环
+            if($request->isAjax())
+            {
+                $response = Response::create(['error_code' => -1,'error_msg' => '没有操作权限'], 'json');
+            }else {
+                $error = $this->fetch('../application/common/view/error.html',[
+                    'title' => '没有操作权限',
+                    'msg'   => '抱歉，您没有操作该页面的权限！'
+                ]);
+                $response->data($error);
+            }
+            //抛出异常并输出，终止后续业务代码执行
+            throw new HttpResponseException($response);
+        }
+        // 初始化User属性
+        $this->UserInfo   = Session::get('user_info');
+        // 获取管理菜单
+        $UserAuthMenu = $this->AuthService->getUserAuthMenu();
+        // 输出管理菜单
+        $this->assign('UserAuthMenu',$UserAuthMenu);
     }
 
     /**
@@ -82,5 +107,15 @@ class BaseAuthController extends BasicController
     protected function isUserLogin()
     {
         return $this->UserService->isUserLogin();
+    }
+
+    /**
+     * @param mixed $url 无域名无前缀斜线无文件后缀的url
+     * @return bool
+     * @throws \think\Exception
+     */
+    protected function userHasPermission($url = null)
+    {
+        return $this->AuthService->userHasPermission($url);
     }
 }
