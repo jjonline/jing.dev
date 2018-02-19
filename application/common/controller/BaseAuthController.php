@@ -15,7 +15,6 @@ namespace app\common\controller;
 
 use think\Container;
 use app\common\service\AuthService;
-use app\common\service\LogService;
 use app\common\service\UserService;
 use think\exception\HttpResponseException;
 use think\Response;
@@ -43,17 +42,17 @@ class BaseAuthController extends BasicController
     public function initialize()
     {
         parent::initialize();
+        //初始化用户服务、权限效验服务、操作日志服务
+        $this->UserService = Container::get('app\common\service\UserService');
+        $this->AuthService = Container::get('app\common\service\AuthService');
         /**
-         * @var [] 不需要登录状态即可渲染的控制器和不需要验证权限的公共ajax控制器
+         * @var [] 不需要登录状态即可渲染的控制器和不需要验证权限的公共ajax控制器，所有模块下的site、common两个控制器不做菜单权限检查和登录效验
          */
         $except_controller = ['site','common'];
         if(in_array(strtolower($this->request->controller()),$except_controller))
         {
             return true;
         }
-        //初始化用户服务、权限效验服务、操作日志服务
-        $this->UserService = Container::get('app\common\service\UserService');
-        $this->AuthService = Container::get('app\common\service\AuthService');
         // 检查是否登录
         if(!$this->isUserLogin())
         {

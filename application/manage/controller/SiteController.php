@@ -9,6 +9,7 @@
 namespace app\manage\controller;
 
 use app\common\controller\BaseController;
+use think\Exception;
 
 class SiteController extends BaseController
 {
@@ -18,14 +19,12 @@ class SiteController extends BaseController
      */
     public function loginAction()
     {
-        $this->logRecorder();
-        return;
         // 检查是否登录
         if($this->isUserLogin())
         {
             if($this->request->isAjax())
             {
-                return ['error_code' => 0,'error_msg' => '已处于登录状态'];
+                return $this->renderJson('已处于登录状态');
             }
             $this->redirect('index/index');
         }
@@ -46,8 +45,12 @@ class SiteController extends BaseController
      */
     protected function doLogin()
     {
-        $result = $this->UserService->doLogin($this->request->post());
-        return $this->asJson($result);
+        try{
+            $this->UserService->checkUserLogin($this->request->post());
+            return $this->renderJson('登录成功');
+        }catch (Exception $e) {
+            return $this->renderJson($e->getMessage(),400);
+        }
     }
 
     /**

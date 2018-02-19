@@ -16,10 +16,11 @@ use app\common\helper\ArrayHelper;
 use app\common\helper\FilterValidHelper;
 use app\common\helper\GenerateHelper;
 use app\common\helper\StringHelper;
-use app\manage\model\User;
+use app\common\model\User;
 use app\common\model\Menu;
-use app\manage\model\RoleMenu;
+use app\common\model\RoleMenu;
 use app\common\model\Role;
+use think\Db;
 use think\Exception;
 use think\facade\Cache;
 use think\facade\Config;
@@ -46,17 +47,23 @@ class AuthService
      */
     public $RoleMenu;
     /**
+     * @var LogService
+     */
+    public $LogService;
+    /**
      * @var [] 高亮使用的key-value数组
      */
     protected $MenuMap = [];
 
-    public function __construct(User $User,
+    public function __construct(LogService $logService,
+                                User $User,
                                 Role $Role,
                                 Department $Department)
     {
         $this->User           = $User;
         $this->Department     = $Department;
         $this->Role           = $Role;
+        $this->LogService     = $logService;
     }
 
     /**
@@ -159,7 +166,7 @@ class AuthService
         $request = request();
         if(empty($url))
         {
-            $url = strtolower($request->controller().'/'.$request->action());
+            $url = strtolower($request->module().'/'.$request->controller().'/'.$request->action());
         }
         $user_menu_cache_Map_key = 'User_menu_cache_Map_key'.$user_id;
         if(!Config::get('app.app_debug'))
@@ -300,5 +307,7 @@ class AuthService
             }
             return $UserAuthMenu;
         }
+        // 菜单数据异常，原样返回
+        return $UserAuthMenu;
     }
 }

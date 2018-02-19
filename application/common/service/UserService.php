@@ -36,14 +36,20 @@ class UserService
      * @var Role
      */
     public $Role;
+    /**
+     * @var LogService
+     */
+    public $LogService;
 
-    public function __construct(User $User,
+    public function __construct(LogService $logService,
+                                User $User,
                                 Role $Role,
                                 Department $Department)
     {
         $this->User           = $User;
         $this->Department     = $Department;
         $this->Role           = $Role;
+        $this->LogService     = $logService;
     }
 
     /**
@@ -126,7 +132,8 @@ class UserService
     {
         if(empty($User) || empty($User['id']) || empty($User['auth_code']))
         {
-            return false;
+            // 调用给予登录状态方法时严格检查参数，否则抛出异常终止
+            throw new Exception('给予登录状态参数错误',500);
         }
         // 重新生成auth_code
         if(false !== $reGenerateAuthToken)
@@ -143,7 +150,7 @@ class UserService
         Session::set('user_id',$User['id']);
         Session::set('user_info',$User);
         // 记录日志
-        // TODO
+        $this->LogService->logRecorder('用户登录');
         return true;
     }
 
@@ -152,10 +159,10 @@ class UserService
      */
     public function setUserLogout()
     {
-        if(Session::get('user_id'))
+        if($this->isUserLogin())
         {
             // 记录日志
-            // TODO
+            $this->LogService->logRecorder('用户退出');
         }
         Cookie::delete('user_id');
         Cookie::delete('token');

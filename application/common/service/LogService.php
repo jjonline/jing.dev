@@ -17,7 +17,6 @@ use app\common\helper\GenerateHelper;
 use app\common\helper\NumberHelper;
 use app\common\model\Log;
 use think\Container;
-use think\facade\Session;
 use think\Request;
 
 class LogService
@@ -39,7 +38,7 @@ class LogService
     /**
      * 统一记录用户动作日志的对外方法
      * ---
-     * 延迟记录，具体性能优化方法再行处理
+     * 延迟记录至对象数组，response_end钩子处执行最终的日志写入
      * ---
      * @param $data
      * @return bool
@@ -57,24 +56,25 @@ class LogService
             $data = '';
         }
         $logData['extra_data'] = $data;
-        $this->LogData         = $logData;
-        // 执行日志写入方法，性能优化修改save方法的实现逻辑即可
-        return $this->save();
+        $this->LogData[]       = $logData;
+
+        return true;
     }
 
     /**
+     * 执行日志批量写入
      * @return bool
      */
-    protected function save()
+    public function save()
     {
         if(empty($this->LogData))
         {
             return false;
         }
-        $result = !!$this->Log->isUpdate(false)->save($this->LogData);
-
-        // TODO 直接存储日志方法代码实现，当前方法体直接往数据库里写
-
+        // 批量插入日志数据
+        $result = !!$this->Log->db()->insertAll($this->LogData);
+        // 清理内存中的已写入的日志数据
+        $result && $this->LogData = [];
         return $result;
     }
 
@@ -107,8 +107,13 @@ class LogService
         $logData['user_agent']          = $request->header('user-agent','');
         // 操作的模块、控制器、操作
         $logData['action']              = strtolower($request->module().'/'.$request->controller().'/'.$request->action());
-        // 操作用户ID
-        $logData['user_id']             = Session::get('user_id') ? Session::get('user_id') : 0;
+        // 操作用户ID，解决输出后钩子执行时session已销毁的问题
+        if(session_status() === PHP_SESSION_ACTIVE)
+        {
+            $logData['user_id']         = $request->session('user_id') ? $request->session('user_id') : 0;
+        }else {
+            $logData['user_id']         = ctype_digit($request->cookie('user_id')) ? $request->cookie('user_id') : 0;
+        }
         $logData['create_time']         = date('Y-m-d H:i:s');
         $logData['update_time']         = $logData['create_time'];
 

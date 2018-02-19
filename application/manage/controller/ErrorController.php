@@ -30,7 +30,7 @@ class ErrorController extends Controller
         $this->view->engine->layout(false);
         $response = app('response');
         $response->code(404);
-        return $this->fetch('error/error');
+        return $this->fetch('../application/common/view/error.html');
     }
 
 }

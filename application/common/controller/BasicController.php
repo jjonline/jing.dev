@@ -16,6 +16,8 @@ namespace app\common\controller;
 use app\common\service\LogService;
 use think\Container;
 use think\Controller;
+use think\facade\Hook;
+use think\facade\Session;
 use think\Response;
 
 class BasicController extends Controller
@@ -29,9 +31,20 @@ class BasicController extends Controller
     {
         parent::initialize();
         // 初始化操作日志服务，封装控制器下直接可使用的日志记录方法
-        $this->LogService  = Container::get('app\common\service\LogService');
+        $this->LogService = $LogService = Container::get('app\common\service\LogService');
+
+        // 闭包传参执行钩子行为的最终写入Db或其他永久存储
+        Hook::add('response_end',function () use ($LogService) {
+            $LogService->logRecorder('normal');
+            $LogService->save();
+        });
     }
 
+    /**
+     * 控制器中封装好的直接使用的记录用户操作动作的日志方法
+     * @param null $data
+     * @return bool
+     */
     protected function logRecorder($data = null)
     {
         return $this->LogService->logRecorder($data);
@@ -51,19 +64,23 @@ class BasicController extends Controller
     }
 
     /**
-     * 按约定输出json
-     * @param int    $error_code json自定义错误码
+     * 按约定输出json，默认1个参数时为约定json格式的成功状态
      * @param string $error_msg  json自定义错误描述信息
-     * @param mixed  $data       json自定义输出数据内容
+     * @param int    $error_code json自定义错误码
+     * @param mixed  $data       json自定义输出数据内容，可空
      * @return Response
      */
-    protected function renderJson($error_code,$error_msg,$data)
+    protected function renderJson($error_msg , $error_code = 0 , $data = null)
     {
-        return Response::create([
+        $json = [
             'error_code' => $error_code,
-            'error_msg'  => $error_msg,
-            'data'       => $data
-        ], 'json', 200);
+            'error_msg'  => $error_msg
+        ];
+        if(!empty($data))
+        {
+            $json['data'] = $data;
+        }
+        return Response::create($json,'json',200);
     }
 
 }
