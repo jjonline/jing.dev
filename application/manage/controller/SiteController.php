@@ -2,15 +2,17 @@
 /**
  * 鉴权
  * @user Jea杨 (JJonline@JJonline.Cn)
- * @date 2018-01-09 10:56:37
- * @file
+ * @date 2018-02-19 21:49:15
+ * @file SiteController.php
  */
 
 namespace app\manage\controller;
 
 use app\common\controller\BaseController;
+use app\common\service\AuthService;
 use think\Exception;
 use think\facade\Session;
+use think\Request;
 
 class SiteController extends BaseController
 {
@@ -71,6 +73,43 @@ class SiteController extends BaseController
             $this->UserService->setUserLogout();
         }
         $this->redirect('site/login');
+    }
+
+    /**
+     * 导航直达功能--输入菜单名称模糊检索后直接跳转到第一条有权限的菜单列表
+     * ---
+     * 未检索到或检索到的记录没有权限则回到检索前的页面
+     * ---
+     * @param Request $request
+     * @param AuthService $authService
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function menuSearchAction(Request $request,AuthService $authService)
+    {
+        $menu_name = $request->get('q');
+        if(empty($menu_name))
+        {
+            $this->redirect($request->header('Referer'));
+        }
+        // 模糊搜索出所有菜单，注意检索出第一条有权限的记录并跳转
+        $menu = $authService->Menu->db()
+              ->where('name','like','%'.$menu_name.'%')
+              ->order('sort','ASC')
+              ->select();
+        if(!empty($menu))
+        {
+            foreach ($menu as $item)
+            {
+                if($authService->userHasPermission($item['url']))
+                {
+                    $this->redirect(url($item['url']));
+                }
+            }
+        }
+        $this->redirect($request->header('Referer'));
     }
 
 }
