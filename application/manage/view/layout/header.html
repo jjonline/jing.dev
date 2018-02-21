@@ -22,17 +22,48 @@
 <link href="__PUBLIC__/plugin/zTree/css/bootstrapStyle/bootstrapStyle.css" rel="stylesheet">
 <link href="__PUBLIC__/css/common.css?ver=<%{:config('local.version')}%>" rel="stylesheet">
 <%{if condition="!empty($load_layout_css)" }%><%{/* 使用 `小写控制器名/小写操作.css` 作为应用额外载入css，启用这个特性在action中assign出$load_layout_css变量为true即可 */}%>
-<link href="__PUBLIC__/css/app/<%{:strtolower(request()->controller())}%>/<%{:strtolower(request()->action())}%>.css?ver=<%{:config('local.version')}%>" rel="stylesheet">
+<link href="__PUBLIC__/css/<%{:strtolower(request()->module())}%>/<%{:strtolower(request()->controller())}%>/<%{:strtolower(request()->action())}%>.css?ver=<%{:config('local.version')}%>" rel="stylesheet">
 <%{/if}%>
 </head>
 <body class="hold-transition skin-blue sidebar-mini" id="app">
 <div class="wrapper">
 <header class="main-header">
-    <a class="logo" href="/"><span class="logo-mini">ERP</span><span class="logo-lg"><b><%{:config('local.site_name')}%></b>管理平台</span></a>
+    <a class="logo" href="/"><span class="logo-mini">COM</span><span class="logo-lg"><b><%{:config('local.site_name')}%></b>管理平台</span></a>
     <nav class="navbar navbar-static-top" role="navigation">
         <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
             <span class="sr-only">隐藏/显示侧边栏</span>
         </a>
 
+        <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+
+                <li class="dropdown user user-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <img src="__IMG__/default_avatar.jpg" class="user-image" alt="用户figure">
+                        <span class="hidden-xs"><%{:session('user_info.username')}%></span>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="user-header">
+                            <img src="__IMG__/default_avatar.jpg" class="img-circle" alt="User Image">
+                            <p>
+                                <%{:session('user_info.real_name')}%>
+                                <small style="font-size:15px;">[<%{:session('user_info.role_name')}%>]</small>
+                                <small><%{:session('user_info.update_time')}%></small>
+                            </p>
+                        </li>
+                        <li class="user-footer">
+                            <div class="pull-left">
+                                <a href="<%{:url('manage/mine/home')}%>" class="btn btn-default btn-flat">个人中心</a>
+                            </div>
+                            <div class="pull-right">
+                                <a href="<%{:url('manage/site/logout')}%>" class="btn btn-default btn-flat">注销</a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="<%{:url('manage/site/logout')}%>"><i class="glyphicon glyphicon-off"></i></a></li>
+            </ul>
+        </div>
     </nav>
 </header>

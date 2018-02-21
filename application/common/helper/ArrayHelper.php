@@ -138,7 +138,7 @@ class ArrayHelper {
         foreach ($first_level_data as $first_level_datum) {
             $item     = static::sortRoleArray($data,$first_level_datum[$parent_key],$parent_key,$child_key);
             $sort_data[$first_level_datum[$parent_key]] = $first_level_datum;
-            $sort_data = array_merge($sort_data,$item);
+            $sort_data = $sort_data + $item;//array_merge合并数组的话会产生索引键名覆盖的问题
         }
         return $sort_data;
     }

@@ -211,6 +211,24 @@ class UserService
         {
             throw new Exception('用户名不得为空或大于50个字符',500);
         }
+        // 检查非空手机号是否重复
+        if(!empty($User['mobile']))
+        {
+            $mobile_exist = $this->User->getUserInfoByMobile($User['mobile']);
+            if(!empty($mobile_exist))
+            {
+                throw new Exception('手机号已存在',500);
+            }
+        }
+        // 检查非空邮箱是否重复
+        if(!empty($User['email']))
+        {
+            $email_exist = $this->User->getUserInfoByEmail($User['email']);
+            if(!empty($email_exist))
+            {
+                throw new Exception('邮箱已存在',500);
+            }
+        }
         // 验证密码
         if(empty($User['password']) || !FilterValidHelper::is_password_valid(trim($User['password'])))
         {
@@ -230,8 +248,8 @@ class UserService
         }
         $_User['user_name'] = trim($User['user_name']);
         $_User['real_name'] = trim($User['real_name']);
-        $_User['mobile']    = $User['mobile'];
-        $_User['email']     = trim($User['email']);
+        $_User['mobile']    = !empty($User['mobile']) ? $User['mobile'] : '';
+        $_User['email']     = !empty($User['email'])  ? trim($User['email']) : '';
         $_User['auth_code'] = GenerateHelper::makeNonceStr(8);
         $_User['password']  = $this->generateUserPassword(trim($User['password']));
         $_User['dept_id']   = $User['dept_id'];

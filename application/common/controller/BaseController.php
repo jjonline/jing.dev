@@ -44,7 +44,7 @@ class BaseController extends BaseAuthController
     /**
      * 初始化执行
      */
-    public function initialize()
+    protected function initialize()
     {
         parent::initialize();
         // 默认关闭每个操作下都载入特定css的特性

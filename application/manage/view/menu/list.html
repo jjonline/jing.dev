@@ -1,0 +1,49 @@
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-danger">
+            <div class="box-body">
+                <table class="table table-bordered table-striped table-hover display responsive nowrap" cellspacing="0" width="100%" id="menu_table" data-orderable="false">
+                    <thead>
+                    <tr>
+                        <th data-priority="1">名称</th>
+                        <th data-priority="5">标签</th>
+                        <th data-priority="6">Url</th>
+                        <th data-priority="7" style="text-align: center;">图标</th>
+                        <th data-priority="8">备注</th>
+                        <th data-priority="3">排序</th>
+                        <th data-priority="2" style="text-align: center;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <%{volist name="list" id="item"}%>
+                    <tr>
+                        <td><%{$item.name|raw}%></td>
+                        <td><%{$item.tag}%></td>
+                        <td><%{$item.url}%></td>
+                        <td style="text-align: center;">
+                            <%{if condition="empty($item.icon)"}%>
+                                无
+                            <%{else/}%>
+                                <i class="<%{$item.icon}%>"></i>
+                            <%{/if}%>
+                        </td>
+                        <td><%{$item.remark}%></td>
+                        <td>
+                            <div class="layui-input-inline">
+                                <input type="text" class="sort form-control" data-id="<%{$item.id}%>" value="<%{$item.sort}%>" style="max-width: 55px;">
+                            </div>
+                        </td>
+                        <td style="text-align: center;">
+                            <a href="<%{:url('menu/edit',['id' => $item.id])}%>" class="btn btn-xs btn-success"><i class="fa fa-pencil-square-o"></i> 编辑</a>
+                            <a href="javascript:;" data-href="<%{:url('menu/delete',['id' => $item.id])}%>" class="btn btn-xs btn-danger delete" data-id="<%{$item.id}%>"><i class="fa fa-trash-o"></i> 删除</a>
+                        </td>
+                    </tr>
+                    <%{/volist}%>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

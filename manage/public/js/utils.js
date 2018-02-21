@@ -61,7 +61,7 @@ var utils = {
         return utils.getCsrf();
     },
     /**
-     * bootbox提示方法封装
+     * bootbox提示方法封装的提示层
      * @param  message  提示消息文字
      * @param  callback 点击确认之后的回调函数
      * @param  title    可选的自定义提示框标题
@@ -69,7 +69,7 @@ var utils = {
      */
     alert: function (message, callback, title, OkbtnClass) {
         title = title || "提示";
-        OkbtnClass = OkbtnClass || 'btn-circle';
+        OkbtnClass = OkbtnClass || 'btn-info';
         bootbox.dialog({
             message: message,
             title: title,
@@ -83,6 +83,21 @@ var utils = {
                 }
             }
         });
+    },
+    /**
+     * layer封装的toast提示层方法，定时自动消失
+     * @param message
+     * @param time
+     * @param callback
+     */
+    toast:function (message,time,callback) {
+        time = time || 3000;
+        layer.msg(message,{
+            time:time
+        });
+        setTimeout(function () {
+            callback && callback();
+        },time);
     },
     /**
      * 操作确认
@@ -118,7 +133,7 @@ var utils = {
      * @param successCallBack  确认并执行之后的回调函数
      * @param callCallBack 取消不执行后的回调函数
      */
-    deleteConfirm: function (message,request_url,data,successCallBack,callCallBack) {
+    ajaxConfirm: function (message,request_url,data,successCallBack,callCallBack) {
         bootbox.dialog({
             message: message,
             title: '操作确认',
@@ -135,8 +150,7 @@ var utils = {
                             data: data,
                             success: function (data) {
                                 if(data.error_code == 0){
-                                    utils.alert(data.error_msg ? data.error_msg : '操作成功');
-                                    successCallBack();
+                                    utils.alert(data.error_msg ? data.error_msg : '操作成功',successCallBack);
                                 }else{
                                     utils.alert(data.error_msg ? data.error_msg : '未知错误');
                                 }
@@ -358,14 +372,16 @@ var utils = {
      */
     windowSize:function() {
         var winWidth,winHeight;
-        if (window.innerWidth)
+        if (window.innerWidth) {
             winWidth = window.innerWidth;
-        else if ((document.body) && (document.body.clientWidth))
+        }else if ((document.body) && (document.body.clientWidth)) {
             winWidth = document.body.clientWidth;
-        if (window.innerHeight)
+        }
+        if (window.innerHeight){
             winHeight = window.innerHeight;
-        else if ((document.body) && (document.body.clientHeight))
+        }else if ((document.body) && (document.body.clientHeight)) {
             winHeight = document.body.clientHeight;
+        }
         if (document.documentElement && document.documentElement.clientHeight && document.documentElement.clientWidth) {
             winHeight = document.documentElement.clientHeight;
             winWidth = document.documentElement.clientWidth;

@@ -40,7 +40,7 @@ class BaseAuthController extends BasicController
      * 初始化认证、鉴权
      * @throws
      */
-    public function initialize()
+    protected function initialize()
     {
         parent::initialize();
         //初始化用户服务、权限效验服务、操作日志服务

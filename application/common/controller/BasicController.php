@@ -26,7 +26,7 @@ class BasicController extends Controller
      */
     protected $LogService;
 
-    public function initialize()
+    protected function initialize()
     {
         parent::initialize();
         // 初始化操作日志服务，封装控制器下直接可使用的日志记录方法
