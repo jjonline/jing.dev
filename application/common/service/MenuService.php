@@ -80,16 +80,23 @@ class MenuService
         $Menu['remark']       = trim($menu['remark']);
 
         // 是否必选
+        $Menu['is_required']  = 0;
         if(isset($menu['is_required']))
         {
             $Menu['is_required'] = 1;
         }
         // 是否badge
+        $Menu['is_badge'] = 0;
         if(isset($menu['is_badge']))
         {
             $Menu['is_badge'] = 1;
         }
-
+        // 是否系统菜单 不允许删除
+        $Menu['is_system'] = 0;
+        if(isset($menu['is_system']))
+        {
+            $Menu['is_system'] = 1;
+        }
         // 可能的菜单额外数据处理
         if(!empty($menu['extra_param']))
         {
@@ -186,6 +193,10 @@ class MenuService
         if(empty($menu))
         {
             return ['error_code' => 400,'error_msg' => '拟删除的菜单数据不存在'];
+        }
+        if($menu['is_system'] == 1)
+        {
+            return ['error_code' => 400,'error_msg' => '系统核心菜单禁止删除'];
         }
         $ret = $this->Menu->db()->where('id',$id)->delete();
         // 日志方式备份保存原始菜单信息

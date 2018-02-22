@@ -16,7 +16,7 @@ $(function () {
     });
 
     //sort
-    $('.table').on('change','.sort',function () {
+    $('.table').on('change','.list-sort-input',function () {
         var id = $(this).data('id');
         var sort = $(this).val();
         utils.ajaxConfirm('确认修改该菜单的排序？','/manage/menu/sort',{'id':id,'sort':sort},function () {

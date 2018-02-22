@@ -15,7 +15,7 @@
                                 <option value="">--新建一级菜单--</option>
                                 <%{volist name="list" id="item"}%>
                                     <%{if condition="$item.level EQ 1"}%>
-                                        <option value="<%{$item.id}%>"<%{if condition="$menu_edit.level EQ 1 && $menu_edit.id EQ $item.id"}%> selected="selected"<%{/if}%>><%{$item.name}%></option>
+                                        <option value="<%{$item.id}%>"<%{if condition="$menu_edit.level EQ 1 && $menu_edit.id EQ $item.id && $menu_edit.level NEQ 1"}%> selected="selected"<%{/if}%>><%{$item.name}%></option>
                                     <%{/if}%>
                                 <%{/volist}%>
                             </select>
@@ -73,6 +73,14 @@
                         <div class="col-sm-5">
                             <div class="js-switch-container">
                                 <input type="checkbox" id="is_badge" name="Menu[is_badge]" title="是" data-on-text="是" data-off-text="否"<%{if condition="$menu_edit.is_badge EQ 1"}%> checked="checked"<%{/if}%>>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">是否系统菜单：</label>
+                        <div class="col-sm-5">
+                            <div class="js-switch-container">
+                                <input type="checkbox" id="is_system" name="Menu[is_system]" title="是" data-on-text="是" data-off-text="否"<%{if condition="$menu_edit.is_system EQ 1"}%> checked="checked"<%{/if}%>>
                             </div>
                         </div>
                     </div>

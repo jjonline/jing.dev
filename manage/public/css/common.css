@@ -1,3 +1,25 @@
+
+/**
+ * 列表中排序字段的input框
+ */
+.list-sort-input {
+    display: inline-block;
+    vertical-align: middle;
+    border:1px solid #d2d6de;
+    max-width: 55px;
+    height: 28px;
+    padding: 3px 10px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    outline: none;
+    color: #555;
+    background-color: #fff;
+    border-radius: 3px;
+}
+.list-sort-input:focus {
+    background-color:#ffffee;
+}
+
 .dl-horizontal dd {margin-top:8px;margin-bottom: 8px;}
 
 .btn-upload-file {position: relative;overflow: hidden;display: inline-block;}
