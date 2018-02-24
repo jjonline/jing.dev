@@ -1,0 +1,39 @@
+<%{:dump($UserAuthMenu)}%>
+<form action="<%{:url('role/create')}%>" class="form-horizontal" id="roleAdd">
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-danger">
+            <div class="box-header with-border">
+                <h4 class="box-title">角色基本信息</h4>
+            </div>
+            <div class="box-body">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">角色名称：</label>
+                    <div class="col-sm-5"><input type="text" id="name" class="form-control" name="Role[name]" placeholder="角色名称，名称唯一，例如：仓库管理员">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">角色排序：</label>
+                    <div class="col-sm-5">
+                        <input type="number" id="sort" class="form-control" name="Role[sort]" placeholder="列表排序，大于0的整数，数字越小越靠前">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">备注信息：</label>
+                    <div class="col-sm-5">
+                        <textarea id="remark" rows=3 class="form-control" name="Role[remark]" placeholder="角色备注信息，便于识别，可选"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer">
+                <div class="row">
+                    <div class="col-sm-offset-2 col-sm-5">
+                        <button type="submit" class="btn btn-success pull-right btn-submit">新增</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</form>

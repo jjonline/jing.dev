@@ -1,0 +1,54 @@
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h4 class="box-title">公司或业态信息</h4>
+            </div>
+            <form action="<%{:url('department/edit')}%>" class="form-horizontal" id="departmentEdit">
+                <div class="box-body">
+
+                    <%{if condition="isset($top_dept)"}%>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">公司名称：</label>
+                            <div class="col-sm-5">
+                                <input type="text" id="parent_name" class="form-control" name="Dept[parent_name]" placeholder="公司名称，即一级部门信息" value="<%{$top_dept.name}%>" readonly="readonly">
+                                <input type="hidden" id="parent_id" name="Dept[parent_id]" value="<%{$top_dept.id}%>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">业态名称：</label>
+                            <div class="col-sm-5"><input type="text" id="name" class="form-control" name="Dept[name]" placeholder="业态名称或部门名称" value="<%{$dept.name}%>">
+                            </div>
+                        </div>
+                    <%{else/}%>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">公司名称：</label>
+                            <div class="col-sm-5"><input type="text" id="name" class="form-control" name="Dept[name]" placeholder="公司名称，即一级部门信息" value="<%{$dept.name}%>">
+                            </div>
+                        </div>
+                    <%{/if}%>
+                    <input type="hidden" name="Dept[id]" value="<%{$dept.id}%>">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">部门排序：</label>
+                        <div class="col-sm-5">
+                            <input type="number" id="sort" class="form-control" name="Dept[sort]" placeholder="自定义排序，大于0的整数，数字越小越靠前" value="<%{$dept.sort}%>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">备注信息：</label>
+                        <div class="col-sm-5">
+                            <textarea id="remark" rows=3 class="form-control" name="Dept[remark]" placeholder="对该部门的备注信息"><%{$dept.remark}%></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <div class="row">
+                        <div class="col-sm-offset-2 col-sm-5"><button type="submit" class="btn btn-success pull-right btn-submit">保存</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

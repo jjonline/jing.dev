@@ -13,18 +13,13 @@
 namespace app\common\service;
 
 use app\common\helper\ArrayHelper;
-use app\common\helper\FilterValidHelper;
-use app\common\helper\GenerateHelper;
-use app\common\helper\StringHelper;
 use app\common\model\User;
 use app\common\model\Menu;
 use app\common\model\RoleMenu;
 use app\common\model\Role;
-use think\Db;
 use think\Exception;
 use think\facade\Cache;
 use think\facade\Config;
-use think\facade\Cookie;
 use think\facade\Session;
 use app\common\model\Department;
 
@@ -213,10 +208,15 @@ class AuthService
         {
             return [];
         }
-        // 开发者账号，显示所有菜单
+        // 开发者账号，显示所有菜单具有所有超级权限
         if($user_id === 1)
         {
-            return $this->Menu->getMenuList();
+            $data = $this->Menu->getMenuList();
+            foreach ($data as $key => $value)
+            {
+                $data[$key]['permissions'] = 'super';
+            }
+            return $data;
         }
         // 依据开发模式自动选择是否启用户菜单缓存
         $user_menu_cache_key = 'User_Menu_Cache_Origin_key'.$user_id;
@@ -228,16 +228,7 @@ class AuthService
                 return $user_menu;
             }
         }
-        $user_menu = Db::name('menu menu')
-            ->field(['menu.*'])
-            ->leftJoin('role_menu role_menu','role_menu.menu_name = menu.name')
-            ->leftJoin('role role','role.name = role_menu.role_name')
-            ->leftJoin('user_role user_role','user_role.role_name = role.name')
-            ->leftJoin('user user','user.id = user_role.user_id')
-            ->where(['user.id' => $user_id])
-            ->group('menu.tag')
-            ->order(['menu.sort' => 'ASC','menu.level' => 'ASC'])
-            ->select()->toArray();
+        $user_menu = $this->RoleMenu->getRoleMenuListByUserId($user_id);
         // 将结果集缓存
         if(!Config::get('app.app_debug'))
         {

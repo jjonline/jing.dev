@@ -31,6 +31,7 @@
 <script src="__PUBLIC__/plugin/layui/layui.all.js" type="text/javascript"></script>
 <script src="__JS__/utils.js?ver=<%{:config('local.version')}%>" type="text/javascript"></script>
 <script src="__JS__/common.js?ver=<%{:config('local.version')}%>" type="text/javascript"></script>
+<script src="__JS__/require.min.js" type="text/javascript"></script>
 <%{if condition="!empty($load_layout_js)" }%>
 <script src="__PUBLIC__/js/<%{:strtolower(request()->module())}%>/<%{:strtolower(request()->controller())}%>/<%{:strtolower(request()->action())}%>.js?ver=<%{:config('local.version')}%>" type="text/javascript"></script>
 <%{/if}%>

@@ -56,7 +56,7 @@ class MenuController extends BaseController
         if($request->isPost() && $request->isAjax())
         {
             // 新增menu菜单后端检测和操作
-            return $menuService->edit($request);
+            return $menuService->save($request);
         }
         $this->title            = '新增菜单 - '.config('local.site_name');
         $this->content_title    = '新增菜单';
@@ -88,7 +88,7 @@ class MenuController extends BaseController
         if($request->isPost() && $request->isAjax())
         {
             // 编辑menu菜单后端检测和操作
-            return $menuService->edit($request);
+            return $menuService->save($request);
         }
         $this->title            = '编辑菜单 - '.config('local.site_name');
         $this->content_title    = '编辑菜单';

@@ -39,7 +39,7 @@ class MenuService
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function edit(Request $request)
+    public function save(Request $request)
     {
         $menu  = $request->post('Menu/a');
         if(empty($menu['name']) || empty($menu['tag']))

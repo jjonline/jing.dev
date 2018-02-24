@@ -30,4 +30,20 @@ class Role extends Model
         $role = $this->find($id);
         return $role ? $role->toArray() : [];
     }
+
+    /**
+     * 查询出所有角色数据
+     * ---
+     * 角色数据有限，无需考虑分页等情况
+     * ---
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getRoleList()
+    {
+        $data = $this->order(['sort' => 'ASC','create_time' => 'DESC'])->select();
+        return $data ? $data->toArray() : [];
+    }
 }

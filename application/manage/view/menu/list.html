@@ -36,7 +36,9 @@
                         </td>
                         <td style="text-align: center;">
                             <a href="<%{:url('menu/edit',['id' => $item.id])}%>" class="btn btn-xs btn-success"><i class="fa fa-pencil-square-o"></i> 编辑</a>
-                            <a href="javascript:;" data-href="<%{:url('menu/delete',['id' => $item.id])}%>" class="btn btn-xs btn-danger delete" data-id="<%{$item.id}%>"><i class="fa fa-trash-o"></i> 删除</a>
+                            <%{if condition="empty($item.is_system)"}%>
+                                <a href="javascript:;" data-href="<%{:url('menu/delete',['id' => $item.id])}%>" class="btn btn-xs btn-danger delete" data-id="<%{$item.id}%>"><i class="fa fa-trash-o"></i> 删除</a>
+                            <%{/if}%>
                         </td>
                     </tr>
                     <%{/volist}%>
