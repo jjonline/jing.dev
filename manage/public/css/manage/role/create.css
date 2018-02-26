@@ -1,0 +1,18 @@
+.ztree li span.button.switch{margin-right:5px}
+.ztree ul ul li{display:inline-block;white-space:normal}
+.ztree>li>ul>li{padding:5px}
+.ztree>li{background: #dae6f0}
+.ztree>li:nth-child(even)>ul>li:nth-child(even){background: #eef5fa}
+.ztree>li:nth-child(even)>ul>li:nth-child(odd){background: #f6fbff}
+.ztree>li:nth-child(odd)>ul>li:nth-child(even){background: #eef5fa}
+.ztree>li:nth-child(odd)>ul>li:nth-child(odd){background: #f6fbff}
+.ztree>li>ul{margin-top:12px}
+.ztree>li{padding:15px;padding-right:25px}
+.ztree li{white-space:normal!important}
+.ztree>li>a>span{font-size:15px;font-weight:700}
+.ztree>li>a {text-decoration: none;border-bottom: none;}
+.ztree li a.curSelectedNode {border:none;background: none;}
+
+.menu_permissions {list-style: none;background-color: #dae6f0;padding-bottom: 15px;}
+.menu_permissions h3 {font-size:18px;color:#2c9ada;}
+.menu_permissions li p {margin-right:50px;padding-left:25px;padding-bottom: 6px;margin-bottom: 0;background-color: #f6fbff;}

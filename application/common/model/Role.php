@@ -32,6 +32,24 @@ class Role extends Model
     }
 
     /**
+     * 通过角色名称查找角色数据
+     * @param $name
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getRoleInfoByName($name)
+    {
+        if(empty($name))
+        {
+            return [];
+        }
+        $role = $this->where('name',trim($name))->find();
+        return $role ? $role->toArray() : [];
+    }
+
+    /**
      * 查询出所有角色数据
      * ---
      * 角色数据有限，无需考虑分页等情况

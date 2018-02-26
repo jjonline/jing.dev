@@ -1,10 +1,10 @@
-<%{:dump($UserAuthMenu)}%>
+
 <form action="<%{:url('role/create')}%>" class="form-horizontal" id="roleAdd">
 <div class="row">
     <div class="col-md-12">
         <div class="box box-danger">
             <div class="box-header with-border">
-                <h4 class="box-title">角色基本信息</h4>
+                <h4 class="box-title">1、角色基本信息</h4>
             </div>
             <div class="box-body">
                 <div class="form-group">
@@ -25,6 +25,14 @@
                         <textarea id="remark" rows=3 class="form-control" name="Role[remark]" placeholder="角色备注信息，便于识别，可选"></textarea>
                     </div>
                 </div>
+                <hr>
+                <h4 class="box-title">2、选择角色菜单</h4>
+                <div id="menu_tree" class="ztree"></div>
+                <hr>
+                <h4 class="box-title">3、设置角色所属每一个菜单的权限级别</h4>
+                <div id="permissions">
+
+                </div>
             </div>
             <div class="box-footer">
                 <div class="row">
@@ -37,3 +45,6 @@
     </div>
 </div>
 </form>
+<script>
+var menu = <%{:json_encode($menu_list)}%>;
+</script>

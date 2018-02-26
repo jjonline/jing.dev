@@ -42,10 +42,11 @@ class RoleController extends BaseController
     }
 
     /**
-     * 新增角色|仅超级管理员可添加
+     * 新增角色
      * @param Request $request
      * @param RoleService $roleService
-     * @return mixed
+     * @return array|mixed
+     * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
@@ -67,9 +68,7 @@ class RoleController extends BaseController
         $this->load_layout_css = true;
         $this->load_layout_js  = true;
 
-        $MenuModel = new Menu();
-        $menu_list = $MenuModel->getMenuList();
-        dump($roleService->getRoleMenuList());
+        $menu_list = $roleService->getRoleMenuTreeDataByRoleId();
         $this->assign('menu_list',$menu_list);
         return $this->fetch();
     }
