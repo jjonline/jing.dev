@@ -152,6 +152,12 @@ class RoleController extends BaseController
     {
         if($request->isPost() && $request->isAjax())
         {
+            // 检查编辑者的角色权限是否有权编辑该角色
+            $has_edit_auth = $roleService->checkRoleEditorAuth($request->post('id'),$this->UserInfo['role_id']);
+            if(!$has_edit_auth)
+            {
+                return $this->renderJson('您的权限级无法删除该角色，请联系上级删除',400);
+            }
             return $this->asJson($roleService->delete($request));
         }
     }

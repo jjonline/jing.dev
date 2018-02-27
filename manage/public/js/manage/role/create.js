@@ -68,6 +68,7 @@ $(function () {
                 node.id   = n.id;
                 node.name = n.name;
                 node.url  = n._url;
+                node.permissions  = n.permissions;
                 permissions.push(node);
                 if(!utils.isEmpty(n.children))
                 {
@@ -84,6 +85,7 @@ $(function () {
                     node.id   = n.id;
                     node.name = n.name;
                     node.url  = n._url;
+                    node.permissions  = n.permissions;
                     permissions.push(node);
                     if(!utils.isEmpty(n.children))
                     {
@@ -110,9 +112,10 @@ $(function () {
             node.id   = n.id;
             node.name = n.name;
             node.url  = n._url;
+            node.permissions  = n.permissions;
             permissions.push(node);
         });
-        // console.log(default_permissions.length);
+        // console.log(default_permissions);
         initPermissionsDom(permissions);
     };
 
@@ -126,18 +129,47 @@ $(function () {
             dom += '<li class="form-group">' +
                 '<input type="hidden" name="Role_ID[]" value="'+ n.id +'">' +
                 '<h3><i class="fa fa-child"></i> ' + n.name + '</h3>';
-            dom += '<p><label class="radio-inline">' +
-                   '   <input type="radio" value="super" name="permissions['+n.id+']"> 超级管理员' +
-                   '</label>';
-            dom += '<label class="radio-inline">' +
-                '   <input type="radio" value="leader" name="permissions['+n.id+']"> 部门领导' +
-                '</label>';
-            dom += '<label class="radio-inline">' +
-                '   <input type="radio" value="staff" name="permissions['+n.id+']"> 部门职员' +
-                '</label>';
-            dom += '<label class="radio-inline">' +
-                '   <input type="radio" value="guest" name="permissions['+n.id+']" checked> 游客' +
-                '</label>';
+            switch(n.permissions)
+            {
+                case 'super' :
+                    dom += '<p><label class="radio-inline">' +
+                        '   <input type="radio" value="super" name="permissions['+n.id+']" checked> 超级管理员' +
+                        '</label>';
+                    dom += '<label class="radio-inline">' +
+                        '   <input type="radio" value="leader" name="permissions['+n.id+']"> 部门领导' +
+                        '</label>';
+                    dom += '<label class="radio-inline">' +
+                        '   <input type="radio" value="staff" name="permissions['+n.id+']"> 部门职员' +
+                        '</label>';
+                    dom += '<label class="radio-inline">' +
+                        '   <input type="radio" value="guest" name="permissions['+n.id+']"> 游客' +
+                        '</label>';
+                    break;
+                case 'leader' :
+                    dom += '<label class="radio-inline">' +
+                        '   <input type="radio" value="leader" name="permissions['+n.id+']" checked> 部门领导' +
+                        '</label>';
+                    dom += '<label class="radio-inline">' +
+                        '   <input type="radio" value="staff" name="permissions['+n.id+']"> 部门职员' +
+                        '</label>';
+                    dom += '<label class="radio-inline">' +
+                        '   <input type="radio" value="guest" name="permissions['+n.id+']" checked> 游客' +
+                        '</label>';
+                    break;
+                case 'staff' :
+                    dom += '<label class="radio-inline">' +
+                        '   <input type="radio" value="staff" name="permissions['+n.id+']" checked> 部门职员' +
+                        '</label>';
+                    dom += '<label class="radio-inline">' +
+                        '   <input type="radio" value="guest" name="permissions['+n.id+']"> 游客' +
+                        '</label>';
+                    break;
+                case 'guest' :
+                    dom += '<label class="radio-inline">' +
+                        '   <input type="radio" value="guest" name="permissions['+n.id+']" checked> 游客' +
+                        '</label>';
+                    break;
+            }
             dom += '</p></li>';
         });
         dom += '</ul>';

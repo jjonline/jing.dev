@@ -1,5 +1,5 @@
 
-<form action="<%{:url('role/create')}%>" class="form-horizontal" id="roleAdd">
+<form action="<%{:url('role/edit')}%>" class="form-horizontal" id="roleEdit">
     <div class="row">
         <div class="col-md-12">
             <div class="box box-danger">
@@ -9,20 +9,20 @@
                 <div class="box-body">
                     <div class="form-group">
                         <label class="col-sm-2 control-label">角色名称：</label>
-                        <div class="col-sm-5"><input type="text" id="name" class="form-control" name="Role[name]" placeholder="角色名称，名称唯一，例如：仓库管理员">
+                        <div class="col-sm-5"><input type="text" id="name" class="form-control" name="Role[name]" placeholder="角色名称，名称唯一，例如：仓库管理员" value="<%{$role.name}%>">
                         </div>
                     </div>
-
+                    <input type="hidden" name="id" value="<%{$role.id}%>">
                     <div class="form-group">
                         <label class="col-sm-2 control-label">角色排序：</label>
                         <div class="col-sm-5">
-                            <input type="number" id="sort" class="form-control" name="Role[sort]" placeholder="列表排序，大于0的整数，数字越小越靠前">
+                            <input type="number" id="sort" class="form-control" name="Role[sort]" placeholder="列表排序，大于0的整数，数字越小越靠前" value="<%{$role.sort}%>">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">备注信息：</label>
                         <div class="col-sm-5">
-                            <textarea id="remark" rows=3 class="form-control" name="Role[remark]" placeholder="角色备注信息，便于识别，可选"></textarea>
+                            <textarea id="remark" rows=3 class="form-control" name="Role[remark]" placeholder="角色备注信息，便于识别，可选"><%{$role.remark}%></textarea>
                         </div>
                     </div>
                     <hr>
@@ -37,7 +37,7 @@
                 <div class="box-footer">
                     <div class="row">
                         <div class="col-sm-offset-2 col-sm-5">
-                            <button type="submit" class="btn btn-success pull-right btn-submit">新增</button>
+                            <button type="submit" class="btn btn-success pull-right btn-submit">提交</button>
                         </div>
                     </div>
                 </div>
@@ -47,4 +47,5 @@
 </form>
 <script>
     var menu = <%{:json_encode($menu_list)}%>;
+    var role_menu = <%{:json_encode($role_menu)}%>;
 </script>

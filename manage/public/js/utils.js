@@ -150,7 +150,12 @@ var utils = {
                             data: data,
                             success: function (data) {
                                 if(data.error_code == 0){
-                                    utils.alert(data.error_msg ? data.error_msg : '操作成功',successCallBack);
+                                    utils.alert(data.error_msg ? data.error_msg : '操作成功',function () {
+                                        // 回调延时0.5s触发 防止按钮点击后的卡顿感受
+                                        setTimeout(function () {
+                                            successCallBack && successCallBack();
+                                        },500);
+                                    });
                                 }else{
                                     utils.alert(data.error_msg ? data.error_msg : '未知错误');
                                 }

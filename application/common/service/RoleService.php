@@ -420,6 +420,7 @@ class RoleService
     {
         $id   = $request->post('id/i');
         $role = $this->Role->getRoleInfoById($id);
+        $role_menu = $this->RoleMenu->getRoleMenuListByRoleId($id);
         if(empty($role))
         {
             return ['error_code' => 400,'error_msg' => '拟删除的角色数据不存在'];
@@ -436,7 +437,7 @@ class RoleService
             Db::name('role')->where('id',$id)->delete();
             Db::name('role_menu')->where('role_id',$id)->delete();
             // 日志方式备份保存原始菜单信息
-            $this->LogService->logRecorder($role);
+            $this->LogService->logRecorder(array_merge($role,$role_menu));
             Db::commit();
             return ['error_code' => 0,'error_msg' => '角色删除成功'];
         }catch (\Throwable $e) {
