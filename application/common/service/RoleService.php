@@ -229,6 +229,69 @@ class RoleService
     }
 
     /**
+     * 检查编辑角色的管理员的角色是否有权限编辑该角色数据
+     * ---
+     * 1、菜单列表包含关系
+     * 2、每一个菜单的权限级别也是包含关系
+     * ---
+     * @param $edit_role_id
+     * @param $editor_role_id
+     * @return bool
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function checkRoleEditorAuth($edit_role_id,$editor_role_id)
+    {
+        $edit_role_menu_list   = $this->RoleMenu->getRoleMenuListByRoleId($edit_role_id);
+        $editor_role_menu_list = $this->RoleMenu->getRoleMenuListByRoleId($editor_role_id);
+        // 循环对比和检查
+        $check_data = $edit_role_menu_list;
+        foreach ($edit_role_menu_list as $key => $value)
+        {
+            foreach ($editor_role_menu_list as $_key => $_value)
+            {
+                if($value['id'] == $_value['id'])
+                {
+                    unset($check_data[$key]);
+                    // 检查权限，不符直接返回false不再执行
+                    $permissions = $this->comparePermissions($_value['permissions'],$value['permissions']);
+                    if(!$permissions)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        if(empty($check_data))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 菜单权限比较
+     * @param string $per1 预期大的权限
+     * @param string $per2 预期小的权限
+     * @return bool
+     */
+    protected function comparePermissions($per1,$per2)
+    {
+        $per = [
+            'super'  => ['super','leader','staff','guest'],
+            'leader' => ['leader','staff','guest'],
+            'staff'  => ['staff','guest'],
+            'guest'  => ['guest'],
+        ];
+        if(empty($per[$per1]))
+        {
+            return false;
+        }
+        return in_array($per2,$per[$per1]);
+    }
+
+    /**
      * 保存角色数据||编辑+新增
      * @param Request $request
      * @return array

@@ -35,10 +35,6 @@ return [
         '__CSS__'     => '/public/css',
         '__IMG__'     => '/public/images',
     ],
-    // 默认错误跳转对应的模板文件，控制器下error方法渲染的模板
-    'dispatch_error_tmpl' => '../application/common/view/dispatch_error_tmpl.html',
-    // 默认成功跳转对应的模板文件，控制器下success方法渲染的模板
-    'dispatch_success_tmpl' => '../application/common/view/dispatch_success_tmpl.html',
     // 模板引擎普通标签开始标记
     'tpl_begin'    => '<%{',
     // 模板引擎普通标签结束标记

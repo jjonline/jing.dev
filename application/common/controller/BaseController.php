@@ -12,7 +12,9 @@
 
 namespace app\common\controller;
 
+use think\exception\HttpResponseException;
 use think\facade\Config;
+use think\Response;
 
 class BaseController extends BaseAuthController
 {
@@ -51,6 +53,33 @@ class BaseController extends BaseAuthController
         $this->load_layout_css = false;
         // 默认关闭每个操作下都载入特定js的特性
         $this->load_layout_js  = false;
+    }
+
+    /**
+     * 系统异常错误进行覆盖操作--没有跳转动作，只有页面提示
+     * @overwrite
+     * @param string $msg
+     * @param null $url
+     * @param string $data
+     * @param int $wait
+     * @param array $header
+     */
+    protected function error($msg = '', $url = null, $data = '', $wait = 3, array $header = [])
+    {
+        $msg = $msg ? $msg : '系统错误';
+        $this->assign('title','系统错误');
+        $this->assign('msg',$msg);
+        // 关闭全局设定的模板布局功能
+        $this->view->engine->layout(false);
+        /**
+         * @var Response
+         */
+        $response = app('response');
+        $response->code(500);
+        $error    = $this->fetch('../application/common/view/error.html');
+        $response->data($error);
+        //抛出异常并输出，终止后续业务代码执行
+        throw new HttpResponseException($response);
     }
 
     /**

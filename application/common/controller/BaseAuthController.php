@@ -89,9 +89,11 @@ class BaseAuthController extends BasicController
             throw new HttpResponseException($response);
         }
         // 初始化User属性
-        $this->UserInfo   = Session::get('user_info');
+        $this->UserInfo         = Session::get('user_info');
+        // 当前菜单权限的一些信息
+        $this->UserInfo['auth'] = $this->AuthService->getUserSingleMenuInfo();
         // 获取管理菜单
-        $UserAuthMenu = $this->AuthService->getUserAuthMenu();
+        $UserAuthMenu           = $this->AuthService->getUserAuthMenu();
         // 输出管理菜单
         $this->assign('UserAuthMenu',$UserAuthMenu);
     }
@@ -117,5 +119,33 @@ class BaseAuthController extends BasicController
     protected function userHasPermission($url = null)
     {
         return $this->AuthService->userHasPermission($url);
+    }
+
+    /**
+     * 获取用户指定Url的权限标记，即返回：['super','leader','staff','guest']中的一者
+     * @param null $url
+     * @return mixed
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    protected function getUserPermissionsTag($url = null)
+    {
+        return $this->AuthService->getUserPermissionsTag($url);
+    }
+
+    /**
+     * 获取指定Url中的额外数组数据，无则为空字符串
+     * @param null $url
+     * @return mixed
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    protected function getMenuExtraParam($url = null)
+    {
+        return $this->AuthService->getMenuExtraParam($url);
     }
 }

@@ -176,11 +176,6 @@ class AuthService
             }
         }
         $user_menu_map = $this->getUserMenuList();
-        // 开发者账号，所有菜单都有权限
-        if($user_id === 1)
-        {
-            $user_menu_map = $this->Menu->getMenuList();
-        }
         if(empty($user_menu_map))
         {
             return false;
@@ -193,6 +188,88 @@ class AuthService
             Cache::set($user_menu_cache_Map_key,$user_menu_map,3600 * 12);
         }
         return array_key_exists($url,$user_menu_map);
+    }
+
+    /**
+     * 获取指定Url的当前用户的单个菜单的权限信息
+     * --
+     * 大部分时候无参数调用
+     * --
+     * @param null $url
+     * @return bool
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getUserSingleMenuInfo($url = null)
+    {
+        if(!$this->userHasPermission($url))
+        {
+            throw new Exception('用户无该菜单权限，获取菜单权限信息失败',500);
+        }
+        $user_id = Session::get('user_id');
+        $request = request();
+        if(empty($url))
+        {
+            $url = strtolower($request->module().'/'.$request->controller().'/'.$request->action());
+        }
+        $user_menu_cache_Map_key = 'User_menu_cache_Map_key'.$user_id;
+        if(!Config::get('app.app_debug'))
+        {
+            $user_menu_map = Cache::get($user_menu_cache_Map_key);
+        }else {
+            $user_menu_map = $this->getUserMenuList();
+            if(empty($user_menu_map))
+            {
+                throw new Exception('用户无该菜单权限，获取菜单权限信息失败',500);
+            }
+            //按url分组，url成为数组的键名
+            $user_menu_map = ArrayHelper::group($user_menu_map,'url');
+            //依据开发模式与否将全新Map数组缓存
+            if(!Config::get('app.app_debug'))
+            {
+                Cache::set($user_menu_cache_Map_key,$user_menu_map,3600 * 12);
+            }
+        }
+        // 前方菜单权限已检查通过，此处值绝对存在，前方按url排序后是一个只有一个元素的二维数组，还原
+        $info = $user_menu_map[$url][0];
+        if(!empty($info['extra_param']))
+        {
+            // 还原额外参数的数组格式
+            $info['extra_param'] = unserialize($info['extra_param']);
+        }
+        return $info;
+    }
+
+    /**
+     * 获取用户指定Url的权限标记，即返回：['super','leader','staff','guest']中的一者
+     * @param null $url
+     * @return mixed
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getUserPermissionsTag($url = null)
+    {
+        $menu = $this->getUserSingleMenuInfo($url);
+        return $menu['permissions'];
+    }
+
+    /**
+     * 获取指定Url中的额外数组数据，无则为空字符串
+     * @param null $url
+     * @return []|''
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getMenuExtraParam($url = null)
+    {
+        $menu = $this->getUserSingleMenuInfo($url);
+        return $menu['extra_param'];
     }
 
     /**

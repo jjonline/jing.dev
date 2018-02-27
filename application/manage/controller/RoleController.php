@@ -96,16 +96,24 @@ class RoleController extends BaseController
 
         // 角色数据
         $RoleModel = new Role();
-        $Role      = $RoleModel->getRoleByName($request->param('name'));
+        $Role      = $RoleModel->getRoleInfoById($request->get('id'));
         if(empty($Role))
         {
             $this->redirect(url('develop/role'));
         }
-        $MenuModel = new Menu();
-        $menu_list = $MenuModel->getMenuList();
-
+        // 检查编辑者的角色权限是否有权编辑该角色
+        $has_edit_auth = $roleService->checkRoleEditorAuth($Role['id'],$this->UserInfo['role_id']);
+        if(!$has_edit_auth)
+        {
+            $this->error('您的权限级无法编辑该角色数据，请联系上级进行编辑');
+        }
+        // 当前账号具备的所有菜单权限
+        $menu_list = $roleService->getRoleMenuTreeDataByRoleId();
+        $this->assign('menu_list',$menu_list);
+        // 待编辑的菜单权限列表
         $RoleMenuModel = new RoleMenu();
-        $role_menu     = $RoleMenuModel->getMenuNamesByRoleName($Role['name']);
+        $role_menu     = $RoleMenuModel->getRoleMenuListByRoleId($Role['id']);
+
         $this->assign('menu_list',$menu_list);
         $this->assign('role_menu',$role_menu);
         $this->assign('role',$Role);
