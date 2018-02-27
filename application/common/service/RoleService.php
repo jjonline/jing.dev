@@ -347,6 +347,29 @@ class RoleService
             $_role_menu['permissions'] = $permissions[$menu_id];
             $role_menu[]               = $_role_menu;
         }
+
+        // 检查当前用户所具备的菜单权限级别是否超限
+        $user_role_menu = $this->RoleMenu->getRoleMenuListByRoleId(Session::get('user_info.role_id'));
+        $checked_menu   = $role_menu;
+        foreach ($role_menu as $key => $value)
+        {
+            foreach ($user_role_menu as $_key => $_value)
+            {
+                if($value['menu_id'] == $_value['id']) {
+                    unset($checked_menu[$key]);
+                    $permissions = $this->comparePermissions($_value['permissions'], $value['permissions']);
+                    if (!$permissions) {
+                        return ['error_code' => 400,'error_msg' => '菜单权限级别非法'];
+                    }
+                }
+            }
+        }
+        // 如果菜单列表不为空，则添加了额外的没有权限的菜单列表
+        if(!empty($checked_menu))
+        {
+            return ['error_code' => 400,'error_msg' => '拟分配的菜单不存在或您没有分配该菜单的权限'];
+        }
+
         // 角色数据
         $role           = [];
         $role['name']   = trim($data['Role']['name']);

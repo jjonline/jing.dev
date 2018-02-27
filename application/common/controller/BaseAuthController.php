@@ -91,7 +91,7 @@ class BaseAuthController extends BasicController
         // 初始化User属性
         $this->UserInfo         = Session::get('user_info');
         // 当前菜单权限的一些信息
-        $this->UserInfo['auth'] = $this->AuthService->getUserSingleMenuInfo();
+        $this->UserInfo['user_auth'] = $this->AuthService->getUserSingleMenuInfo();
         // 获取管理菜单
         $UserAuthMenu           = $this->AuthService->getUserAuthMenu();
         // 输出管理菜单
