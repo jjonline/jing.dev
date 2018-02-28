@@ -33,6 +33,24 @@ class Department extends Model
     }
 
     /**
+     * 查询子部门列表
+     * @param $parent_id
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getDeptInfoByParentId($parent_id)
+    {
+        if(empty($parent_id))
+        {
+            return [];
+        }
+        $dept = $this->where('parent_id',$parent_id)->select();
+        return !$dept->isEmpty() ? $dept->toArray() : [];
+    }
+
+    /**
      * 获取所有部门列表
      * @return array
      * @throws \think\db\exception\DataNotFoundException

@@ -103,4 +103,42 @@ class DepartmentController extends BaseController
         $this->assign('dept',$Dept);
         return $this->fetch();
     }
+
+    /**
+     * 跳转部门排序字段
+     * @param Request $request
+     * @param DepartmentService $departmentService
+     * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function sortAction(Request $request , DepartmentService $departmentService)
+    {
+        if($request->isPost() && $request->isAjax())
+        {
+            // 编辑menu菜单后端检测和操作
+            return $this->asJson($departmentService->sort($request));
+        }
+    }
+
+    /**
+     * 删除部门
+     * @param Request $request
+     * @param DepartmentService $departmentService
+     * @return mixed
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
+     */
+    public function deleteAction(Request $request , DepartmentService $departmentService)
+    {
+        if($request->isPost() && $request->isAjax())
+        {
+            // 编辑menu菜单后端检测和操作
+            return $this->asJson($departmentService->delete($request));
+        }
+    }
 }

@@ -10,6 +10,7 @@ namespace app\common\service;
 
 use app\common\helper\TreeHelper;
 use app\common\model\Department;
+use app\common\model\User;
 use think\Request;
 
 class DepartmentService
@@ -18,10 +19,22 @@ class DepartmentService
      * @var Department
      */
     public $Department;
+    /**
+     * @var LogService
+     */
+    public $LogService;
+    /**
+     * @var User
+     */
+    public $User;
 
-    public function __construct(Department $department)
+    public function __construct(Department $department,
+                                User $user,
+                                LogService $logService)
     {
         $this->Department = $department;
+        $this->LogService = $logService;
+        $this->User       = $user;
     }
 
     public function save(Request $request)
@@ -29,14 +42,68 @@ class DepartmentService
 
     }
 
+    /**
+     * 跳转部门排序字段
+     * @param Request $request
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function sort(Request $request)
     {
-
+        $id   = $request->post('id/i');
+        $sort = intval($request->post('sort'));
+        if($sort <= 0)
+        {
+            return ['error_code' => 400,'error_msg' => '排序数字有误'];
+        }
+        $dept = $this->Department->getDeptInfoById($id);
+        if(empty($dept))
+        {
+            return ['error_code' => 400,'error_msg' => '拟编辑排序的部门数据不存在'];
+        }
+        $ret = $this->Department->isUpdate(true)->save(['sort' => intval($sort)],['id' => $id]);
+        return $ret >= 0 ?
+            ['error_code' => 0,'error_msg' => '排序调整成功'] :
+            ['error_code' => 500,'error_msg' => '排序调整失败：系统异常'];
     }
 
+    /**
+     * 删除废弃部门数据
+     * @param Request $request
+     * @return array
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
+     */
     public function delete(Request $request)
     {
-
+        $id   = $request->post('id/i');
+        $dept = $this->Department->getDeptInfoById($id);
+        if(empty($dept))
+        {
+            return ['error_code' => 400,'error_msg' => '拟删除的部门数据不存在'];
+        }
+        // 检查是否有子部门、检查是否有分配
+        $exist_user = $this->User->db()->where('dept_id',$id)->select();
+        if(!$exist_user->isEmpty())
+        {
+            return ['error_code' => 400,'error_msg' => '无法删除：拟删除的部门已分配用户'];
+        }
+        $exist_child = $this->Department->getDeptInfoByParentId($id);
+        if(!empty($exist_child))
+        {
+            return ['error_code' => 400,'error_msg' => '无法删除：拟删除的部门存在子部门'];
+        }
+        $ret = $this->Department->db()->where('id',$id)->delete();
+        // 日志方式备份保存原始菜单信息
+        $this->LogService->logRecorder($dept);
+        return $ret >= 0 ?
+            ['error_code' => 0,'error_msg' => '部门删除成功'] :
+            ['error_code' => 500,'error_msg' => '部门删除失败：系统异常'];
     }
 
     /**
