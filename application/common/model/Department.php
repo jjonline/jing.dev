@@ -32,6 +32,29 @@ class Department extends Model
         return $dept ? $dept->toArray() : [];
     }
 
+    /**
+     * 获取所有部门列表
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getDeptList()
+    {
+        $dept = $this->order(['level' => 'ASC','sort' => 'ASC'])->select();
+        if(!$dept->isEmpty())
+        {
+            return $dept->toArray();
+        }
+        return [];
+    }
+
+    /**
+     * @param $id
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function getDeptIdVectorByDeptId($id)
     {
         $data = Db::name('department dept1')

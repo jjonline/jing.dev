@@ -94,8 +94,7 @@ class MenuController extends BaseController
         $this->content_title    = '编辑菜单';
         $this->content_subtitle = '开发者模式下修改菜单';
         $this->breadcrumb       = [
-            ['label' => '系统管理','url' => url('develop/menu')],
-            ['label' => '菜单管理','url'  => url('develop/menu')],
+            ['label' => '菜单管理','url'  => url('menu/list')],
             ['label' => '编辑菜单','url'  => ''],
         ];
         $this->load_layout_css = false;
@@ -106,7 +105,7 @@ class MenuController extends BaseController
         $list      = $MenuModel->getMenuList();
         if(empty($menu))
         {
-            $this->redirect(url('develop/menu'));
+            $this->redirect(url('menu/list'));
         }
         $this->assign('menu_edit',$menu);
         $this->assign('list',$list);

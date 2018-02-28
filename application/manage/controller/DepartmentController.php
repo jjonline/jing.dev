@@ -10,6 +10,7 @@ namespace app\manage\controller;
 
 use app\common\controller\BaseController;
 use app\common\model\Department;
+use app\common\service\DepartmentService;
 use app\manage\model\search\DepartmentSearch;
 use think\Request;
 
@@ -18,12 +19,12 @@ class DepartmentController extends BaseController
     /**
      * 部门管理-部门列表
      */
-    public function listAction(Request $request , DepartmentSearch $departmentSearch)
+    public function listAction(Request $request , DepartmentService $departmentService)
     {
-        if($request->isAjax())
-        {
-            return $departmentSearch->search($request);
-        }
+//        if($request->isAjax())
+//        {
+//            return $departmentSearch->search($request);
+//        }
         $this->title            = '部门管理 - '.config('local.site_name');
         $this->content_title    = '部门管理';
         $this->content_subtitle = '部门管理工具，设置和管理系统部门数据';
@@ -33,6 +34,10 @@ class DepartmentController extends BaseController
         ];
         $this->load_layout_css = false;
         $this->load_layout_js  = true;
+
+        $dept_list = $departmentService->getDeptTreeList();
+
+        $this->assign('dept_list',$dept_list);
 
         return $this->fetch();
     }
@@ -47,7 +52,7 @@ class DepartmentController extends BaseController
     {
         if($request->isPost() && $request->isAjax())
         {
-            return $departmentService->saveData($request);
+            return $departmentService->save($request);
         }
         $this->title            = '新增部门 - '.config('local.site_name');
         $this->content_title    = '新增部门';
@@ -59,12 +64,8 @@ class DepartmentController extends BaseController
         $this->load_layout_css = false;
         $this->load_layout_js  = true;
 
-        if($request->has('dept_id'))
-        {
-            $dept_id  = $request->param('dept_id');
-            $top_dept = $departmentService->getTopDeptById($dept_id);
-            $top_dept && $this->assign('top_dept',$top_dept);
-        }
+        $departmentService->getDeptTreeList();
+
         return $this->fetch();
     }
 
