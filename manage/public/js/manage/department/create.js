@@ -1,5 +1,12 @@
 $(function () {
 
+    // 初始化已选上级部门
+    var parent_id = utils.getUrlParam('parent_id');
+    if(!utils.isEmpty(parent_id))
+    {
+        $('#parent_id').val(parent_id).trigger('change');
+    }
+
     // 管理员新增部门提交
     $('#departmentAdd').submit(function () {
         if($('#parent_id').val() == '-1')
@@ -22,7 +29,7 @@ $(function () {
             success: function (data) {
                 if(data.error_code == 0){
                     utils.alert(data.error_msg,function () {
-                        location.href = 'list';
+                        location.href = '/manage/department/lis';
                     });
                 }else{
                     utils.alert(data.error_msg ? data.error_msg : '未知错误');

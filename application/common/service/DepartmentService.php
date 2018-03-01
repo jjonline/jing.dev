@@ -179,7 +179,7 @@ class DepartmentService
             $dept[$key]['name_format2'] = $value['name'];
             if($value['level'] > 1)
             {
-                $dept[$key]['name_format1']   = str_repeat('&nbsp;&nbsp;├&nbsp;&nbsp;',$value['level'] - 1).$value['name'];
+                $dept[$key]['name_format1']   = str_repeat('&nbsp;&nbsp;├&nbsp;&nbsp;',$value['level']).$value['name'];
                 $dept[$key]['name_format2']   = str_repeat('&nbsp;',floor(pow(($value['level'] - 1),1.8) * 2)).'└─'.$value['name'];
             }
         }

@@ -98,16 +98,13 @@ class DepartmentController extends BaseController
         $this->load_layout_css = false;
         $this->load_layout_js  = true;
 
-        $Dept = (new Department())->getDeptById($request->param('id'));
+        $Dept = $departmentService->Department->getDeptInfoById($request->param('id'));
         if(empty($Dept))
         {
             $this->redirect(url('department/list'));
         }
-        if($Dept['level'] == 2)
-        {
-            $top_dept = $departmentService->getTopDeptById($Dept['parent_id']);
-            $top_dept && $this->assign('top_dept',$top_dept);
-        }
+        $dept_list = $departmentService->getDeptTreeList();
+        $this->assign('dept_list',$dept_list);
         $this->assign('dept',$Dept);
         return $this->fetch();
     }

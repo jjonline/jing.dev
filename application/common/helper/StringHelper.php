@@ -52,6 +52,20 @@ class StringHelper {
         }
     }
 
+    /**
+     * 字符自动判断编码并转化为utf8
+     * @param $str
+     * @return string
+     */
+    public static function convert2utf8($str)
+    {
+        $fileType = mb_detect_encoding($str , array('UTF-8','GBK','LATIN1','BIG5')) ;
+        if( $fileType != 'UTF-8'){
+            $str = mb_convert_encoding($str ,'utf-8' , $fileType);
+        }
+        return trim($str);
+    }
+
     public static function appendUrlParams($originUrl, $params) {
         $arr = explode('?', $originUrl);
 
