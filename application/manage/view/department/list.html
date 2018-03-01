@@ -66,7 +66,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a href="<%{:url('department/edit',['id' => $dept.id])}%>" class="btn btn-xs btn-success"><i class="fa fa-pencil-square-o"></i> 编辑</a>
+                                    <a href="<%{:url('department/edit')}%>?id=<%{$dept.id}%>" class="btn btn-xs btn-success"><i class="fa fa-pencil-square-o"></i> 编辑</a>
                                     <a href="javascript:;" data-href="<%{:url('department/delete',['id' => $dept.id])}%>" class="btn btn-xs btn-danger delete" data-id="<%{$dept.id}%>"><i class="fa fa-trash-o"></i> 删除</a>
                                     <%{if condition="$dept.level lt 5"}%>
                                     <a href="javascript:;" class="btn btn-xs btn-info create" data-id="<%{$dept.id}%>"><i class="fa fa-plus"></i> 新建子部门</a>

@@ -4,7 +4,7 @@ $(function () {
     /**
      * 绑定select2事件
      */
-    $(".select2").select2();
+    $(".select2").select2({language: "zh-CN"});
 
     /**
      * 绑定button模拟的radio

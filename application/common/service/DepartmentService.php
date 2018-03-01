@@ -37,9 +37,45 @@ class DepartmentService
         $this->User       = $user;
     }
 
+    /**
+     * 新增|编辑部门数据
+     * @param Request $request
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function save(Request $request)
     {
-
+        $dept = $request->post('Dept/a');
+        if(empty($menu['name']) || empty($menu['parent_id']))
+        {
+            return ['error_code' => 400,'error_msg' => '上级部门或部门名称缺失'];
+        }
+        $is_edit = !empty($dept['id']);
+        if($is_edit)
+        {
+            $exist_dept = $this->Department->getDeptInfoById($dept['id']);
+            if(empty($exist_dept))
+            {
+                return ['error_code' => 400,'error_msg' => '拟编辑部门不存在'];
+            }
+        }
+        // 构造数据
+        $Dept           = [];
+        $Dept['name']   = trim($dept['name']);
+        $Dept['sort']   = intval($dept['sort']) < 0 ? 1 : intval($dept['sort']);
+        $Dept['remark'] = trim($dept['remark']);
+        if($is_edit)
+        {
+            $Dept['id'] = $dept['id'];
+            $result     = $this->Department->isUpdate(true)->data($Dept);
+        }else {
+            $result     = $this->Department->isUpdate(false)->data($Dept);
+        }
+        return $result >= 0 ?
+            ['error_code' => 0,'error_msg'   => '部门保存成功'] :
+            ['error_code' => 500,'error_msg' => '部门保存失败：系统异常'];
     }
 
     /**
