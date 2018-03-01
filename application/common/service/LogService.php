@@ -40,12 +40,13 @@ class LogService
      * ---
      * 延迟记录至对象数组，response_end钩子处执行最终的日志写入
      * ---
-     * @param $data
+     * @param mixed  $data
+     * @param string $description 代码中主动记录时的日志说明文字
      * @return bool
      */
-    public function logRecorder($data = null)
+    public function logRecorder($data = null,$description = null)
     {
-        $logData = $this->generateLog();
+        $logData = $this->generateLog($description);
         // 处理额外数据
         if(is_scalar($data))
         {
@@ -63,13 +64,15 @@ class LogService
 
     /**
      * 执行日志批量写入
+     * @param mixed  $data
+     * @param string $description 代码中主动记录时的日志说明文字
      * @return bool
      */
-    public function save($data = null)
+    public function save($data = null,$description = null)
     {
         if(!empty($data))
         {
-            $this->logRecorder($data);
+            $this->logRecorder($data,$description);
         }
         if(empty($this->LogData))
         {
@@ -83,9 +86,10 @@ class LogService
     }
 
     /**
+     * @param string $description 代码中主动记录时的日志说明文字
      * @return array
      */
-    protected function generateLog()
+    protected function generateLog($description = null)
     {
         /**
          * @var Request
@@ -120,6 +124,13 @@ class LogService
         }
         $logData['create_time']         = date('Y-m-d H:i:s');
         $logData['update_time']         = $logData['create_time'];
+
+        // 说明文字
+        $logData['description']         = '';
+        if(!empty($description))
+        {
+            $logData['description']     = $description;
+        }
 
         return $logData;
     }

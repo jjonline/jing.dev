@@ -123,6 +123,7 @@ CREATE TABLE `com_log` (
   `extra_data` text COMMENT '主动保存进日志的数据',
   `memory_usage` decimal(20,2) NOT NULL DEFAULT '0.00' COMMENT '内存小号（kb）',
   `execute_millisecond` int(11) NOT NULL DEFAULT '0' COMMENT '执行耗时（毫秒）',
+  `description` varchar(128) NOT NULL DEFAULT '' COMMENT '日志手动记录的说明文字',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
   PRIMARY KEY (`id`),

@@ -393,6 +393,7 @@ class RoleService
                 $role_menu[$key]['role_id'] = $role_id;
             }
             Db::name('role_menu')->insertAll($role_menu);
+            $this->LogService->logRecorder([$role,$role_menu],$is_edit ? '编辑角色' : '新增角色');
             Db::commit();
             return ['error_code' => 0,'error_msg' => '保存成功'];
         }catch (\Throwable $e) {
