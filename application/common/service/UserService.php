@@ -69,8 +69,9 @@ class UserService
             }else {
                 // cookie维持登录状态
                 $User = $this->User->getUserInfoById(Cookie::get('user_id'));
-                if(empty($User) || $User['delete_time'])
+                if(empty($User) || empty($User['enable']))
                 {
+                    $this->setUserLogout();
                     return false;
                 }
                 // 效验cookie合法性通过后设置登录
@@ -78,6 +79,7 @@ class UserService
                 {
                     return $this->setUserLogin($User,true);
                 }
+                $this->setUserLogout();
                 return false;
             }
         }

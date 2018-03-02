@@ -90,7 +90,9 @@ $(function () {
             success: function (data) {
                 if(data.error_code == 0){
                     utils.alert(data.error_msg,function () {
-                        location.href = '/manage/department/list';
+                        setTimeout(function () {
+                            location.href = '/manage/department/list';
+                        },300);
                     });
                 }else{
                     utils.alert(data.error_msg ? data.error_msg : '未知错误');
@@ -126,7 +128,9 @@ $(function () {
             success: function (data) {
                 if(data.error_code == 0){
                     utils.alert(data.error_msg,function () {
-                        location.href = '/manage/department/list';
+                        setTimeout(function () {
+                            location.href = '/manage/department/list';
+                        },300);
                     });
                 }else{
                     utils.alert(data.error_msg ? data.error_msg : '未知错误');

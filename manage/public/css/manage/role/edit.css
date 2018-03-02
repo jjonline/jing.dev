@@ -14,5 +14,5 @@
 .ztree li a.curSelectedNode {border:none;background: none;}
 
 .menu_permissions {list-style: none;background-color: #dae6f0;padding-bottom: 15px;}
-.menu_permissions h3 {font-size:18px;color:#2c9ada;}
+.menu_permissions h3 {font-size:18px;color:#2c9ada;margin: 8px auto;}
 .menu_permissions li p {margin-right:50px;padding-left:25px;padding-bottom: 6px;margin-bottom: 0;background-color: #f6fbff;}
