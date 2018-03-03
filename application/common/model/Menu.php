@@ -10,6 +10,7 @@ namespace app\common\model;
 
 use app\common\helper\ArrayHelper;
 use app\common\helper\StringHelper;
+use app\common\helper\TreeHelper;
 use think\Model;
 
 class Menu extends Model
@@ -67,6 +68,7 @@ class Menu extends Model
     public function getFormatMenuList()
     {
         $menu = $this->getMenuList();
+        $menu = TreeHelper::vTree($menu);
         foreach ($menu as $key => $value)
         {
             if($value['level'] > 1)
