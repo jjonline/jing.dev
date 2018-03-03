@@ -148,11 +148,11 @@ class AuthService
 
     /**
      * 检查当前用户访问的url或指定url是否有权限
-     * @param string $url
+     * @param string $auth_tag 检查权限的Url或该菜单对应为全局唯一的字符串即菜单的tag字符串，为null则检查当前Url
      * @throws
      * @return bool
      */
-    public function userHasPermission($url = null)
+    public function userHasPermission($auth_tag = null)
     {
         // 未登录直接抛异常终止执行
         $user_id = Session::get('user_id');
@@ -160,11 +160,15 @@ class AuthService
         {
             throw new Exception('未初始化用户登录状态不可调用userHasPermission方法',500);
         }
-        $request = request();
-        if(empty($url))
+
+        // 如果未传参则拼接当前url
+        if(empty($auth_tag))
         {
-            $url = strtolower($request->module().'/'.$request->controller().'/'.$request->action());
+            $request  = request();
+            $auth_tag = strtolower($request->module().'/'.$request->controller().'/'.$request->action());
         }
+
+        // 缓存数据的Key
         $user_menu_cache_Map_key = 'User_menu_cache_Map_key'.$user_id;
         if(!Config::get('app.app_debug'))
         {
@@ -172,22 +176,30 @@ class AuthService
             if(!empty($user_menu_map))
             {
                 // 查找到缓存 直接从缓存中判断
-                return array_key_exists($url,$user_menu_map);
+                return isset($user_menu_map[$auth_tag]);
+                // return array_key_exists($auth_tag,$user_menu_map);
             }
         }
+
+        // 处理菜单数据
         $user_menu_map = $this->getUserMenuList();
         if(empty($user_menu_map))
         {
             return false;
         }
-        //按url分组，url成为数组的键名
-        $user_menu_map = ArrayHelper::group($user_menu_map,'url');
-        //依据开发模式与否将全新Map数组缓存
+
+        // 按url和tag分组，url和tag成为数组的键名
+        $user_menu_map1 = ArrayHelper::group($user_menu_map,'url');
+        $user_menu_map2 = ArrayHelper::group($user_menu_map,'tag');
+        $user_menu_map  = array_merge($user_menu_map1,$user_menu_map2);
+
+        // 依据开发模式与否将全新Map数组缓存
         if(!Config::get('app.app_debug'))
         {
             Cache::set($user_menu_cache_Map_key,$user_menu_map,3600 * 12);
         }
-        return array_key_exists($url,$user_menu_map);
+        return isset($user_menu_map[$auth_tag]);
+        // return array_key_exists($auth_tag,$user_menu_map);
     }
 
     /**

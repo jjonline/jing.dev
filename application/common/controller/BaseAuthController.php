@@ -112,13 +112,13 @@ class BaseAuthController extends BasicController
     }
 
     /**
-     * @param mixed $url 无域名无前缀斜线无文件后缀的url
+     * @param mixed $auth_tag 检查权限的Url或该菜单对应为全局唯一的字符串即菜单的tag字符串，为null则检查当前Url
      * @return bool
      * @throws \think\Exception
      */
-    protected function userHasPermission($url = null)
+    protected function userHasPermission($auth_tag = null)
     {
-        return $this->AuthService->userHasPermission($url);
+        return $this->AuthService->userHasPermission($auth_tag);
     }
 
     /**

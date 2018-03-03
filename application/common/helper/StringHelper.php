@@ -82,7 +82,8 @@ class StringHelper {
             $targetParams = array_merge($originParams, $params);
         }
 
-        $arr[1] = http_build_query($targetParams);
+        // 重新拼接
+        $targetParams && $arr[1] = http_build_query($targetParams);
 
         return implode("?", $arr);
     }
