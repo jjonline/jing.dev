@@ -3,6 +3,11 @@
  */
 var default_permissions = [];
 $(function () {
+    // 载入iCheck资源
+    utils.loadCss('/public/plugin/iCheck/all.css');
+    utils.loadJs('/public/plugin/iCheck/icheck.min.js',function () {
+        $("input[type='radio']").iCheck({'radioClass':'iradio_square-blue'});
+    });
     $('#roleAdd').submit(function () {
         if (utils.isEmpty($('#name').val())) {
             $('#name').focus();
@@ -128,18 +133,18 @@ $(function () {
         $.each(checked_permissions,function (i,n) {
             dom += '<li class="form-group">' +
                 '<input type="hidden" name="Role_ID[]" value="'+ n.id +'">' +
-                '<h3><i class="fa fa-child"></i> ' + n.name + '</h3>';
+                '<div class="permissions_radio"><span><i class="fa fa-child"></i> ' + n.name + '</span>';
             switch(n.permissions)
             {
                 case 'super' :
-                    dom += '<p><label class="radio-inline">' +
-                        '   <input type="radio" value="super" name="permissions['+n.id+']" checked> 超级管理员' +
+                    dom += '<label class="radio-inline">' +
+                        '   <input type="radio" value="super" name="permissions['+n.id+']" checked> 超级管理员（管理所有数据）' +
                         '</label>';
                     dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="leader" name="permissions['+n.id+']"> 部门领导' +
+                        '   <input type="radio" value="leader" name="permissions['+n.id+']"> 部门领导（管理部门数据）' +
                         '</label>';
                     dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="staff" name="permissions['+n.id+']"> 部门职员' +
+                        '   <input type="radio" value="staff" name="permissions['+n.id+']"> 部门职员（管理个人数据)' +
                         '</label>';
                     dom += '<label class="radio-inline">' +
                         '   <input type="radio" value="guest" name="permissions['+n.id+']"> 游客' +
@@ -147,10 +152,10 @@ $(function () {
                     break;
                 case 'leader' :
                     dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="leader" name="permissions['+n.id+']" checked> 部门领导' +
+                        '   <input type="radio" value="leader" name="permissions['+n.id+']" checked> 部门领导（管理部门数据）' +
                         '</label>';
                     dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="staff" name="permissions['+n.id+']"> 部门职员' +
+                        '   <input type="radio" value="staff" name="permissions['+n.id+']"> 部门职员（管理个人数据)' +
                         '</label>';
                     dom += '<label class="radio-inline">' +
                         '   <input type="radio" value="guest" name="permissions['+n.id+']" checked> 游客' +
@@ -158,7 +163,7 @@ $(function () {
                     break;
                 case 'staff' :
                     dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="staff" name="permissions['+n.id+']" checked> 部门职员' +
+                        '   <input type="radio" value="staff" name="permissions['+n.id+']" checked> 部门职员（管理个人数据)' +
                         '</label>';
                     dom += '<label class="radio-inline">' +
                         '   <input type="radio" value="guest" name="permissions['+n.id+']"> 游客' +
@@ -170,7 +175,7 @@ $(function () {
                         '</label>';
                     break;
             }
-            dom += '</p></li>';
+            dom += '</div></li>';
         });
         dom += '</ul>';
         $('#permissions').empty().html(dom);

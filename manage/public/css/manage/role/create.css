@@ -13,6 +13,8 @@
 .ztree>li>a {text-decoration: none;border-bottom: none;}
 .ztree li a.curSelectedNode {border:none;background: none;}
 
-.menu_permissions {list-style: none;background-color: #dae6f0;padding-bottom: 15px;}
-.menu_permissions h3 {font-size:18px;color:#2c9ada;}
-.menu_permissions li p {margin-right:50px;padding-left:25px;padding-bottom: 6px;margin-bottom: 0;background-color: #f6fbff;}
+.menu_permissions {list-style: none;padding-bottom: 15px;margin-top:20px;padding-top: 20px;background: #e4f0fd;font-family: Verdana, Arial, Helvetica, AppleGothic, sans-serif;}
+.permissions_radio {line-height: 20px;font-size: 13px;margin:8px auto 3px;}
+.permissions_radio span {display: inline-block;min-width: 130px;font-size:15px;}
+.permissions_radio .radio-inline {padding:0 25px 0 0;line-height: 18px;color:#777;position: relative;}
+.permissions_radio .iradio_square-blue {margin-bottom:2px;}
