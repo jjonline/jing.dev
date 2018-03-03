@@ -1,12 +1,14 @@
 /**
  * 初始化默认菜单权限选择
  */
+var load_tag = false;
 var default_permissions = [];
 var edit_permissions = [];
 $(function () {
     // 载入iCheck资源
     utils.loadCss('/public/plugin/iCheck/all.css');
     utils.loadJs('/public/plugin/iCheck/icheck.min.js',function () {
+        load_tag = true;
         $("input[type='radio']").iCheck({'radioClass':'iradio_square-blue'});
     });
 
@@ -259,6 +261,7 @@ $(function () {
         });
         dom += '</ul>';
         $('#permissions').empty().html(dom);
+        load_tag && $("input[type='radio']").iCheck({'radioClass':'iradio_square-blue'});
     };
 
 });
