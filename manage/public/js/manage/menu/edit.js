@@ -1,30 +1,4 @@
 $(function () {
-    var select2Level1 = $('#level1').select2();
-    var select2Level2 = $('#level2').select2();
-    // 初始化分级菜单 level =1的在模板层面已处理
-    if(level == 2)
-    {
-        var level1_id = item.parent_id;
-        select2Level1.val(level1_id).trigger('change');//设置一级菜单即可
-    }
-    if(level == 3)
-    {
-        var level2_id = item.parent_id;
-        var level2Node  = menu[level2_name];
-        var level1Node  = menu[level2Node.parent_id];
-        // 渲染二级菜单
-        var option = '<option value="">--新建二级菜单--</option>';
-        $.each(menu,function (i,n) {
-            if(n.parent_id == level1Node.id)
-            {
-                option += '<option value="'+n.id+'">'+n.name+'</option>';
-            }
-        });
-        $('#level2').html(option);
-        select2Level1.val(level1Node.id).trigger('change');//设置一级菜单
-        select2Level2.val(level2_id).trigger('change');//设置二级菜单
-    }
-
     // 菜单选择事件
     $('#level1').change(function () {
         var option = '<option value="">--新建二级菜单--</option>';
@@ -42,6 +16,34 @@ $(function () {
         });
         $('#level2').html(option);
     });
+
+
+    var select2Level1 = $('#level1').select2();
+    var select2Level2 = $('#level2').select2();
+    // 初始化分级菜单 level =1的在模板层面已处理
+    if(level == 2)
+    {
+        var level1_id = item.parent_id;
+        select2Level1.val(level1_id).trigger('change');//设置一级菜单即可
+        //$('#level1').change();
+    }
+    if(level == 3)
+    {
+        var level2_id = item.parent_id;
+        var level2Node  = menu[level2_id];
+        var level1Node  = menu[level2Node.parent_id];
+        // 渲染二级菜单
+        var option = '<option value="">--新建二级菜单--</option>';
+        $.each(menu,function (i,n) {
+            if(n.parent_id == level1Node.id)
+            {
+                option += '<option value="'+n.id+'">'+n.name+'</option>';
+            }
+        });
+        $('#level2').html(option);
+        select2Level1.val(level1Node.id).trigger('change');//设置一级菜单
+        select2Level2.val(level2_id).trigger('change');//设置二级菜单
+    }
 
     // 提交
     $('#menuEdit').submit(function () {
