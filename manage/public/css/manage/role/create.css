@@ -1,11 +1,11 @@
 .ztree li span.button.switch{margin-right:5px}
 .ztree ul ul li{display:inline-block;white-space:normal}
 .ztree>li>ul>li{padding:5px}
-.ztree>li{background: #dae6f0}
-.ztree>li:nth-child(even)>ul>li:nth-child(even){background: #eef5fa}
-.ztree>li:nth-child(even)>ul>li:nth-child(odd){background: #f6fbff}
-.ztree>li:nth-child(odd)>ul>li:nth-child(even){background: #eef5fa}
-.ztree>li:nth-child(odd)>ul>li:nth-child(odd){background: #f6fbff}
+.ztree>li{background: #e4f0fd}
+.ztree>li:nth-child(even)>ul>li:nth-child(even){background: #c9e0fb}
+.ztree>li:nth-child(even)>ul>li:nth-child(odd){background: #d4e7fd}
+.ztree>li:nth-child(odd)>ul>li:nth-child(even){background: #c9e0fb}
+.ztree>li:nth-child(odd)>ul>li:nth-child(odd){background: #d4e7fd}
 .ztree>li>ul{margin-top:12px}
 .ztree>li{padding:15px;padding-right:25px}
 .ztree li{white-space:normal!important}
@@ -16,5 +16,5 @@
 .menu_permissions {list-style: none;padding-bottom: 15px;margin-top:20px;padding-top: 20px;background: #e4f0fd;font-family: Verdana, Arial, Helvetica, AppleGothic, sans-serif;}
 .permissions_radio {line-height: 20px;font-size: 13px;margin:8px auto 3px;}
 .permissions_radio span {display: inline-block;min-width: 130px;font-size:15px;}
-.permissions_radio .radio-inline {padding:0 25px 0 0;line-height: 18px;color:#777;position: relative;}
+.permissions_radio .radio-inline {padding:0 25px 0 0;line-height: 18px;color:#333;position: relative;}
 .permissions_radio .iradio_square-blue {margin-bottom:2px;}

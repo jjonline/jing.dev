@@ -38,13 +38,34 @@ CREATE TABLE `com_user` (
   UNIQUE KEY `user_name` (`user_name`),
   KEY `mobile` (`mobile`),
   KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台用户表：与职员表对应(staff中存在user中可不存在，user中存在staff中绝对要存在)';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台统一用户表：系统本身的登录授权基础表';
+
+-----开放平台登录账户信息
+CREATE TABLE `com_user_open` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+  `user_id` int(11) NOT NULL DEFAULT 0 COMMENT '后台管理系统统一用户ID，为0则表示尚未与用户绑定',
+  `open_type` ENUM('qq','pc_weixin','mp_weixin','xiaochengxu','weibo') NOT NULL COMMENT '开放平台登录类型qq-QQ开放登录 pc_weixin-Pc网站版微信扫码登录 mp_weixin-微信公众号版微信登录 xiaochengxu-微信小程序登录 weibo-微博登录当(需要添加新类型时添加该枚举类型的待选值)',
+  `open_id` varchar(128) NOT NULL DEFAULT '' COMMENT 'OpenID',
+  `access_token` varchar(255) NOT NULL DEFAULT '' COMMENT 'AccessToken',
+  `name` varchar(32) NOT NULL DEFAULT '' COMMENT '昵称',
+  `gender` tinyint(1) NOT NULL DEFAULT -1 COMMENT '性别：-1未知0女1男',
+  `figure` varchar(128) NOT NULL DEFAULT '' COMMENT '头像图src',
+  `union_id` varchar(128) NOT NULL DEFAULT '' COMMENT 'UnionID',
+  `exipire_time` datetime DEFAULT NULL COMMENT 'Token过期时间点',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `open_id` (`open_id`,`open_type`),
+  KEY `user_id` (`user_id`),
+  KEY `union_id` (`union_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='多平台开放平台登录账户信息（用户和开放平台一对多）';
+
 
 
 -----雇员信息表[员工信息表]，
 CREATE TABLE `com_staff` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '员工ID',
-  `user_id` int(11) NOT NULL DEFAULT '' COMMENT '后台hsz 管理系统ID',
+  `user_id` int(11) NOT NULL DEFAULT '' COMMENT '后台管理系统统一用户ID',
   `is_leader` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否领导：1是0不是 用于部门内部审批、数据权限等识别',
   `dept_id` int(11) NOT NULL DEFAULT 0 COMMENT '所属部门ID',
   `role_id` int(11) NOT NULL DEFAULT 0 COMMENT '所属角色ID',
