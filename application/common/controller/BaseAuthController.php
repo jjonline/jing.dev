@@ -71,11 +71,10 @@ class BaseAuthController extends BasicController
         // 检查权限
         if(!$this->AuthService->userHasPermission())
         {
-            $request  = app('request');//读取单例
             $response = app('response');//读取单例
             $response->code(404);
             $this->view->engine->layout(false);//关闭layout 防止死循环
-            if($request->isAjax())
+            if($this->request->isAjax())
             {
                 $response = Response::create(['error_code' => -1,'error_msg' => '没有操作权限'], 'json');
             }else {
