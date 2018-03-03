@@ -66,12 +66,18 @@ class StringHelper {
         return trim($str);
     }
 
+    /**
+     * Url中附加get变量
+     * @param string $originUrl 待附加get变量的url
+     * @param mixed  $params    拟添加的url的get变量key=>value数组或parse_str可解析的a=1&b=2形式的字符串
+     * @return string
+     */
     public static function appendUrlParams($originUrl, $params) {
-        $arr = explode('?', $originUrl);
+        $arr  = explode('?', $originUrl);
 
-        if (count($arr) <= 1) {
-            $targetParams = $params;
-        } else {
+        if (is_string($arr)) {
+            parse_str($params,$targetParams);
+        } elseif(is_array($arr)) {
             parse_str($arr[1], $originParams);
             $targetParams = array_merge($originParams, $params);
         }
