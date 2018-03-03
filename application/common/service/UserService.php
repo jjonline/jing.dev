@@ -21,6 +21,7 @@ use think\Exception;
 use think\facade\Config;
 use think\facade\Cookie;
 use think\facade\Session;
+use think\Request;
 
 class UserService
 {
@@ -40,16 +41,22 @@ class UserService
      * @var LogService
      */
     public $LogService;
+    /**
+     * @var UserOpenService
+     */
+    public $UserOpenService;
 
     public function __construct(LogService $logService,
                                 User $User,
                                 Role $Role,
-                                Department $Department)
+                                Department $Department,
+                                UserOpenService $userOpenService)
     {
-        $this->User           = $User;
-        $this->Department     = $Department;
-        $this->Role           = $Role;
-        $this->LogService     = $logService;
+        $this->User            = $User;
+        $this->Department      = $Department;
+        $this->Role            = $Role;
+        $this->LogService      = $logService;
+        $this->UserOpenService = $userOpenService;
     }
 
     /**
@@ -161,11 +168,8 @@ class UserService
      */
     public function setUserLogout()
     {
-        if($this->isUserLogin())
-        {
-            // 记录日志
-            $this->LogService->logRecorder('用户退出');
-        }
+        // 记录日志--不检查是否登录状态，可能造成检查登录的死循环
+        $this->LogService->logRecorder('用户退出');
         Cookie::delete('user_id');
         Cookie::delete('token');
         Session::clear();
@@ -259,6 +263,65 @@ class UserService
         $_User['remark']    = !empty($User['remark']) ? trim($User['remark']) : '';
 
         return $_User;
+    }
+
+    public function userModifyOwnUserInfo(Request $request)
+    {
+        dump($request->post());
+        try{
+            $this->autoSmartCheckPassword($request->post('Profile.password'));
+
+        }catch (\Throwable $e){
+            return ['error_code' => 500,'error_msg' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * 登录状态下自动效验用户密码，连续3次错误自动退出登录状态
+     * ---
+     * 效验失败或错误次数过多抛出异常
+     * ---
+     * @param $password_text
+     * @return bool
+     * @throws Exception
+     */
+    public function autoSmartCheckPassword($password_text)
+    {
+        $times = 1;
+        if(Session::get('auto_check_pwd_times'))
+        {
+            $times = Session::get('auto_check_pwd_times');
+            $times++;
+        }
+        $User = $this->getLoginUserInfo();
+        // 检查密码超过3次自动退出
+        if(empty($User) || $times > 3)
+        {
+            // 记录日志 将最后一次尝试的密码记录下来
+            $this->LogService->logRecorder($password_text,'登录状态下尝试密码次数过多');
+            $this->setUserLogout();
+            throw new Exception('密码错误次数过多，请重新登录');
+        }
+        if($this->checkUserPassword($password_text,$User['password']))
+        {
+            Session::delete('auto_check_pwd_times');//验证通过清理记录次数的session
+            return true;
+        }
+        Session::set('auto_check_pwd_times',$times);
+        throw new Exception('密码效验失败');
+    }
+
+    /**
+     * 登录状态下获取登录用户信息，空数组则是未登录
+     * @return array
+     */
+    public function getLoginUserInfo()
+    {
+        if(!$this->isUserLogin())
+        {
+            return [];
+        }
+        return Session::get('user_info');
     }
 
     /**

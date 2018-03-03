@@ -9,31 +9,32 @@
 namespace app\common\service;
 
 
+use app\common\model\User;
 use app\common\model\UserOpen;
 use think\Exception;
 
 class UserOpenService
 {
     /**
+     * @var User
+     */
+    public $User;
+    /**
      * @var UserOpen
      */
     public $UserOpen;
-    /**
-     * @var UserService
-     */
-    public $UserService;
     /**
      * @var LogService
      */
     public $LogService;
 
     public function __construct(UserOpen $userOpen,
-                                LogService $logService,
-                                UserService $userService)
+                                User $user,
+                                LogService $logService)
     {
         $this->LogService  = $logService;
-        $this->UserService = $userService;
         $this->UserOpen    = $userOpen;
+        $this->User        = $user;
     }
 
     /**
@@ -58,7 +59,7 @@ class UserOpenService
         {
             throw new Exception('绑定开放平台参数错误：指定开放平台类型不存在，请先完善开放平台类型的支持方式');
         }
-        $user_info = $this->UserService->User->getUserInfoById($user_id);
+        $user_info = $this->User->getUserInfoById($user_id);
         if(empty($user_info) || empty($user_info['enable']))
         {
             throw new Exception('绑定开放平台失败：待绑定的系统用户不存在或已被禁用');
