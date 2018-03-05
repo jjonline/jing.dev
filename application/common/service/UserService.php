@@ -315,6 +315,11 @@ class UserService
             {
                 $user_update['password'] = $this->generateUserPassword($profile['password']);
             }
+            // 座机号码
+            if(!empty($profile['telephone']) && $profile['telephone'] != $user['telephone'])
+            {
+                $user_update['telephone'] = $profile['telephone'];
+            }
 
             if(empty($user_update))
             {

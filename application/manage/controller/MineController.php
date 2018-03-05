@@ -45,6 +45,11 @@ class MineController extends BaseController
         return $this->fetch();
     }
 
+    /**
+     * ajax提交编辑的用户个人资料|密码+真实姓名+手机号+邮箱+性别
+     * @param Request $request
+     * @return array|\think\Response
+     */
     public function editAction(Request $request)
     {
         if($request->isAjax() && $request->post('Profile.id') == $this->UserInfo['id'])
