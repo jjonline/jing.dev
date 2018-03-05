@@ -150,3 +150,22 @@ CREATE TABLE `com_log` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`,`action`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户操作动作的详细日志，每个请求都记录';
+
+----附件表-即文件上传所保存的上传文件的信息表
+CREATE TABLE `com_attachment` (
+  `id` char(36) NOT NULL COMMENT 'ID，UUID形式',
+  `user_id` int(11) NOT NULL COMMENT '用户ID',
+  `file_origin_name` varchar(128) NOT NULL COMMENT '带后缀的上传时的原始文件名',
+  `file_name` varchar(128) NOT NULL COMMENT '带后缀的上传完毕保存的文件名',
+  `file_path` varchar(512) NOT NULL COMMENT '相对于网站根目录的带文件名的文件路径，斜杠开头，方便切换CDN',
+  `file_mime` varchar(64) NOT NULL COMMENT '文件mime类型',
+  `file_size` bigint(20)  NOT NULL COMMENT '资源大小，单位：kb',
+  `file_sha1` varchar(40) NOT NULL COMMENT '资源的sha1值',
+  `image_width` int(10)  NOT NULL DEFAULT '0' COMMENT '图片类型宽资源的宽度',
+  `image_height` int(10) NOT NULL DEFAULT '0' COMMENT '图片类型资源的高度',
+  `is_use` tinyint(1) NOT NULL DEFAULT '0' COMMENT '图片类型资源的高度',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`user_id`,`file_sha1`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='附件表：用户上传资源数据';

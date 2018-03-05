@@ -40,12 +40,13 @@ class BasicController extends Controller
 
     /**
      * 控制器中封装好的直接使用的记录用户操作动作的日志方法
-     * @param null $data
+     * @param mixed  $data 记录的日志数据-譬如需备份保存的数据
+     * @param string $description 记录日志的描述内容
      * @return bool
      */
-    protected function logRecorder($data = null)
+    protected function logRecorder($data = null,$description = null)
     {
-        return $this->LogService->logRecorder($data);
+        return $this->LogService->logRecorder($data,$description);
     }
 
     /**
