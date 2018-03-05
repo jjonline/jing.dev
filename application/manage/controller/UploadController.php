@@ -9,13 +9,22 @@
 namespace app\manage\controller;
 
 use app\common\controller\BaseController;
+use app\common\service\AttachmentService;
 
 class UploadController extends BaseController
 {
-
-    public function uploadAction()
+    /**
+     * 上传文件
+     * @param AttachmentService $attachmentService
+     * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function uploadAction(AttachmentService $attachmentService)
     {
-
+        $result = $attachmentService->uploadFile($this->request);
+        return $this->asJson($result);
     }
 
 }

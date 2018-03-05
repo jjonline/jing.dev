@@ -3,7 +3,7 @@
  * KindEditor后端服务
  * @user Jea杨 (JJonline@JJonline.Cn)
  * @date 2018-03-05 10:49
- * @file UploadController.php
+ * @file FileManagerController.php
  */
 
 namespace app\manage\controller;
@@ -14,8 +14,8 @@ use think\Request;
 class FileManagerController extends BaseController
 {
     private $Order;
-    private $RootPath = './Uploads/';//上传文件根目录 相对于入口文件
-    private $RootUrl  = '/Uploads/';//上传目录的url形式
+    private $RootPath = './uploads/';//上传文件根目录 相对于入口文件
+    private $RootUrl  = '/uploads/';//上传目录的url形式
 
     /**
      * KindEditor图片|文件浏览后端服务
@@ -34,9 +34,9 @@ class FileManagerController extends BaseController
             return json(['error' => 1, 'message' => 'Invalid Directory name.']);
         }
         //指定不同类型浏览目录的相对目录位置 === 添加了文件类型
-        $this->RootPath       = $this->RootPath.ucfirst($paramDir).'/';
+        $this->RootPath       = $this->RootPath.$paramDir.'/';
         //指定不同类型浏览目录的Url位置 === 添加了文件类型
-        $this->RootUrl        = $this->RootUrl.ucfirst($paramDir).'/';
+        $this->RootUrl        = $this->RootUrl.$paramDir.'/';
         //设定各目录参数
         if (!$paramPath) { //浏览上传根目录
             $current_path     = realpath($this->RootPath).'/';
@@ -152,7 +152,7 @@ class FileManagerController extends BaseController
             return json(['error' => 1, 'message' => '不允许上传的文件类型']);
         }
         //检查通过 开始处理上传的文件
-        $saveDir        =    './Uploads/'.ucfirst($paramDir).'/';//不同类型文件存储的根目录 如图片则是./Uploads/Image/
+        $saveDir        =    './uploads/'.$paramDir.'/';//不同类型文件存储的根目录 如图片则是./Uploads/Image/
         //检查文件夹权限
         if(!is_dir($saveDir))
         {
@@ -164,9 +164,10 @@ class FileManagerController extends BaseController
          */
         $file_ext = $allowedExt[$paramDir];
         $file     = $request->file('imgFile');
-        ##自定义上传文件名 按hash来命名文件也达到了去重的作用
+        ## 自定义上传文件名 按hash来命名文件也达到了去重的作用
         $fileInfo = $file->validate(['ext' => $file_ext])
-                  ->move($saveDir,date('Ym').'/'.$file->hash('sha1'));
+                  ->rule('sha1')
+                  ->move($saveDir);
         if(!$fileInfo)
         {
             return json(['error' => 1, 'message' => $file->getError()]);
