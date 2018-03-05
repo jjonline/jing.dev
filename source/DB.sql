@@ -51,7 +51,7 @@ CREATE TABLE `com_user_open` (
   `gender` tinyint(1) NOT NULL DEFAULT -1 COMMENT '性别：-1未知0女1男',
   `figure` varchar(128) NOT NULL DEFAULT '' COMMENT '头像图src',
   `union_id` varchar(128) NOT NULL DEFAULT '' COMMENT 'UnionID',
-  `exipire_time` datetime DEFAULT NULL COMMENT 'Token过期时间点',
+  `expire_time` datetime DEFAULT NULL COMMENT 'Token过期时间点',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
   PRIMARY KEY (`id`),

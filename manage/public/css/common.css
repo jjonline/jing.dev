@@ -14,7 +14,7 @@ body {
     padding-left: 10px;
 }
 .box {margin-bottom: 10px;}
-.box-min {min-height: 360px;}
+.box-min {min-height: 505px;}
 
 /**
  * 列表中排序字段的input框

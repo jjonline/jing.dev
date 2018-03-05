@@ -267,10 +267,70 @@ class UserService
 
     public function userModifyOwnUserInfo(Request $request)
     {
-        dump($request->post());
         try{
             $this->autoSmartCheckPassword($request->post('Profile.password'));
+            // 效验
+            if(!empty($profile['re_password']) && !FilterValidHelper::is_password_valid($profile['re_password']))
+            {
+                return ['error_code' => 400,'error_msg' => '新密码格式有误：6至18位同时包含数字和字母'];
+            }
+            if(!empty($profile['mobile']) && !FilterValidHelper::is_phone_valid($profile['mobile']))
+            {
+                return ['error_code' => 400,'error_msg' => '手机号码格式有误'];
+            }
+            if(!empty($profile['email']) && !FilterValidHelper::is_mail_valid($profile['email']))
+            {
+                return ['error_code' => 400,'error_msg' => '邮箱格式有误'];
+            }
+            if(!empty($profile['real_name']) && mb_strlen($profile['real_name'],'utf8') >= 32)
+            {
+                return ['error_code' => 400,'error_msg' => '真实姓名长度不得超过32位'];
+            }
+            // 收集修改的信息
+            $profile     = $request->post('Profile/a');
+            $user        = $this->getLoginUserInfo();
+            $user_update = [];
+            // 真实姓名
+            if(!empty($profile['real_name']) && $profile['real_name'] != $user['real_name'])
+            {
+                $user_update['real_name'] = trim($profile['real_name']);
+            }
+            // 手机号
+            if(FilterValidHelper::is_phone_valid($profile['mobile']) && $profile['mobile'] != $user['mobile'])
+            {
+                $user_update['mobile'] = trim($profile['mobile']);
+            }
+            // 邮箱
+            if(FilterValidHelper::is_mail_valid($profile['email']) && $profile['email'] != $user['email'])
+            {
+                $user_update['email'] = trim($profile['email']);
+            }
+            // 性别
+            if(in_array($profile['gender'],[-1,0,1]) && $profile['gender'] != $user['gender'])
+            {
+                $user_update['gender'] = $profile['gender'];
+            }
+            // 密码
+            if(FilterValidHelper::is_password_valid($profile['re_password']) && $profile['re_password'] != $profile['password'])
+            {
+                $user_update['password'] = $this->generateUserPassword($profile['password']);
+            }
 
+            if(empty($user_update))
+            {
+                return ['error_code' => 400,'error_msg' => '本次未修改个人信息'];
+            }
+            $user_update['id'] = $user['id'];
+            $result = $this->User->isUpdate(true)->data($user_update)->save();
+            if(false !== $result)
+            {
+                $this->LogService->logRecorder($profile,'修改个人资料');
+                // 修改成功 清理session 下次请求自动重新生成
+                Session::delete('user_id');
+                Session::delete('user_info');
+                return ['error_code' => 0,'error_msg' => '个人资料修改成功'];
+            }
+            return ['error_code' => 500,'error_msg' => '个人资料修改失败：数据库异常'];
         }catch (\Throwable $e){
             return ['error_code' => 500,'error_msg' => $e->getMessage()];
         }

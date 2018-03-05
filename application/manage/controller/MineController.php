@@ -9,12 +9,19 @@
 namespace app\manage\controller;
 
 use app\common\controller\BaseController;
+use app\common\service\UserOpenService;
+use think\Request;
 
 
 class MineController extends BaseController
 {
 
-    public function profileAction()
+    /**
+     * 个人资料概要页
+     * @return mixed
+     * @throws \think\Exception
+     */
+    public function profileAction(UserOpenService $userOpenService)
     {
         $this->title            = '个人中心 - '.config('local.site_name');
         $this->content_title    = '个人中心';
@@ -23,9 +30,27 @@ class MineController extends BaseController
             ['label' => '个人中心','url' => url('mine/profile')],
             ['label' => '个人资料概要','url'  => ''],
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = false;
+        $this->load_layout_css = true;
+        $this->load_layout_js  = true;
+
+        // 是否有权编辑个人信息
+        // $can_edit = $this->userHasPermission('manage/mine/edit'); // 无前后缀菜单url方法检查权限，全部使用小写
+        $can_edit = $this->userHasPermission('Mine_Edit'); // 菜单tag方法检查权限，tag严格区分大小写
+        $this->assign('can_edit',$can_edit);
+
+        // 用户的开放平台绑定信息
+        $user_open = $userOpenService->UserOpen->getUserOpenListInfoByUserId($this->UserInfo['id']);
+        $this->assign('user_open',$user_open);
 
         return $this->fetch();
+    }
+
+    public function editAction(Request $request)
+    {
+        if($request->isAjax() && $request->post('Profile.id') == $this->UserInfo['id'])
+        {
+            return $this->UserService->userModifyOwnUserInfo($request);
+        }
+        return $this->renderJson('异常错误',500);
     }
 }

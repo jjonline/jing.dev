@@ -82,7 +82,7 @@ $(function () {
             return false;
         }
         var data = $('#DeptForm').serializeArray();
-        $('.btn-submit').prop('disabled',true).text('提交中...');
+        $('.btn-submit-edit').prop('disabled',true).text('提交中...');
         $.ajax({
             url: $('#DeptForm').data('edit'),
             type: 'POST',
@@ -97,10 +97,10 @@ $(function () {
                 }else{
                     utils.alert(data.error_msg ? data.error_msg : '未知错误');
                 }
-                $('.btn-submit').prop('disabled',false).text('提交');
+                $('.btn-submit-edit').prop('disabled',false).text('提交');
             },
             error:function () {
-                $('.btn-submit').prop('disabled',false).text('提交');
+                $('.btn-submit-edit').prop('disabled',false).text('提交');
                 utils.alert('网络或服务器异常，请稍后再试');
             }
         });
@@ -120,7 +120,7 @@ $(function () {
             return false;
         }
         var data = $('#DeptForm').serializeArray();
-        $('.btn-submit').prop('disabled',true).text('提交中...');
+        $('.btn-submit-create').prop('disabled',true).text('提交中...');
         $.ajax({
             url: $('#DeptForm').data('create'),
             type: 'POST',
@@ -135,10 +135,10 @@ $(function () {
                 }else{
                     utils.alert(data.error_msg ? data.error_msg : '未知错误');
                 }
-                $('.btn-submit').prop('disabled',false).text('提交');
+                $('.btn-submit-create').prop('disabled',false).text('提交');
             },
             error:function () {
-                $('.btn-submit').prop('disabled',false).text('提交');
+                $('.btn-submit-create').prop('disabled',false).text('提交');
                 utils.alert('网络或服务器异常，请稍后再试');
             }
         });
