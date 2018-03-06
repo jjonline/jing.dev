@@ -20,6 +20,7 @@
 <link href="__PUBLIC__/plugin/datatables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet">
 <link href="__PUBLIC__/plugin/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css" rel="stylesheet">
 <link href="__PUBLIC__/plugin/zTree/css/bootstrapStyle/bootstrapStyle.css" rel="stylesheet">
+<link href="__PUBLIC__/plugin/jcrop/css/jquery.Jcrop.min.css" rel="stylesheet">
 <link href="__PUBLIC__/css/common.css?ver=<%{:config('local.version')}%>" rel="stylesheet">
 <%{if condition="!empty($load_layout_css)" }%><%{/* 使用 `小写控制器名/小写操作.css` 作为应用额外载入css，启用这个特性在action中assign出$load_layout_css变量为true即可 */}%>
 <link href="__PUBLIC__/css/<%{:strtolower(request()->module())}%>/<%{:strtolower(request()->controller())}%>/<%{:strtolower(request()->action())}%>.css?ver=<%{:config('local.version')}%>" rel="stylesheet">

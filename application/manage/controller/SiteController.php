@@ -103,7 +103,7 @@ class SiteController extends BaseController
         {
             foreach ($menu as $item)
             {
-                if($authService->userHasPermission($item['url']))
+                if($item['level'] <= 2 && !empty($item['url']) && $authService->userHasPermission($item['url']))
                 {
                     $this->redirect(url($item['url']));
                 }

@@ -84,12 +84,12 @@ class AttachmentService
             return ['error_code' => 0,'error_msg' => '上传成功：文件曾上传过','data' => $exist_attachment];
         }
         //不同类型文件存储的根目录 如图片则是./Uploads/Image/
-        $saveDir = './uploads/'.$paramDir.'/';
+        $saveDir = './uploads/'.$paramDir.'/'.date('Y').'/';
         //检查文件夹权限
-        if(!is_dir($saveDir))
-        {
-            mkdir($saveDir);
-        }
+//        if(!is_dir($saveDir))
+//        {
+//            mkdir($saveDir);
+//        }
         $file = $origin_file->validate(['ext' => $allowedExt[$paramDir]])
             ->rule('sha1')
             ->move($saveDir);

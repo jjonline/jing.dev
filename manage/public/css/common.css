@@ -93,5 +93,15 @@ body {
     box-shadow:0 3px 6px rgba(0,0,0,.2),0 3px 6px rgba(0,0,0,.26)
 }
 
-
+.btn-default,.btn-default:hover,.btn-default:focus  {background-color: #fff;border-color: #fafafa;}
 .main-footer .version {color:#ccc;}
+
+/**
+ * upload corper
+ */
+#image_cut_container {width: 100%;}
+#image_cut_preview {width: 100%;}
+#cut {width: 100%;height: 100%;overflow: hidden;}
+#_File {display: none;}
+#image_cut_uploader {margin-top:20px;text-align: center;}
+#image_cut_uploader p {margin:20px auto;font-size:13px;}

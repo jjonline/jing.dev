@@ -652,67 +652,9 @@ var utils = {
     isCardNumber:function (id) {
         return utils.isID(id);
     },
-    // 上传formdata
-    uploadBlob: function (id, callback,param) {
-            url = param["url"] || '/upload/handle?action=uploadimage';
-            data = param["data"] || {};
-            data._csrf = utils.getCsrf();
-            data._safe = param["safe"];
-            if(!$("#imgfield").html()){  
-              return;
-           }
-
-           function append(form,obj){
-              for(var i in obj){
-                form.append && form.append( i , obj[i] );
-              }
-
-              return form;
-           }
-           
-           //获取裁剪完后的base64图片url,转换为blob  
-           var data_blob=document.getElementById("myCan").toDataURL();
-           var formData=new FormData();
-
-           formData.append("upfile",dataURLtoBlob(data_blob) , utils.uploadBlob.filename || "default.png" );
-
-           function dataURLtoBlob(dataurl) {
-               var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-                       bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-               while (n--) {
-                   u8arr[n] = bstr.charCodeAt(n);
-               }  
-               return new Blob([u8arr], { type: mime });
-           }  
-           var data1=append(formData,data);
-
-            utils.showLoading("文件上传中,请稍候...");
-            $.ajax( {
-                        url: url, //用于文件上传的服务器端请求地址
-                        secureuri: false, //是否需要安全协议，一般设置为false
-                        type: 'POST',  
-                        data: data1,
-                        async:true,
-                        cache: false,
-                        contentType: false,  
-                        processData: false,  
-                        success: function (data) {
-                            callback && callback(data);
-                            // $uploader.replaceWith(origin);
-                            // $("#" + id).on("change", self);
-                            utils.hideLoading();
-                           
-                        },
-                        error: function (data, status, e){
-                            utils.hideLoading();
-                            console.log(e);
-                            utils.alert("网络或服务器异常，请稍后再试，如有疑问请联系管理员");
-                        }
-                    });
-        },
     //传入fn  解决utils.uploadFile.caller为null的问题
     uploadFile: function (id, callback, url, data, safe,fn) {
-        url = url || '/upload/handle?action=uploadimage';
+        url = url || '/upload/upload?action=uploadimage';
         data = data || {};
         data._csrf = utils.getCsrf();
         data._safe = safe;
@@ -760,17 +702,239 @@ var utils = {
             , url, data, safe);
         });
     },
+    /**
+     * 绑定图片裁剪上传控件
+     * @param node_id 绑定裁剪元素的ID
+     * @param params  裁剪方法的参数对象
+     */
+    bindCutImageUploader:function (node_id,params) {
+
+        // 默认参数和额外参数进行合并
+        var param = $.extend({
+            rate:'4/3',//裁剪图的比例
+            message:'',//选择图片框页面提示尺寸和比例之后附加的提示文字
+            width:800,//指定裁剪后图片宽度
+            height:600,//指定裁剪后图片高度
+            extraData:{},//额外塞入上传的post数据体重的filed-value对象数组
+            success:function (data) {},//裁剪并上传成功后的回调函数，data参数为服务器返回的json对象
+            error:function () {}//裁剪或上传失败的回调函数
+        },params);
+
+        // 渲染生成裁剪框
+        var dialog_content = [
+            '<div id="image_cut_container">',
+                '<div id="image_cut_preview">',
+                    '<div id="cut"></div>',
+                '</div>',
+                '<div id="image_cut_uploader">',
+                    '<input type="file" id="_File" name="File">',
+                    '<button class="btn btn-default btn-upload btn-select-image" type="button">点击选择图片</button>',
+                    '<p>建议上传宽高比为 <span id="image_cut_rate"></span> 的图片，裁剪上传的图片尺寸为：<span id="image_cut_width"></span>px * <sapn id="image_cut_height"></sapn>px</p>',
+                '</div>',
+                '<canvas id="image_cut_canvas" width="800px" height="600px" style="display: none;"></canvas>',
+            '</div>'
+        ].join('');
+
+
+        var crop = {
+            /**
+             * 显示选择图片和预览图并裁剪的浮层
+             */
+            showCutDialog:function () {
+                var that = this;
+                bootbox.dialog({
+                    message: dialog_content,
+                    //size:'large',
+                    title: '图片剪裁',
+                    onEscape: true,
+                    backdrop: true,
+                    buttons: {
+                        success: {
+                            label: '<i class="fa fa-upload" id="do_upload"></i> 确认并上传',
+                            className: "btn btn-danger",
+                            callback: function () {
+                                if(!$('#cut').html()){
+                                    return false;
+                                }
+                                that.uploadBlob();
+                            }
+                        },
+                        cancel: {
+                            label: '取消操作',
+                            className: "btn btn-default btn-cancel"
+                        }
+                    }
+                });
+            },
+            /**
+             * 初始化裁剪框浮层和各种事件
+             */
+            init:function () {
+                var width = param.width;
+                var height= param.width / param._rate;
+                // 调整canvas元素长宽
+                $('#image_cut_canvas').attr({
+                    width : width + 'px',
+                    height:height + 'px'
+                });
+                this.width = width;
+                this.height= height;
+                this.param = param;
+                this.bindEvents();
+            },
+            /**
+             * 初始化Jcrop裁剪插件
+             */
+            initCrop:function () {
+                var that = this;
+                var crop_object;
+                $('#corp_box').Jcrop(
+                    {
+                        onSelect:that.onCropSelect,
+                        allowSelect:false,
+                        aspectRatio:param._rate,
+                        boxWidth:$('#cut').width(),
+                        boxHeight:$('#cut').height()
+                    },
+                    function () {
+                        crop_object = this;
+                        this.setSelect([0,0,3000,3000]);
+                    }
+                );
+            },
+            /**
+             * Jcrop的onSelect事件，将图片按尺寸塞入canvas
+             */
+            onCropSelect:function (corp_object) {
+                var img=document.getElementById("corp_box");
+                var ctx=document.getElementById("image_cut_canvas").getContext("2d");
+                ctx.drawImage(img,corp_object.x,corp_object.y, corp_object.w, corp_object.h,0,0,crop.width,crop.height);
+            },
+            /**
+             * 绑定裁剪框各种事件
+             */
+            bindEvents:function () {
+                var that = this;
+                // 绑定点击选择图片按钮的事件进行传递
+                $('#image_cut_container').on('click','.btn-select-image',function () {
+                    $('#_File').click();
+                });
+                // 绑定浮层上传input输入框的change事件
+                $('#_File').on('change',function () {
+                    that.changeEvent.call(this);
+                });
+            },
+            /**
+             * 选择图片后的变化事件
+             */
+            changeEvent:function () {
+                // 浮层上的input触发change事件后的动作和方法
+                var checked_file_info = $(this).get(0).files[0];
+                if(utils.isEmpty(checked_file_info))
+                {
+                    return false;
+                }
+                var fileName = checked_file_info.name;
+                var fileType=fileName.substring(fileName.lastIndexOf('.'),fileName.length).toLowerCase();
+                if(fileType!='.gif' && fileType!='.jpeg' && fileType!='.png' && fileType!='.jpg')
+                {
+                    utils.toast('请选择gif、jpeg、jpg或png格式的图片');
+                    return false;
+                }
+                utils.field_name = fileName;
+                // 将选择的图片文件本地渲染装载
+                var file_reader = new FileReader();
+                file_reader.readAsDataURL(checked_file_info);
+                file_reader.onload =function (e) {
+                    var img_preview = '<img id="corp_box" src="'+e.target.result+'">';
+                    $('#cut').html(img_preview);
+                };
+
+                // 装载图初始化Jcrop
+                setTimeout(function () {
+                    crop.initCrop();
+                },10);
+            },
+            uploadBlob:function () {
+                url  = '/manage/upload/upload?action=image';
+                data = param.extraData || {};
+                if(!$('#cut').html())
+                {
+                    return false;
+                }
+
+                function append(form,obj)
+                {
+                    for(var i in obj){
+                        form.append && form.append( i , obj[i] );
+                    }
+                    return form;
+                }
+
+                //获取裁剪完后的base64图片url,转换为blob
+                var data_blob = document.getElementById("image_cut_canvas").toDataURL();
+                var formData  = new FormData();
+
+                formData.append("File",dataURLtoBlob(data_blob) , utils.field_name || "default.png" );
+
+                function dataURLtoBlob(dataurl) {
+                    var arr  = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+                    while (n--) {
+                        u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    return new Blob([u8arr], { type: mime });
+                }
+                var data1 = append(formData,data);
+
+                utils.showLoading("文件上传中,请稍候...");
+                $.ajax( {
+                    url: url, //用于文件上传的服务器端请求地址
+                    type: 'POST',
+                    data: data1,
+                    async:true,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        param.success && param.success(data);
+                        utils.hideLoading();
+                        utils.toast(data.error_msg);
+                    },
+                    error: function (data, status, e){
+                        utils.hideLoading();
+                        param.error && param.error();
+                        utils.alert("网络或服务器异常，请稍后再试，如有疑问请联系管理员");
+                    }
+                });
+            }
+        };
+
+        // 指定ID名为 mode_id 的元素绑定点击事件
+        $('#'+node_id).on('click',function () {
+            crop.showCutDialog();
+            var rate     = param.rate.split('/');
+            param._rate  = rate[0] / rate[1];
+            param.height = Math.ceil(param._rate * param.height);
+            $('#image_cut_rate').text(rate[0] + ':' + rate[1]);
+            $('#image_cut_width').text(param.width);
+            $('#image_cut_height').text(param.height);
+
+            // init ++ bind event
+            crop.init();
+            return false;
+        });
+    },
     showLoading: function (title) {
         title = title || "数据加载中，请稍候...";
-        var modalHtml = '<div class="modal fade" id="loadingModal" role="basic" aria-hidden="true" style="display: none;">' +
-                '<div class="modal-dialog">' +
-                '<div class="modal-content">' +
-                '<div class="modal-body">' +
-                '<img src="/static/images/load.gif" alt="" class="loading">' +
-                '<span id="loadingLabel"> &nbsp;&nbsp;' + title + ' </span>' +
-                '</div>' +
-                '</div>' +
-                '</div>' +
+        var modalHtml = '<div class="modal fade" id="loadingModal" role="basic" aria-hidden="true" style="display: none;">' + '<div class="modal-dialog">' +
+                    '<div class="modal-content">' +
+                            '<div class="modal-body">' +
+                                '<img src="/public/images/load.gif" alt="" class="loading">' +
+                                '<span id="loadingLabel"> &nbsp;&nbsp;' + title + ' </span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
                 '</div>';
         if (!($("#loadingModal").length > 0)) {
             $(document.body).append(modalHtml);
