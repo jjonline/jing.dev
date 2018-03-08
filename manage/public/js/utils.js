@@ -800,7 +800,6 @@ var utils = {
         // 默认参数和额外参数进行合并
         var param = $.extend({
             rate:'4/3',//裁剪图的比例
-            message:'',//选择图片框页面提示尺寸和比例之后附加的提示文字
             width:800,//指定裁剪后图片宽度
             height:600,//指定裁剪后图片高度
             extraData:{},//额外塞入上传的post数据体重的filed-value对象数组
