@@ -313,7 +313,7 @@ class UserService
             // 密码
             if(FilterValidHelper::is_password_valid($profile['re_password']) && $profile['re_password'] != $profile['password'])
             {
-                $user_update['password'] = $this->generateUserPassword($profile['password']);
+                $user_update['password'] = $this->generateUserPassword($profile['re_password']);
             }
             // 座机号码
             if(!empty($profile['telephone']) && $profile['telephone'] != $user['telephone'])

@@ -54,12 +54,14 @@ class AuthService
                                 User $User,
                                 Role $Role,
                                 Menu $Menu,
+                                RoleMenu $roleMenu,
                                 Department $Department)
     {
         $this->User           = $User;
         $this->Department     = $Department;
         $this->Role           = $Role;
         $this->Menu           = $Menu;
+        $this->RoleMenu       = $roleMenu;
         $this->LogService     = $logService;
     }
 
