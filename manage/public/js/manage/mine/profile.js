@@ -43,4 +43,5 @@ $(function () {
     });
     
     utils.bindCutImageUploader('do',{'rate':'3/2','callback':function () {},'message':'sd',extraData:{'dd':'x'}});
+    utils.bindAjaxUploader('dm',{data:{'id':1}});
 });

@@ -652,54 +652,142 @@ var utils = {
     isCardNumber:function (id) {
         return utils.isID(id);
     },
-    //传入fn  解决utils.uploadFile.caller为null的问题
-    uploadFile: function (id, callback, url, data, safe,fn) {
-        url = url || '/upload/upload?action=uploadimage';
-        data = data || {};
-        data._csrf = utils.getCsrf();
-        data._safe = safe;
-        var $uploader = $("#" + id);
-        var origin = $uploader[0].outerHTML;
-        var self = utils.uploadFile.caller || fn;
-        utils.showLoading("文件上传中,请稍候...");
-        $.ajaxFileUpload({
-            url: url, //用于文件上传的服务器端请求地址
-            secureuri: false, //是否需要安全协议，一般设置为false
-            fileElementId: id, //文件上传域的ID
-            data: data,
-            success: function (data) {
-                var str = $(data).find("body").text();
-                var data = $.parseJSON(str);
-                callback && callback(data);
-                $uploader.replaceWith(origin);
-                $("#" + id).on("change", self);
-                $("#" + id).val('');
-                utils.hideLoading();
+    /**
+     * 精简的没有精度条的单个文件ajax上传
+     * @param id
+     * @param success
+     * @param error
+     * @returns {boolean}
+     */
+    ajaxUploadFile: function (id,success,error) {
+        var that = $('#' + id);
+        that.dmUploader({
+            method:'POST',
+            fieldName:'File',
+            multiple:false,
+            url:'/manage/upload/upload?origin=ajax',
+            onInit:function () {},
+            onNewFile:function (id,file_info) {},
+            onUploadProgress:function (id, percent) {},
+            onUploadSuccess:function (id, data) {
+                if(data.error_code == 0)
+                {
+                    success && success(data);
+                }else {
+                    error && error();
+                }
             },
-            error: function (data, status, e)//服务器响应失败处理函数
-            {
-                $uploader.replaceWith(origin);
-                $("#" + id).on("change", self);
-                $("#" + id).val('');
-                utils.hideLoading();
-
-                console.log(e);
-                utils.alert("网络正忙，请稍后再试，如有疑问请联系管理员");
+            onUploadError:function (id, xhr, status, errorThrown) {
+                error && error();
             }
-        })
+        });
         return false;
     },
-    bindUploader: function (id, callback, url, data, safe) {
-        $("#" + id).on("change", function () {
-            utils.uploadFile($(this).attr("id"),
-                function (data) {
-                    if (data.state == "SUCCESS") {
-                        callback && callback(data);
-                    } else {
-                        utils.alert(data.state);
-                    }
+    /**
+     * 绑定带进度条的单个或多个文件上传控件
+     * @param id string 待绑定上传input文件框的ID
+     * @param _param object 绑定ajax文件上传的参数对象， {multiple:bool,error:function,success:function,data:{}}
+     */
+    bindAjaxUploader: function (id, _param) {
+        var param = $.extend({
+            multiple:true,//是否允许选择多张图，默认允许多张
+            error:function () {},//上传成功的回调函数
+            success:function () {},//上传失败的回调函数
+            data: {} //上传控制器额外附带的key-value
+        },_param);
+        param.file_name = [];//初始化内部变量
+        /**
+         * -----
+         * 上传按钮html结构如下，其中input的title属性可用于一些提示性文案文字
+         * -----
+         * <div class="upload-container">
+         *    <span class="upload">
+         *        <input type="file" name="File" title="点击选择图片并上传" id="dm">
+         *    </span>
+         * </div>
+         * -----
+         * Js中调用：utils.bindUploader('input元素的ID',{
+         *      'data':'需在上传时额外附带的key-value对象，一般留空即可',
+         *      'success':'文件上传成功后的回调函数，参数为上传后端控制器返回的json',
+         *      'error':'文件上传失败后的回调函数，大部分时候不用传，页面会有toast提示',
+         * });
+         * 即可实现ajax文件上传，上传成功后使用回调函数处理接下来的逻辑，譬如将文件url放入隐藏的input框，将图片显示成预览图等
+         * -----
+         */
+        var that = $("#" + id);
+        // 提示
+        if(!utils.isEmpty($(that).parent('.upload').html()))
+        {
+            if(!utils.isEmpty(that.attr('title')))
+            {
+                $(that).parent('.upload').tooltip({
+                    title:that.attr('title')
+                });
+            }
+        }
+        /**
+         * 初始化上传进度条内部方法
+         * @param file_name 文件名
+         */
+        var initProcess = function (file_name) {
+            var process_dom = [
+                '<div id="dm-uploader-process">',
+                    '<div class="row">',
+                        '<div class="col-md-12">',
+                            '<div id="dm-uploader-filename">正在上传：'+ file_name || '文件名未知' +'</div>',
+                            '<div id="dm-uploader-percent-container">',
+                                '<div id="dm-uploader-percent-bar" class="bg-primary dm-uploader-percent">',
+
+                                '</div>',
+                            '</div>',
+                        '</div>',
+                    '</div>',
+                '</div>'
+            ].join('');
+            bootbox.dialog({
+                message: process_dom,
+                closeButton:false,
+                //title: '文件上传进度',
+                onEscape: true,
+                //backdrop: true,
+                buttons: {}
+            });
+        };
+        // 图片（若是图片）预览，上传进度
+        that.dmUploader({
+            method:'POST',
+            fieldName:'File',
+            extraData:param.data,
+            multiple:!!param.multiple,
+            url:'/manage/upload/upload?origin=ajax',
+            onInit:function () {},
+            onNewFile:function (id,file_info) {
+                param.file_name[id] = file_info.name;
+                // console.log(file_info);
+                // initProcess();
+            },
+            onUploadProgress:function (id, percent) {
+                if(utils.isEmpty($('#dm-uploader-process').html()))
+                {
+                    initProcess(param.file_name[id]);
                 }
-            , url, data, safe);
+                $('#dm-uploader-percent-bar').css('width',percent + '%').text(percent+'%');
+                console.log(percent);
+            },
+            onUploadSuccess:function (id, data) {
+                $('.bootbox').modal('hide');
+                if(data.error_code == 0)
+                {
+                    param.success && param.success(data);
+                }else {
+                    param.error && param.error();
+                }
+                // console.log(data);
+            },
+            onUploadError:function (id, xhr, status, errorThrown) {
+                $('.bootbox').modal('hide');
+                param.error && param.error();
+            }
         });
     },
     /**
@@ -747,13 +835,14 @@ var utils = {
                     //size:'large',
                     title: '图片剪裁',
                     onEscape: true,
-                    backdrop: true,
+                    //backdrop: true,
                     buttons: {
                         success: {
                             label: '<i class="fa fa-upload" id="do_upload"></i> 确认并上传',
                             className: "btn btn-danger",
                             callback: function () {
                                 if(!$('#cut').html()){
+                                    utils.toast('请选择图片并裁剪');
                                     return false;
                                 }
                                 that.uploadBlob();
@@ -915,7 +1004,7 @@ var utils = {
             crop.showCutDialog();
             var rate     = param.rate.split('/');
             param._rate  = rate[0] / rate[1];
-            param.height = Math.ceil(param._rate * param.height);
+            param.height = Math.floor(param.width / param._rate);
             $('#image_cut_rate').text(rate[0] + ':' + rate[1]);
             $('#image_cut_width').text(param.width);
             $('#image_cut_height').text(param.height);

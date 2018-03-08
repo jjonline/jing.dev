@@ -27,10 +27,4 @@ class UploadController extends BaseController
         return $this->asJson($result);
     }
 
-    public function blobAction(AttachmentService $attachmentService)
-    {
-        $result = $attachmentService->uploadFile($this->request);
-        return $this->asJson($result);
-    }
-
 }

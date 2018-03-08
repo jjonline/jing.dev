@@ -62,7 +62,15 @@
             </div>
             <div class="box-body">
                 <form action="<%{:url('manage/upload/upload')}%>" enctype="multipart/form-data" method="post">
-                    <input type="file" name="File"/> <br>
+
+                    <div class="upload-container">
+                        <span class="upload">
+                            <input type="file" name="excel" title="点击选择图片并上传" id="dm">
+                        </span>
+                    </div>
+
+
+                    <br>
                     <input type="submit" value="上传"  id="do"/>
                 </form>
             </div>
