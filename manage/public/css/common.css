@@ -13,8 +13,9 @@ body {
     padding-right: 10px;
     padding-left: 10px;
 }
-.box {margin-bottom: 10px;}
+.box {margin-bottom: 10px;box-shadow: 1px 0 10px 1px rgba(0,0,0,.3);}
 .box-min {min-height: 505px;}
+.select2 {width: 100%;}
 
 /**
  * 列表中排序字段的input框

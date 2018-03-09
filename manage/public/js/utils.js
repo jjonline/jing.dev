@@ -653,6 +653,23 @@ var utils = {
         return utils.isID(id);
     },
     /**
+     * 绑定datetimepicker日历时间组件
+     * @param $node jquery对象
+     */
+    bindDateTimePicker:function ($node) {
+        $node.each(function (i,e) {
+            $(e).datetimepicker({
+                language: 'zh-CN',
+                autoclose: true,
+                todayHighlight: true,
+                format: 'yyyy-mm-dd hh:ii:ss',
+                minView: 0,
+                startView: 2,
+                viewSelect: 3
+            });
+        });
+    },
+    /**
      * 精简的没有精度条的单个文件ajax上传
      * @param id
      * @param success

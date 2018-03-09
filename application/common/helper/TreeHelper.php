@@ -12,6 +12,25 @@ namespace app\common\helper;
 class TreeHelper
 {
     /**
+     * @param array $arr    树数组
+     * @param int $paren_id 需要查找所有子节点
+     * @return array|mixed
+     */
+    public static function child($arr,$paren_id)
+    {
+        // $child = [];
+        foreach ($arr as $key => $value)
+        {
+            if($value['parent_id'] == $paren_id)
+            {
+                $child[$value['id']] = $value;
+                $child              += self::child($arr,$value['id']);
+            }
+        }
+        return isset($child) ? $child : [];
+    }
+
+    /**
      * 分类排序（降序）
      * @param $arr
      * @param $cols

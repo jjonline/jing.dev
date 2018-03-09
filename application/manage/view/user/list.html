@@ -1,0 +1,76 @@
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="box box-solid">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-3">
+                                <!--common.js初始化该select以及处理选中事件-->
+                                <select name="dept_id" id="select_dept" class="form-control select2" style="width: 100%;">
+                                    <option value="0">--选择部门--</option>
+                                    <%{volist name="dept_list" id="_dept"}%>
+                                        <option value="<%{$_dept.id}%>"><%{$_dept.name_format1|raw}%></option>
+                                    <%{/volist}%>
+                                </select>
+                            </div>
+                            <div class="col-xs-12 col-sm-3">
+                                <div class="has-feedback">
+                                    <input id="txt_search" type="text" class="form-control" placeholder="搜索用户名、姓名、手机等">
+                                    <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-3">
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input readonly id="search_begin_date" data-key="search_begin_date" type="text" class="form-control pull-right search_date" placeholder="开始过滤时间">
+                                    <div class="input-group-addon clear-begin-data" style="cursor: pointer;">
+                                        <i class="fa fa-times"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-3">
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input readonly id="search_end_date" data-key="search_end_date" type="text" class="form-control pull-right search_date" placeholder="结束过滤时间">
+                                    <div class="input-group-addon clear-end-data" style="cursor: pointer;">
+                                        <i class="fa fa-times"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-danger">
+            <div class="box-body">
+                <table class="table table-bordered table-striped table-hover display responsive nowrap" cellspacing="0" width="100%" id="table" data-order='[[ 6, "desc" ]]'>
+                    <thead>
+                    <tr>
+                        <th data-priority="1">用户名</th>
+                        <th data-priority="5" data-orderable="false">部门</th>
+                        <th data-priority="6" data-orderable="false">角色</th>
+                        <th data-priority="2">姓名</th>
+                        <th data-priority="7">手机号</th>
+                        <th data-priority="8" data-orderable="false">邮箱</th>
+                        <th data-priority="4">创建时间</th>
+                        <th data-priority="9" data-orderable="false">备注</th>
+                        <th data-priority="10">状态</th>
+                        <th data-priority="3" style="text-align: center;" data-orderable="false">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -49,6 +49,10 @@ class AuthService
      * @var [] 高亮使用的key-value数组
      */
     protected $MenuMap = [];
+    /**
+     * @var string 缓存所有部门列表数据的tag标识，可实现按tag标识清理缓存
+     */
+    public $cache_tag = 'auth';
 
     public function __construct(LogService $logService,
                                 User $User,
@@ -198,7 +202,7 @@ class AuthService
         // 依据开发模式与否将全新Map数组缓存
         if(!Config::get('app.app_debug'))
         {
-            Cache::set($user_menu_cache_Map_key,$user_menu_map,3600 * 12);
+            Cache::tag($this->cache_tag)->set($user_menu_cache_Map_key,$user_menu_map,3600 * 12);
         }
         return isset($user_menu_map[$auth_tag]);
         // return array_key_exists($auth_tag,$user_menu_map);
@@ -243,7 +247,7 @@ class AuthService
             //依据开发模式与否将全新Map数组缓存
             if(!Config::get('app.app_debug'))
             {
-                Cache::set($user_menu_cache_Map_key,$user_menu_map,3600 * 12);
+                Cache::tag($this->cache_tag)->set($user_menu_cache_Map_key,$user_menu_map,3600 * 12);
             }
         }
         // 前方菜单权限已检查通过，此处值绝对存在，前方按url排序后是一个只有一个元素的二维数组，还原
@@ -289,8 +293,10 @@ class AuthService
     /**
      * 获取用户的权限菜单列表
      * @param string $user_id 可选的用户id，留空则获取当前登录用户
-     * @throws
-     * @return []
+     * @return array|mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function getUserMenuList($user_id = null)
     {
@@ -323,7 +329,7 @@ class AuthService
         // 将结果集缓存
         if(!Config::get('app.app_debug'))
         {
-            Cache::set($user_menu_cache_key,$user_menu,3600 * 12);//缓存12小时
+            Cache::tag($this->cache_tag)->set($user_menu_cache_key,$user_menu,3600 * 12);//缓存12小时
         }
         return $user_menu;
     }
@@ -332,7 +338,7 @@ class AuthService
      * 设置导航栏高亮属性
      * @param array $UserAuthMenu 用户所具有的菜单权限数组
      * @param array $highLight 检测到的当前高亮菜单数组
-     * @return []
+     * @return array
      */
     protected function setHighLight($UserAuthMenu = [],$highLight)
     {

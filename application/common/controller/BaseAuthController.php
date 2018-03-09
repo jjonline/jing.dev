@@ -16,6 +16,7 @@ namespace app\common\controller;
 use think\Container;
 use app\common\service\AuthService;
 use app\common\service\UserService;
+use app\common\service\DepartmentService;
 use think\exception\HttpResponseException;
 use think\Response;
 use think\facade\Session;
@@ -35,6 +36,10 @@ class BaseAuthController extends BasicController
      * @var AuthService
      */
     protected $AuthService;
+    /**
+     * @var DepartmentService
+     */
+    protected $DepartmentService;
 
     /**
      * 初始化认证、鉴权
@@ -44,8 +49,9 @@ class BaseAuthController extends BasicController
     {
         parent::initialize();
         //初始化用户服务、权限效验服务、操作日志服务
-        $this->UserService = Container::get('app\common\service\UserService');
-        $this->AuthService = Container::get('app\common\service\AuthService');
+        $this->UserService       = Container::get('app\common\service\UserService');
+        $this->AuthService       = Container::get('app\common\service\AuthService');
+        $this->DepartmentService = Container::get('app\common\service\DepartmentService');
         /**
          * @var [] 不需要登录状态即可渲染的控制器和不需要验证权限的公共ajax控制器，所有模块下的site、common两个控制器不做菜单权限检查和登录效验
          */
@@ -88,11 +94,13 @@ class BaseAuthController extends BasicController
             throw new HttpResponseException($response);
         }
         // 初始化User属性
-        $this->UserInfo         = Session::get('user_info');
+        $this->UserInfo              = Session::get('user_info');
         // 当前菜单权限的一些信息
-        $this->UserInfo['user_auth'] = $this->AuthService->getUserSingleMenuInfo();
+        $this->UserInfo['menu_auth'] = $this->AuthService->getUserSingleMenuInfo();
+        // 会员可操作的部门列表信息
+        $this->UserInfo['dept_auth'] = $this->DepartmentService->getAuthDeptInfoByDeptId($this->UserInfo['dept_id'],$this->UserInfo['is_leader']);
         // 获取管理菜单
-        $UserAuthMenu           = $this->AuthService->getUserAuthMenu();
+        $UserAuthMenu                = $this->AuthService->getUserAuthMenu();
         // 输出管理菜单
         $this->assign('UserAuthMenu',$UserAuthMenu);
     }
@@ -123,7 +131,7 @@ class BaseAuthController extends BasicController
     /**
      * 获取用户指定Url的权限标记，即返回：['super','leader','staff','guest']中的一者
      * @param null $url
-     * @return mixed
+     * @return mixed|string
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
@@ -137,7 +145,7 @@ class BaseAuthController extends BasicController
     /**
      * 获取指定Url中的额外数组数据，无则为空字符串
      * @param null $url
-     * @return mixed
+     * @return mixed|array
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException

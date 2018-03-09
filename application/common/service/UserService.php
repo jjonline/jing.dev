@@ -265,6 +265,11 @@ class UserService
         return $_User;
     }
 
+    /**
+     * 会员修改个人会员资料
+     * @param Request $request
+     * @return array
+     */
     public function userModifyOwnUserInfo(Request $request)
     {
         try{
@@ -411,7 +416,7 @@ class UserService
      */
     protected function generateUserPassword($pwd_text)
     {
-        return password_hash(config('local.auth_key').trim($pwd_text),PASSWORD_BCRYPT);
+        return password_hash(Config::get('local.auth_key').trim($pwd_text),PASSWORD_BCRYPT);
     }
 
     /**
@@ -422,6 +427,6 @@ class UserService
      */
     protected function checkUserPassword($pwd_text,$pwd_hash)
     {
-        return password_verify(config('local.auth_key').trim($pwd_text),$pwd_hash);
+        return password_verify(Config::get('local.auth_key').trim($pwd_text),$pwd_hash);
     }
 }
