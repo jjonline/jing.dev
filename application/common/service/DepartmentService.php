@@ -205,7 +205,12 @@ class DepartmentService
      * ---
      * @param $dept_id
      * @param int $user_is_leader
-     * @return array|mixed ['dept_id_vector' => 包含能管理的部门ID的索引数组,'dept_list' => 包含能管理的部门的多维数组]
+     * @return array|mixed
+     * [
+     *     'dept_id_vector' => 包含能管理的部门ID的索引数组,
+     *     'dept_list' => 包含能管理的部门的多维数组,
+     *     'dept_list_tree' => 按纵向树排序的部门数据
+     * ]
      * @throws Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
@@ -227,14 +232,35 @@ class DepartmentService
                 return $vector;
             }
         }
+        $vector = $this->getChildDeptInfoByParentDeptId($dept_id,$user_is_leader);
+        $vector && Cache::tag($this->cache_tag)->set('User_Auth_Dept'.$user_id,$vector,3600*12);
+        return $vector;
+    }
+
+    /**
+     * 获取指定部门ID下辖的所有子部门信息
+     * @param $parent_id
+     * @param int $user_is_leader
+     * @return array
+     * [
+     *    'dept_id_vector' => 包含能管理的部门ID的索引数组,
+     *    'dept_list'      => 包含能管理的部门的多维数组,
+     *    'dept_list_tree' => 按纵向树排序的部门数据
+     * ]
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getChildDeptInfoByParentDeptId($parent_id,$user_is_leader = 0)
+    {
         $dept_list   = $this->getDeptList();
-        $vector_list = TreeHelper::child($dept_list,$dept_id);
+        $vector_list = TreeHelper::child($dept_list,$parent_id);
         $vector      = [];
         $begin_level = 0;//所辖部门开始层级
         // 若$user_is_leader为1表示为$dept_id指定部门的领导--将本部门信息也附加进去
         foreach ($dept_list as $key => $value)
         {
-            if($dept_id == $value['id'])
+            if($parent_id == $value['id'])
             {
                 $begin_level = $value['level'];
                 if($user_is_leader)
@@ -249,14 +275,14 @@ class DepartmentService
         }
         foreach ($vector_list as $key => $value)
         {
-            $value['name_format1'] = str_repeat('&nbsp;&nbsp;├&nbsp;&nbsp;',$value['level'] - $begin_level).$value['name'];
-            $value['name_format2'] = str_repeat('&nbsp;',floor(pow(($value['level'] - $begin_level - 1),1.8) * 2)).'└─'.$value['name'];
+            // 附加部门名称的层级标识
+            $value['name_format1']      = str_repeat('&nbsp;&nbsp;├&nbsp;&nbsp;',$value['level'] - $begin_level).$value['name'];
+            $value['name_format2']      = str_repeat('&nbsp;',floor(pow(($value['level'] - $begin_level - 1),1.8) * 2)).'└─'.$value['name'];
             $vector['dept_id_vector'][] = $value['id'];
             $vector['dept_list'][]      = $value;
         }
         // 将所辖部门处理成具有层级的纵向树顺序
-        $vector['dept_list_tree'] = TreeHelper::vTree($vector['dept_list']);
-        $vector && Cache::tag($this->cache_tag)->set('User_Auth_Dept'.$user_id,$vector,3600*12);
+        $vector['dept_list_tree']       = TreeHelper::vTree($vector['dept_list']);
         return $vector;
     }
 

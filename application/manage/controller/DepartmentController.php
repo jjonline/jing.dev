@@ -9,22 +9,21 @@
 namespace app\manage\controller;
 
 use app\common\controller\BaseController;
-use app\common\model\Department;
 use app\common\service\DepartmentService;
-use app\manage\model\search\DepartmentSearch;
 use think\Request;
 
 class DepartmentController extends BaseController
 {
     /**
      * 部门管理-部门列表
+     * @param DepartmentService $departmentService
+     * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
-    public function listAction(Request $request , DepartmentService $departmentService)
+    public function listAction(DepartmentService $departmentService)
     {
-//        if($request->isAjax())
-//        {
-//            return $departmentSearch->search($request);
-//        }
         $this->title            = '部门管理 - '.config('local.site_name');
         $this->content_title    = '部门管理';
         $this->content_subtitle = '部门管理工具，设置和管理系统部门数据';

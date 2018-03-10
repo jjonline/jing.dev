@@ -118,11 +118,19 @@ class BaseSearch
      * 时间范围检索
      * @param Query $query       引用模式的Query查询对象
      * @param string $column     待检索的单个datetime类型的字段，可带别名
-     * @param string $begin_date 指定的检索的开始时间
-     * @param string $end_date   指定的减速偶的结束时间
+     * @param string $begin_date 指定的检索的开始时间，不传则获取变量中名为begin_date的值
+     * @param string $end_date   指定的减速偶的结束时间，不传则获取变量中名为end_date的值
      */
-    protected function dateTimeSearch(Query &$query,$column,$begin_date,$end_date)
+    protected function dateTimeSearch(Query &$query,$column,$begin_date = null,$end_date = null)
     {
+        if(is_null($begin_date))
+        {
+            $begin_date = $this->request->param('begin_date');
+        }
+        if(is_null($end_date))
+        {
+            $end_date = $this->request->param('end_date');
+        }
         $begin_date = $begin_date ? date('Y-m-d H:i:s',strtotime($begin_date)) : null;
         $end_date   = $end_date ? date('Y-m-d H:i:s',strtotime($end_date)) : null;
         if(!empty($begin_date) && empty($end_date))

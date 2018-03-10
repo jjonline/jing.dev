@@ -80,7 +80,7 @@ class UserSearch extends BaseSearch
         }
 
         // 时间范围检索
-        $this->dateTimeSearch($Query,'user.create_time',$this->request->param('begin_date'),$this->request->param('edn_date'));
+        $this->dateTimeSearch($Query,'user.create_time');
 
         // 克隆Query对象读取总记录数
         $countQuery       = clone $Query;
