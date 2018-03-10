@@ -246,7 +246,7 @@ $(function () {
                         location.href = '/manage/user/list';
                     });
                 }else{
-                    utils.alert(data.error_msg ? data.error_msg : '未知错误');
+                    utils.toast(data.error_msg ? data.error_msg : '未知错误');
                 }
                 //$('.btn-submit').prop('disabled',false).text('提交');
             },
