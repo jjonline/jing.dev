@@ -29,7 +29,8 @@ class UserController extends BaseController
         if($request->isAjax())
         {
             // 将当前登录用户信息传递过去
-            return $this->asJson($userSearch->list($this->UserInfo));
+            $result = $userSearch->list($this->UserInfo);
+            return $this->asJson($result);
         }
         $this->title            = '用户管理 - '.config('local.site_name');
         $this->content_title    = '用户列表';
@@ -46,9 +47,41 @@ class UserController extends BaseController
         return $this->fetch();
     }
 
+    /**
+     * 超级管理员新增用户
+     * @param Request $request
+     * @param UserService $userService
+     * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function createAction(Request $request,UserService $userService)
     {
+        if($request->isAjax())
+        {
+            // 将当前登录用户信息传递过去
+            $result = $userService->superUserInsertUser($request);
+            return $this->asJson($result);
+        }
+        $this->title            = '用户管理 - '.config('local.site_name');
+        $this->content_title    = '新增用户';
+        $this->content_subtitle = '新增后台用户（此处不涉及职员信息的维护，仅维护后台账号信息）';
+        $this->breadcrumb       = [
+            ['label' => '用户管理','url' => url('user/list')],
+            ['label' => '新增用户','url'  => url('user/create')],
+        ];
+        $this->load_layout_css = false;
+        $this->load_layout_js  = true;
 
+        // 仅能分配当前账号所下辖的部门
+        $dept_list = $this->UserInfo['dept_auth']['dept_list_tree'];
+        $role_list = $userService->Role->getRoleList(); // 角色显示所有
+
+        $this->assign('dept_list',$dept_list);
+        $this->assign('role_list',$role_list);
+
+        return $this->fetch();
     }
 
     public function editAction(Request $request,UserService $userService)
@@ -56,11 +89,20 @@ class UserController extends BaseController
 
     }
 
+    /**
+     * 启用|禁用用户
+     * @param Request $request
+     * @param UserService $userService
+     * @return mixed
+     * @throws \think\exception\DbException
+     */
     public function enableToggleAction(Request $request,UserService $userService)
     {
         if($request->isPost() && $request->isAjax())
         {
-            return $this->asJson($userService->enableToggle($request));
+            $result = $userService->enableUserToggle($request->post('id/i'),$this->UserInfo);
+            return $this->asJson($result);
         }
+        return $this->renderJson('请求失败',404);
     }
 }

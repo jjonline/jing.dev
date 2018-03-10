@@ -15,7 +15,6 @@ namespace app\common\service;
 use app\common\helper\FilterValidHelper;
 use app\common\helper\GenerateHelper;
 use app\common\model\User;
-use app\common\model\Department;
 use app\common\model\Role;
 use think\Exception;
 use think\facade\Config;
@@ -30,9 +29,9 @@ class UserService
      */
     public $User;
     /**
-     * @var Department
+     * @var DepartmentService
      */
-    public $Department;
+    public $DepartmentService;
     /**
      * @var Role
      */
@@ -49,14 +48,14 @@ class UserService
     public function __construct(LogService $logService,
                                 User $User,
                                 Role $Role,
-                                Department $Department,
+                                DepartmentService $departmentService,
                                 UserOpenService $userOpenService)
     {
-        $this->User            = $User;
-        $this->Department      = $Department;
-        $this->Role            = $Role;
-        $this->LogService      = $logService;
-        $this->UserOpenService = $userOpenService;
+        $this->User              = $User;
+        $this->DepartmentService = $departmentService;
+        $this->Role              = $Role;
+        $this->LogService        = $logService;
+        $this->UserOpenService   = $userOpenService;
     }
 
     /**
@@ -176,6 +175,33 @@ class UserService
     }
 
     /**
+     * super管理员单独新增后台用户，不涉及职员信息维护和管理
+     * @param Request $request
+     * @return array
+     */
+    public function superUserInsertUser(Request $request)
+    {
+        $_user = $request->post('User/a');
+        try{
+            // 自动检测生成新用户信息
+            $user              = $this->generateNewUserInfo($_user);
+            // 补充座机和是否领导以及是否启用
+            $user['telephone'] = !empty($_user['telephone']) ? $_user['telephone'] : '';
+            $user['is_leader'] = !empty($_user['is_leader']) ? 1 : 0;
+            $user['enable']    = !empty($_user['enable']) ? 1 : 0;
+            $result = $this->User->isUpdate(false)->save($user);
+            if(false !== $result)
+            {
+                $this->LogService->logRecorder([$_user,$user],'单独新增后台用户');
+                return ['error_code' => 0,'error_msg' => '新增用户成功，初始密码为：'.$_user['password']];
+            }
+            return ['error_code' => 500,'error_msg' => '新增用户失败：系统异常'];
+        }catch (\Throwable $e) {
+            return ['error_code' => 500,'error_msg' => $e->getMessage()];
+        }
+    }
+
+    /**
      * 生成新用户数组信息，仅用于生成新用户信息，并不会写入
      * notice // 新增系统用户时提交的表单直接使用该方法进行效验和数据生成，需要try获取错误信息进行提示
      * ----
@@ -241,13 +267,13 @@ class UserService
             throw new Exception('密码必须同时包含字母和数字，6至18位',500);
         }
         // 部门
-        $dept = $this->Department->getDeptInfoById($User['dept_id']);
+        $dept = $this->DepartmentService->Department->getDeptInfoById($User['dept_id']);
         if(empty($dept))
         {
             throw new Exception('拟分配用户的部门信息不存在',500);
         }
         // 角色
-        $role = $this->Role->getRoleInfoById($User['dept_id']);
+        $role = $this->Role->getRoleInfoById($User['role_id']);
         if(empty($role))
         {
             throw new Exception('拟分配用户的角色信息不存在',500);
@@ -392,6 +418,39 @@ class UserService
             return [];
         }
         return Session::get('user_info');
+    }
+
+    /**
+     * 带部门权限判断的启用|禁用用户
+     * @param mixed|int $user_id
+     * @param array $act_user_info 控制器中的包含菜单、部门权限信息的UserInfo属性数组
+     * @return array
+     * @throws \think\exception\DbException
+     */
+    public function enableUserToggle($user_id,$act_user_info = array())
+    {
+        if(empty($user_id) || empty($act_user_info))
+        {
+            return ['error_code' => 400,'error_msg' => '参数缺失'];
+        }
+        $user            = $this->User->getUserInfoById($user_id);
+        $act_dept_vector = $act_user_info['dept_auth']['dept_id_vector'] ?? [];
+        if(!in_array($user['dept_id'],$act_dept_vector))
+        {
+            return ['error_code' => 500,'error_msg' => '您无权限启用或禁用该用户'];
+        }
+
+        // 启用或禁用用户写入
+        $_enable           = [];
+        $_enable['id']     = $user['id'];
+        $_enable['enable'] = $user['enable'] ? 0 : 1;
+        $result            = $this->User->isUpdate(true)->save($_enable);
+        if(false !== $result)
+        {
+            $this->LogService->logRecorder($user,'启用或禁用用户');
+            return ['error_code' => 0,'error_msg' => $user['enable'] ? '禁用完成' : '启用完成'];
+        }
+        return ['error_code' => 500,'error_msg' => '操作失败：数据库异常'];
     }
 
     /**

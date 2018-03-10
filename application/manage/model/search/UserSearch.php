@@ -48,6 +48,7 @@ class UserSearch extends BaseSearch
                    'user.dept_id',
                    'user.real_name',
                    'user.mobile',
+                   'user.telephone',
                    'user.email',
                    'user.gender',
                    'user.enable',

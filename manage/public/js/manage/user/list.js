@@ -88,6 +88,7 @@ $(function () {
                             // 启用|禁用账号按钮
                             if(user_id != json.data[n].id)
                             {
+                                json.data[n].operate += ' <a href="javascript:;" data-href="/manage/user/enableToggle?id='+json.data[n].id+'" class="btn btn-xs btn-primary edit" data-id="'+json.data[n].id+'" data-user_name="'+ json.data[n].user_name +'" data-real_name="'+json.data[n].real_name+'" data-gender="'+json.data[n].gender+'" data-mobile="'+json.data[n].mobile+'" data-email="'+json.data[n].email+'" data-telephone="'+json.data[n].telephone+'" data-dept_id="'+json.data[n].dept_id+'"  data-role_id="'+json.data[n].role_id+'"><i class="fa fa-pencil-square-o"></i> 编辑</a>';
                                 if(json.data[n].enable == 1)
                                 {
                                     json.data[n].operate += ' <a href="javascript:;" data-href="/manage/user/enableToggle?id='+json.data[n].id+'" class="btn btn-xs btn-danger enableToggle" data-id="'+json.data[n].id+'" data-enable="'+ json.data[n].enable +'"><i class="fa fa-toggle-off"></i> 禁用</a>';
@@ -164,6 +165,10 @@ $(function () {
             refreshTable();
         });
         return false;
+    // 编辑
+    }).on('click','.edit',function () {
+        var id   = $(this).data('id');
+        var url  = $(this).data('href');
     });
 
 

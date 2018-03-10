@@ -284,6 +284,16 @@ var utils = {
         }
         return false;
     },
+    isPassWord:function(match) {
+        var pcre = /[A-Za-z]+/,num = /\d+/;
+        if (pcre.test(match)) {
+            if (num.test(match)) {
+                return true;
+            }
+            return false;
+        }
+        return false;
+    },
     /**
      * 检查是否全部为字母构成
      * @param match
@@ -1104,15 +1114,21 @@ var utils = {
     },
     /**
      * 获取url中的get变量值
-     * @param  {[type]} name [description]
-     * @return {[type]}      [description]
+     * @param  name string 获取的get变量的key名称
+     * @return
      */
     getUrlParam: function (name) {
         var reg = new RegExp("(^|&)" + name + "=([^&#]*)(&|$|#)"); //构造一个含有目标参数的正则表达式对象
         var r = window.location.search.substr(1).match(reg);  //匹配目标参数
         if (r != null)
-            return unescape(r[2]);
+        {
+            return decodeURI(r[2]);
+        }
         return null; //返回参数值
+    },
+    // getUrlParam同名函数
+    getUrlQueryString:function (name) {
+        return utils.getUrlParam(name);
     },
     /**
      * 设置url的变量并返回设置后的url
@@ -1170,6 +1186,10 @@ var utils = {
                 return baseUrl + "?" + name + "=" + value;
             }
         }
+    },
+    // setUrlParam同名函数
+    setUrlQueryString:function (name,value,url) {
+        return utils.setUrlParam(name,value,url);
     },
     isHttps : function () {
         return 'https:' === document.location.protocol;

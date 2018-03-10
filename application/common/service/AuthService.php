@@ -21,7 +21,6 @@ use think\Exception;
 use think\facade\Cache;
 use think\facade\Config;
 use think\facade\Session;
-use app\common\model\Department;
 
 class AuthService
 {
@@ -46,6 +45,10 @@ class AuthService
      */
     public $LogService;
     /**
+     * @var DepartmentService
+     */
+    public $DepartmentService;
+    /**
      * @var [] 高亮使用的key-value数组
      */
     protected $MenuMap = [];
@@ -59,14 +62,14 @@ class AuthService
                                 Role $Role,
                                 Menu $Menu,
                                 RoleMenu $roleMenu,
-                                Department $Department)
+                                DepartmentService $departmentService)
     {
-        $this->User           = $User;
-        $this->Department     = $Department;
-        $this->Role           = $Role;
-        $this->Menu           = $Menu;
-        $this->RoleMenu       = $roleMenu;
-        $this->LogService     = $logService;
+        $this->User              = $User;
+        $this->DepartmentService = $departmentService;
+        $this->Role              = $Role;
+        $this->Menu              = $Menu;
+        $this->RoleMenu          = $roleMenu;
+        $this->LogService        = $logService;
     }
 
     /**
