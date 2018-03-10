@@ -88,7 +88,7 @@ $(function () {
                             // 启用|禁用账号按钮
                             if(user_id != json.data[n].id)
                             {
-                                json.data[n].operate += ' <a href="javascript:;" data-href="/manage/user/enableToggle?id='+json.data[n].id+'" class="btn btn-xs btn-primary edit" data-id="'+json.data[n].id+'" data-user_name="'+ json.data[n].user_name +'" data-real_name="'+json.data[n].real_name+'" data-gender="'+json.data[n].gender+'" data-mobile="'+json.data[n].mobile+'" data-email="'+json.data[n].email+'" data-telephone="'+json.data[n].telephone+'" data-dept_id="'+json.data[n].dept_id+'"  data-role_id="'+json.data[n].role_id+'"><i class="fa fa-pencil-square-o"></i> 编辑</a>';
+                                json.data[n].operate += ' <a href="javascript:;" data-href="/manage/user/edit?id='+json.data[n].id+'" class="btn btn-xs btn-primary edit" data-id="'+json.data[n].id+'" data-user_name="'+ json.data[n].user_name +'" data-real_name="'+json.data[n].real_name+'" data-gender="'+json.data[n].gender+'" data-mobile="'+json.data[n].mobile+'" data-email="'+json.data[n].email+'" data-telephone="'+json.data[n].telephone+'" data-dept_id="'+json.data[n].dept_id+'"  data-role_id="'+json.data[n].role_id+'" data-remark="'+json.data[n].remark+'" data-is_leader="'+json.data[n].is_leader+'" data-enable="'+ json.data[n].enable +'"><i class="fa fa-pencil-square-o"></i> 编辑</a>';
                                 if(json.data[n].enable == 1)
                                 {
                                     json.data[n].operate += ' <a href="javascript:;" data-href="/manage/user/enableToggle?id='+json.data[n].id+'" class="btn btn-xs btn-danger enableToggle" data-id="'+json.data[n].id+'" data-enable="'+ json.data[n].enable +'"><i class="fa fa-toggle-off"></i> 禁用</a>';
@@ -165,12 +165,97 @@ $(function () {
             refreshTable();
         });
         return false;
-    // 编辑
+    // 显示编辑浮层
     }).on('click','.edit',function () {
-        var id   = $(this).data('id');
-        var url  = $(this).data('href');
+        $('#id').val($(this).data('id'));
+        $('#real_name').val($(this).data('real_name'));
+        $('#user_name').val($(this).data('user_name'));
+        $('#mobile').val($(this).data('mobile'));
+        $('#email').val($(this).data('email'));
+        $('#telephone').val($(this).data('telephone'));
+        $('#remark').val($(this).data('remark'));
+
+        $('#gender').val($(this).data('gender')).trigger('change');
+        $('#dept_id').val($(this).data('dept_id')).trigger('change');
+        $('#role_id').val($(this).data('role_id')).trigger('change');
+
+        $('#is_leader').bootstrapSwitch('state',!!$(this).data('is_leader'));
+        $('#enable').bootstrapSwitch('state',!!$(this).data('enable'));
+
+        $('#UserModal').modal('show');
     });
 
-
+    // 提交编辑
+    $('.btn-submit-edit').click(function () {
+        if(utils.isEmpty($('#real_name').val()))
+        {
+            $('#real_name').focus();
+            utils.toast('输入真实姓名');
+            return false;
+        }
+        if(utils.isEmpty($('#user_name').val()))
+        {
+            $('#user_name').focus();
+            utils.toast('输入用户名');
+            return false;
+        }
+        if(!utils.isEmpty($('#password').val())) {
+            if (!utils.isPassWord($('#password').val())) {
+                $('#password').focus();
+                utils.toast('登录密码必须有字母和数字构成');
+                return false;
+            }
+        }
+        if(!utils.isEmpty($('#mobile').val()))
+        {
+            if(!utils.isPhone($('#mobile').val()))
+            {
+                $('#mobile').focus();
+                utils.toast('手机号格式有误');
+                return false;
+            }
+        }
+        if(!utils.isEmpty($('#email').val()))
+        {
+            if(!utils.isMail($('#email').val()))
+            {
+                $('#email').focus();
+                utils.toast('邮箱格式有误');
+                return false;
+            }
+        }
+        if(utils.isEmpty($('#role_id').val()))
+        {
+            utils.toast('请选择所属角色');
+            return false;
+        }
+        if(utils.isEmpty($('#dept_id').val()))
+        {
+            utils.toast('请选择所属部门');
+            return false;
+        }
+        var data = $('#userEdit').serializeArray();
+        //$('.btn-submit').prop('disabled',true).text('提交中...');
+        $.ajax({
+            url: $('#userEdit').attr('action'),
+            type: 'POST',
+            data: data,
+            success: function (data) {
+                if(data.error_code == 0){
+                    utils.alert(data.error_msg,function () {
+                        location.href = '/manage/user/list';
+                    });
+                }else{
+                    utils.alert(data.error_msg ? data.error_msg : '未知错误');
+                }
+                //$('.btn-submit').prop('disabled',false).text('提交');
+            },
+            error:function () {
+                //$('.btn-submit').prop('disabled',false).text('提交');
+                utils.alert('网络或服务器异常，请稍后再试');
+            }
+        });
+        return false;
+    });
 
 });

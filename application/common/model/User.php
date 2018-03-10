@@ -24,6 +24,10 @@ class User extends Model
      */
     public function getUserInfoById($user_id)
     {
+        if(empty($user_id))
+        {
+            return [];
+        }
         $data = $this->get(['id' => $user_id]);
         return $data ? $data->toArray() : [];
     }
@@ -36,6 +40,10 @@ class User extends Model
      */
     public function getUserInfoByUserName($user_name)
     {
+        if(empty($user_name))
+        {
+            return [];
+        }
         $data = $this->get(['user_name' => $user_name]);
         return $data ? $data->toArray() : [];
     }
@@ -48,6 +56,10 @@ class User extends Model
      */
     public function getUserInfoByEmail($email)
     {
+        if(empty($email))
+        {
+            return [];
+        }
         $data = $this->get(['email' => $email]);
         return $data ? $data->toArray() : [];
     }
@@ -60,6 +72,10 @@ class User extends Model
      */
     public function getUserInfoByMobile($mobile)
     {
+        if(empty($mobile))
+        {
+            return [];
+        }
         $data = $this->get(['mobile' => $mobile]);
         return $data ? $data->toArray() : [];
     }

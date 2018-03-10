@@ -49,6 +49,7 @@ class UserSearch extends BaseSearch
                    'user.real_name',
                    'user.mobile',
                    'user.telephone',
+                   'user.is_leader',
                    'user.email',
                    'user.gender',
                    'user.enable',

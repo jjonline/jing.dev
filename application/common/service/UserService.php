@@ -174,6 +174,167 @@ class UserService
         Session::clear();
     }
 
+    public function superUserUpdateUser(Request $request,$act_user_info)
+    {
+        $_user = $request->post('User/a');
+        // 待编辑的用户是否存在
+        if(empty($_user['id']))
+        {
+            return ['error_code' => 400,'error_msg' => '参数缺失'];
+        }
+        $exist_user = $this->User->getUserInfoById($_user['id']);
+        if(empty($exist_user))
+        {
+            return ['error_code' => 400,'error_msg' => '拟编辑用户信息不存在'];
+        }
+        // 是否有权限编辑
+        if(!in_array($exist_user['dept_id'],$act_user_info['dept_auth']['dept_id_vector']))
+        {
+            return ['error_code' => 400,'error_msg' => '您无权限编辑该用户的信息'];
+        }
+
+        // 收集修改编辑过的item
+        $update_user = [];
+        // 修改用户名
+        if($_user['user_name'] != $exist_user['user_name'])
+        {
+            $repeat = $this->User->getUserInfoByUserName(trim($_user['user_name']));
+            if(!empty($repeat))
+            {
+                return ['error_code' => 400,'error_msg' => '用户名已存在'];
+            }
+            $update_user['user_name'] = trim($_user['user_name']);
+        }
+        // 修改真实姓名
+        if($_user['real_name'] != $exist_user['real_name'])
+        {
+            if(mb_strlen($_user['real_name'],'utf8') >= 50)
+            {
+                return ['error_code' => 400,'error_msg' => '真实姓名不得大于50个字符'];
+            }
+            $update_user['real_name'] = trim($_user['real_name']);
+        }
+        // 修改性别
+        if($_user['gender'] != $exist_user['gender'])
+        {
+            if(in_array($_user['gender'],[-1,0,1]))
+            {
+                $update_user['gender'] = $_user['gender'];
+            }
+        }
+        // 修改或删掉手机号
+        if($_user['mobile'] != $exist_user['mobile'])
+        {
+            if(!empty($_user['mobile']))
+            {
+                // 修改手机号
+                if(!FilterValidHelper::is_phone_valid(trim($_user['mobile'])))
+                {
+                    return ['error_code' => 400,'error_msg' => '手机号格式有误'];
+                }
+                $repeat = $this->User->getUserInfoByMobile(trim($_user['mobile']));
+                if(!empty($repeat))
+                {
+                    return ['error_code' => 400,'error_msg' => '手机号已存在'];
+                }
+                $update_user['mobile'] = trim($_user['mobile']);
+            }else {
+                // 删除手机号
+                $update_user['mobile'] = '';
+            }
+        }
+        // 修改或删掉邮箱
+        if($_user['email'] != $exist_user['email'])
+        {
+            if(!empty($_user['email']))
+            {
+                // 修改邮箱
+                if(!FilterValidHelper::is_mail_valid(trim($_user['email'])))
+                {
+                    return ['error_code' => 400,'error_msg' => '邮箱格式有误'];
+                }
+                $repeat = $this->User->getUserInfoByEmail(trim($_user['email']));
+                if(!empty($repeat))
+                {
+                    return ['error_code' => 400,'error_msg' => '邮箱已存在'];
+                }
+                $update_user['email'] = trim($_user['email']);
+            }else {
+                // 删除邮箱
+                $update_user['email'] = '';
+            }
+        }
+        // 修改座机
+        if($_user['telephone'] != $exist_user['telephone'])
+        {
+            if(!empty($_user['telephone']))
+            {
+                // 修改座机
+                $update_user['telephone'] = trim($_user['telephone']);
+            }else {
+                // 删除座机
+                $update_user['telephone'] = '';
+            }
+        }
+        // 修改部门
+        if($_user['dept_id'] != $exist_user['dept_id'])
+        {
+            $exist_dept = $this->DepartmentService->Department->getDeptInfoById($_user['dept_id']);
+            if(empty($exist_dept))
+            {
+                return ['error_code' => 400,'error_msg' => '拟分配的部门不存在'];
+            }
+            $update_user['dept_id'] = $_user['dept_id'];
+        }
+        // 修改角色
+        if($_user['role_id'] != $exist_user['role_id'])
+        {
+            $exist_role = $this->Role->getRoleInfoById($_user['role_id']);
+            if(empty($exist_role))
+            {
+                return ['error_code' => 400,'error_msg' => '拟分配的角色不存在'];
+            }
+            $update_user['role_id'] = $_user['role_id'];
+        }
+        // 修改备注
+        if(empty($_user['remark']) && $_user['remark'] != $exist_user['remark'])
+        {
+            $update_user['remark'] = trim($_user['remark']);
+        }
+        // 启用|禁用 && 是否部门领导
+        $is_leader = isset($_user['is_leader']) ? 1 : 0;
+        $enable    = isset($_user['enable']) ? 1 : 0;
+        if($is_leader != $exist_user['is_leader'])
+        {
+            $update_user['is_leader'] = $is_leader;
+        }
+        if($enable != $exist_user['enable'])
+        {
+            $update_user['enable'] = $enable;
+        }
+
+        // 修改密码
+        if(!empty($_user['password']) && FilterValidHelper::is_password_valid($_user['password']))
+        {
+            $update_user['password'] = $this->generateUserPassword($_user['password']);
+        }
+
+        if(empty($update_user))
+        {
+            return ['error_code' => 200,'error_msg' => '未修改任何信息'];
+        }
+
+        // 补充ID 开始更新
+        $update_user['id'] = $exist_user['id'];
+        $result = $this->User->isUpdate(true)->save($update_user);
+        if(false !== $result)
+        {
+            $this->LogService->logRecorder([$update_user,$_user,$exist_user],'单独更新编辑后台用户');
+            return ['error_code' => 0,'error_msg' => '编辑用户信息成功'];
+        }
+        return ['error_code' => 500,'error_msg' => '编辑用户信息失败：系统异常'];
+    }
+
     /**
      * super管理员单独新增后台用户，不涉及职员信息维护和管理
      * @param Request $request
@@ -242,6 +403,11 @@ class UserService
         if(empty($User['user_name']) || mb_strlen($User['user_name'],'utf8') >= 32)
         {
             throw new Exception('用户名不得为空或大于50个字符',500);
+        }
+        // 性别
+        if(!empty($User['gender']) && in_array($User['gender'],[-1,0,1]))
+        {
+            $_User['gender'] = $User['gender'];
         }
         // 检查非空手机号是否重复
         if(!empty($User['mobile']))
