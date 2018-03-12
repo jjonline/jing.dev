@@ -282,7 +282,16 @@ class DepartmentService
             $vector['dept_list'][]      = $value;
         }
         // 将所辖部门处理成具有层级的纵向树顺序
-        $vector['dept_list_tree']       = TreeHelper::vTree($vector['dept_list']);
+        // 1、基层职员可能没有任何下辖部门的权限
+        // 2、没有子部门的成员被设置成了非领导也没有下辖部门权限
+        if(empty($vector))
+        {
+            $vector = [
+                'dept_id_vector' => [],
+                'dept_list'      => []
+            ];
+        }
+        $vector['dept_list_tree'] = TreeHelper::vTree($vector['dept_list']);
         return $vector;
     }
 
