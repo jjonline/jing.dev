@@ -24,6 +24,10 @@ class MenuService
      * @var LogService
      */
     public $LogService;
+    /**
+     * @var string 菜单、权限的缓存tag
+     */
+    public $cache_tag = 'auth';
 
     public function __construct(Menu $Menu,LogService $logService)
     {
@@ -144,7 +148,7 @@ class MenuService
             $ret = $this->Menu->data($Menu)->isUpdate(false)->save();
         }
         // 编辑菜单之后清空缓存
-        Cache::clear();
+        Cache::clear($this->cache_tag);
         return $ret !== false ?
                ['error_code' => 0,'error_msg' => '保存菜单成功'] :
                ['error_code' => 500,'error_msg' => '菜单保存失败：系统异常'];
@@ -171,6 +175,8 @@ class MenuService
             return ['error_code' => 400,'error_msg' => '拟编辑排序的菜单数据不存在'];
         }
         $ret = $this->Menu->isUpdate(true)->save(['sort' => intval($sort)],['id' => $id]);
+        // 编辑菜单之后清空缓存
+        Cache::clear($this->cache_tag);
         return $ret >= 0 ?
                ['error_code' => 0,'error_msg' => '排序调整成功'] :
                ['error_code' => 500,'error_msg' => '排序调整失败：系统异常'];
@@ -199,6 +205,8 @@ class MenuService
             return ['error_code' => 400,'error_msg' => '系统核心菜单禁止删除'];
         }
         $ret = $this->Menu->db()->where('id',$id)->delete();
+        // 编辑菜单之后清空缓存
+        Cache::clear($this->cache_tag);
         // 日志方式备份保存原始菜单信息
         $this->LogService->logRecorder($menu);
         return $ret >= 0 ?

@@ -803,13 +803,7 @@ var utils = {
             },
             onUploadSuccess:function (id, data) {
                 $('.bootbox').modal('hide');
-                if(data.error_code == 0)
-                {
-                    param.success && param.success(data);
-                }else {
-                    param.error && param.error();
-                }
-                // console.log(data);
+                param.success && param.success(data);
             },
             onUploadError:function (id, xhr, status, errorThrown) {
                 $('.bootbox').modal('hide');

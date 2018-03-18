@@ -25,6 +25,13 @@
 <%{if condition="!empty($load_layout_css)" }%><%{/* 使用 `小写控制器名/小写操作.css` 作为应用额外载入css，启用这个特性在action中assign出$load_layout_css变量为true即可 */}%>
 <link href="__PUBLIC__/css/<%{:strtolower(request()->module())}%>/<%{:strtolower(request()->controller())}%>/<%{:strtolower(request()->action())}%>.css?ver=<%{:config('local.version')}%>" rel="stylesheet">
 <%{/if}%>
+<script>
+    var app_info = {
+        module:'<%{:strtolower(request()->module())}%>',
+        controller:'<%{:strtolower(request()->controller())}%>',
+        action:'<%{:strtolower(request()->action())}%>'
+    };
+</script>
 </head>
 <body class="hold-transition skin-blue sidebar-mini" id="app">
 <div class="wrapper">

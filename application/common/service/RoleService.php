@@ -14,6 +14,7 @@ use app\common\model\RoleMenu;
 use app\common\model\User;
 use think\Db;
 use think\Exception;
+use think\facade\Cache;
 use think\facade\Session;
 use think\Request;
 
@@ -39,6 +40,10 @@ class RoleService
      * @var LogService
      */
     public $LogService;
+    /**
+     * @var string 菜单、权限的缓存tag
+     */
+    public $cache_tag = 'auth';
 
     public function __construct(Role $role ,
                                 User $user ,
@@ -399,6 +404,8 @@ class RoleService
             }
             Db::name('role_menu')->insertAll($role_menu);
             $this->LogService->logRecorder([$role,$role_menu],$is_edit ? '编辑角色' : '新增角色');
+            // 编辑角色之后清空缓存
+            Cache::clear($this->cache_tag);
             Db::commit();
             return ['error_code' => 0,'error_msg' => '保存成功'];
         }catch (\Throwable $e) {
@@ -430,6 +437,8 @@ class RoleService
             return ['error_code' => 400,'error_msg' => '拟编辑排序的角色数据不存在'];
         }
         $ret = $this->Role->isUpdate(true)->save(['sort' => intval($sort)],['id' => $id]);
+        // 编辑角色之后清空缓存
+        Cache::clear($this->cache_tag);
         return $ret >= 0 ?
             ['error_code' => 0,'error_msg' => '排序调整成功'] :
             ['error_code' => 500,'error_msg' => '排序调整失败：系统异常'];
@@ -471,6 +480,8 @@ class RoleService
             Db::name('role_menu')->where('role_id',$id)->delete();
             // 日志方式备份保存原始菜单信息
             $this->LogService->logRecorder(array_merge($role,$role_menu));
+            // 编辑角色之后清空缓存
+            Cache::clear($this->cache_tag);
             Db::commit();
             return ['error_code' => 0,'error_msg' => '角色删除成功'];
         }catch (\Throwable $e) {
