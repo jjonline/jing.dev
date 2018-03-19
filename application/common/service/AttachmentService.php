@@ -8,8 +8,10 @@
 
 namespace app\common\service;
 
+use app\common\helper\AttachmentHelper;
 use app\common\helper\GenerateHelper;
 use app\common\model\Attachment;
+use think\facade\Config;
 use think\Image;
 use think\Request;
 
@@ -81,16 +83,16 @@ class AttachmentService
         $exist_attachment = $this->Attachment->getAttachmentByUserFileSha1($origin_file->hash('sha1'));
         if(!empty($exist_attachment))
         {
+            // 存在的文件使用安全域
+            if($exist_attachment['is_safe'])
+            {
+                $exist_attachment['file_path'] = AttachmentHelper::generateSafeAttachmentPath($exist_attachment['id']);
+            }
             return ['error_code' => 0,'error_msg' => '上传成功：文件曾上传过','data' => $exist_attachment];
         }
         //不同类型文件存储的根目录 如图片则是./Uploads/Image/
         $saveDir = './uploads/'.$paramDir.'/'.date('Y').'/';
-        //检查文件夹权限
-//        if(!is_dir($saveDir))
-//        {
-//            mkdir($saveDir);
-//        }
-        $file = $origin_file->validate(['ext' => $allowedExt[$paramDir]])
+        $file    = $origin_file->validate(['ext' => $allowedExt[$paramDir]])
             ->rule('sha1')
             ->move($saveDir);
         if(!$file)
@@ -108,6 +110,10 @@ class AttachmentService
         $attachment['file_mime']        = $file->getMime();
         $attachment['file_size']        = $file->getSize();
         $attachment['file_sha1']        = $file->hash('sha1');
+
+        // 是否安全资源
+        $is_safe                        = $request->has('is_safe','post');
+        $attachment['is_safe']          = $is_safe ? 1 : 0;
 
         // 如果图片增加图片高宽尺寸
         if($paramDir == 'image')
@@ -129,7 +135,38 @@ class AttachmentService
             // 上传成功，记录日志
             $this->LogService->logRecorder($attachment['file_path'],'上传文件');
         }
+        // 如果是安全资源，返回的资源地址修改为安全地址
+        if($is_safe)
+        {
+            $attachment['file_path'] = AttachmentHelper::generateSafeAttachmentPath($attachment['id']);
+        }
         // 无论attachment是否成功 文件上传完成均返回文件信息数组
         return ['error_code' => 0,'error_msg' => '上传成功：新增文件','data' => $attachment];
+    }
+
+    /**
+     * 通过资源ID获取资源地址
+     * @param string $attachment_id 主键ID
+     * @return string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getAttachmentPathById($attachment_id)
+    {
+        $attachment = $this->Attachment->getAttachmentById($attachment_id);
+        if(empty($attachment))
+        {
+            return '';
+        }
+        // 检查是否安全资源并生成资源Url  后续切换cdn修改此处代码即可
+        if(!!$attachment['is_safe'])
+        {
+            $path = AttachmentHelper::generateSafeAttachmentPath($attachment['id']);
+        }else{
+            $path = $attachment['file_path'];
+        }
+        // 当前返回本地带域名Url 切换cdn后再行修改
+        return app('request')->domain().$path;
     }
 }
