@@ -21,6 +21,8 @@ use think\Exception;
 use think\facade\Cache;
 use think\facade\Config;
 use think\facade\Session;
+use think\facade\Url;
+use think\Request;
 
 class AuthService
 {
@@ -87,7 +89,7 @@ class AuthService
         // 导航栏高亮、一级导航默认展开标记处理
         $highLight = false;//当前高亮的层级
         $request   = request();
-        $now_url   = strtolower($request->module().'/'.$request->controller().'/'.$request->action());
+        $now_url   = $this->generateRequestMenuUrl($request);
         foreach ($data as $key => $value)
         {
             $value['active']    = false;//高亮
@@ -174,7 +176,7 @@ class AuthService
         if(empty($auth_tag))
         {
             $request  = request();
-            $auth_tag = strtolower($request->module().'/'.$request->controller().'/'.$request->action());
+            $auth_tag = $this->generateRequestMenuUrl($request);
         }
 
         // 缓存数据的Key
@@ -233,7 +235,7 @@ class AuthService
         $request = request();
         if(empty($url))
         {
-            $url = strtolower($request->module().'/'.$request->controller().'/'.$request->action());
+            $url = $this->generateRequestMenuUrl($request);
         }
         $user_menu_cache_Map_key = 'User_menu_cache_Map_key'.$user_id;
         if(!Config::get('app.app_debug'))
@@ -402,5 +404,16 @@ class AuthService
         }
         // 菜单数据异常，原样返回
         return $UserAuthMenu;
+    }
+
+    /**
+     * 依据当前模块、控制器、操作生成与菜单权限对应的无斜杠前缀、无文件后缀的Url组成部分
+     * @param Request $request
+     * @return string
+     */
+    protected function generateRequestMenuUrl(Request $request)
+    {
+        $component = $request->module().'/'.$request->controller().'/'.$request->action();
+        return trim(Url::build($component,'',''),'/');
     }
 }
