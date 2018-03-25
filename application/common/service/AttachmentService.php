@@ -11,7 +11,6 @@ namespace app\common\service;
 use app\common\helper\AttachmentHelper;
 use app\common\helper\GenerateHelper;
 use app\common\model\Attachment;
-use think\facade\Config;
 use think\Image;
 use think\Request;
 
