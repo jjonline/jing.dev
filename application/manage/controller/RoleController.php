@@ -24,11 +24,11 @@ class RoleController extends BaseController
      */
     public function listAction()
     {
-        $this->title            = '角色管理 - '.config('local.site_name');
+        $this->title            = '人事设置 - '.config('local.site_name');
         $this->content_title    = '角色管理';
         $this->content_subtitle = '系统角色管理工具';
         $this->breadcrumb       = [
-            ['label' => '系统管理','url' => url('role/list')],
+            ['label' => '人事设置','url' => url('role/list')],
             ['label' => '角色管理','url'  => ''],
         ];
         $this->load_layout_css = false;
@@ -58,9 +58,9 @@ class RoleController extends BaseController
             // 保存角色
             return $roleService->save($request);
         }
-        $this->title            = '新增角色 - '.config('local.site_name');
+        $this->title            = '人事设置 - '.config('local.site_name');
         $this->content_title    = '新增角色';
-        $this->content_subtitle = '新增管理角色并设置角色权限';
+        $this->content_subtitle = '人事设置-新增角色';
         $this->breadcrumb       = [
             ['label' => '角色管理','url'  => url('role/list')],
             ['label' => '新增角色','url'  => ''],
@@ -86,7 +86,7 @@ class RoleController extends BaseController
         }
         $this->title            = '角色管理 - '.config('local.site_name');
         $this->content_title    = '编辑角色';
-        $this->content_subtitle = '开发者模式下的角色编辑';
+        $this->content_subtitle = '人事设置-角色编辑';
         $this->breadcrumb       = [
             ['label' => '角色管理','url'  => url('role/list')],
             ['label' => '编辑角色','url'  => ''],
@@ -110,12 +110,12 @@ class RoleController extends BaseController
         // 当前账号具备的所有菜单权限
         $menu_list = $roleService->getRoleMenuTreeDataByRoleId();
         $this->assign('menu_list',$menu_list);
+
         // 待编辑的菜单权限列表
         $RoleMenuModel = new RoleMenu();
         $role_menu     = $RoleMenuModel->getRoleMenuListByRoleId($Role['id']);
-
-        $this->assign('menu_list',$menu_list);
         $this->assign('role_menu',$role_menu);
+
         $this->assign('role',$Role);
         return $this->fetch();
     }

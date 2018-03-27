@@ -15,6 +15,6 @@
 
 .menu_permissions {list-style: none;padding-bottom: 15px;margin-top:20px;padding-top: 20px;background: #e4f0fd;font-family: Verdana, Arial, Helvetica, AppleGothic, sans-serif;}
 .permissions_radio {line-height: 20px;font-size: 13px;margin:8px auto 3px;}
-.permissions_radio span {display: inline-block;min-width: 130px;font-size:15px;}
+.permissions_radio span {display: inline-block;min-width: 200px;font-size:15px;color:#3c8dbc;}
 .permissions_radio .radio-inline {padding:0 25px 0 0;line-height: 18px;color:#333;position: relative;}
 .permissions_radio .iradio_square-blue {margin-bottom:2px;}

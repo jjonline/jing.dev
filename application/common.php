@@ -10,3 +10,13 @@
 // +----------------------------------------------------------------------
 
 // 应用公共文件
+
+/**
+ * 检查当前登录用户指定菜单Url或tag的权限
+ * @param string $tag 待检查的无前缀斜线无文件后缀的菜单Url或菜单tag标签
+ * @return boolean
+ */
+function user_has_permission($tag = null)
+{
+    return app('app\common\service\AuthService')->userHasPermission($tag);
+}

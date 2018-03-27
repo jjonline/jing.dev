@@ -50,10 +50,10 @@ $(function () {
     var zTree;
     var setting = {
         view: {showLine: false, showIcon: false, dblClickExpand: false},
-        check: {enable: true, nocheck: false, chkboxType: {"Y": "ps", "N": "ps"}},
+        check: {enable: true, nocheck: false, chkboxType: {"Y": "p", "N": "s"}},
         callback: {
             onClick: function (e, treeId, treeNode,clickFlag) {
-                zTree.checkNode(treeNode, !treeNode.checked, true);
+                zTree.checkNode(treeNode, !treeNode.checked, false);
                 collectCheckedMenu();
             },
             onCheck:function (event, treeId, treeNode) {
@@ -94,7 +94,7 @@ $(function () {
                 edit_menu = isMenuEdit(n.id);
                 if(edit_menu)
                 {
-                    zTreeObj.checkNode(n, true, true);//选中node
+                    zTreeObj.checkNode(n, true, false);//选中node
                     var _node = {};
                     _node.id   = n.id;
                     _node.name = n.name;
@@ -106,6 +106,8 @@ $(function () {
                     {
                         child(n.children);
                     }
+                }else{
+                    zTreeObj.checkNode(n, false, false);// 取消选中node
                 }
             }
         });
@@ -132,7 +134,7 @@ $(function () {
                     edit_menu = isMenuEdit(n.id);
                     if(edit_menu)
                     {
-                        zTreeObj.checkNode(n, true, true);//选中node
+                        zTreeObj.checkNode(n, true, false);//选中node
                         var _node = {};
                         _node.id   = n.id;
                         _node.name = n.name;
@@ -144,6 +146,8 @@ $(function () {
                         {
                             child(n.children);
                         }
+                    }else{
+                        zTreeObj.checkNode(n, false, false);// 取消选中node
                     }
                 }
             });

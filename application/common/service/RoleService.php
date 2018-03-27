@@ -390,7 +390,7 @@ class RoleService
         try{
             if($is_edit)
             {
-                $role_id = $exist_role['id'];
+                $role_id = $repeat_role['id'];
                 // 更新角色
                 Db::name('role')->where('id',$role_id)->update($role);
                 // 编辑模式 删除原先角色的菜单数据
