@@ -317,12 +317,12 @@ class RoleService
         if($is_edit)
         {
             // 检查拟编辑角色是否存在
-            $exist_role = $this->Role->getRoleInfoById($request->post('id'));
-            if(empty($exist_role))
+            $repeat_role = $this->Role->getRoleInfoById($request->post('id'));
+            if(empty($repeat_role))
             {
                 return ['error_code' => 400,'error_msg' => '拟编辑角色不存在'];
             }
-            if($exist_role['name'] != trim($data['Role']['name']) && !empty($exist_role))
+            if($repeat_role['name'] != trim($data['Role']['name']) && !empty($exist_role))
             {
                 return ['error_code' => 400,'error_msg' => '角色名称已存在，角色名称不能重复'];
             }
