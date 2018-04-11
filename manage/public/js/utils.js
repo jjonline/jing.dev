@@ -717,7 +717,9 @@ var utils = {
      */
     bindAjaxUploader: function (id, _param) {
         var param = $.extend({
+            url:'',//上传文件后端Url，留空则为/manage/upload/upload?origin=ajax
             multiple:true,//是否允许选择多张图，默认允许多张
+            allow_extension: null,//null不限制、需限制时使用数组 ['jpg','jpeg']
             error:function () {},//上传成功的回调函数
             success:function () {},//上传失败的回调函数
             data: {} //上传控制器额外附带的key-value
@@ -785,8 +787,9 @@ var utils = {
             method:'POST',
             fieldName:'File',
             extraData:param.data,
+            extFilter:param.allow_extension ? param.allow_extension : null,
             multiple:!!param.multiple,
-            url:'/manage/upload/upload?origin=ajax',
+            url:param.url ?  param.url : '/manage/upload/upload?origin=ajax',
             onInit:function () {},
             onNewFile:function (id,file_info) {
                 param.file_name[id] = file_info.name;
@@ -799,11 +802,15 @@ var utils = {
                     initProcess(param.file_name[id]);
                 }
                 $('#dm-uploader-percent-bar').css('width',percent + '%').text(percent+'%');
-                console.log(percent);
+                // console.log(percent);
             },
             onUploadSuccess:function (id, data) {
                 $('.bootbox').modal('hide');
                 param.success && param.success(data);
+            },
+            onFileExtError:function(file) {
+                $('.bootbox').modal('hide');
+                param.error && param.error('所选文件后缀有误，允许后缀：' + param.allow_extension.join('、'));
             },
             onUploadError:function (id, xhr, status, errorThrown) {
                 $('.bootbox').modal('hide');
