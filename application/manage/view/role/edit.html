@@ -12,7 +12,7 @@
                         <div class="col-sm-5"><input type="text" id="name" class="form-control" name="Role[name]" placeholder="角色名称，名称唯一，例如：仓库管理员" value="<%{$role.name}%>">
                         </div>
                     </div>
-                    <input type="hidden" name="id" value="<%{$role.id}%>">
+                    <input type="hidden" name="id" id="role_id" value="<%{$role.id}%>">
                     <div class="form-group">
                         <label class="col-sm-2 control-label">角色排序：</label>
                         <div class="col-sm-5">
@@ -26,13 +26,11 @@
                         </div>
                     </div>
                     <hr>
-                    <h4 class="box-title">2、选择角色菜单</h4>
-                    <div id="menu_tree" class="ztree"></div>
-                    <hr>
-                    <h4 class="box-title">3、设置角色所属每一个菜单的权限级别</h4>
-                    <div id="permissions">
-
+                    <h4 class="box-title">2、选择角色菜单和数据权限范围</h4>
+                    <div class="box-body text-aqua">
+                        灰色不可选菜单表示必选菜单并且无数据权限之分，系统默认选择；带*号二级菜单与该二级菜单下第一个三级菜单本质是一个菜单
                     </div>
+                    <div id="menu_tree" class="ztree"></div>
                 </div>
                 <div class="box-footer">
                     <div class="row">

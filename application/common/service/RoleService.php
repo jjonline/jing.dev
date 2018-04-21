@@ -206,7 +206,7 @@ class RoleService
                         $value['name']         = $value['name'].'*';
                         $menu2[]               = $value;
                         $v_value3['parent_id'] = $value['id'];
-                        $v_value3['children']  = $this->getPermissionTreeData($value['permissions'],$v_value3['parent_id']);
+                        $v_value3['children']  = $this->getPermissionTreeData($value['permissions'],$v_value3['id']);
                         $menu3[]               = $v_value3;
                     }else {
                         $menu2[]               = $value;
@@ -515,7 +515,7 @@ class RoleService
             {
                 return ['error_code' => 400,'error_msg' => '拟编辑角色不存在'];
             }
-            if($repeat_role['name'] != trim($data['Role']['name']) && !empty($exist_role))
+            if($repeat_role['name'] != trim($data['name']) && !empty($exist_role))
             {
                 return ['error_code' => 400,'error_msg' => '角色名称已存在，角色名称不能重复'];
             }

@@ -26,8 +26,8 @@ $(function () {
                 var check_status = menu[i].getCheckStatus();
                 if(utils.isNumber(menu[i].id) && check_status.checked)
                 {
-                    // 1级别没有菜单链接 直接super
-                    if(menu[i].level == 1)
+                    // 0级别和1级别没有菜单链接 直接super
+                    if(menu[i].level == 1 || menu[i].level == 0)
                     {
                         post_ids.push(menu[i].id);
                         post_permissions.push('super');
@@ -95,11 +95,13 @@ $(function () {
         check: {enable: true, nocheck: false, chkboxType: {"Y": "ps", "N": "ps"}},
         callback: {
             onClick: function (e, treeId, treeNode,clickFlag) {
-                zTree.checkNode(treeNode, !treeNode.checked, true);
                 if(treeNode.level == 3)
                 {
+                    zTree.checkNode(treeNode, !treeNode.checked, false);
                     // console.log(treeNode);
                     $('#radio_' + treeNode.id).prop('checked',true);
+                }else {
+                    zTree.checkNode(treeNode, !treeNode.checked, true);
                 }
             },
             onCheck:function (event, treeId, treeNode) {
@@ -129,10 +131,69 @@ $(function () {
                 // 点击radio元素本身
                 aObj.click();
             });
-            // aObj.on('click',function () {
-            //     // 点击radio元素后方的文字
-            //     $(radio_input).attr('checked',true);
-            // });
+        }
+    }
+
+    initPermissions();
+
+    /**
+     * 初始化数据权限勾选逻辑
+     */
+    function initPermissions() {
+        var all_nodes = zTree.transformToArray(zTree.getNodes());
+        for(var i=0;i<all_nodes.length;i++)
+        {
+            if(utils.isNumber(all_nodes[i].id))
+            {
+                if(all_nodes[i].level == 2 && all_nodes[i].is_required == 0)
+                {
+                    setRadioStatus(all_nodes[i].id,all_nodes[i].permissions);
+                }
+            }
+        }
+    }
+
+    /**
+     * radio禁用范围
+     * @param node_id
+     * @param up_permissions
+     */
+    function setRadioStatus(node_id,up_permissions)
+    {
+        var super_id   = '#radio_permissions_super_' + node_id;
+        var leader_id  = '#radio_permissions_leader_' + node_id;
+        var staff_id   = '#radio_permissions_staff_' + node_id;
+        //var guest_id   = 'radio_permissions_guest_' + node_id + '_v';
+        var radio_name = 'radio_' + node_id;
+        switch (up_permissions)
+        {
+            case 'super':
+                break;
+            case 'leader':
+                console.log(super_id);
+                $(super_id).prop('disabled',true).parent('li').on('click',function () {
+                    return false;
+                }).find('span').css({'cursor':'not-allowed','color':'#bbb'});
+                break;
+            case 'staff':
+                $(super_id).prop('disabled',true).parent('li').on('click',function () {
+                    return false;
+                }).find('span').css({'cursor':'not-allowed','color':'#bbb'});
+                $(leader_id).prop('disabled',true).parent('li').on('click',function () {
+                    return false;
+                }).find('span').css({'cursor':'not-allowed','color':'#bbb'});
+                break;
+            case 'guest':
+                $(super_id).prop('disabled',true).parent('li').on('click',function () {
+                    return false;
+                }).find('span').css({'cursor':'not-allowed','color':'#bbb'});
+                $(leader_id).prop('disabled',true).parent('li').on('click',function () {
+                    return false;
+                }).find('span').css({'cursor':'not-allowed','color':'#bbb'});
+                $(staff_id).prop('disabled',true).parent('li').on('click',function () {
+                    return false;
+                }).find('span').css({'cursor':'not-allowed','color':'#bbb'});
+                break;
         }
     }
 

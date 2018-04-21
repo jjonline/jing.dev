@@ -1,6 +1,9 @@
 .ztree li span.button.switch{margin-right:5px}
-.ztree ul ul li{display:inline-block;white-space:normal}
+.ztree ul ul li{white-space:normal}
 .ztree>li>ul>li{padding:5px}
+.ztree>li>ul>li>ul>li>ul>li{display:inline-block;padding:5px}
+.ztree>li>ul>li>ul>li>ul>li .button{display:none !important;}
+.ztree>li>ul>li>ul>li>ul>li .node_name{margin-left: 4px;}
 .ztree>li{background: #e4f0fd}
 .ztree>li:nth-child(even)>ul>li:nth-child(even){background: #c9e0fb}
 .ztree>li:nth-child(even)>ul>li:nth-child(odd){background: #d4e7fd}

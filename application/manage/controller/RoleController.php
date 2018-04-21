@@ -10,8 +10,6 @@ namespace app\manage\controller;
 
 use app\common\controller\BaseController;
 use app\common\model\Role;
-use app\common\model\Menu;
-use app\common\model\RoleMenu;
 use app\common\service\RoleService;
 use think\Request;
 
@@ -20,7 +18,10 @@ class RoleController extends BaseController
 
     /**
      * 角色列表
-     * @throws
+     * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function listAction()
     {
@@ -75,7 +76,13 @@ class RoleController extends BaseController
 
     /**
      * 修改角色
-     * @throws
+     * @param Request $request
+     * @param RoleService $roleService
+     * @return array|mixed
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function editAction(Request $request , RoleService $roleService)
     {
@@ -99,7 +106,7 @@ class RoleController extends BaseController
         $Role      = $RoleModel->getRoleInfoById($request->get('id'));
         if(empty($Role))
         {
-            $this->redirect(url('develop/role'));
+            $this->redirect(url('role/list'));
         }
         // 检查编辑者的角色权限是否有权编辑该角色
         $has_edit_auth = $roleService->checkRoleEditorAuth($Role['id'],$this->UserInfo['role_id']);
@@ -112,8 +119,7 @@ class RoleController extends BaseController
         $this->assign('menu_list',$menu_list);
 
         // 待编辑的菜单权限列表
-        $RoleMenuModel = new RoleMenu();
-        $role_menu     = $RoleMenuModel->getRoleMenuListByRoleId($Role['id']);
+        $role_menu     = $roleService->RoleMenu->getRoleMenuListByRoleId($Role['id']);
         $this->assign('role_menu',$role_menu);
 
         $this->assign('role',$Role);
