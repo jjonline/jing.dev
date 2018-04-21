@@ -196,10 +196,27 @@ class RoleService
                     $menu1[] = $value;
                     break;
                 case 2:
-                    $menu2[] = $value;
+                    /**
+                     * 将二级菜单虚拟一个到三级中，启用联动效应
+                     */
+                    if($value['is_required'] == 0)
+                    {
+                        $v_value3              = $value;
+                        $value['id']           = $value['id'].'_v';
+                        $value['name']         = $value['name'].'*';
+                        $menu2[]               = $value;
+                        $v_value3['parent_id'] = $value['id'];
+                        $v_value3['children']  = $this->getPermissionTreeData($value['permissions'],$v_value3['parent_id']);
+                        $menu3[]               = $v_value3;
+                    }else {
+                        $menu2[]               = $value;
+                    }
                     break;
                 case 3:
-                    $menu3[] = $value;
+                    if($value['is_required'] == 0) {
+                        $value['children'] = $this->getPermissionTreeData($value['permissions'], $value['id']);
+                    }
+                    $menu3[]            = $value;
                     break;
             }
         }
@@ -231,6 +248,182 @@ class RoleService
             $tree[$key1]['children'] = $_menu2;
         }
         return $tree;
+    }
+
+    /**
+     * 获取数据权限级别radio
+     * @param $permission
+     * @param $parent_id
+     * @return mixed
+     * @throws Exception
+     */
+    protected function getPermissionTreeData($permission,$parent_id)
+    {
+        $per = [
+            'super'  => [
+                [
+                    'id'    => 'permissions_super_'.$parent_id,
+                    'tag'   => 'super'.$parent_id,
+                    'value' => 'super',
+                    'name'  => '全部数据',
+                    'level' => 4,
+                    'open'  => true,
+                    'node'  => 'permissions_super_'.$parent_id,
+                ],
+                [
+                    'id'    => 'permissions_leader_'.$parent_id,
+                    'tag'   => 'leader'.$parent_id,
+                    'value' => 'leader',
+                    'name'  => '部门和个人数据',
+                    'level' => 4,
+                    'open'  => true,
+                    'node'  => 'permissions_leader_'.$parent_id,
+                ],
+                [
+                    'id'    => 'permissions_staff_'.$parent_id,
+                    'tag'   => 'staff'.$parent_id,
+                    'value' => 'staff',
+                    'name'  => '仅个人数据',
+                    'level' => 4,
+                    'open'  => true,
+                    'node'  => 'permissions_staff_'.$parent_id,
+                ],
+                [
+                    'id'    => 'permissions_guest_'.$parent_id,
+                    'tag'   => 'guest'.$parent_id,
+                    'value' => 'guest',
+                    'name'  => '无数据权限',
+                    'level' => 4,
+                    'open'  => true,
+                    'node'  => 'permissions_guest_'.$parent_id,
+                ],
+            ],
+            'leader' => [
+                [
+                    'id'          => 'permissions_super_' . $parent_id,
+                    'tag'         => 'super' . $parent_id,
+                    'value'       => 'super',
+                    'name'        => '全部数据',
+                    'level'       => 4,
+                    'open'        => true,
+                    'chkDisabled' => true,
+                    'node'        => 'permissions_super_' . $parent_id,
+                ],
+                [
+                    'id'    => 'permissions_leader_'.$parent_id,
+                    'tag'   => 'leader'.$parent_id,
+                    'value' => 'leader',
+                    'name'  => '部门和个人数据',
+                    'level' => 4,
+                    'open'  => true,
+                    'node'  => 'permissions_leader_'.$parent_id,
+                ],
+                [
+                    'id'    => 'permissions_staff_'.$parent_id,
+                    'tag'   => 'staff'.$parent_id,
+                    'value' => 'staff',
+                    'name'  => '仅个人数据',
+                    'level' => 4,
+                    'open'  => true,
+                    'node'  => 'permissions_staff_'.$parent_id,
+                ],
+                [
+                    'id'    => 'permissions_guest_'.$parent_id,
+                    'tag'   => 'guest'.$parent_id,
+                    'value' => 'guest',
+                    'name'  => '无数据权限',
+                    'level' => 4,
+                    'open'  => true,
+                    'node'  => 'permissions_guest_'.$parent_id,
+                ],
+            ],
+            'staff'  => [
+                [
+                    'id'          => 'permissions_super_' . $parent_id,
+                    'tag'         => 'super' . $parent_id,
+                    'value'       => 'super',
+                    'name'        => '全部数据',
+                    'level'       => 4,
+                    'open'        => true,
+                    'chkDisabled' => true,
+                    'node'        => 'permissions_super_' . $parent_id,
+                ],
+                [
+                    'id'          => 'permissions_leader_' . $parent_id,
+                    'tag'         => 'leader' . $parent_id,
+                    'value'       => 'leader',
+                    'name'        => '部门和个人数据',
+                    'level'       => 4,
+                    'open'        => true,
+                    'chkDisabled' => true,
+                    'node'        => 'permissions_leader_' . $parent_id,
+                ],
+                [
+                    'id'    => 'permissions_staff_'.$parent_id,
+                    'tag'   => 'staff'.$parent_id,
+                    'value' => 'staff',
+                    'name'  => '仅个人数据',
+                    'level' => 4,
+                    'open'  => true,
+                    'node'  => 'permissions_staff_'.$parent_id,
+                ],
+                [
+                    'id'    => 'permissions_guest_'.$parent_id,
+                    'tag'   => 'guest'.$parent_id,
+                    'value' => 'guest',
+                    'name'  => '无数据权限',
+                    'level' => 4,
+                    'open'  => true,
+                    'node'  => 'permissions_guest_'.$parent_id,
+                ],
+            ],
+            'guest'  => [
+                [
+                    'id'          => 'permissions_super_' . $parent_id,
+                    'tag'         => 'super' . $parent_id,
+                    'value'       => 'super',
+                    'name'        => '全部数据',
+                    'level'       => 4,
+                    'open'        => true,
+                    'chkDisabled' => true,
+                    'node'        => 'permissions_super_' . $parent_id,
+                ],
+                [
+                    'id'          => 'permissions_leader_' . $parent_id,
+                    'tag'         => 'leader' . $parent_id,
+                    'value'       => 'leader',
+                    'name'        => '部门数据和个人数据',
+                    'level'       => 4,
+                    'open'        => true,
+                    'chkDisabled' => true,
+                    'node'        => 'permissions_leader_' . $parent_id,
+                ],
+                [
+                    'id'          => 'permissions_staff_' . $parent_id,
+                    'tag'         => 'staff' . $parent_id,
+                    'value'       => 'staff',
+                    'name'        => '仅个人数据',
+                    'level'       => 4,
+                    'open'        => true,
+                    'chkDisabled' => true,
+                    'node'        => 'permissions_staff_' . $parent_id,
+                ],
+                [
+                    'id'    => 'permissions_guest_'.$parent_id,
+                    'tag'   => 'guest'.$parent_id,
+                    'value' => 'guest',
+                    'name'  => '无数据权限',
+                    'level' => 4,
+                    'open'  => true,
+                    'node'  => 'permissions_guest_'.$parent_id,
+                ],
+            ],
+        ];
+        if(empty($per[$permission]))
+        {
+            throw new Exception('权限级别数据致命错误');
+        }
+        return $per[$permission];
     }
 
     /**
@@ -307,13 +500,13 @@ class RoleService
     public function save(Request $request)
     {
         $data = $request->post();
-        if(empty($data['Role']['name']))
+        if(empty($data['name']))
         {
             return ['error_code' => 400,'error_msg' => '角色名称不得为空'];
         }
         // 是否编辑模式
         $is_edit    = $request->has('id','post');
-        $exist_role = $this->Role->getRoleInfoByName($data['Role']['name']);
+        $exist_role = $this->Role->getRoleInfoByName($data['name']);
         if($is_edit)
         {
             // 检查拟编辑角色是否存在
@@ -333,8 +526,8 @@ class RoleService
             }
         }
         // 检查权限菜单是否存在
-        $menu_ids = $request->post('Role_ID/a');
-        $menus = $this->Menu->db()->where('id','IN',$menu_ids)->select();
+        $menu_ids = $request->post('ids/a');
+        $menus    = $this->Menu->db()->where('id','IN',$menu_ids)->select();
         if(count($menus) != count($menu_ids))
         {
             return ['error_code' => 400,'error_msg' => '菜单数据已变动请刷新页面后再试'];
@@ -346,10 +539,10 @@ class RoleService
         }
         // 角色菜单及权限
         $role_menu = [];
-        foreach ($menu_ids as $menu_id) {
+        foreach ($menu_ids as $key => $menu_id) {
             $_role_menu                = [];
             $_role_menu['menu_id']     = $menu_id;
-            $_role_menu['permissions'] = $permissions[$menu_id];
+            $_role_menu['permissions'] = $permissions[$key];
             $role_menu[]               = $_role_menu;
         }
 
@@ -362,7 +555,7 @@ class RoleService
                 return ['error_code' => 400, 'error_msg' => '开发者角色不允许非开发者编辑'];
             }
             $user_role_menu = $this->RoleMenu->getRoleMenuListByRoleId(Session::get('user_info.role_id'));
-            $checked_menu = $role_menu;
+            $checked_menu   = $role_menu;
             foreach ($role_menu as $key => $value) {
                 foreach ($user_role_menu as $_key => $_value) {
                     if ($value['menu_id'] == $_value['id']) {
@@ -382,9 +575,9 @@ class RoleService
 
         // 角色数据
         $role           = [];
-        $role['name']   = trim($data['Role']['name']);
-        $role['sort']   = intval($data['Role']['sort']) >= 0 ? intval($data['Role']['sort']) : 0;
-        $role['remark'] = !empty($data['Role']['remark']) ? trim($data['Role']['remark']) : '';
+        $role['name']   = trim($data['name']);
+        $role['sort']   = intval($data['sort']) >= 0 ? intval($data['sort']) : 0;
+        $role['remark'] = !empty($data['remark']) ? trim($data['remark']) : '';
         // 事务开始写入角色数据
         Db::startTrans();
         try{

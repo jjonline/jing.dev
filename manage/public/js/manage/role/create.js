@@ -1,34 +1,74 @@
 /**
  * 初始化默认菜单权限选择
  */
-var load_tag = false;
-var default_permissions = [];
+var zTree;
 $(function () {
-    // 载入iCheck资源
-    utils.loadCss('/public/plugin/iCheck/all.css');
-    utils.loadJs('/public/plugin/iCheck/icheck.min.js',function () {
-        load_tag = true;
-        $("input[type='radio']").iCheck({'radioClass':'iradio_square-blue'});
-    });
+
     $('#roleAdd').submit(function () {
         if (utils.isEmpty($('#name').val())) {
             $('#name').focus();
             utils.toast('请输入角色名称');
             return false;
         }
-        // 检查选择的菜单
-        if($("input[name='Role_ID[]']").length <= 0)
+        var menu = zTree.transformToArray(zTree.getNodes());
+        // 获取选择的菜单数据
+        var post_ids = [];
+        var post_permissions = [];
+        for(var i=0;i<menu.length;i++)
         {
-            utils.toast('请选择角色菜单和菜单权限');
+            // 处理必选菜单
+            if(menu[i].is_required == 1 && utils.isNumber(menu[i].id))
+            {
+                post_ids.push(menu[i].id);
+                post_permissions.push('super');
+            }else {
+                // 读取已选中item
+                var check_status = menu[i].getCheckStatus();
+                if(utils.isNumber(menu[i].id) && check_status.checked)
+                {
+                    // 1级别没有菜单链接 直接super
+                    if(menu[i].level == 1)
+                    {
+                        post_ids.push(menu[i].id);
+                        post_permissions.push('super');
+                    }
+                    if(menu[i].level == 2)
+                    {
+                        var radio_name  = 'radio_' + menu[i].id;
+                        var permissions = $("input:radio[name='"+radio_name+"']:checked").val();
+                        if(!permissions)
+                        {
+                            utils.toast('请选择【'+menu[i].name+'】的数据权限');
+                            return false;
+                        }
+                        post_ids.push(menu[i].id);
+                        post_permissions.push(permissions);
+                    }
+                }
+
+            }
+        }
+        // 检测是否有选择
+        if(utils.isEmpty(post_ids) || utils.isEmpty(post_permissions))
+        {
+            utils.toast('请选择角色菜单和数据权限范围');
             return false;
         }
+        var post = {
+            'name' : $('#name').val(),
+            'sort' : $('#sort').val(),
+            'remark' : $('#remark').val(),
+            'ids' : post_ids,
+            'permissions' : post_permissions
+        };
         $('.btn-submit').prop('disabled',true).text('提交中...');
         $.ajax({
             url: $('#roleAdd').attr('action'),
             type: 'POST',
-            data: $('#roleAdd').serializeArray(),
+            data: post,
             success: function (data) {
-                if(data.error_code == 0){
+                if(data.error_code == 0)
+                {
                     utils.alert(data.error_msg,function () {
                         location.href = '/manage/role/list';
                     });
@@ -45,143 +85,55 @@ $(function () {
         return false;
     });
 
-    var zTree;
     var setting = {
-        view: {showLine: false, showIcon: false, dblClickExpand: false},
+        view: {
+            showLine: false,
+            showIcon: false,
+            dblClickExpand: false,
+            addDiyDom:addDiyDom
+        },
         check: {enable: true, nocheck: false, chkboxType: {"Y": "ps", "N": "ps"}},
         callback: {
             onClick: function (e, treeId, treeNode,clickFlag) {
                 zTree.checkNode(treeNode, !treeNode.checked, true);
-                collectCheckedMenu();
+                if(treeNode.level == 3)
+                {
+                    // console.log(treeNode);
+                    $('#radio_' + treeNode.id).prop('checked',true);
+                }
             },
             onCheck:function (event, treeId, treeNode) {
-                collectCheckedMenu();
+                //console.log(treeNode);
             }
         }
     };
     zTree = $.fn.zTree.init($("#menu_tree"), setting, menu);
-    initDefaultMenuPermissions();
 
     /**
-     * 初始化菜单权限
+     * 自定义tree
+     * @param treeId
+     * @param treeNode
      */
-    function initDefaultMenuPermissions()
-    {
-        var permissions = [];
-        $.each(menu,function (i,n) {
-            if(n.is_required == 1)
-            {
-                var node = {};
-                node.id   = n.id;
-                node.name = n.name;
-                node.url  = n._url;
-                node.permissions  = n.permissions;
-                permissions.push(node);
-                if(!utils.isEmpty(n.children))
-                {
-                    child(n.children);
-                }
-            }
-        });
-        function child(child_node)
+    function addDiyDom(treeId, treeNode) {
+        var IDMark_A = '_a';
+        var aObj = $("#" + treeNode.tId + IDMark_A);
+        if (treeNode.level == 3)
         {
-            $.each(child_node,function (i,n) {
-                if(n.is_required == 1)
-                {
-                    var node = {};
-                    node.id   = n.id;
-                    node.name = n.name;
-                    node.url  = n._url;
-                    node.permissions  = n.permissions;
-                    permissions.push(node);
-                    if(!utils.isEmpty(n.children))
-                    {
-                        child(n.children);
-                    }
-                }
+            var radio_name = 'radio_' + treeNode.getParentNode().id;
+            var editStr = "<input type='radio' class='radioBtn' id='radio_" +treeNode.id+ "' name='"+radio_name+"' value='"+treeNode.value+"'></input>";
+            aObj.before(editStr);
+
+            // bind event
+            var radio_input = "#radio_"+treeNode.id;
+            $('#menu_tree').on("click", radio_input ,function() {
+                // 点击radio元素本身
+                aObj.click();
             });
+            // aObj.on('click',function () {
+            //     // 点击radio元素后方的文字
+            //     $(radio_input).attr('checked',true);
+            // });
         }
-        default_permissions = permissions;
-        initPermissionsDom(default_permissions);
-    };
-
-    /**
-     * 收集选中节点
-     */
-    function collectCheckedMenu()
-    {
-        var permissions = default_permissions.concat();
-        // console.log(default_permissions.length);
-        var obj  = $.fn.zTree.getZTreeObj("menu_tree");
-        var json = obj.getCheckedNodes(true);
-        $.each(json,function (i,n) {
-            var node = {};
-            node.id   = n.id;
-            node.name = n.name;
-            node.url  = n._url;
-            node.permissions  = n.permissions;
-            permissions.push(node);
-        });
-        // console.log(default_permissions);
-        initPermissionsDom(permissions);
-    };
-
-    /**
-     * 渲染初始化菜单的权限选择dom
-     */
-    function initPermissionsDom(checked_permissions) {
-        var dom = '<ul class="menu_permissions">';
-        //console.log(checked_permissions);
-        $.each(checked_permissions,function (i,n) {
-            dom += '<li class="form-group">' +
-                '<input type="hidden" name="Role_ID[]" value="'+ n.id +'">' +
-                '<div class="permissions_radio"><span><i class="fa fa-child"></i> ' + n.name + '</span>';
-            switch(n.permissions)
-            {
-                case 'super' :
-                    dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="super" name="permissions['+n.id+']" checked> 超级管理员（管理所有数据）' +
-                        '</label>';
-                    dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="leader" name="permissions['+n.id+']"> 部门领导（管理部门数据）' +
-                        '</label>';
-                    dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="staff" name="permissions['+n.id+']"> 部门职员（管理个人数据)' +
-                        '</label>';
-                    dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="guest" name="permissions['+n.id+']"> 游客' +
-                        '</label>';
-                    break;
-                case 'leader' :
-                    dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="leader" name="permissions['+n.id+']" checked> 部门领导（管理部门数据）' +
-                        '</label>';
-                    dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="staff" name="permissions['+n.id+']"> 部门职员（管理个人数据)' +
-                        '</label>';
-                    dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="guest" name="permissions['+n.id+']" checked> 游客' +
-                        '</label>';
-                    break;
-                case 'staff' :
-                    dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="staff" name="permissions['+n.id+']" checked> 部门职员（管理个人数据)' +
-                        '</label>';
-                    dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="guest" name="permissions['+n.id+']"> 游客' +
-                        '</label>';
-                    break;
-                case 'guest' :
-                    dom += '<label class="radio-inline">' +
-                        '   <input type="radio" value="guest" name="permissions['+n.id+']" checked> 游客' +
-                        '</label>';
-                    break;
-            }
-            dom += '</div></li>';
-        });
-        dom += '</ul>';
-        $('#permissions').empty().html(dom);
-        load_tag && $("input[type='radio']").iCheck({'radioClass':'iradio_square-blue'});
-    };
+    }
 
 });
