@@ -17,6 +17,12 @@ body {
 .box-min {min-height: 505px;}
 .select2 {width: 100%;}
 
+/*侧边栏1级导航下划线*/
+.sidebar-menu>li{border-bottom: 1px solid #141a1d;}
+.treeview-menu {padding-bottom: 4px;}
+.treeview-menu>li {font-size:13px;padding:4px 0 2px;}
+.treeview-menu>li a {font-size:13px;}
+
 /**
  * 列表中排序字段的input框
  */

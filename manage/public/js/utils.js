@@ -254,7 +254,7 @@ var utils = {
         if (!match) {
             return false;
         }
-        var phone = /^(13[0-9]|14[0-9]|15[0-9]|18[0-9]|170)\d{8}$/;
+        var phone = /^(13[0-9]|14[0-9]|15[0-9]|18[0-9]|17[0-9])\d{8}$/;
         if (phone.test(match)) {
             return true;
         }
