@@ -350,6 +350,7 @@ class UserService
             $user['telephone'] = !empty($_user['telephone']) ? $_user['telephone'] : '';
             $user['is_leader'] = !empty($_user['is_leader']) ? 1 : 0;
             $user['enable']    = !empty($_user['enable']) ? 1 : 0;
+            $user['auth_code'] = GenerateHelper::makeNonceStr(8);
             $result = $this->User->isUpdate(false)->save($user);
             if(false !== $result)
             {
@@ -403,6 +404,12 @@ class UserService
         if(empty($User['user_name']) || mb_strlen($User['user_name'],'utf8') >= 32)
         {
             throw new Exception('用户名不得为空或大于50个字符',500);
+        }
+        // 用户名不能重复
+        $user_name_repeat = $this->User->getUserInfoByUserName($User['user_name']);
+        if(!empty($user_name_repeat))
+        {
+            throw new Exception('用户名'.$User['user_name'].'已存在',500);
         }
         // 性别
         if(!empty($User['gender']) && in_array($User['gender'],[-1,0,1]))
