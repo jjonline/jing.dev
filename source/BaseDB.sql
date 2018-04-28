@@ -195,8 +195,8 @@ CREATE TABLE `com_async_task` (
   `id` char(36) NOT NULL COMMENT 'ID，UUID形式',
   `user_id` int(11) NOT NULL COMMENT '用户ID',
   `dept_id` int(11) NOT NULL DEFAULT 0 COMMENT '所属部门ID',
-  `title` char(128) NOT NULL DEFAULT '' COMMENT '异步任务可识读标题:由底层类属性标记',
-  `task` char(128) NOT NULL DEFAULT '' COMMENT '异步任务:对应底层类名',
+  `title` varchar(128) NOT NULL DEFAULT '' COMMENT '异步任务可识读标题:由底层类属性标记',
+  `task` varchar(128) NOT NULL DEFAULT '' COMMENT '异步任务:对应底层类名',
   `task_data` text NOT NULL COMMENT '异步任务参数数据，JSON字符串',
   `result` text NOT NULL COMMENT '异步任务执行结果描述，描述文本',
   `task_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '异步任务执行状态：0、未投递未执行，1、已投递正在执行，2、执行成功，3、执行失败',
@@ -208,3 +208,21 @@ CREATE TABLE `com_async_task` (
   KEY `user_id` (`user_id`),
   KEY `create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='异步任务记录';
+
+---用户可识别日志
+CREATE TABLE `com_user_log` (
+  `id` char(36) NOT NULL COMMENT 'ID，UUID形式',
+  `user_id` int(11) NOT NULL COMMENT '用户ID',
+  `dept_id` int(11) NOT NULL DEFAULT 0 COMMENT '所属部门ID',
+  `title` varchar(128) NOT NULL DEFAULT '' COMMENT '日志标题或描述',
+  `os` varchar(128) NOT NULL DEFAULT '' COMMENT '操作系统信息',
+  `broswer` varchar(128) NOT NULL DEFAULT '' COMMENT '浏览器信息',
+  `ip` varchar(128) NOT NULL DEFAULT '' COMMENT 'IP地址',
+  `location` varchar(128) NOT NULL DEFAULT '' COMMENT 'IP地址解析出的归属地信息',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `dept_id` (`dept_id`),
+  KEY `create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户可识别日志';
