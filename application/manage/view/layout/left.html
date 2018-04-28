@@ -20,12 +20,12 @@
                 <%{if condition="!empty($menu.url)"}%>
                     <!--一级导航直接链接-->
                     <li class="<%{$menu.active ? 'active' : ' '}%> <%{$menu.open_menu ? 'open-menu' : ' '}%>">
-                        <a href="<%{:url($menu.url)}%>" id="LeftMenu_<%{$menu.tag}%>">
+                        <a href="<%{:url($menu.url)}%>" id="<%{$menu.tag}%>">
                             <i class="<%{$menu.icon}%>"></i>
                             <span><%{$menu.name}%></span>
                             <%{if condition="!empty($menu.is_badge)"}%>
-                            <span class="pull-right-container">
-                                <small class="is-badge label pull-right bg-green">0</small>
+                            <span class="pull-right-container badge-container">
+                                <small class="is-badge label pull-right bg-red">0</small>
                             </span>
                             <%{/if}%>
                         </a>
@@ -33,7 +33,7 @@
                 <%{else/}%>
                     <!--二级导航无链接，有二级子菜单-->
                     <li class="treeview <%{$menu.active ? 'active' : ' '}%> <%{$menu.open_menu ? 'open-menu' : ' '}%>">
-                        <a href="#" id="LeftMenu_<%{$menu.tag}%>">
+                        <a href="#" id="<%{$menu.tag}%>">
                             <i class="<%{$menu.icon}%>"></i> <span><%{$menu.name}%></span>
                             <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                         </a>
@@ -41,12 +41,12 @@
                         <ul class="treeview-menu">
                             <%{volist name="$menu.children" id="menu_child"}%>
                                 <li class="<%{$menu_child.active ? 'active' : ' '}%>">
-                                    <a href="<%{:url($menu_child.url)}%>" id="LeftMenu_<%{$menu_child.tag}%>">
+                                    <a href="<%{:url($menu_child.url)}%>" id="<%{$menu_child.tag}%>">
                                         <i class="<%{$menu_child.icon}%>"></i>
                                         <span><%{$menu_child.name}%></span>
                                         <%{if condition="!empty($menu_child.is_badge)"}%>
-                                            <span class="pull-right-container">
-                                                <small class="is-badge label pull-right bg-green">0</small>
+                                            <span class="pull-right-container badge-container">
+                                                <small class="is-badge label pull-right bg-red">0</small>
                                             </span>
                                         <%{/if}%>
                                     </a>

@@ -169,3 +169,42 @@ CREATE TABLE `com_attachment` (
   PRIMARY KEY (`id`),
   UNIQUE KEY (`user_id`,`file_sha1`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='附件表：用户上传资源数据';
+
+
+---具有操作流程的操作记录表
+CREATE TABLE `com_operation_record` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `operation_name` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '操作流程名称，一般为对应流程的数据表表名称，譬如退货流程记录时值为：pro_returns',
+  `business_id` int(11) NOT NULL DEFAULT '0' COMMENT '对应的业务ID，譬如退货记录时该字段记录退货单ID',
+  `title` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '操作流程简要标题',
+  `desc` VARCHAR(512) NOT NULL DEFAULT '' COMMENT '操作流程描述',
+  `creator` int(11) NOT NULL DEFAULT '0' COMMENT '操作者的用户ID',
+  `creator_name` VARCHAR(32) NOT NULL DEFAULT '' COMMENT '操作者姓名，用于直接显示',
+  `creator_dept_id` int(11) NOT NULL DEFAULT '0' COMMENT '操作者的部门ID',
+  `creator_dept_name` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '操作者的部门名称',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`),
+  KEY `process_name` (`operation_name`,`business_id`),
+  KEY `creator` (`creator`),
+  KEY `creator_dept_id` (`creator_dept_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='具有操作流程的操作记录表';
+
+---异步任务记录
+CREATE TABLE `com_async_task` (
+  `id` char(36) NOT NULL COMMENT 'ID，UUID形式',
+  `user_id` int(11) NOT NULL COMMENT '用户ID',
+  `dept_id` int(11) NOT NULL DEFAULT 0 COMMENT '所属部门ID',
+  `title` char(128) NOT NULL DEFAULT '' COMMENT '异步任务可识读标题:由底层类属性标记',
+  `task` char(128) NOT NULL DEFAULT '' COMMENT '异步任务:对应底层类名',
+  `task_data` text NOT NULL COMMENT '异步任务参数数据，JSON字符串',
+  `result` text NOT NULL COMMENT '异步任务执行结果描述，描述文本',
+  `task_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '异步任务执行状态：0、未投递未执行，1、已投递正在执行，2、执行成功，3、执行失败',
+  `delivery_time` datetime DEFAULT NULL COMMENT '任务投递时间',
+  `finish_time` datetime DEFAULT NULL COMMENT '任务结束时间',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='异步任务记录';
