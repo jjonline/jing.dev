@@ -10,7 +10,6 @@ $(function () {
         lengthChange: true,
         AutoWidth: false,
         language: {
-            "sProcessing": "<i class=\"fa fa-refresh fa-spin\"></i> 载入中...",
             "sLengthMenu": "显示 _MENU_ 项结果",
             "sZeroRecords": "没有匹配结果",
             "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
