@@ -1,0 +1,21 @@
+[Unit]
+Description=Async Task Server.
+After=network.target
+After=syslog.target
+
+[Service]
+User=www
+Group=www
+
+Type=simple
+
+LimitNOFILE=65535
+# PIDFile=/var/run/swoole.pid
+ExecStart=/usr/bin/php think tasks prod
+ExecStop=/bin/kill $MAINPID
+ExecReload=/bin/kill -USR1 $MAINPID
+PrivateTmp=false
+Restart=always
+
+[Install]
+WantedBy=multi-user.target graphical.target

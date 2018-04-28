@@ -7,7 +7,10 @@ namespace Composer\Autoload;
 class ComposerStaticInitab27b442dd0fdf43d03bd5bd3646291e
 {
     public static $files = array (
+        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
+        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         'a9ed0d27b5a698798a89181429f162c5' => __DIR__ . '/..' . '/khanamiryan/qrcode-detector-decoder/lib/Common/customFunctions.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '9b552a3cc426e3287cc811caefa3cf53' => __DIR__ . '/..' . '/topthink/think-helper/src/helper.php',
     );
 
@@ -42,6 +45,9 @@ class ComposerStaticInitab27b442dd0fdf43d03bd5bd3646291e
         'P' => 
         array (
             'Psr\\SimpleCache\\' => 16,
+            'Psr\\Log\\' => 8,
+            'Psr\\Http\\Message\\' => 17,
+            'Psr\\Cache\\' => 10,
             'PhpOffice\\PhpWord\\' => 18,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
             'PhpOffice\\Common\\' => 17,
@@ -50,9 +56,23 @@ class ComposerStaticInitab27b442dd0fdf43d03bd5bd3646291e
         array (
             'MyCLabs\\Enum\\' => 13,
         ),
+        'G' => 
+        array (
+            'GuzzleHttp\\Psr7\\' => 16,
+            'GuzzleHttp\\Promise\\' => 19,
+            'GuzzleHttp\\' => 11,
+        ),
         'E' => 
         array (
             'Endroid\\QrCode\\' => 15,
+        ),
+        'C' => 
+        array (
+            'Cache\\TagInterop\\' => 17,
+            'Cache\\Hierarchy\\' => 16,
+            'Cache\\Bridge\\SimpleCache\\' => 25,
+            'Cache\\Adapter\\Redis\\' => 20,
+            'Cache\\Adapter\\Common\\' => 21,
         ),
     );
 
@@ -109,6 +129,18 @@ class ComposerStaticInitab27b442dd0fdf43d03bd5bd3646291e
         array (
             0 => __DIR__ . '/..' . '/psr/simple-cache/src',
         ),
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+        ),
+        'Psr\\Http\\Message\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'Psr\\Cache\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/cache/src',
+        ),
         'PhpOffice\\PhpWord\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpword/src/PhpWord',
@@ -125,9 +157,41 @@ class ComposerStaticInitab27b442dd0fdf43d03bd5bd3646291e
         array (
             0 => __DIR__ . '/..' . '/myclabs/php-enum/src',
         ),
+        'GuzzleHttp\\Psr7\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
+        ),
+        'GuzzleHttp\\Promise\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
+        ),
+        'GuzzleHttp\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
+        ),
         'Endroid\\QrCode\\' => 
         array (
             0 => __DIR__ . '/..' . '/endroid/qr-code/src',
+        ),
+        'Cache\\TagInterop\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cache/tag-interop',
+        ),
+        'Cache\\Hierarchy\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cache/hierarchical-cache',
+        ),
+        'Cache\\Bridge\\SimpleCache\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cache/simple-cache-bridge',
+        ),
+        'Cache\\Adapter\\Redis\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cache/redis-adapter',
+        ),
+        'Cache\\Adapter\\Common\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cache/adapter-common',
         ),
     );
 
