@@ -216,7 +216,7 @@ CREATE TABLE `com_user_log` (
   `dept_id` int(11) NOT NULL DEFAULT 0 COMMENT '所属部门ID',
   `title` varchar(128) NOT NULL DEFAULT '' COMMENT '日志标题或描述',
   `os` varchar(128) NOT NULL DEFAULT '' COMMENT '操作系统信息',
-  `broswer` varchar(128) NOT NULL DEFAULT '' COMMENT '浏览器信息',
+  `browser` varchar(128) NOT NULL DEFAULT '' COMMENT '浏览器信息',
   `ip` varchar(128) NOT NULL DEFAULT '' COMMENT 'IP地址',
   `location` varchar(128) NOT NULL DEFAULT '' COMMENT 'IP地址解析出的归属地信息',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

@@ -44,11 +44,16 @@ class UserService
      * @var UserOpenService
      */
     public $UserOpenService;
+    /**
+     * @var UserLogService
+     */
+    public $UserLogService;
 
     public function __construct(LogService $logService,
                                 User $User,
                                 Role $Role,
                                 DepartmentService $departmentService,
+                                UserLogService $userLogService,
                                 UserOpenService $userOpenService)
     {
         $this->User              = $User;
@@ -56,6 +61,7 @@ class UserService
         $this->Role              = $Role;
         $this->LogService        = $logService;
         $this->UserOpenService   = $userOpenService;
+        $this->UserLogService    = $userLogService;
     }
 
     /**
@@ -157,8 +163,10 @@ class UserService
         // 保存session
         Session::set('user_id',$User['id']);
         Session::set('user_info',$User);
-        // 记录日志
+        // 记录底层日志
         $this->LogService->logRecorder('用户登录');
+        // 记录用户日志
+        $this->UserLogService->insert('登录',$User);
         return true;
     }
 
@@ -169,11 +177,21 @@ class UserService
     {
         // 记录日志--不检查是否登录状态，可能造成检查登录的死循环
         $this->LogService->logRecorder('用户退出');
+        $this->UserLogService->insert('退出登录',Session::get('user_info'));
         Cookie::delete('user_id');
         Cookie::delete('token');
         Session::clear();
     }
 
+    /**
+     * 超级管理员编辑修改其他管理员信息
+     * @param Request $request
+     * @param $act_user_info
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function superUserUpdateUser(Request $request,$act_user_info)
     {
         $_user = $request->post('User/a');
@@ -534,6 +552,8 @@ class UserService
             if(false !== $result)
             {
                 $this->LogService->logRecorder($profile,'修改个人资料');
+                // 记录用户日志
+                $this->UserLogService->insert('修改个人资料',$user);
                 // 修改成功 清理session 下次请求自动重新生成
                 Session::delete('user_id');
                 Session::delete('user_info');

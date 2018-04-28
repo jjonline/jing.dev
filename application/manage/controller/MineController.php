@@ -9,6 +9,7 @@
 namespace app\manage\controller;
 
 use app\common\controller\BaseController;
+use app\common\service\UserLogService;
 use app\common\service\UserOpenService;
 use think\Request;
 
@@ -21,7 +22,7 @@ class MineController extends BaseController
      * @return mixed
      * @throws \think\Exception
      */
-    public function profileAction(UserOpenService $userOpenService)
+    public function profileAction(UserOpenService $userOpenService,UserLogService $userLogService)
     {
         $this->title            = '个人中心 - '.config('local.site_name');
         $this->content_title    = '个人中心';
@@ -41,6 +42,10 @@ class MineController extends BaseController
         // 用户的开放平台绑定信息
         $user_open = $userOpenService->UserOpen->getUserOpenListInfoByUserId($this->UserInfo['id']);
         $this->assign('user_open',$user_open);
+
+        // 最近10条操作记录
+        $user_log = $userLogService->getLastTenItemByUserId($this->UserInfo['id']);
+        $this->assign('user_log',$user_log);
 
         return $this->fetch();
     }

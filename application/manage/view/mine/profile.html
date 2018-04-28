@@ -61,21 +61,45 @@
                 <h4 class="box-title">人事信息</h4>
             </div>
             <div class="box-body">
-                <form action="<%{:url('manage/upload/upload')}%>" enctype="multipart/form-data" method="post">
 
-                    <div class="upload-container">
-                        <span class="upload">
-                            <input type="file" name="excel" title="点击选择图片并上传" id="dm">
-                        </span>
-                    </div>
-
-
-                    <br>
-                    <input type="submit" value="上传"  id="do"/>
-                </form>
             </div>
         </div>
     </div>
+
+    <div class="col-md-12">
+        <div class="box box-danger">
+            <div class="box-header with-border">
+                <h4 class="box-title">最近操作动态</h4>
+            </div>
+            <div class="box-body">
+                <table class="table table-bordered table-hover" id="user_log">
+                    <thead>
+                    <tr>
+                        <th>操作</th>
+                        <th>时间</th>
+                        <th>归属地</th>
+                        <th>IP</th>
+                        <th>操作系统</th>
+                        <th>浏览器</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <%{volist name="user_log" id="_log"}%>
+                    <tr>
+                        <td><%{$_log.title}%></td>
+                        <td><%{$_log.create_time}%></td>
+                        <td><%{$_log.location}%></td>
+                        <td><%{$_log.ip}%></td>
+                        <td><%{$_log.os}%></td>
+                        <td><%{$_log.browser}%></td>
+                    </tr>
+                    <%{/volist}%>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 
