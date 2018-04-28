@@ -249,7 +249,18 @@ class UtilHelper
     public static function get_os_info($user_agent = null)
     {
         $agent = empty($user_agent) ? $_SERVER['HTTP_USER_AGENT'] : $user_agent;//获取用户代理字符串
-        if (preg_match('/win/i', $agent) && strpos($agent, '95'))
+        if(preg_match('/Mobile/i',$agent))
+        {
+            $os = '移动设备';
+            if(preg_match('/Android/i',$agent))
+            {
+                $os = 'Android';
+            }
+            if(preg_match('/iPhone/i',$agent))
+            {
+                $os = 'iPhone';
+            }
+        }else if (preg_match('/win/i', $agent) && strpos($agent, '95'))
         {
             $os = 'Windows 95';
         }
@@ -379,7 +390,41 @@ class UtilHelper
     public static function get_browser_info($user_agent = null)
     {
         $sys = empty($user_agent) ? $_SERVER['HTTP_USER_AGENT'] : $user_agent;//获取用户代理字符串
-        if (stripos($sys, "Firefox/") > 0) {
+        if(preg_match('/Mobile/i',$sys))
+        {
+            $exp[0] = '移动浏览器';
+            $exp[1] = '';
+            if(preg_match('/Android/i',$sys))
+            {
+                if(preg_match('/MicroMessenger/i',$sys))
+                {
+                    $exp[0] = 'Android微信浏览器';
+                }else if(preg_match('/MQQBrowser/i',$sys)) {
+                    $exp[0] = '安卓QQ浏览器';
+                }else if(preg_match('/UCBrowser/i',$sys)) {
+                    $exp[0] = '安卓UC浏览器';
+                }else if(stripos($sys, "Chrome") > 0){
+                    $exp[0] = 'Chrome内核浏览器';
+                }else {
+                    $exp[0] = '安卓浏览器';
+                }
+            }
+            if(preg_match('/iPhone/i',$sys) && preg_match('/MicroMessenger/i',$sys))
+            {
+                if(preg_match('/MicroMessenger/i',$sys))
+                {
+                    $exp[0] = 'iPhone微信浏览器';
+                }else if(preg_match('/MQQBrowser/i',$sys)) {
+                    $exp[0] = 'iPhoneQQ浏览器';
+                }else if(preg_match('/UCBrowser/i',$sys)) {
+                    $exp[0] = 'iPhoneUC浏览器';
+                }else if(stripos($sys, "Chrome") > 0){
+                    $exp[0] = 'Chrome内核浏览器';
+                }else{
+                    $exp[0] = 'iPhone浏览器';
+                }
+            }
+        }else if (stripos($sys, "Firefox/") > 0) {
             preg_match("/Firefox\/([^;)]+)+/i", $sys, $b);
             $exp[0] = "Firefox";
             $exp[1] = $b[1];  //获取火狐浏览器的版本号
@@ -415,8 +460,8 @@ class UtilHelper
         }else {
             Log::record('无法识别浏览器版本的UserAgent:'.$sys);
             $exp[0] = "未知浏览器";
-            $exp[1] = "";
+            $exp[1] = '';
         }
-        return $exp[0].'('.$exp[1].')';
+        return empty($exp[1]) ? $exp[0] : $exp[0].'('.$exp[1].')';
     }
 }
