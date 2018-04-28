@@ -9,10 +9,12 @@
 namespace app\common\service;
 
 use app\common\helper\GenerateHelper;
+use app\common\helper\UtilHelper;
 use app\common\model\AsyncTask;
 use think\Exception;
 use think\facade\Config;
 use think\facade\Log;
+use think\Request;
 
 class AsyncTaskService
 {
@@ -103,4 +105,21 @@ class AsyncTaskService
             return false;
         }
     }
+
+    /**
+     * 通过Id 获取任务详情
+     * @param Request $request
+     * @return array
+     */
+    public function getDetailById(Request $request)
+    {
+        $id   = $request->get('id/i');
+        $data = $this->AsyncTask->getDetailById($id);
+        if(!empty($data) && !empty($data['result']))
+        {
+            $data['result'] = UtilHelper::nl2p($data['result']);
+        }
+        return ['error_code' => 0,'error_msg'=>'Success:请求成功','data'=>$data];
+    }
+
 }
