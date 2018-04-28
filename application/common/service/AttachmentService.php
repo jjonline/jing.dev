@@ -11,6 +11,7 @@ namespace app\common\service;
 use app\common\helper\AttachmentHelper;
 use app\common\helper\GenerateHelper;
 use app\common\model\Attachment;
+use think\facade\Config;
 use think\Image;
 use think\Request;
 
@@ -82,6 +83,12 @@ class AttachmentService
         $exist_attachment = $this->Attachment->getAttachmentByUserFileSha1($origin_file->hash('sha1'));
         if(!empty($exist_attachment))
         {
+            //限定了文件类型
+            $extension = strtolower(pathinfo($exist_attachment['file_path'], PATHINFO_EXTENSION));
+            if(!in_array($extension,$allowedExt[$paramDir]))
+            {
+                return ['error_code' => 500,'error_msg' => '不允许上传的文件后缀：'.$extension];
+            }
             // 存在的文件使用安全域
             if($exist_attachment['is_safe'])
             {
