@@ -15,11 +15,11 @@ return [
     // 服务器地址
     'hostname'        => 'localhost',
     // 数据库名
-    'database'        => 'productive_test',
+    'database'        => 'component',
     // 用户名
-    'username'        => 'laikebang',
+    'username'        => 'root',
     // 密码
-    'password'        => 'laikebang@#$%',
+    'password'        => 'cf123456',
     // 端口
     'hostport'        => '3306',
     // 连接dsn
@@ -29,9 +29,9 @@ return [
     // 数据库编码默认采用utf8
     'charset'         => 'utf8mb4',
     // 数据库表前缀
-    'prefix'          => 'pro_',
+    'prefix'          => 'com_',
     // 数据库调试模式
-    'debug'           => false,
+    'debug'           => true,
     // 数据库部署方式:0 集中式(单一服务器),1 分布式(主从服务器)
     'deploy'          => 0,
     // 数据库读写是否分离 主从式有效
@@ -50,8 +50,6 @@ return [
     'datetime_format' => false,
     // 是否需要进行SQL性能分析
     'sql_explain'     => false,
-    // 开启断线重连机制
-    'break_reconnect' => true,
     // Query类
     'query'           => '\\think\\db\\Query',
 ];

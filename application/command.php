@@ -9,4 +9,7 @@
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
 
-return [];
+return [
+    'app\console\command\init',// 初始化项目配置
+    'app\console\command\tasks',// 基于swoole扩展的TCP异步服务器
+];
