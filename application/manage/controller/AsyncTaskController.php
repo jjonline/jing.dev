@@ -48,6 +48,9 @@ class AsyncTaskController extends BaseController
      * @param Request $request
      * @param AsyncTaskService $asyncTaskService
      * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function detailAction(Request $request,AsyncTaskService $asyncTaskService)
     {
