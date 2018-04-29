@@ -71,7 +71,7 @@ class UserController extends BaseController
         }
         $this->title            = '用户管理 - '.config('local.site_name');
         $this->content_title    = '新增用户';
-        $this->content_subtitle = '新增后台用户（此处不涉及职员信息的维护，仅维护后台账号信息）';
+        $this->content_subtitle = '新增后台用户';
         $this->breadcrumb       = [
             ['label' => '用户管理','url' => url('user/list')],
             ['label' => '新增用户','url'  => url('user/create')],

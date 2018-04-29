@@ -226,3 +226,67 @@ CREATE TABLE `com_user_log` (
   KEY `dept_id` (`dept_id`),
   KEY `create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户可识别日志';
+
+
+-----应用层会员系统主表
+CREATE TABLE `com_member` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+  `user_name` varchar(32) NOT NULL COMMENT '账号',
+  `password` varchar(255) NOT NULL COMMENT '密码（密文）',
+  `real_name` varchar(32) NOT NULL DEFAULT '' COMMENT '真实姓名',
+  `gender` tinyint(1) NOT NULL DEFAULT -1 COMMENT '性别：-1未知0女1男',
+  `mobile` varchar(20) NOT NULL DEFAULT '' COMMENT '手机号码',
+  `email` varchar(128) NOT NULL DEFAULT '' COMMENT '电子邮箱',
+  `telephone` varchar(20) NOT NULL DEFAULT '' COMMENT '座机号码',
+  `auth_code` char(32) NOT NULL COMMENT '授权code，用于cookie加密(可变)',
+  `province` varchar(32) NOT NULL DEFAULT '' COMMENT 'distpicker插件的省份',
+  `city` varchar(32) NOT NULL DEFAULT '' COMMENT 'distpicker插件的地区|市单位',
+  `district` varchar(32) NOT NULL DEFAULT '' COMMENT 'distpicker插件的县级',
+  `address` varchar(256) NOT NULL DEFAULT '' COMMENT '会员的完整地址',
+  `current_points` int(11) NOT NULL DEFAULT '0' COMMENT '会员当前积分',
+  `accumulate_points` int(11) NOT NULL DEFAULT '0' COMMENT '会员累加积分，只加(正常消费)不减，惩罚性对应扣除累积积分',
+  `enable` tinyint(1) NOT NULL DEFAULT 0 COMMENT '启用禁用标记：1启用0禁用',
+  `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注信息',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_name` (`user_name`),
+  KEY `mobile` (`mobile`),
+  KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='前台会员主表';
+
+-----会员开放平台登录账户信息
+CREATE TABLE `com_member_open` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+  `member_id` int(11) NOT NULL DEFAULT 0 COMMENT '会员表ID',
+  `open_type` ENUM('qq','pc_wx','mp_wx','xcx','wb') NOT NULL COMMENT '开放平台登录类型qq-QQ开放登录 pc_wx-Pc网站版微信扫码登录 mp_wx-微信公众号版微信登录 xcx-微信小程序登录 wb-微博登录当(需要添加新类型时添加该枚举类型的待选值)',
+  `open_id` varchar(128) NOT NULL DEFAULT '' COMMENT 'OpenID',
+  `access_token` varchar(255) NOT NULL DEFAULT '' COMMENT 'AccessToken',
+  `name` varchar(32) NOT NULL DEFAULT '' COMMENT '昵称',
+  `gender` tinyint(1) NOT NULL DEFAULT -1 COMMENT '性别：-1未知0女1男',
+  `figure` varchar(128) NOT NULL DEFAULT '' COMMENT '头像图src',
+  `union_id` varchar(128) NOT NULL DEFAULT '' COMMENT 'UnionID',
+  `expire_time` datetime DEFAULT NULL COMMENT 'Token过期时间点',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `open_id` (`open_id`,`open_type`),
+  KEY `member_id` (`member_id`),
+  KEY `union_id` (`union_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='会员多平台开放平台登录账户信息';
+
+-----应用层会员积分变动记录表
+CREATE TABLE `com_member_point_record` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+  `member_id` int(11) NOT NULL DEFAULT 0 COMMENT '客户表的ID，若没有则为0',
+  `points_changes` int(11) NOT NULL DEFAULT '0' COMMENT '积分变动数量：增加正数消费负数',
+  `current_points` int(11) NOT NULL DEFAULT '0' COMMENT '变动后积分数量，不得为负数',
+  `accumulate_points` int(11) NOT NULL DEFAULT '0' COMMENT '会员累加积分，只加(正常消费)不减，惩罚性对应扣除累积积分',
+  `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '积分变动后台操作用户ID，0表示无关后台用户',
+  `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注信息',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`),
+  KEY `member_id` (`member_id`),
+  KEY `create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='会员积分变动记录表';
