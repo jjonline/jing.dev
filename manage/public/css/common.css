@@ -1,3 +1,4 @@
+.modal{ overflow: auto !important;}
 body {
     font-family: "lucida Grande","Microsoft YaHei","PingFang SC","Helvetica Neue","Helvetica","Hiragino Sans GB","Arial","sans-serif";
 }
@@ -16,6 +17,11 @@ body {
 .box {margin-bottom: 10px;box-shadow: 1px 0 10px 1px rgba(0,0,0,.3);}
 .box-min {min-height: 505px;}
 .select2 {width: 100%;}
+.control-label .required,.required {
+    color: #e02222;
+    font-size:12px;
+    padding-left: 2px;
+}
 
 /*侧边栏1级导航下划线*/
 .sidebar-menu>li{border-bottom: 1px solid #141a1d;}

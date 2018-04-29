@@ -290,3 +290,20 @@ CREATE TABLE `com_member_point_record` (
   KEY `member_id` (`member_id`),
   KEY `create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='会员积分变动记录表';
+
+
+---应用层会员可识别日志
+CREATE TABLE `com_member_log` (
+  `id` char(36) NOT NULL COMMENT 'ID，UUID形式',
+  `member_id` int(11) NOT NULL COMMENT '用户ID',
+  `title` varchar(128) NOT NULL DEFAULT '' COMMENT '日志标题或描述',
+  `os` varchar(128) NOT NULL DEFAULT '' COMMENT '操作系统信息',
+  `browser` varchar(128) NOT NULL DEFAULT '' COMMENT '浏览器信息',
+  `ip` varchar(128) NOT NULL DEFAULT '' COMMENT 'IP地址',
+  `location` varchar(128) NOT NULL DEFAULT '' COMMENT 'IP地址解析出的归属地信息',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`),
+  KEY `member_id` (`member_id`),
+  KEY `create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='应用层会员可识别日志';
