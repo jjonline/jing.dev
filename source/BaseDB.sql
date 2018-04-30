@@ -243,6 +243,7 @@ CREATE TABLE `com_member` (
   `city` varchar(32) NOT NULL DEFAULT '' COMMENT 'distpicker插件的地区|市单位',
   `district` varchar(32) NOT NULL DEFAULT '' COMMENT 'distpicker插件的县级',
   `address` varchar(256) NOT NULL DEFAULT '' COMMENT '会员的完整地址',
+  `member_level_id` int(11) NOT NULL DEFAULT '0' COMMENT '会员当等级ID，依据累积积分计算',
   `current_points` int(11) NOT NULL DEFAULT '0' COMMENT '会员当前积分',
   `accumulate_points` int(11) NOT NULL DEFAULT '0' COMMENT '会员累加积分，只加(正常消费)不减，惩罚性对应扣除累积积分',
   `enable` tinyint(1) NOT NULL DEFAULT 0 COMMENT '启用禁用标记：1启用0禁用',
@@ -252,6 +253,7 @@ CREATE TABLE `com_member` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name` (`user_name`),
   KEY `mobile` (`mobile`),
+  KEY `member_level_id` (`member_level_id`),
   KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='前台会员主表';
 
@@ -274,6 +276,21 @@ CREATE TABLE `com_member_open` (
   KEY `member_id` (`member_id`),
   KEY `union_id` (`union_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='会员多平台开放平台登录账户信息';
+
+-----会员等级设定表
+CREATE TABLE `com_member_level` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `name` varchar(32) NOT NULL DEFAULT '' COMMENT '等级名称',
+  `once_obtain_begin` int(11)  NOT NULL DEFAULT '0' COMMENT '一次性获取积分起始值',
+  `once_obtain_end` int(11)  NOT NULL DEFAULT '0' COMMENT '一次性获取积分结束值',
+  `accumulate_begin` int(11)  NOT NULL DEFAULT '0' COMMENT '累积积分起始值',
+  `accumulate_end` int(11)  NOT NULL DEFAULT '0' COMMENT '累积积分结束值',
+  `remark` varchar(512) NOT NULL DEFAULT '' COMMENT '管理员备注',
+  `level` int(11) NOT NULL DEFAULT '1' COMMENT '当前级别，1<2<3',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='会员等级设定表';
 
 -----应用层会员积分变动记录表
 CREATE TABLE `com_member_point_record` (

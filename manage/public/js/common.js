@@ -145,7 +145,12 @@ $(function () {
             var th_list = $('#table thead>tr>th');
             var arr     = [];
             $.each(th_list,function (i,n) {
-                arr.push($(n).text());
+                var head = $(n).text();
+                if(utils.isEmpty($(n).text()))
+                {
+                    head = '-';
+                }
+                arr.push(head);
             });
             return arr;
         }

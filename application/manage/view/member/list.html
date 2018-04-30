@@ -20,30 +20,25 @@
                         <div class="row">
                             <div class="col-xs-12 col-sm-3">
                                 <div class="has-feedback">
-                                    <input id="txt_search" type="text" class="form-control" placeholder="搜索用户名、姓名、邮箱、手机等">
+                                    <input id="txt_search" type="text" class="form-control" placeholder="搜索用户名、姓名、邮箱、手机号">
                                     <span class="glyphicon glyphicon-search form-control-feedback"></span>
                                 </div>
                             </div>
                             <div class="col-xs-12 col-sm-3">
-                                <div class="input-group date">
-                                    <div class="input-group-addon">
-                                        <i class="fa fa-calendar"></i>
-                                    </div>
-                                    <input readonly id="search_begin_date" data-key="search_begin_date" type="text" class="form-control pull-right search_date" placeholder="开始过滤时间">
-                                    <div class="input-group-addon clear-begin-data" style="cursor: pointer;">
-                                        <i class="fa fa-times"></i>
-                                    </div>
-                                </div>
+
                             </div>
                             <div class="col-xs-12 col-sm-3">
-                                <div class="input-group date">
-                                    <div class="input-group-addon">
-                                        <i class="fa fa-calendar"></i>
-                                    </div>
-                                    <input readonly id="search_end_date" data-key="search_end_date" type="text" class="form-control pull-right search_date" placeholder="结束过滤时间">
-                                    <div class="input-group-addon clear-end-data" style="cursor: pointer;">
-                                        <i class="fa fa-times"></i>
-                                    </div>
+
+                            </div>
+                            <div class="col-xs-12 col-sm-3 pull-right">
+                                <div class="btn-group pull-right">
+                                    <button class="btn btn-default search-btn"><i class="fa fa-cog"></i> 高级查询</button>
+                                    <button class="btn btn-default" id="table-refresh" data-toggle="tooltip" title="点击刷新当前列表">
+                                        <i class="fa fa-refresh"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-default" id="table-columns" data-toggle="tooltip" title="点击筛选字段">
+                                        <i class="glyphicon glyphicon-th icon-th"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -54,18 +49,28 @@
 
         <div class="box box-primary">
             <div class="box-body">
-                <table class="table table-bordered table-striped table-hover display responsive nowrap" cellspacing="0" width="100%" id="table" data-order='[[ 5, "desc" ]]'>
+                <table class="table table-bordered table-striped table-hover display responsive nowrap" cellspacing="0" width="100%" id="table" data-order='[[ 9, "desc" ]]'>
                     <thead>
                     <tr>
-                        <th data-priority="1">ID</th>
-                        <th data-priority="2">用户名</th>
-                        <th data-priority="4">姓名</th>
+                        <th data-priority="false" data-orderable="false">
+                            <input type="checkbox" class="check_all" title="选中/反选全部">
+                        </th>
+                        <th data-priority="2">ID</th>
+                        <th data-priority="3" data-orderable="false">用户名</th>
+                        <th data-priority="4" data-orderable="false">姓名</th>
                         <th data-priority="5">手机号</th>
                         <th data-priority="6" data-orderable="false">邮箱</th>
+                        <th data-priority="10" data-orderable="false">省份</th>
+                        <th data-priority="11" data-orderable="false">市级</th>
+                        <th data-priority="12" data-orderable="false">县级</th>
+                        <th data-priority="13" data-orderable="false">地址</th>
                         <th data-priority="7">创建时间</th>
+                        <th data-priority="14">当前积分</th>
+                        <th data-priority="15">累积积分</th>
+                        <th data-priority="16" data-orderable="false">客户等级</th>
                         <th data-priority="8" data-orderable="false">备注</th>
                         <th data-priority="9">状态</th>
-                        <th data-priority="3" style="text-align: center;" data-orderable="false">操作</th>
+                        <th data-priority="20" data-orderable="false">操作</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -145,9 +150,9 @@
                             <label class="col-sm-3 control-label">选择省市县  <span class="required">*</span></label>
                             <div class="col-sm-7">
                                 <div id="address_picker">
-                                    <select data-province="-- 选择省 --" class="form-control province select2" style="width: 100%;"  name="Member[province]"></select>
-                                    <select data-city="-- 选择市 --"  class="form-control city select2" style="width: 100%;" name="Member[city]"></select>
-                                    <select data-district="-- 选择区 --"  class="form-control district select2" style="width: 100%;" name="Member[district]"></select>
+                                    <select data-province="-- 选择省 --" class="form-control province select2" style="width: 100%;"  name="Member[province]" id="province"></select>
+                                    <select data-city="-- 选择市 --"  class="form-control city select2" style="width: 100%;" name="Member[city]" id="city"></select>
+                                    <select data-district="-- 选择区 --"  class="form-control district select2" style="width: 100%;" name="Member[district]" id="district"></select>
                                 </div>
                             </div>
                         </div>
@@ -192,6 +197,96 @@
         </div>
     </div>
 </div>
+
+
+<!--高级查询modal Begin-->
+<div class="modal fade" id="SearchModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="SearchModelLabel">高级查询</h4>
+            </div>
+            <div class="modal-body">
+                <form action="" class="form-horizontal" id="SearchForm">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">账号状态</label>
+                        <div class="col-sm-8">
+                            <select name="adv_enable" id="adv_enable" class="form-control select2" style="width: 100%;">
+                                <option value="">--选择账号状态--</option>
+                                <option value="0">禁用</option>
+                                <option value="1">启用</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">性别</label>
+                        <div class="col-sm-8">
+                            <select name="adv_gender" id="adv_gender" class="form-control select2" style="width: 100%;">
+                                <option value="">--选择性别--</option>
+                                <option value="1">男</option>
+                                <option value="0">女</option>
+                                <option value="-1">未知</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">注册时间</label>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="search_begin_date" data-key="search_begin_date" type="text" class="form-control pull-right search_date" placeholder="创建时间开始">
+                                <div class="input-group-addon clear-begin-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="search_end_date" data-key="search_end_date" type="text" class="form-control pull-right search_date" placeholder="创建时间结束">
+                                <div class="input-group-addon clear-end-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">省市县</label>
+                        <div class="col-sm-8">
+                            <div id="adv_picker">
+                                <select data-province="-- 选择省 --" class="form-control province select2" style="width: 100%;"  name="adv_province" id="adv_province"></select>
+                                <select data-city="-- 选择市 --"  class="form-control city select2" style="width: 100%;" name="adv_city" id="adv_city"></select>
+                                <select data-district="-- 选择区 --"  class="form-control district select2" style="width: 100%;" name="adv_district" id="adv_district"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="box-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <div class="col-xs-6 text-right">
+                            <button type="button" class="btn btn-default btn-reset">重置</button>
+                        </div>
+                        <div class="col-xs-6 text-left">
+                            <button type="button" class="btn btn-info btn-search">查询</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--高级查询结束-->
 <script>
     var has_edit_permission = <%{:user_has_permission('manage/member/edit') ? 'true' : 'false'}%>;
     var has_enable_permission = <%{:user_has_permission('manage/member/enabletoggle') ? 'true' : 'false'}%>;

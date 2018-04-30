@@ -29,6 +29,9 @@ body {
 .treeview-menu>li {font-size:13px;padding:4px 0 2px;}
 .treeview-menu>li a {font-size:13px;}
 
+/*列表选中*/
+tr.selected {background-color: #eaf9ea !important;}
+tr.selected>td {}
 /**
  * 列表中排序字段的input框
  */

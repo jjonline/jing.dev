@@ -2,6 +2,11 @@ $(function () {
     var searchBeginDate = $("#search_begin_date");
     var searchEndDate = $("#search_end_date");
     var txtSearch = $('#txt_search');
+    var adv_province = $('#adv_province');
+    var adv_city = $('#adv_city');
+    var adv_district = $('#adv_district');
+    var adv_gender = $('#adv_gender');
+    var adv_enable = $('#adv_enable');
     var keyUpHandle;
 
     var targetSearch = utils.cookie('txtMemberSearch');
@@ -27,10 +32,6 @@ $(function () {
 
         // 绑定DateTimePicker时间筛选组件动作
         utils.bindDateTimePicker($(".search_date"));
-        // 日历时间组件绑定时间出发数据重载
-        $(".search_date").datetimepicker().on('changeDate', function () {
-            refreshTable();
-        });
         //清理开始时间
         $('.clear-begin-data').click(function () {
             $('#search_begin_date').val('');
@@ -41,6 +42,53 @@ $(function () {
             $('#search_end_date').val('');
             refreshTable();
         });
+
+        /**
+         * 手动刷新表格
+         */
+        $('#table-refresh').click(function () {
+            pageDataSearch.ajax.reload(null, false);
+        });
+        /**
+         * 绑定选择字段事件
+         */
+        $('#table').on('init.dt',function () {
+            utils.bindColumnSelector('table-columns',pageDataSearch);
+            $('.tooltips').tooltip({container: 'body'});
+        });
+
+        // 高级查询按省市县搜索
+        $('#adv_picker').distpicker();
+
+        // tr行记录双击事件
+        $('#table').on('dblclick','tr',function () {
+            if($(this).hasClass('selected'))
+            {
+                $('.check_all').prop('checked',false);
+                $(this).find('.check_item').prop('checked',false).trigger('change');
+            }else {
+                $(this).find('.check_item').prop('checked',true).trigger('change');
+            }
+        }).on('change','.check_item',function () {
+            var tr = $(this).parents('tr');
+            if($(this).prop('checked'))
+            {
+                tr.addClass('selected');
+            }else {
+                $('.check_all').prop('checked',false);
+                tr.removeClass('selected');
+            }
+        });
+        // 全选
+        $('.check_all').on('click',function () {
+            if($(this).prop('checked'))
+            {
+                $('.check_item').prop('checked',true).trigger('change');
+            }else {
+                $('.check_item').prop('checked',false).trigger('change');
+            }
+        });
+
     };
 
     var pageDataSearch;
@@ -52,7 +100,7 @@ $(function () {
     var initTable = function () {
         pageDataSearch = $('#table').DataTable({
             serverSide: true,
-            responsive: true,
+            responsive: false,
             paging: true,
             searching: false,
             info: true,
@@ -61,6 +109,7 @@ $(function () {
             pageLength: 100,
             lengthChange: false,
             AutoWidth: false,
+            scrollX: true,
             ajax: {
                 url: '/manage/member/list',
                 type: 'GET',
@@ -69,13 +118,31 @@ $(function () {
                         keyword: txtSearch.val(),
                         begin_date: searchBeginDate.val(),
                         end_date: searchEndDate.val(),
-                        status: $("#task_status button.active").data("status")
+                        gender: adv_gender.val(),
+                        province: adv_province.val(),
+                        city: adv_city.val(),
+                        enable: adv_enable.val(),
+                        district: adv_district.val()
                     });
+                },
+                // ajax数据返回后、被使用前对结构进行变更，tr标签添加ID、data属性
+                dataFilter:function (data) {
+                    try {
+                        var json = JSON.parse(data);
+                        for (var n in json.data) {
+                            json.data[n].DT_RowClass = 'DT_Member';
+                            json.data[n].DT_RowId = 'DT_Member_' + json.data[n].id;
+                            json.data[n].DT_RowAttr = {'data-id':json.data[n].id,'data-json':JSON.stringify(json.data[n])};
+                        }
+                        return JSON.stringify(json);
+                    }catch (e) {
+                        return data;
+                    }
                 },
                 dataSrc: function (json) {
                     if (json.data && json.data.length > 0) {
                         for (var n in json.data) {
-                            json.data[n].operate = '';
+                            json.data[n].operate  = '';
                             if(has_edit_permission)
                             {
                                 json.data[n].operate += ' <a href="javascript:;" data-href="/manage/member/edit?id='+json.data[n].id+'" class="btn btn-xs btn-primary edit" data-id="'+json.data[n].id+'" data-json=\''+ JSON.stringify(json.data[n]) +'\'><i class="fa fa-pencil-square-o"></i> 编辑</a>';
@@ -104,15 +171,29 @@ $(function () {
                 }
             },
             columns: [
+                {data: function (row,type,val,meta) {
+                    if(type == 'display')
+                    {
+                        return '<input type="checkbox" id="check_'+row.id+'" class="check_item" name="check" value="'+row.id+'">';
+                    }
+                    return '';
+                }},
                 {data: 'id'},
                 {data: 'user_name'},
                 {data: 'real_name'},
                 {data: 'mobile'},
                 {data: 'email'},
+                {data: 'province'},
+                {data: 'city'},
+                {data: 'district'},
+                {data: 'address'},
                 {data: 'create_time'},
+                {data: 'current_points'},
+                {data: 'accumulate_points'},
+                {data: 'level_name'},
                 {data: 'remark'},
                 {data: 'enable'},
-                {data: 'operate'}
+                {data: 'operate',className:'text-center'}
             ],
             language: {
                 "sProcessing": "<i class=\"fa fa-refresh fa-spin\"></i> 载入中...",
@@ -172,12 +253,13 @@ $(function () {
         $('#remark').val(member.remark);
         $('#gender').val(member.gender).trigger('change');
         $('#enable').bootstrapSwitch('state',!!member.enable);
-        $('.province').val(member.province).trigger('change');
-        $('.city').val(member.city).trigger('change');
-        $('.district').val(member.district).trigger('change');
+        $('#province').val(member.province).trigger('change');
+        $('#city').val(member.city).trigger('change');
+        $('#district').val(member.district).trigger('change');
 
 
         $('#MemberEditModal').modal('show');
+        return false;
     });
 
     // 省市县event
@@ -270,6 +352,30 @@ $(function () {
                 utils.alert('网络或服务器异常，请稍后再试');
             }
         });
+        return false;
+    });
+
+
+
+
+    //点击高级查询
+    $('.search-btn').click(function () {
+        $('#SearchModal').modal('show');
+    });
+    //查询（高级查询）
+    $('.btn-search').click(function () {
+        $('#SearchModal').modal('hide');
+        refreshTable();
+    });
+    //重置（高级查询）
+    $('.btn-reset').click(function () {
+        $('#task_status').val('').trigger('change');
+        adv_gender.val('').trigger('change');
+        adv_province.val('').trigger('change');
+        adv_city.val('').trigger('change');
+        adv_enable.val('').trigger('change');
+        adv_district.val('').trigger('change');
+        refreshTable();
         return false;
     });
 

@@ -12,9 +12,19 @@ use think\Db;
 
 class MemberSearch extends BaseSearch
 {
+    /**
+     * 前台不呈现异常信息
+     * @param $act_member_info
+     * @return array
+     */
     public function lists($act_member_info)
     {
-        return $this->search($act_member_info);
+        try {
+            return $this->search($act_member_info);
+        }catch (\Throwable $e) {
+            $this->pageError = '出现异常：'.$e->getMessage();
+            return $this->handleResult();
+        }
     }
 
     /**
@@ -41,6 +51,7 @@ class MemberSearch extends BaseSearch
         // 构造Query对象
         $Query = Db::name('member member')
                ->field([
+                    //'CONCAT("DT_Member_",member.id) as DT_RowId',
                     'member.id',
                     'member.user_name',
                     'member.real_name',
@@ -50,12 +61,17 @@ class MemberSearch extends BaseSearch
                     'member.gender',
                     'member.enable',
                     'member.province',
+                    'member.member_level_id',
+                    'member_level.name as level_name',
                     'member.city',
                     'member.district',
                     'member.address',
+                    'member.current_points',
+                    'member.accumulate_points',
                     'member.create_time',
                     'member.remark'
-               ]);
+               ])
+               ->leftJoin('member_level member_level','member_level.id = member.member_level_id');
 
         /**
          * 检索条件
