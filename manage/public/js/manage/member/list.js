@@ -165,6 +165,15 @@ $(function () {
                             }else {
                                 json.data[n].enable = '<span class="label bg-orange">禁用</span>';
                             }
+                            // 性别
+                            if(json.data[n].gender == 1)
+                            {
+                                json.data[n].gender = '男';
+                            }else if(json.data[n].gender == 0) {
+                                json.data[n].gender = '女';
+                            }else {
+                                json.data[n].gender = '未知';
+                            }
                         }
                     }
                     return json.data;
@@ -181,6 +190,7 @@ $(function () {
                 {data: 'id'},
                 {data: 'user_name'},
                 {data: 'real_name'},
+                {data: 'gender'},
                 {data: 'mobile'},
                 {data: 'email'},
                 {data: 'province'},

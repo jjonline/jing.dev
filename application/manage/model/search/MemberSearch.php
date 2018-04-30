@@ -80,6 +80,41 @@ class MemberSearch extends BaseSearch
         $search_columns = ['member.user_name', 'member.real_name', 'member.mobile', 'member.email', 'member.remark'];
         $this->keywordSearch($Query,$search_columns,$this->keyword);
 
+        // 禁用|启用状态
+        $enable = $this->request->param('enable');
+        if(in_array($enable,['0','1']))
+        {
+            $Query->where('member.enable',$enable);
+        }
+
+        // 性别
+        $gender = $this->request->param('gender');
+        if(in_array($gender,['-1','0','1']))
+        {
+            $Query->where('member.gender',$gender);
+        }
+
+        // 省份
+        $province = $this->request->param('province');
+        if(!empty($province))
+        {
+            $Query->where('member.province',$province);
+        }
+
+        // 地区
+        $city = $this->request->param('city');
+        if(!empty($city))
+        {
+            $Query->where('member.city',$city);
+        }
+
+        // 县级
+        $district = $this->request->param('district');
+        if(!empty($district))
+        {
+            $Query->where('member.district',$district);
+        }
+
         // 时间范围检索
         $this->dateTimeSearch($Query,'member.create_time');
 
