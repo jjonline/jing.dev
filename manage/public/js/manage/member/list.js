@@ -140,6 +140,7 @@ $(function () {
                     }
                 },
                 dataSrc: function (json) {
+                    $('.check_all').prop('checked',false);
                     if (json.data && json.data.length > 0) {
                         for (var n in json.data) {
                             json.data[n].operate  = '';
