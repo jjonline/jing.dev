@@ -56,7 +56,9 @@ class init extends Command
         $destination = rtrim($destination, '/') . '/';
         $target      = rtrim($target, '/') . '/';
         $iterator    = new \DirectoryIterator($destination);
-        while($iterator->valid()) {
+        while($iterator->valid())
+        {
+            // 文件
             if($iterator->isFile() && $iterator->getExtension() == 'php')
             {
                 $destination_file = $destination.$iterator->getFilename();
@@ -66,6 +68,17 @@ class init extends Command
                 {
                     $output->writeln('<info>Copy File:'.$iterator->getFilename().'</info>');
                 }
+            }
+            // 目录
+            if($iterator->isDir() && !$iterator->isDot())
+            {
+                $_target = $target.$iterator->getFilename();
+                // 目录不存在，新建目录
+                if(!file_exists($_target))
+                {
+                    mkdir($_target);
+                }
+                $this->circleCopyFile($destination.$iterator->getFilename(),$_target,$output);
             }
             $iterator->next();
         }
