@@ -14,6 +14,7 @@ namespace app\common\service;
 
 use app\common\helper\FilterValidHelper;
 use app\common\helper\GenerateHelper;
+use app\common\helper\UtilHelper;
 use app\common\model\User;
 use app\common\model\Role;
 use think\Exception;
@@ -126,12 +127,21 @@ class UserService
         {
             throw new Exception('该账号已禁用，若需重新开通请联系平台管理员',500);
         }
+        // 防御状态禁止该账号登录
+        if(UtilHelper::isInDefense($user_exist['id']))
+        {
+            throw new Exception('密码错误次数过多，请15分钟后再试');
+        }
         // 检查密码是否正确
         if(!$this->checkUserPassword($user['password'],$user_exist['password']))
         {
+            // 登录防御
+            UtilHelper::loginDefense($user_exist['id']);
             // 密码错误之后不详细提示是账号错误还是密码错误
             throw new Exception('账号或密码错误',500);
         }
+        // 清除登录防御
+        UtilHelper::releaseDefense($user_exist['id']);
         return $this->setUserLogin($user_exist,true);
     }
 
