@@ -23,19 +23,194 @@ use think\route\dispatch\View as ViewDispatch;
 
 abstract class Rule
 {
+    /**
+     * 路由标识
+     * @var string
+     */
     protected $name;
-    // 路由对象实例
+
+    /**
+     * 路由对象
+     * @var Route
+     */
     protected $router;
-    // 路由父对象
+
+    /**
+     * 路由所属分组
+     * @var RuleGroup
+     */
     protected $parent;
-    // 路由参数
+
+    /**
+     * 路由规则
+     * @var mixed
+     */
+    protected $rule;
+
+    /**
+     * 路由地址
+     * @var string|\Closure
+     */
+    protected $route;
+
+    /**
+     * 请求类型
+     * @var string
+     */
+    protected $method;
+
+    /**
+     * 路由变量
+     * @var array
+     */
+    protected $vars = [];
+
+    /**
+     * 路由参数
+     * @var array
+     */
     protected $option = [];
-    // 路由变量规则
+
+    /**
+     * 路由变量规则
+     * @var array
+     */
     protected $pattern = [];
-    // 需要合并的路由参数
+
+    /**
+     * 需要和分组合并的路由参数
+     * @var array
+     */
     protected $mergeOptions = ['after', 'before', 'model', 'header', 'response', 'append', 'middleware'];
 
-    abstract public function check($request, $url, $depr = '/');
+    /**
+     * 是否需要后置操作
+     * @var bool
+     */
+    protected $doAfter;
+
+    abstract public function check($request, $url, $completeMatch = false);
+
+    /**
+     * 获取Name
+     * @access public
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * 获取当前路由规则
+     * @access public
+     * @return string
+     */
+    public function getRule()
+    {
+        return $this->rule;
+    }
+
+    /**
+     * 获取当前路由地址
+     * @access public
+     * @return mixed
+     */
+    public function getRoute()
+    {
+        return $this->route;
+    }
+
+    /**
+     * 获取当前路由的请求类型
+     * @access public
+     * @return string
+     */
+    public function getMethod()
+    {
+        return strtolower($this->method);
+    }
+
+    /**
+     * 获取当前路由的变量
+     * @access public
+     * @return array
+     */
+    public function getVars()
+    {
+        return $this->vars;
+    }
+
+    /**
+     * 获取路由对象
+     * @access public
+     * @return Route
+     */
+    public function getRouter()
+    {
+        return $this->router;
+    }
+
+    /**
+     * 路由是否有后置操作
+     * @access public
+     * @return bool
+     */
+    public function doAfter()
+    {
+        return $this->doAfter;
+    }
+
+    /**
+     * 获取路由分组
+     * @access public
+     * @return RuleGroup|null
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * 获取变量规则定义
+     * @access public
+     * @param  string  $name 变量名
+     * @return mixed
+     */
+    public function getPattern($name = '')
+    {
+        if ('' === $name) {
+            return $this->pattern;
+        }
+
+        return isset($this->pattern[$name]) ? $this->pattern[$name] : null;
+    }
+
+    /**
+     * 获取路由参数
+     * @access public
+     * @param  string  $name 变量名
+     * @return mixed
+     */
+    public function getConfig($name = '')
+    {
+        return $this->router->config($name);
+    }
+
+    /**
+     * 获取路由参数定义
+     * @access public
+     * @param  string  $name 参数名
+     * @return mixed
+     */
+    public function getOption($name = '')
+    {
+        if ('' === $name) {
+            return $this->option;
+        }
+
+        return isset($this->option[$name]) ? $this->option[$name] : null;
+    }
 
     /**
      * 注册路由参数
@@ -87,74 +262,16 @@ abstract class Rule
     }
 
     /**
-     * 获取Name
+     * 设置变量
      * @access public
-     * @return string
+     * @param  array  $vars 变量
+     * @return $this
      */
-    public function getName()
+    public function vars($vars)
     {
-        return $this->name;
-    }
+        $this->vars = $vars;
 
-    /**
-     * 获取Parent对象
-     * @access public
-     * @return $this|null
-     */
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    /**
-     * 获取变量规则定义
-     * @access public
-     * @param  string  $name 变量名
-     * @return mixed
-     */
-    public function getPattern($name = '')
-    {
-        if ('' === $name) {
-            return $this->pattern;
-        }
-
-        return isset($this->pattern[$name]) ? $this->pattern[$name] : null;
-    }
-
-    /**
-     * 获取路由参数
-     * @access public
-     * @param  string  $name 变量名
-     * @return mixed
-     */
-    public function getConfig($name = '')
-    {
-        return $this->router->config($name);
-    }
-
-    /**
-     * 获取路由对象
-     * @access public
-     * @return Route
-     */
-    public function getRouter()
-    {
-        return $this->router;
-    }
-
-    /**
-     * 获取路由参数定义
-     * @access public
-     * @param  string  $name 参数名
-     * @return mixed
-     */
-    public function getOption($name = '')
-    {
-        if ('' === $name) {
-            return $this->option;
-        }
-
-        return isset($this->option[$name]) ? $this->option[$name] : null;
+        return $this;
     }
 
     /**
@@ -221,6 +338,24 @@ abstract class Rule
     public function domain($domain)
     {
         return $this->option('domain', $domain);
+    }
+
+    /**
+     * 设置参数过滤检查
+     * @access public
+     * @param  string|array     $name
+     * @param  mixed            $value
+     * @return $this
+     */
+    public function filter($name, $value = null)
+    {
+        if (is_array($name)) {
+            $this->option['filter'] = $name;
+        } else {
+            $this->option['filter'][$name] = $value;
+        }
+
+        return $this;
     }
 
     /**
@@ -582,9 +717,10 @@ abstract class Rule
         $url   = array_slice(explode('|', $url), $count + 1);
         $this->parseUrlParams($request, implode('|', $url), $matches);
 
-        $this->route  = $route;
-        $this->vars   = $matches;
-        $this->option = $option;
+        $this->route   = $route;
+        $this->vars    = $matches;
+        $this->option  = $option;
+        $this->doAfter = true;
 
         // 发起路由调度
         return $this->dispatch($request, $route, $option);
@@ -673,9 +809,9 @@ abstract class Rule
 
         $result = new ControllerDispatch($request, $this, implode('/', $route), $var);
 
-        $request->action(array_pop($route));
-        $request->controller($route ? array_pop($route) : $this->getConfig('default_controller'));
-        $request->module($route ? array_pop($route) : $this->getConfig('default_module'));
+        $request->setAction(array_pop($route));
+        $request->setController($route ? array_pop($route) : $this->getConfig('default_controller'));
+        $request->setModule($route ? array_pop($route) : $this->getConfig('default_module'));
 
         return $result;
     }
@@ -703,7 +839,7 @@ abstract class Rule
         }
 
         // 设置当前请求的路由变量
-        $request->route($var);
+        $request->setRouteVars($var);
 
         // 路由到模块/控制器/操作
         return new ModuleDispatch($request, $this, [$module, $controller, $action], ['convert' => false]);
@@ -752,6 +888,14 @@ abstract class Rule
             return false;
         }
 
+        // 请求参数检查
+        if (isset($option['filter'])) {
+            foreach ($option['filter'] as $name => $value) {
+                if ($request->param($name, '', null) != $value) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
@@ -774,9 +918,6 @@ abstract class Rule
                 }, $url);
             }
         }
-
-        // 设置当前请求的参数
-        $request->route($var);
     }
 
     /**
@@ -935,5 +1076,15 @@ abstract class Rule
         array_unshift($args, $method);
 
         return call_user_func_array([$this, 'option'], $args);
+    }
+
+    public function __sleep()
+    {
+        return ['name', 'rule', 'route', 'method', 'vars', 'option', 'pattern', 'doAfter'];
+    }
+
+    public function __wakeup()
+    {
+        $this->router = Container::get('route');
     }
 }

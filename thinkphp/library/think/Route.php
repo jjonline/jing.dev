@@ -28,11 +28,11 @@ class Route
     protected $rest = [
         'index'  => ['get', '', 'index'],
         'create' => ['get', '/create', 'create'],
-        'edit'   => ['get', '/:id/edit', 'edit'],
-        'read'   => ['get', '/:id', 'read'],
+        'edit'   => ['get', '/<id>/edit', 'edit'],
+        'read'   => ['get', '/<id>', 'read'],
         'save'   => ['post', '', 'save'],
-        'update' => ['put', '/:id', 'update'],
-        'delete' => ['delete', '/:id', 'delete'],
+        'update' => ['put', '/<id>', 'update'],
+        'delete' => ['delete', '/<id>', 'delete'],
     ];
 
     /**
@@ -142,6 +142,17 @@ class Route
         }
 
         return isset($this->config[$name]) ? $this->config[$name] : null;
+    }
+
+    /**
+     * 配置
+     * @access public
+     * @param  array $config
+     * @return void
+     */
+    public function setConfig(array $config = [])
+    {
+        $this->config = array_merge($this->config, array_change_key_case($config));
     }
 
     public static function __make(App $app, Config $config)
@@ -371,11 +382,12 @@ class Route
      * 读取路由标识
      * @access public
      * @param  string    $name 路由标识
+     * @param  string    $domain 域名
      * @return mixed
      */
-    public function getName($name = null)
+    public function getName($name = null, $domain = null)
     {
-        return $this->app['rule_name']->get($name);
+        return $this->app['rule_name']->get($name, $domain);
     }
 
     /**
@@ -818,9 +830,9 @@ class Route
         }
 
         // 默认路由解析
-        $ruleItem = new RuleItem($this, $this->group, '', '', $url);
-
-        return new UrlDispatch($this->request, $ruleItem, $url, ['auto_search' => $this->autoSearchController]);
+        return new UrlDispatch($this->request, $this->group, $url, [
+            'auto_search' => $this->autoSearchController,
+        ]);
     }
 
     /**
@@ -861,7 +873,7 @@ class Route
 
             if (isset($panDomain)) {
                 // 保存当前泛域名
-                $this->request->panDomain($panDomain);
+                $this->request->setPanDomain($panDomain);
             }
         }
 
