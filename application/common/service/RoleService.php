@@ -547,7 +547,7 @@ class RoleService
         }
 
         // 检查当前用户所具备的菜单权限级别是否超限，开发者角色具有所有权限
-        if($request->session('user_info.role_id') != 1)
+        if(Session::get('user_info.role_id') != 1)
         {
             // 开发者角色仅允许拥有开发者角色的账号进行编辑
             if($is_edit == 1)
