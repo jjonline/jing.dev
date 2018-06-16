@@ -324,3 +324,21 @@ CREATE TABLE `com_member_log` (
   KEY `member_id` (`member_id`),
   KEY `create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='应用层会员可识别日志';
+
+---系统配置表:key=>value形式
+CREATE TABLE `com_site_config` (
+  `id` int(20) unsigned NOT NULL AUTO_INCREMENT,
+  `flag` varchar(128) NOT NULL DEFAULT '' COMMENT '配置项分组标记[字符串]，统一flag是一个分组',
+  `key` varchar(128) NOT NULL DEFAULT '' COMMENT '配置项字符串名称：字符串标记，程序中直接使用该值使用',
+  `value` varchar(1024) NOT NULL DEFAULT '' COMMENT '配置项内容',
+  `default` varchar(1024) NOT NULL DEFAULT '' COMMENT '配置项默认值',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '配置项中文名称',
+  `description` varchar(1024) NOT NULL DEFAULT '' COMMENT '配置项中文功能说明',
+  `type` enum('text','radio','textarea') NOT NULL DEFAULT 'text' COMMENT '配置项后台显示的类型:输入框、单选项、大段文本',
+  `val` text COMMENT 'radio单选框待选值列表',
+  `sort` bigint(20) NOT NULL DEFAULT '0' COMMENT '排序，数字越小越靠前',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `key` (`key`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COMMENT='站点自定义配置表';
