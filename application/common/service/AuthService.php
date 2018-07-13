@@ -247,8 +247,10 @@ class AuthService
             {
                 throw new Exception('用户无该菜单权限，获取菜单权限信息失败',500);
             }
-            //按url分组，url成为数组的键名
-            $user_menu_map = ArrayHelper::group($user_menu_map,'url');
+            // 按url和tag分组，url和tag成为数组的键名
+            $user_menu_map1 = ArrayHelper::group($user_menu_map,'url');
+            $user_menu_map2 = ArrayHelper::group($user_menu_map,'tag');
+            $user_menu_map  = array_merge($user_menu_map1,$user_menu_map2);
             //依据开发模式与否将全新Map数组缓存
             if(!Config::get('app.app_debug'))
             {

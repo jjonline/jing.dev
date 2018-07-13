@@ -90,16 +90,46 @@ class GenerateHelper
     /**
      * 产生随机字符串,默认32位
      * @param int $length
+     * @param bool $except_str 是否去除易混淆的字符oOLl和数字01，默认不去除
      * @return string
      */
-    public static function makeNonceStr($length = 32)
+    public static function makeNonceStr($length = 32,$except_str = false)
     {
         $chars  = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        if($except_str)
+        {
+            // 默认去掉了容易混淆的字符oOLl和数字01，要添加请使用addChars参数
+            $chars  = 'ABCDEFGHIJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+        }
         $str    = '';
         $strLen = strlen($chars) - 1;
         for ($i = 0; $i < $length; $i++) {
             $str .= substr($chars, mt_rand(0, $strLen), 1);
         }
         return $str;
+    }
+
+    /**
+     * 生成24位唯一红包码
+     * @param string $prefix 红包码前缀
+     * @return string
+     */
+    public static function couponSn($prefix = 'HB')
+    {
+        $sn         = uniqid('', true);
+        $sn_array   = explode('.', $sn);
+        if(count($sn_array) == 2)
+        {
+            $rand_number = str_split($sn_array[1]);
+            foreach ($rand_number as $key => $value)
+            {
+                if(mt_rand(0,1))
+                {
+                    $rand_number[$key] = chr($value + mt_rand(65,81));
+                }
+            }
+            return $prefix.strtoupper($sn_array[0].implode('',$rand_number));
+        }
+        return $prefix.strtoupper(str_replace('.','',$sn));
     }
 }

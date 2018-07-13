@@ -56,7 +56,13 @@ class AttachmentService
         $origin_file = $request->file('File');
         if(empty($origin_file))
         {
-            return ['error_code' => 500,'error_msg' => '未检测到上传的文件，本系统指定的上传文件域为：File'];
+            $file_obj_arr = $request->file();
+            if(empty($file_obj_arr))
+            {
+                return ['error_code' => 500,'error_msg' => '未检测到上传的文件，本系统指定的上传文件域为：File'];
+            }
+            // 文件域不为File，自主读取第一个进行处理
+            $origin_file  = array_shift($file_obj_arr);
         }
         // 获取上传文件的后缀
         $file_ext = strtolower(pathinfo($origin_file->getInfo('name'), PATHINFO_EXTENSION));
