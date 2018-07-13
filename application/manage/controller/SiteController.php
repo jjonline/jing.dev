@@ -38,6 +38,7 @@ class SiteController extends BaseController
         }
         // 关闭全局设定的模板布局功能 渲染登录页面
         $this->view->engine->layout(false);
+        $this->assign('title','登录 - '.config('local.site_name').'管理平台');
         $this->assign('load_layout_css',true);
         $this->assign('load_layout_js',true);
         return $this->fetch();
