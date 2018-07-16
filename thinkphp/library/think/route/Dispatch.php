@@ -126,7 +126,9 @@ abstract class Dispatch
 
         // 指定Response响应数据
         if (!empty($option['response'])) {
-            $this->app['hook']->add('response_send', $option['response']);
+            foreach ($option['response'] as $response) {
+                $this->app['hook']->add('response_send', $response);
+            }
         }
 
         // 开启请求缓存
@@ -162,7 +164,29 @@ abstract class Dispatch
             $this->autoValidate($option['validate']);
         }
 
-        return $this->exec();
+        $data = $this->exec();
+
+        return $this->autoResponse($data);
+    }
+
+    protected function autoResponse($data)
+    {
+        if ($data instanceof Response) {
+            $response = $data;
+        } elseif (!is_null($data)) {
+            // 默认自动识别响应输出类型
+            $isAjax = $this->request->isAjax();
+            $type   = $isAjax ? $this->rule->getConfig('default_ajax_return') : $this->rule->getConfig('default_return_type');
+
+            $response = Response::create($data, $type);
+        } else {
+            $data     = ob_get_clean();
+            $content  = false === $data ? '' : $data;
+            $status   = false === $data ? 204 : 200;
+            $response = Response::create($content, '', $status);
+        }
+
+        return $response;
     }
 
     /**

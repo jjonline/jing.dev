@@ -11,6 +11,9 @@
 
 namespace think;
 
+use think\facade\Cookie;
+use think\facade\Session;
+
 class Request
 {
     /**
@@ -45,6 +48,12 @@ class Request
      * @var string
      */
     protected $method;
+
+    /**
+     * 主机名（含端口）
+     * @var string
+     */
+    protected $host;
 
     /**
      * 域名（含协议及端口）
@@ -310,7 +319,6 @@ class Request
     {
         $request = new static($config->pull('app'));
 
-        $request->cookie = $app['cookie']->get();
         $request->server = $_SERVER;
         $request->env    = $app['env']->get();
 
@@ -633,6 +641,12 @@ class Request
         return $root;
     }
 
+    public function setPathinfo($pathinfo)
+    {
+        $this->pathinfo = $pathinfo;
+        return $this;
+    }
+
     /**
      * 获取当前请求URL的pathinfo信息（含URL后缀）
      * @access public
@@ -681,6 +695,7 @@ class Request
         if (is_null($this->path)) {
             $suffix   = $this->config['url_html_suffix'];
             $pathinfo = $this->pathinfo();
+
             if (false === $suffix) {
                 // 禁止伪静态访问
                 $this->path = $pathinfo;
@@ -761,22 +776,23 @@ class Request
     /**
      * 当前的请求类型
      * @access public
-     * @param  bool $method  true 获取原始请求类型
+     * @param  bool $origin  是否获取原始请求类型
      * @return string
      */
-    public function method($method = false)
+    public function method($origin = false)
     {
-        if (true === $method) {
+        if ($origin) {
             // 获取原始请求类型
-            return $this->isCli() ? 'GET' : $this->server('REQUEST_METHOD');
+            return $this->server('REQUEST_METHOD') ?: 'GET';
         } elseif (!$this->method) {
             if (isset($_POST[$this->config['var_method']])) {
-                $this->method = strtoupper($_POST[$this->config['var_method']]);
-                $this->{$this->method}($_POST);
+                $this->method    = strtoupper($_POST[$this->config['var_method']]);
+                $method          = strtolower($this->method);
+                $this->{$method} = $_POST;
             } elseif ($this->server('HTTP_X_HTTP_METHOD_OVERRIDE')) {
                 $this->method = strtoupper($this->server('HTTP_X_HTTP_METHOD_OVERRIDE'));
             } else {
-                $this->method = $this->isCli() ? 'GET' : $this->server('REQUEST_METHOD');
+                $this->method = $this->server('REQUEST_METHOD') ?: 'GET';
             }
         }
 
@@ -910,6 +926,7 @@ class Request
             // 获取包含文件上传信息的数组
             $file = $this->file();
             $data = is_array($file) ? array_merge($this->param, $file) : $this->param;
+
             return $this->input($data, '', $default, $filter);
         }
 
@@ -1060,14 +1077,16 @@ class Request
     public function session($name = '', $default = null)
     {
         if (empty($this->session)) {
-            $this->session = facade\Session::get();
+            $this->session = Session::get();
         }
 
         if ('' === $name) {
             return $this->session;
         }
 
-        return isset($this->session[$name]) ? $this->session[$name] : $default;
+        $data = $this->getData($this->session, $name);
+
+        return is_null($data) ? $default : $data;
     }
 
     /**
@@ -1080,8 +1099,12 @@ class Request
      */
     public function cookie($name = '', $default = null, $filter = '')
     {
+        if (empty($this->cookie)) {
+            $this->cookie = Cookie::get();
+        }
+
         if (!empty($name)) {
-            $data = isset($this->cookie[$name]) ? $this->cookie[$name] : $default;
+            $data = Cookie::has($name) ? Cookie::get($name) : $default;
         } else {
             $data = $this->cookie;
         }
@@ -1272,14 +1295,10 @@ class Request
                 list($name, $type) = explode('/', $name);
             }
 
-            // 按.拆分成多维数组进行判断
-            foreach (explode('.', $name) as $val) {
-                if (isset($data[$val])) {
-                    $data = $data[$val];
-                } else {
-                    // 无输入数据，返回默认值
-                    return $default;
-                }
+            $data = $this->getData($data, $name);
+
+            if (is_null($data)) {
+                return $default;
             }
 
             if (is_object($data)) {
@@ -1300,6 +1319,26 @@ class Request
         if (isset($type) && $data !== $default) {
             // 强制类型转换
             $this->typeCast($data, $type);
+        }
+
+        return $data;
+    }
+
+    /**
+     * 获取数据
+     * @access public
+     * @param  array         $data 数据源
+     * @param  string|false  $name 字段名
+     * @return mixed
+     */
+    protected function getData(array $data, $name)
+    {
+        foreach (explode('.', $name) as $val) {
+            if (isset($data[$val])) {
+                $data = $data[$val];
+            } else {
+                return;
+            }
         }
 
         return $data;
@@ -1655,6 +1694,19 @@ class Request
     }
 
     /**
+     * 设置当前请求的host（包含端口）
+     * @access public
+     * @param  string $host 主机名（含端口）
+     * @return $this
+     */
+    public function setHost($host)
+    {
+        $this->host = $host;
+
+        return $this;
+    }
+
+    /**
      * 当前请求的host
      * @access public
      * @param bool $strict  true 仅仅获取HOST
@@ -1662,9 +1714,11 @@ class Request
      */
     public function host($strict = false)
     {
-        $host = $this->server('HTTP_X_REAL_HOST') ?: $this->server('HTTP_HOST');
+        if (!$this->host) {
+            $this->host = $this->server('HTTP_X_REAL_HOST') ?: $this->server('HTTP_HOST');
+        }
 
-        return true === $strict && strpos($host, ':') ? strstr($host, ':', true) : $host;
+        return true === $strict && strpos($this->host, ':') ? strstr($this->host, ':', true) : $this->host;
     }
 
     /**
@@ -1975,6 +2029,90 @@ class Request
     public function getCache()
     {
         return $this->cache;
+    }
+
+    /**
+     * 设置GET数据
+     * @access public
+     * @param  array $get 数据
+     * @return $this
+     */
+    public function withGet(array $get)
+    {
+        $this->get = $get;
+        return $this;
+    }
+
+    /**
+     * 设置POST数据
+     * @access public
+     * @param  array $post 数据
+     * @return $this
+     */
+    public function withPost(array $post)
+    {
+        $this->post = $post;
+        return $this;
+    }
+
+    /**
+     * 设置COOKIE数据
+     * @access public
+     * @param  array $cookie 数据
+     * @return $this
+     */
+    public function withCookie(array $cookie)
+    {
+        $this->cookie = $cookie;
+        return $this;
+    }
+
+    /**
+     * 设置SERVER数据
+     * @access public
+     * @param  array $server 数据
+     * @return $this
+     */
+    public function withServer(array $server)
+    {
+        $this->server = array_change_key_case($server, CASE_UPPER);
+        return $this;
+    }
+
+    /**
+     * 设置HEADER数据
+     * @access public
+     * @param  array $header 数据
+     * @return $this
+     */
+    public function withHeader(array $header)
+    {
+        $this->header = array_change_key_case($header);
+        return $this;
+    }
+
+    /**
+     * 设置ENV数据
+     * @access public
+     * @param  array $env 数据
+     * @return $this
+     */
+    public function withEnv(array $env)
+    {
+        $this->env = $env;
+        return $this;
+    }
+
+    /**
+     * 设置ROUTE变量
+     * @access public
+     * @param  array $route 数据
+     * @return $this
+     */
+    public function withRoute(array $route)
+    {
+        $this->route = $route;
+        return $this;
     }
 
     /**
