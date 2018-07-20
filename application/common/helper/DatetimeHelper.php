@@ -406,4 +406,15 @@ class DatetimeHelper {
             date('Y-m-d 00:00:00',strtotime('+1 days'))
         ];
     }
+
+    /**
+     * 获取到金额日24点剩余的秒数
+     * @return false|int
+     */
+    public static function getTodayRemainingSeconds()
+    {
+        $tomorrow_begin = strtotime(date('Y-m-d',strtotime('+1 days')));
+        $now            = time();
+        return $tomorrow_begin - $now;
+    }
 }
