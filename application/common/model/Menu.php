@@ -15,6 +15,8 @@ use think\Model;
 
 class Menu extends Model
 {
+    protected $json = ['extra_param'];
+
     /**
      * 菜单ID获取菜单详情
      * @param $id

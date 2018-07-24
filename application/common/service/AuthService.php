@@ -262,7 +262,7 @@ class AuthService
         if(!empty($info['extra_param']))
         {
             // 还原额外参数的数组格式
-            $info['extra_param'] = unserialize($info['extra_param']);
+            $info['extra_param'] = (array)$info['extra_param'];
         }
         return $info;
     }

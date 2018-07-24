@@ -105,11 +105,11 @@ class MenuService
         if(!empty($menu['extra_param']))
         {
             $extra_param = json_decode($menu['extra_param'],true);
-            if(empty($extra_param))
+            if(empty($extra_param) && !is_null($extra_param))
             {
                 return ['error_code' => 400,'error_msg' => '菜单额外数据json字符串解析失败'];
             }
-            $Menu['extra_param'] = $menu['extra_param'];
+            $Menu['extra_param'] = $extra_param;
         }
         // 菜单级别处理
         if(empty($menu['level1']) && empty($menu['level2']))

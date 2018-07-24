@@ -125,15 +125,17 @@ var utils = {
             }
         });
     },
+
     /**
-     * 删除数据确认方法封装
-     * @param message 删除确认浮层提示消息
-     * @param request_url 删除提交的后端request网址，仅post
-     * @param data  删除确认提交的数据对象
+     * ajax提交之前确认方法
+     * @param message          删除确认浮层提示消息
+     * @param request_url      删除提交的后端request网址，仅post
+     * @param data             删除确认提交的数据对象
      * @param successCallBack  确认并执行之后的回调函数
-     * @param callCallBack 取消不执行后的回调函数
+     * @param toastTime        是否启用toast显示结果及显示结果多少毫秒之后执行回调函数，单位：毫秒
+     * @param callCallBack     取消不执行后的回调函数
      */
-    ajaxConfirm: function (message,request_url,data,successCallBack,callCallBack) {
+    ajaxConfirm: function (message,request_url,data,successCallBack,toastTime,callCallBack) {
         bootbox.dialog({
             message: message,
             title: '操作确认',
@@ -144,23 +146,33 @@ var utils = {
                     label: '确定',
                     className: "btn btn-info",
                     callback: function () {
+                        utils.showLoading('提交中，请稍后...');
                         $.ajax({
                             url: request_url,
                             type: 'POST',
                             data: data,
                             success: function (data) {
+                                utils.hideLoading();
                                 if(data.error_code == 0){
-                                    utils.alert(data.error_msg ? data.error_msg : '操作成功',function () {
-                                        // 回调延时0.5s触发 防止按钮点击后的卡顿感受
-                                        setTimeout(function () {
-                                            successCallBack && successCallBack();
-                                        },500);
-                                    });
+                                    if(toastTime > 0)
+                                    {
+                                        // toast方式提示
+                                        utils.toast(data.error_msg ? data.error_msg : '操作成功',toastTime,successCallBack);
+                                    }else {
+                                        // alert方式提示
+                                        utils.alert(data.error_msg ? data.error_msg : '操作成功',function () {
+                                            // 回调延时0.5s触发 防止按钮点击后的卡顿感受
+                                            setTimeout(function () {
+                                                successCallBack && successCallBack();
+                                            },500);
+                                        });
+                                    }
                                 }else{
                                     utils.alert(data.error_msg ? data.error_msg : '未知错误');
                                 }
                             },
                             error:function () {
+                                utils.hideLoading();
                                 utils.alert('网络或服务器异常，请稍后再试');
                             }
                         });
@@ -182,7 +194,7 @@ var utils = {
     shortNotice:function(str,time){
         utils.showLoading(str);
         this._timer=setTimeout(function(){
-            utils.hideLoading()
+            utils.hideLoading();
         },time || 3000);
     },
     /**
@@ -565,7 +577,7 @@ var utils = {
      */
     isID:function(match) {
         var id = match.toUpperCase();//18位身份证中的x为大写
-        id = this.trimAll(match);//去除字符中的所有空格
+        id = utils.trimAllSpace(match);//去除字符中的所有空格
         var ID18 = /^\d{17}(\d|X)$/,ID15 = /^\d{15}$/,
             oCity = {
                 11:"\u5317\u4eac",
@@ -718,8 +730,8 @@ var utils = {
     bindAjaxUploader: function (id, _param) {
         var param = $.extend({
             url:'',//上传文件后端Url，留空则为/manage/upload/upload?origin=ajax
-            multiple:true,//是否允许选择多张图，默认允许多张
             allow_extension: null,//null不限制、需限制时使用数组 ['jpg','jpeg']
+            multiple:true,//是否允许选择多张图，默认允许多张
             error:function () {},//上传成功的回调函数
             success:function () {},//上传失败的回调函数
             data: {} //上传控制器额外附带的key-value
@@ -814,7 +826,7 @@ var utils = {
             },
             onUploadError:function (id, xhr, status, errorThrown) {
                 $('.bootbox').modal('hide');
-                param.error && param.error();
+                param.error && param.error('上传文件出错');
             }
         });
     },
@@ -1062,6 +1074,9 @@ var utils = {
     },
     hideLoading: function (callback) {
         $("#loadingModal").modal('hide');
+        setTimeout(function () {
+            $("body").addClass('modal-open');
+        },500);
         callback && callback();
     },
     /**
@@ -1226,6 +1241,57 @@ var utils = {
             }
         }
        return (tmpa+"/"+tmpb);
+    },
+    /**
+     * 裁剪字符串并返回能用于tooltip预览的html结构
+     * @param string
+     * @param length
+     */
+    subStringForTooltip:function (string,length) {
+        if(utils.isEmpty(string) || string.length <= length)
+        {
+            return string;
+        }
+        var node = $('<div><div class="tooltips" data-toggle="tooltip"></div></div>');
+        node.find('.tooltips').attr('data-original-title',string);
+        node.find('.tooltips').text(string.substring(0,length) + '...');
+        return node.html();
+    },
+    /**
+     * 金额输入框限制
+     * @param obj
+     */
+    numberControl:function (obj) {
+        obj.value = obj.value.replace(/[^\d.]/g, ""); //清除"数字"和"."以外的字符
+        obj.value = obj.value.replace(/^\./g, ""); //验证第一个字符是数字
+        obj.value = obj.value.replace(/\.{2,}/g, "."); //只保留第一个., 清除多余的
+        obj.value = obj.value.replace(".", "$#$").replace(/\./g, "").replace("$#$", ".");
+        obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3'); //只能输入两个小数
+    },
+    /**
+     * 字符截取和省略
+     * @param string
+     * @param length
+     * @returns string
+     */
+    subString:function (string,length)
+    {
+        if(utils.isEmpty(string) || string.length <= length)
+        {
+            return string;
+        }
+        return string.substring(0,length) + '...';
     }
 };// End utils
 
+Array.prototype.remove = function(dx) {
+    if (isNaN(dx) || dx > this.length) {
+        return false;
+    }
+    for (var i = 0, n = 0; i < this.length; i++) {
+        if (this[i] != this[dx]) {
+            this[n++] = this[i]
+        }
+    }
+    this.length -= 1;
+};
