@@ -16,6 +16,7 @@ namespace app\common\controller;
 use app\common\service\LogService;
 use think\Container;
 use think\Controller;
+use think\facade\Config;
 use think\facade\Hook;
 use think\Response;
 
@@ -34,7 +35,12 @@ class BasicController extends Controller
 
         // 闭包传参执行钩子行为的最终写入Db或其他永久存储
         Hook::add('response_end',function () use ($LogService) {
-            $LogService->save('normal');
+            $except_controller = Config::get('local.log_except_controller',[]);
+            $except_action     = Config::get('local.log_except_action',[]);
+            if(!in_array($this->request->controller(),$except_controller) && !in_array($this->request->action(),$except_action))
+            {
+                $LogService->save('normal');
+            }
         });
     }
 
