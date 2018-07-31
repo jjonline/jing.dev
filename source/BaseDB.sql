@@ -99,6 +99,8 @@ CREATE TABLE `com_menu` (
   `sort` int(11) NOT NULL COMMENT '排序数字越小越靠前',
   `extra_param` json DEFAULT NULL COMMENT '额外存储的菜单对应操作所需要的限定参数，json格式',
   `is_system` tinyint(1) NOT NULL DEFAULT 0 COMMENT '标记是否系统菜单，1不允许删除0允许',
+  `is_system` tinyint(1) NOT NULL DEFAULT 0 COMMENT '标记是否系统菜单，1不允许删除0允许',
+  `is_column` tinyint(1) NOT NULL DEFAULT '0' COMMENT '标记是否需要控制字段显示，1：是 0:否',
   `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注信息',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',

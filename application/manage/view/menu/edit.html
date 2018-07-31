@@ -85,9 +85,25 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="col-sm-2 control-label">是否控制字段显示：</label>
+                        <div class="col-sm-5">
+                            <div class="js-switch-container">
+                                <input type="checkbox" id="is_column" name="Menu[is_column]" title="是" data-on-text="是" data-off-text="否" "<%{if condition="$menu_edit.is_column EQ 1"}%> checked="checked"<%{/if}%>>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">是否数据权限控制：</label>
+                        <div class="col-sm-5">
+                            <div class="js-switch-container">
+                                <input type="checkbox" id="is_permissions" name="Menu[is_permissions]" title="是" data-on-text="是" data-off-text="否" "<%{if condition="$menu_edit.is_permissions EQ 1"}%> checked="checked"<%{/if}%>>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="col-sm-2 control-label">菜单额外数据：</label>
                         <div class="col-sm-5">
-                            <textarea id="extra_param" rows=3 class="form-control" name="Menu[extra_param]" placeholder="菜单额外所可使用的数据，填入json字符串，使用时自动转换为数组，可选"></textarea>
+                            <textarea id="extra_param" rows=3 class="form-control" name="Menu[extra_param]" placeholder="菜单额外所可使用的数据，填入json字符串，使用时自动转换为数组，可选"><%{:json_encode($menu_edit.extra_param,JSON_UNESCAPED_UNICODE)}%></textarea>
                         </div>
                     </div>
                     <div class="form-group">

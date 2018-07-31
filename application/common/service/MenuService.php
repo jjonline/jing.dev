@@ -101,16 +101,32 @@ class MenuService
         {
             $Menu['is_system'] = 1;
         }
+        // 是否控制数据权限
+        $Menu['is_permissions'] = 0;
+        if(isset($menu['is_permissions']))
+        {
+            $Menu['is_permissions'] = 1;
+        }
         // 可能的菜单额外数据处理
         if(!empty($menu['extra_param']))
         {
             $extra_param = json_decode($menu['extra_param'],true);
-            if(empty($extra_param) && !is_null($extra_param))
+            if(is_null($extra_param) && strtolower($menu['extra_param']) != 'null')
             {
                 return ['error_code' => 400,'error_msg' => '菜单额外数据json字符串解析失败'];
             }
             $Menu['extra_param'] = $extra_param;
+        }else
+        {
+            $Menu['extra_param'] = [];
         }
+        // 是否控制字段显示
+        $Menu['is_column'] = 0;
+        if(isset($menu['is_column']))
+        {
+            $Menu['is_column'] = 1;
+        }
+
         // 菜单级别处理
         if(empty($menu['level1']) && empty($menu['level2']))
         {
