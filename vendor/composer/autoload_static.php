@@ -29,7 +29,6 @@ class ComposerStaticInitab27b442dd0fdf43d03bd5bd3646291e
         'Z' => 
         array (
             'Zxing\\' => 6,
-            'Zend\\Stdlib\\' => 12,
             'Zend\\Escaper\\' => 13,
         ),
         'W' => 
@@ -98,10 +97,6 @@ class ComposerStaticInitab27b442dd0fdf43d03bd5bd3646291e
         'Zxing\\' => 
         array (
             0 => __DIR__ . '/..' . '/khanamiryan/qrcode-detector-decoder/lib',
-        ),
-        'Zend\\Stdlib\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/zendframework/zend-stdlib/src',
         ),
         'Zend\\Escaper\\' => 
         array (
