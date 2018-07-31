@@ -34,15 +34,27 @@ $(function () {
                     }
                     if(menu[i].level == 2)
                     {
-                        var radio_name  = 'radio_' + menu[i].id;
-                        var permissions = $("input:radio[name='"+radio_name+"']:checked").val();
-                        if(!permissions)
+                        // 需要数据权限的必须勾选
+                        if(menu[i].is_permissions == 1)
                         {
-                            utils.toast('请选择【'+menu[i].name+'】的数据权限');
-                            return false;
+                            var radio_name  = 'radio_' + menu[i].id;
+                            var permissions = $("input:radio[name='"+radio_name+"']:checked").val();
+                            if(!permissions)
+                            {
+                                var radio_node = $("input:radio[name='"+radio_name+"']");
+                                var offset_top = radio_node.offset().top - 30;// 元素距离window顶部的偏移量
+                                $('html,body').animate({scrollTop:offset_top},300);
+                                radio_node.shake(3,20,1000);
+                                utils.toast('请选择【'+menu[i].name+'】的数据权限');
+                                return false;
+                            }
+                            post_ids.push(menu[i].id);
+                            post_permissions.push(permissions);
+                        }else {
+                            // 不需要数据权限的直接super
+                            post_ids.push(menu[i].id);
+                            post_permissions.push('super');
                         }
-                        post_ids.push(menu[i].id);
-                        post_permissions.push(permissions);
                     }
                 }
 
