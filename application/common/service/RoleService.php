@@ -204,6 +204,7 @@ class RoleService
                         $v_value3              = $value;
                         $value['id']           = $value['id'].'_v';
                         $value['name']         = $value['name'].'*';
+                        $value['remark']       = '';
                         $menu2[]               = $value;
                         $v_value3['parent_id'] = $value['id'];
                         // 如果有数据权限范围

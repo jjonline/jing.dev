@@ -130,6 +130,11 @@ $(function () {
     function addDiyDom(treeId, treeNode) {
         var IDMark_A = '_a';
         var aObj = $("#" + treeNode.tId + IDMark_A);
+        // 有备注信息，则将备注信息显示出来
+        if(treeNode.remark)
+        {
+            aObj.find('.node_name').html(treeNode.name + '<em class="node_remark">['+treeNode.remark+']</em>');
+        }
         if (treeNode.level == 3)
         {
             var radio_name = 'radio_' + treeNode.getParentNode().id;
