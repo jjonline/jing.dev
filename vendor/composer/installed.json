@@ -748,17 +748,17 @@
     },
     {
         "name": "myclabs/php-enum",
-        "version": "1.6.1",
-        "version_normalized": "1.6.1.0",
+        "version": "1.6.2",
+        "version_normalized": "1.6.2.0",
         "source": {
             "type": "git",
             "url": "https://github.com/myclabs/php-enum.git",
-            "reference": "8c5649e4ed99acd53a40eada270154dcac089f7e"
+            "reference": "ca2f4090a7ecae6f0c67fc9bd07cfb51cdf04219"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/myclabs/php-enum/zipball/8c5649e4ed99acd53a40eada270154dcac089f7e",
-            "reference": "8c5649e4ed99acd53a40eada270154dcac089f7e",
+            "url": "https://api.github.com/repos/myclabs/php-enum/zipball/ca2f4090a7ecae6f0c67fc9bd07cfb51cdf04219",
+            "reference": "ca2f4090a7ecae6f0c67fc9bd07cfb51cdf04219",
             "shasum": "",
             "mirrors": [
                 {
@@ -774,7 +774,7 @@
             "phpunit/phpunit": "^4.8.35|^5.7|^6.0",
             "squizlabs/php_codesniffer": "1.*"
         },
-        "time": "2018-05-09T08:09:15+00:00",
+        "time": "2018-08-01T21:05:54+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1403,17 +1403,17 @@
     },
     {
         "name": "symfony/inflector",
-        "version": "v4.1.2",
-        "version_normalized": "4.1.2.0",
+        "version": "v4.1.3",
+        "version_normalized": "4.1.3.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/inflector.git",
-            "reference": "a55513ebd8aa4843300e325c84d0954a9d1f4ed8"
+            "reference": "07810b5c88ec0c2e98972571a40a126b44664e13"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/inflector/zipball/a55513ebd8aa4843300e325c84d0954a9d1f4ed8",
-            "reference": "a55513ebd8aa4843300e325c84d0954a9d1f4ed8",
+            "url": "https://api.github.com/repos/symfony/inflector/zipball/07810b5c88ec0c2e98972571a40a126b44664e13",
+            "reference": "07810b5c88ec0c2e98972571a40a126b44664e13",
             "shasum": "",
             "mirrors": [
                 {
@@ -1426,7 +1426,7 @@
             "php": "^7.1.3",
             "symfony/polyfill-ctype": "~1.8"
         },
-        "time": "2018-05-01T23:02:13+00:00",
+        "time": "2018-07-26T08:55:25+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1469,17 +1469,17 @@
     },
     {
         "name": "symfony/options-resolver",
-        "version": "v4.1.2",
-        "version_normalized": "4.1.2.0",
+        "version": "v4.1.3",
+        "version_normalized": "4.1.3.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/options-resolver.git",
-            "reference": "0aec9f9c5d2447ae7ea5ea31bc82f1d43f9a8a56"
+            "reference": "1913f1962477cdbb13df951f8147d5da1fe2412c"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/options-resolver/zipball/0aec9f9c5d2447ae7ea5ea31bc82f1d43f9a8a56",
-            "reference": "0aec9f9c5d2447ae7ea5ea31bc82f1d43f9a8a56",
+            "url": "https://api.github.com/repos/symfony/options-resolver/zipball/1913f1962477cdbb13df951f8147d5da1fe2412c",
+            "reference": "1913f1962477cdbb13df951f8147d5da1fe2412c",
             "shasum": "",
             "mirrors": [
                 {
@@ -1491,7 +1491,7 @@
         "require": {
             "php": "^7.1.3"
         },
-        "time": "2018-07-07T16:00:36+00:00",
+        "time": "2018-07-26T08:55:25+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1594,17 +1594,17 @@
     },
     {
         "name": "symfony/property-access",
-        "version": "v4.1.2",
-        "version_normalized": "4.1.2.0",
+        "version": "v4.1.3",
+        "version_normalized": "4.1.3.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/property-access.git",
-            "reference": "f957d37eb476c9442a0c684b0cd0dd1fb38cb74a"
+            "reference": "e97a399cb40333fc79724ddee952aa926a30c743"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/property-access/zipball/f957d37eb476c9442a0c684b0cd0dd1fb38cb74a",
-            "reference": "f957d37eb476c9442a0c684b0cd0dd1fb38cb74a",
+            "url": "https://api.github.com/repos/symfony/property-access/zipball/e97a399cb40333fc79724ddee952aa926a30c743",
+            "reference": "e97a399cb40333fc79724ddee952aa926a30c743",
             "shasum": "",
             "mirrors": [
                 {
@@ -1623,7 +1623,7 @@
         "suggest": {
             "psr/cache-implementation": "To cache access methods."
         },
-        "time": "2018-05-30T07:26:09+00:00",
+        "time": "2018-07-26T09:10:45+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1739,17 +1739,17 @@
     },
     {
         "name": "topthink/framework",
-        "version": "v5.1.20",
-        "version_normalized": "5.1.20.0",
+        "version": "v5.1.21",
+        "version_normalized": "5.1.21.0",
         "source": {
             "type": "git",
             "url": "https://github.com/top-think/framework.git",
-            "reference": "5a0baedbc155a433e55d33fde70330e35d13e5ed"
+            "reference": "e670467e24399c98581db1b1d39191848f3e6b4d"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/top-think/framework/zipball/5a0baedbc155a433e55d33fde70330e35d13e5ed",
-            "reference": "5a0baedbc155a433e55d33fde70330e35d13e5ed",
+            "url": "https://api.github.com/repos/top-think/framework/zipball/e670467e24399c98581db1b1d39191848f3e6b4d",
+            "reference": "e670467e24399c98581db1b1d39191848f3e6b4d",
             "shasum": "",
             "mirrors": [
                 {
@@ -1771,7 +1771,7 @@
             "sebastian/phpcpd": "2.*",
             "squizlabs/php_codesniffer": "2.*"
         },
-        "time": "2018-07-25T09:01:54+00:00",
+        "time": "2018-08-02T09:17:04+00:00",
         "type": "think-framework",
         "installation-source": "dist",
         "notification-url": "https://packagist.org/downloads/",
