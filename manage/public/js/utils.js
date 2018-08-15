@@ -981,7 +981,7 @@ var utils = {
                 // 装载图初始化Jcrop
                 setTimeout(function () {
                     crop.initCrop();
-                },10);
+                },50);
             },
             uploadBlob:function () {
                 url  = '/manage/upload/upload?action=image';
