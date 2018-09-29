@@ -30,6 +30,7 @@ return array(
     'GuzzleHttp\\Promise\\' => array($vendorDir . '/guzzlehttp/promises/src'),
     'GuzzleHttp\\' => array($vendorDir . '/guzzlehttp/guzzle/src'),
     'Endroid\\QrCode\\' => array($vendorDir . '/endroid/qr-code/src'),
+    'Complex\\' => array($vendorDir . '/markbaker/complex/classes/src'),
     'Cache\\TagInterop\\' => array($vendorDir . '/cache/tag-interop'),
     'Cache\\Hierarchy\\' => array($vendorDir . '/cache/hierarchical-cache'),
     'Cache\\Bridge\\SimpleCache\\' => array($vendorDir . '/cache/simple-cache-bridge'),
