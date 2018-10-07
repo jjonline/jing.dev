@@ -76,24 +76,27 @@ $(function () {
                 buttons: false
             });
             // 勾选字段动作触发
-            $('.columns-checkbox').on('change','input',function () {
-                var is_check           = $(this).prop('checked');
-                var check_columns_name = $(this).data('columns');
+            $(".columns-checkbox").on("change","input",function () {
+                // console.log('B' + new Date().getTime());
+                var is_check           = $(this).prop("checked");
+                var check_columns_name = $(this).data("columns");
+                var index              = $(this).val(); // 字段位置的排序索引，从0开始
                 if(is_check)
                 {
                     addColumns(check_columns_name);
-                    $(".columns-checkbox input").prop('disabled',false);
+                    $(".columns-checkbox input").prop("disabled",false);
+                    manageColumns(index,true);
                 }else {
                     var selected_col = JSON.parse(utils.localData(local_select_key));
                     if(selected_col.length <= 2)
                     {
-                        $(this).prop('checked',true);
+                        $(this).prop("checked",true);
                         return false;
                     }
                     lessColumns(check_columns_name);
+                    manageColumns(index,false);
                 }
-                // event
-                manageColumns();
+                // console.log('E' + new Date().getTime());
             });
         });
 
@@ -104,7 +107,7 @@ $(function () {
         function addColumns(column_name) {
             var selected_col = JSON.parse(utils.localData(local_select_key));
             var is_selected  = false;
-            for(i in selected_col)
+            for(var i in selected_col)
             {
                 if(selected_col[i] == column_name)
                 {
@@ -126,7 +129,7 @@ $(function () {
         function lessColumns(column_name) {
             var selected_col_orin = JSON.parse(utils.localData(local_select_key));
             var selected_col = [];
-            for(i in selected_col_orin)
+            for(var i in selected_col_orin)
             {
                 if(selected_col_orin[i] != column_name)
                 {
@@ -134,6 +137,15 @@ $(function () {
                 }
             }
             utils.localData(local_select_key,JSON.stringify(selected_col));
+        }
+
+        /**
+         * 显示或隐藏单个字段
+         * @param i 需显示或隐藏的字段索引数字
+         * @param is_visible bool true显示false隐藏
+         */
+        function manageColumns(i,is_visible) {
+            dataTableHandler.column(i).visible(is_visible);
         }
 
         /**
@@ -156,14 +168,14 @@ $(function () {
         }
 
         /**
-         * 变动列表字段
+         * 初始化字段
          */
-        function manageColumns() {
+        function initColumns() {
             var selected_columns_local = JSON.parse(utils.localData(local_select_key));
-            for(i in column)
+            for(var i in column)
             {
                 var is_visible = false;
-                for(j in selected_columns_local)
+                for(var j in selected_columns_local)
                 {
                     if(selected_columns_local[j] == column[i])
                     {
@@ -176,7 +188,7 @@ $(function () {
         }
 
         // init
-        manageColumns();
+        initColumns();
     };
 
     /**
