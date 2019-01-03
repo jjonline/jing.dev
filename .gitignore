@@ -2,4 +2,7 @@
 .DS_Store
 composer.lock
 *.log
-manage/component
+.env
+uploads
+thinkphp/
+.php_cs.cache
