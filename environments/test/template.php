@@ -16,6 +16,8 @@
 return [
     // 模板引擎类型 支持 php think 支持扩展
     'type'         => 'Think',
+    // 默认模板渲染规则 1 解析为小写+下划线 2 全部转换小写 3 保持操作方法
+    'auto_rule'    => 1,
     // 模板路径
     'view_path'    => '',
     // 模板后缀
@@ -34,6 +36,7 @@ return [
         '__JS__'      => '/public/js',
         '__CSS__'     => '/public/css',
         '__IMG__'     => '/public/images',
+        '__IMAGES__'  => '/public/images',
     ],
     // 模板引擎普通标签开始标记
     'tpl_begin'    => '<%{',

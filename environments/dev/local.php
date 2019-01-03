@@ -8,15 +8,15 @@
 
 return [
     // 定义应用系统版本号，部分静态js、css引用
-    'version'                => '20180220',
+    'version'                => '20181226',
     // 自定义站点名称
-    'site_name'              => '组件系统',
+    'site_name'              => 'InsSave',
     // 后台cookie和用户密码加密的字符串
-    'auth_key'               => 'Jcc9571SjcLsUSRDqEyyS5ZM95QwQgE',
+    'auth_key'               => 'CwfFXeFa23mdH7KbxyQEEYedsQAJ85AQ',
     // 前台用户cooke和用户密码加密的字符串
-    'pwd_key'                => 'e8DJ6ZfXHiG87pSeAPB2AEEDiNMn6xQz',
+    'pwd_key'                => 'wyjKiyiFh6KwX46rYEHJpd5X6BQeiAhk',
     // 系统默认每个请求都写日志进log表，可通过该配置忽略某个控制器下的请求都不记录
-    'log_except_controller'     => [],
+    'log_except_controller'  => [],
     // 系统默认每个请求都写日志进log表，可通过该配置忽略某个操作名的请求不记录[仅匹配操作名，可能多个控制器下具有相同操作名]
-    'log_except_action'         => ['polling'],
+    'log_except_action'      => ['polling'],
 ];

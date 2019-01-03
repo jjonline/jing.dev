@@ -34,19 +34,19 @@ return [
     'daemonize'              => false,
 
     // Swoole 守护进程的Pid文件位置
-    'pid_file'               => '/www/wwwroot/test.laike188.com/runtime/swoole.pid',
+    'pid_file'               => '/Users/jingjing/Developer/Maintain/inssave/runtime/swoole.pid',
 
     // worker进程的开启数量，使用swoole的task进程执行异步任务，1个worker进程即可(仅负责接收任务塞进队列的数据)
     'worker_num'             => 1,
 
     // Swoole异步执行任务的task进程数，依据任务繁忙程度调节
-    'task_worker_num'        =>  32,
+    'task_worker_num'        =>  8,
 
     // CPU亲和性设置 task线程没有作用，无需设置
     //'open_cpu_affinity'      => true,
 
     // 设置worker/task子进程的所属用户，避免子进程使用root权限 默认本机无需设置，留空不启用
-    'user'                   => 'www',
+    'user'                   => '',
 
 
 

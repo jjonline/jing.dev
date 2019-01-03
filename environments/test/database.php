@@ -13,15 +13,15 @@ return [
     // 数据库类型
     'type'            => 'mysql',
     // 服务器地址
-    'hostname'        => '192.168.1.100',
+    'hostname'        => 'mysql',
     // 数据库名
-    'database'        => 'component',
+    'database'        => '',
     // 用户名
-    'username'        => 'laikebang',
+    'username'        => '',
     // 密码
-    'password'        => 'laikebang@#$%',
+    'password'        => '',
     // 端口
-    'hostport'        => '3306',
+    'hostport'        => '',
     // 连接dsn
     'dsn'             => '',
     // 数据库连接参数
@@ -40,6 +40,8 @@ return [
     'master_num'      => 1,
     // 指定从服务器序号
     'slave_no'        => '',
+    // 自动读取主库数据
+    'read_master'     => false,
     // 是否严格检查字段是否存在
     'fields_strict'   => true,
     // 数据集返回类型
@@ -47,9 +49,15 @@ return [
     // 自动写入时间戳字段
     'auto_timestamp'  => false,
     // 时间字段取出后的默认时间格式
-    'datetime_format' => false,
+    'datetime_format' => 'Y-m-d H:i:s',
     // 是否需要进行SQL性能分析
     'sql_explain'     => false,
+    // Builder类
+    'builder'         => '',
     // Query类
     'query'           => '\\think\\db\\Query',
+    // 是否需要断线重连
+    'break_reconnect' => false,
+    // 断线标识字符串
+    'break_match_str' => [],
 ];
