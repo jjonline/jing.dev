@@ -15,7 +15,7 @@ class AsyncTaskSearch extends BaseSearch
     public function list($act_user_info)
     {
         try {
-            return $this->Search($act_user_info);
+            return $this->search($act_user_info);
         } catch (\Throwable $e) {
             $this->pageError = '出现异常：'.$e->getMessage();
             return $this->handleResult();
@@ -30,7 +30,7 @@ class AsyncTaskSearch extends BaseSearch
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    protected function Search($user_info)
+    protected function search($user_info)
     {
         // 1、超级管理员菜单权限可看全部
         // 2、leader菜单权限且属于部门领导可看所属部门以及子部门下成员
@@ -45,7 +45,12 @@ class AsyncTaskSearch extends BaseSearch
         // 构造Query对象
         $Query = Db::name('async_task async_task')
             ->field([
-                'async_task.*',
+                'async_task.id',
+                'async_task.title',
+                'async_task.task_status',
+                'async_task.delivery_time',
+                'async_task.finish_time',
+                'async_task.create_time',
                 'user.real_name',
                 'department.name as dept_name',
             ])
@@ -73,9 +78,24 @@ class AsyncTaskSearch extends BaseSearch
             $Query->where('async_task.task_status', $this->request->param('task_status'));
         }
         // 时间范围检索
-        $this->dateTimeSearch($Query, 'async_task.create_time', $this->request->param('create_time_begin'), $this->request->param('create_time_end'));
-        $this->dateTimeSearch($Query, 'async_task.delivery_time', $this->request->param('delivery_time_begin'), $this->request->param('delivery_time_end'));
-        $this->dateTimeSearch($Query, 'async_task.finish_time', $this->request->param('finish_time_begin'), $this->request->param('finish_time_end'));
+        $this->dateTimeSearch(
+            $Query,
+            'async_task.create_time',
+            $this->request->param('create_time_begin'),
+            $this->request->param('create_time_end')
+        );
+        $this->dateTimeSearch(
+            $Query,
+            'async_task.delivery_time',
+            $this->request->param('delivery_time_begin'),
+            $this->request->param('delivery_time_end')
+        );
+        $this->dateTimeSearch(
+            $Query,
+            'async_task.finish_time',
+            $this->request->param('finish_time_begin'),
+            $this->request->param('finish_time_end')
+        );
 
         // 克隆Query对象读取总记录数
         $countQuery       = clone $Query;
