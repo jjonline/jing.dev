@@ -3,6 +3,5 @@
 composer.lock
 *.log
 .env
-uploads
 thinkphp/
 .php_cs.cache
