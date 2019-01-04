@@ -44,16 +44,15 @@ class LogService
      * @param string $description 代码中主动记录时的日志说明文字
      * @return bool
      */
-    public function logRecorder($data = null,$description = null)
+    public function logRecorder($data = null, $description = null)
     {
         $logData = $this->generateLog($description);
         // 处理额外数据
-        if(is_scalar($data))
-        {
+        if (is_scalar($data)) {
             $data = $data.'';
-        }elseif(is_array($data) || is_object($data)) {
+        } elseif (is_array($data) || is_object($data)) {
             $data = serialize($data);
-        }else {
+        } else {
             $data = '';
         }
         $logData['extra_data'] = $data;
@@ -68,14 +67,12 @@ class LogService
      * @param string $description 代码中主动记录时的日志说明文字
      * @return bool
      */
-    public function save($data = null,$description = null)
+    public function save($data = null, $description = null)
     {
-        if(!empty($data))
-        {
-            $this->logRecorder($data,$description);
+        if (!empty($data)) {
+            $this->logRecorder($data, $description);
         }
-        if(empty($this->LogData))
-        {
+        if (empty($this->LogData)) {
             return false;
         }
         // 批量插入日志数据
@@ -101,7 +98,7 @@ class LogService
         $logData['ip']                  = Container::get('request')->ip();
         $logData['method']              = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'NONE';
         // 内存使用情况，单位kb
-        $logData['memory_usage']        = NumberHelper::round((memory_get_usage() - Container::get('app')->getBeginMem()) / 1024,2);
+        $logData['memory_usage']        = NumberHelper::round((memory_get_usage() - Container::get('app')->getBeginMem()) / 1024, 2);
         // 耗时，单位：毫秒
         $logData['execute_millisecond'] = NumberHelper::round((microtime(true) - Container::get('app')->getBeginTime()) * 1000);
         // 避免负数的情况
@@ -112,14 +109,13 @@ class LogService
             Container::get('request')->post(),
             Container::get('request')->param()
         ));
-        $logData['user_agent']          = $request->header('user-agent','');
+        $logData['user_agent']          = $request->header('user-agent', '');
         // 操作的模块、控制器、操作
         $logData['action']              = strtolower($request->module().'/'.$request->controller().'/'.$request->action());
         // 操作用户ID，解决输出后钩子执行时session已销毁的问题
-        if(session_status() === PHP_SESSION_ACTIVE)
-        {
+        if (session_status() === PHP_SESSION_ACTIVE) {
             $logData['user_id']         = $request->session('user_id') ? $request->session('user_id') : 0;
-        }else {
+        } else {
             $logData['user_id']         = ctype_digit($request->cookie('user_id')) ? $request->cookie('user_id') : 0;
         }
         $logData['create_time']         = date('Y-m-d H:i:s');
@@ -127,12 +123,10 @@ class LogService
 
         // 说明文字
         $logData['description']         = '';
-        if(!empty($description))
-        {
+        if (!empty($description)) {
             $logData['description']     = $description;
         }
 
         return $logData;
     }
-
 }

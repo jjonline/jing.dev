@@ -8,14 +8,17 @@
 
 namespace app\common\helper;
 
-class ArrayHelper {
+class ArrayHelper
+{
 
     /**
      * 将二维数组转化为字典
-     * @param array $array 待转化的数组 
+     * @param array $array 待转化的数组
      * @param string $key 需要做为键的字段名
+     * @return array
      */
-    public static function convertToDictionary(array $array, $key) {
+    public static function convertToDictionary(array $array, $key)
+    {
         if (empty($array) || empty($key)) {
             return $array;
         }
@@ -33,6 +36,7 @@ class ArrayHelper {
      * 将二维数组中某个键的值提权转换为一维索引数组
      * @param array $array 待转化的数组
      * @param string $key  提取的建名
+     * @return array
      */
     public static function extractToVector(array $array, $key)
     {
@@ -54,9 +58,11 @@ class ArrayHelper {
      * @param callable|string $key_selector
      * @return array
      */
-    public static function group(array $arr, $key_selector) {
-        if (!isset($arr))
+    public static function group(array $arr, $key_selector)
+    {
+        if (!isset($arr)) {
             return null;
+        }
 
         $result = array();
         foreach ($arr as $i) {
@@ -74,8 +80,9 @@ class ArrayHelper {
      */
     public static function groupByCallable(array $arr, $callable)
     {
-        if (!isset($arr))
+        if (!isset($arr)) {
             return null;
+        }
 
         $isSelector = is_callable($callable);
         $result = array();
@@ -93,7 +100,13 @@ class ArrayHelper {
         return $result;
     }
 
-    public static function assoc_unique($arr, $key) {
+    /**
+     * @param $arr
+     * @param $key
+     * @return array
+     */
+    public static function assocUnique($arr, $key)
+    {
         $tmp_arr = [];
         foreach ($arr as $v) {
             if (!array_key_exists($tmp_arr, $v[$key])) {
@@ -111,7 +124,8 @@ class ArrayHelper {
      * @param string $id   数字索引key转换为的属性名
      * @return string
      */
-    public static function toXml($data, $item = 'item', $id = 'id') {
+    public static function toXml($data, $item = 'item', $id = 'id')
+    {
         $xml = $attr = '';
         foreach ($data as $key => $val) {
             if (is_numeric($key)) {
@@ -131,12 +145,13 @@ class ArrayHelper {
      * @param $first_level_data  []  第一级别的元素数组
      * @param $parent_key string 无限分类的父分类键名
      * @param $child_key  string 无限分类的子分类键名
+     * @return array
      */
-    public static function sortMultiTree($data,$first_level_data,$parent_key,$child_key)
+    public static function sortMultiTree($data, $first_level_data, $parent_key, $child_key)
     {
         $sort_data = [];
         foreach ($first_level_data as $first_level_datum) {
-            $item     = static::sortRoleArray($data,$first_level_datum[$parent_key],$parent_key,$child_key);
+            $item     = static::sortRoleArray($data, $first_level_datum[$parent_key], $parent_key, $child_key);
             $sort_data[$first_level_datum[$parent_key]] = $first_level_datum;
             $sort_data = $sort_data + $item;//array_merge合并数组的话会产生索引键名覆盖的问题
         }
@@ -145,23 +160,20 @@ class ArrayHelper {
 
     /**
      * 辅助sortMultiTree方法的内部无限排序
-     * @param $role
+     * @param $data
      * @param $name
      * @param $parent_key
      * @param $child_key
      * @return array
      */
-    public static function sortRoleArray($data,$name,$parent_key,$child_key)
+    public static function sortRoleArray($data, $name, $parent_key, $child_key)
     {
-        foreach($data as $key => $value)
-        {
-            if($value[$child_key] == $name)
-            {
+        foreach ($data as $key => $value) {
+            if ($value[$child_key] == $name) {
                 $_data[$value[$parent_key]] = $value;
-                $_data  += static::sortRoleArray($data,$value[$parent_key],$parent_key,$child_key);
+                $_data  += static::sortRoleArray($data, $value[$parent_key], $parent_key, $child_key);
             }
         }
         return isset($_data) ? $_data : [];
     }
-
 }

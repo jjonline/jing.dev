@@ -22,9 +22,10 @@ class SiteConfigService
      */
     public $LogService;
 
-    public function __construct(SiteConfig $siteConfig,
-                                LogService $logService)
-    {
+    public function __construct(
+        SiteConfig $siteConfig,
+        LogService $logService
+    ) {
         $this->SiteConfig = $siteConfig;
         $this->LogService = $logService;
     }
@@ -40,56 +41,44 @@ class SiteConfigService
     public function save(Request $request)
     {
         $site_config = $request->param('SiteConfig/a');
-        if(empty($site_config['type']))
-        {
+        if (empty($site_config['type'])) {
             return ['error_code' => 400,'error_msg' => '请选择配置项类型'];
         }
-        if($site_config['type'] == 'radio')
-        {
-            if(empty($site_config['val']))
-            {
+        if ($site_config['type'] == 'radio') {
+            if (empty($site_config['val'])) {
                 return ['error_code' => 400,'error_msg' => '请按格式设置radio选项值'];
             }
             $val = $this->parseVal($site_config['val']);
-            if(empty($val))
-            {
+            if (empty($val)) {
                 return ['error_code' => 400,'error_msg' => 'radio选项值格式有误'];
             }
             $site_config['val'] = $val;
         }
-        if(empty($site_config['key']))
-        {
+        if (empty($site_config['key'])) {
             return ['error_code' => 400,'error_msg' => '配置项Key不得为空'];
         }
-        if(empty($site_config['name']))
-        {
+        if (empty($site_config['name'])) {
             return ['error_code' => 400,'error_msg' => '配置项名称不得为空'];
         }
-        if(empty($site_config['description']))
-        {
+        if (empty($site_config['description'])) {
             return ['error_code' => 400,'error_msg' => '配置项说明不得为空'];
         }
-        if(empty($site_config['flag']))
-        {
+        if (empty($site_config['flag'])) {
             return ['error_code' => 400,'error_msg' => '分组flag不得为空'];
         }
 
         $is_edit    = !empty($site_config['id']);
         $exist_data = $this->SiteConfig->getSitConfigValueByKey($site_config['key']);
-        if($is_edit)
-        {
+        if ($is_edit) {
             $repeat_data = $this->SiteConfig->getSiteConfigById($site_config['id']);
-            if(empty($repeat_data))
-            {
+            if (empty($repeat_data)) {
                 return ['error_code' => 400,'error_msg' => '拟编辑配置项不存在'];
             }
-            if($repeat_data['key'] != trim($site_config['key']) && !empty($exist_data))
-            {
+            if ($repeat_data['key'] != trim($site_config['key']) && !empty($exist_data)) {
                 return ['error_code' => 400,'error_msg' => '配置项key已存在，配置项key不能重复'];
             }
-        }else {
-            if(!empty($exist_data))
-            {
+        } else {
+            if (!empty($exist_data)) {
                 return ['error_code' => 400,'error_msg' => '配置项key已存在，配置项key不能重复'];
             }
         }
@@ -97,9 +86,8 @@ class SiteConfigService
 
         // 新增或更新
         $effect_num = $this->SiteConfig->allowField(true)->isUpdate($is_edit)->save($site_config);
-        if(false !== $effect_num)
-        {
-            $this->LogService->logRecorder([$site_config,$request->param()],$is_edit ? '编辑站点配置项' : '新增站点配置信息');
+        if (false !== $effect_num) {
+            $this->LogService->logRecorder([$site_config,$request->param()], $is_edit ? '编辑站点配置项' : '新增站点配置信息');
             return ['error_code' => 0,'error_msg' => '保存成功'];
         }
         return ['error_code' => 500,'error_msg' => '保存失败：写入数据出错'];
@@ -112,16 +100,14 @@ class SiteConfigService
      */
     protected function parseVal($val)
     {
-        $_val = explode("\n",$val);
-        if(!is_array($_val))
-        {
+        $_val = explode("\n", $val);
+        if (!is_array($_val)) {
             return [];
         }
         $_json = [];
         foreach ($_val as $item) {
-            $_item = explode('|',$item);
-            if(is_array($_item) && count($_item) == 2)
-            {
+            $_item = explode('|', $item);
+            if (is_array($_item) && count($_item) == 2) {
                 $_radio = [
                     'value' => trim($_item[0]),
                     'name'  => trim($_item[1])
@@ -144,16 +130,14 @@ class SiteConfigService
     {
         $id   = $request->post('id/i');
         $sort = intval($request->post('sort'));
-        if($sort <= 0)
-        {
+        if ($sort <= 0) {
             return ['error_code' => 400,'error_msg' => '排序数字有误'];
         }
         $site_config = $this->SiteConfig->getSiteConfigById($id);
-        if(empty($site_config))
-        {
+        if (empty($site_config)) {
             return ['error_code' => 400,'error_msg' => '拟编辑排序的数据不存在'];
         }
-        $ret = $this->SiteConfig->isUpdate(true)->save(['sort' => intval($sort)],['id' => $id]);
+        $ret = $this->SiteConfig->isUpdate(true)->save(['sort' => intval($sort)], ['id' => $id]);
         return $ret >= 0 ?
             ['error_code' => 0,'error_msg' => '排序调整成功'] :
             ['error_code' => 500,'error_msg' => '排序调整失败：系统异常'];
@@ -172,12 +156,11 @@ class SiteConfigService
     public function delete($id)
     {
         $site_config = $this->SiteConfig->getSiteConfigById($id);
-        if(empty($site_config))
-        {
+        if (empty($site_config)) {
             return ['error_code' => 400,'error_msg' => '拟删除的数据不存在'];
         }
-        $this->SiteConfig->db()->where('id',$id)->delete();
-        $this->LogService->logRecorder($site_config,'删除站点配置');
+        $this->SiteConfig->db()->where('id', $id)->delete();
+        $this->LogService->logRecorder($site_config, '删除站点配置');
         return ['error_code' => 0,'error_msg' => '数据删除成功'];
     }
 }

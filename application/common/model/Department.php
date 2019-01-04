@@ -23,8 +23,7 @@ class Department extends Model
      */
     public function getDeptInfoById($id)
     {
-        if(empty($id))
-        {
+        if (empty($id)) {
             return [];
         }
         $dept = $this->find($id);
@@ -41,11 +40,10 @@ class Department extends Model
      */
     public function getDeptInfoByParentId($parent_id)
     {
-        if(empty($parent_id))
-        {
+        if (empty($parent_id)) {
             return [];
         }
-        $dept = $this->where('parent_id',$parent_id)->select();
+        $dept = $this->where('parent_id', $parent_id)->select();
         return !$dept->isEmpty() ? $dept->toArray() : [];
     }
 
@@ -59,15 +57,13 @@ class Department extends Model
      */
     public function getDeptListByIds($ids)
     {
-        if($ids instanceof \stdClass)
-        {
+        if ($ids instanceof \stdClass) {
             $ids = (array) $ids;
         }
-        if(empty($ids) || !is_array($ids))
-        {
+        if (empty($ids) || !is_array($ids)) {
             return [];
         }
-        $data = $this->where('id','IN',$ids)->select();
+        $data = $this->where('id', 'IN', $ids)->select();
         return $data->isEmpty() ? [] : $data->toArray();
     }
 
@@ -81,8 +77,7 @@ class Department extends Model
     public function getDeptList()
     {
         $dept = $this->order(['level' => 'ASC','sort' => 'ASC'])->select();
-        if(!$dept->isEmpty())
-        {
+        if (!$dept->isEmpty()) {
             return $dept->toArray();
         }
         return [];
@@ -100,9 +95,8 @@ class Department extends Model
         $Query = $this->field([
             '*'
         ]);
-        if(!empty($keyword))
-        {
-            $Query->where('name','like','%'.$keyword.'%');
+        if (!empty($keyword)) {
+            $Query->where('name', 'like', '%'.$keyword.'%');
         }
         $data = $Query->order(['sort' => 'ASC','create_time' => 'DESC'])
             ->limit(20)
@@ -120,19 +114,16 @@ class Department extends Model
      */
     public function getChildDeptByParentId($parent_id)
     {
-        if(empty($parent_id))
-        {
+        if (empty($parent_id)) {
             return [];
         }
         $dept_ids = [];
         $children_dept = $this->getDeptInfoByParentId($parent_id);
-        if(!empty($children_dept))
-        {
-            foreach ($children_dept as $key => $value)
-            {
+        if (!empty($children_dept)) {
+            foreach ($children_dept as $key => $value) {
                 $dept_ids[] = $value['id'];
                 $children   = $this->getChildDeptByParentId($value['id']);
-                $dept_ids   = array_merge($dept_ids,$children);
+                $dept_ids   = array_merge($dept_ids, $children);
             }
         }
         return $dept_ids;
@@ -147,22 +138,18 @@ class Department extends Model
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getParentDeptByIdAndLevel($parent_id,$level)
+    public function getParentDeptByIdAndLevel($parent_id, $level)
     {
-        if(empty($parent_id) || empty($level))
-        {
+        if (empty($parent_id) || empty($level)) {
             return '';
         }
         $parent_dept = $this->getDeptInfoById($parent_id);
-        if(empty($parent_dept))
-        {
+        if (empty($parent_dept)) {
             return '';
         }
-        if($parent_dept['level'] != $level)
-        {
-            $dept_id = $this->getParentDeptByIdAndLevel($parent_dept['parent_id'],$level);
-        }else
-        {
+        if ($parent_dept['level'] != $level) {
+            $dept_id = $this->getParentDeptByIdAndLevel($parent_dept['parent_id'], $level);
+        } else {
             $dept_id = $parent_dept['id'];
         }
         return $dept_id;
@@ -176,7 +163,7 @@ class Department extends Model
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
      */
-    public function getParentInfoByChildIdAndParentLevel($child_dept_id,$limit_level)
+    public function getParentInfoByChildIdAndParentLevel($child_dept_id, $limit_level)
     {
         $sql = "SELECT 
                     T2.id,

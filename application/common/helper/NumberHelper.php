@@ -8,7 +8,6 @@
 
 namespace app\common\helper;
 
-
 class NumberHelper
 {
     /**
@@ -19,10 +18,10 @@ class NumberHelper
      * @param int $mode      模式
      * @return string
      */
-    static function round($num,$precision = 0,$mode = PHP_ROUND_HALF_UP)
+    public static function round($num, $precision = 0, $mode = PHP_ROUND_HALF_UP)
     {
-        $num = str_replace(',' , '' , $num);//去除带半角逗号的数字计数法字符串中的半角逗号
+        $num = str_replace(',', '', $num);//去除带半角逗号的数字计数法字符串中的半角逗号
         // 返回字符串形式的小数
-        return round($num,$precision,$mode).'';
+        return round($num, $precision, $mode).'';
     }
 }

@@ -35,16 +35,14 @@ class UserOpen extends Model
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getUserOpenListInfoByUserId($user_id,$open_type = null)
+    public function getUserOpenListInfoByUserId($user_id, $open_type = null)
     {
-        if(empty($open_type))
-        {
-            $data = $this->where('user_id',$user_id)->select();
-        }else {
+        if (empty($open_type)) {
+            $data = $this->where('user_id', $user_id)->select();
+        } else {
             $data = $this->where(['user_id' => $user_id,'open_type' => trim($open_type)])->select();
         }
-        if(!$data->isEmpty())
-        {
+        if (!$data->isEmpty()) {
             $data = $data->toArray();
             foreach ($data as $key => $val) {
                 $data[$key] = $this->parseUserOpenInfo($val);
@@ -63,12 +61,11 @@ class UserOpen extends Model
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getUserOpenInfoByOpenId($open_id,$open_type = null)
+    public function getUserOpenInfoByOpenId($open_id, $open_type = null)
     {
-        if(empty($open_type))
-        {
-            $data = $this->where('open_id',$open_id)->find();
-        }else {
+        if (empty($open_type)) {
+            $data = $this->where('open_id', $open_id)->find();
+        } else {
             $data = $this->where(['open_id' => $open_id,'open_type' => trim($open_type)])->find();
         }
         return $data ? $data->toArray() : [];
@@ -92,14 +89,12 @@ class UserOpen extends Model
      */
     protected function parseUserOpenInfo($user_open_item = array())
     {
-        if(empty($user_open_item) || empty($user_open_item['open_type']))
-        {
+        if (empty($user_open_item) || empty($user_open_item['open_type'])) {
             throw new Exception('解析用户开放平台类型参数错误：必须有open_type标识');
         }
         $open_type              = $user_open_item['open_type'];
         $user_open_item['type'] = '未知';
-        if(isset($this->OpenType[$open_type]))
-        {
+        if (isset($this->OpenType[$open_type])) {
             $user_open_item['type'] = $this->OpenType[$open_type];
         }
         return $user_open_item;

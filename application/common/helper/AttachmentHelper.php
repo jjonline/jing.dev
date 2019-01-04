@@ -31,7 +31,7 @@ class AttachmentHelper
         $param              = [];
         $param['expire_in'] = time() + 1800;
         //生成ID的加密字符串 半小时有效
-        $param['access_key']= self::transfer_encrypt($attachment_id,config('local.auth_key'),1800);
+        $param['access_key']= self::transfer_encrypt($attachment_id, config('local.auth_key'), 1800);
         return '/manage/common/attachment?'.http_build_query($param);
     }
 
@@ -73,18 +73,18 @@ class AttachmentHelper
         $box                    =   range(0, 255);
         $rndkey                 =   array();
         // 产生密匙簿
-        for($i = 0; $i <= 255; $i++) {
+        for ($i = 0; $i <= 255; $i++) {
             $rndkey[$i]         =   ord($cryptkey[$i % $key_length]);
         }
         // 用固定的算法，打乱密匙簿，增加随机性，好像很复杂，实际上并不会增加密文的强度
-        for($j = $i = 0; $i < 256; $i++) {
+        for ($j = $i = 0; $i < 256; $i++) {
             $j                  =   ($j + $box[$i] + $rndkey[$i]) % 256;
             $tmp                =   $box[$i];
             $box[$i]            =   $box[$j];
             $box[$j]            =   $tmp;
         }
         // 核心加解密部分
-        for($a = $j = $i = 0; $i < $string_length; $i++) {
+        for ($a = $j = $i = 0; $i < $string_length; $i++) {
             $a                  =   ($a + 1) % 256;
             $j                  =   ($j + $box[$a]) % 256;
             $tmp                =   $box[$a];
@@ -93,12 +93,12 @@ class AttachmentHelper
             // 从密匙簿得出密匙进行异或，再转成字符
             $result            .=   chr(ord($string[$i]) ^ ($box[($box[$a] + $box[$j]) % 256]));
         }
-        if($isEncode) {
+        if ($isEncode) {
             // substr($result, 0, 10) == 0 验证数据有效性
             // substr($result, 0, 10) - time() > 0 验证数据有效性
             // substr($result, 10, 16) == substr(md5(substr($result, 26).$keyb), 0, 16) 验证数据完整性
             // 验证数据有效性，请看未加密明文的格式
-            if((substr($result, 0, 10) == 0 || substr($result, 0, 10) - time() > 0) && substr($result, 10, 16) == substr(md5(substr($result, 26).$keyb), 0, 16)) {
+            if ((substr($result, 0, 10) == 0 || substr($result, 0, 10) - time() > 0) && substr($result, 10, 16) == substr(md5(substr($result, 26).$keyb), 0, 16)) {
                 return substr($result, 26);
             } else {
                 return '';

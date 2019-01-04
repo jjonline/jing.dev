@@ -23,7 +23,7 @@ class MemberLogService
      */
     public $IpLocationService;
 
-    public function __construct(MemberLog $memberLog,IpLocationService $ipLocationService)
+    public function __construct(MemberLog $memberLog, IpLocationService $ipLocationService)
     {
         $this->MemberLog         = $memberLog;
         $this->IpLocationService = $ipLocationService;
@@ -35,10 +35,9 @@ class MemberLogService
      * @param int    $member_id 前台用户信息
      * @return false|int
      */
-    public function insert($title,$member_id)
+    public function insert($title, $member_id)
     {
-        if(empty($act_user_info))
-        {
+        if (empty($act_user_info)) {
             return false;
         }
         $request    = app('request');
@@ -68,6 +67,6 @@ class MemberLogService
      */
     public function getLastTenItemByUserId($user_id)
     {
-        return $this->MemberLog->getLimitListByUserId($user_id,10);
+        return $this->MemberLog->getLimitListByUserId($user_id, 10);
     }
 }

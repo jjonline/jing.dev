@@ -63,7 +63,7 @@ class BaseSearch
         $this->order   = $this->request->param('order/a');
         $this->start   = $this->request->param('start/i');
         $this->length  = $this->request->param('length/i');
-        $this->keyword = $this->request->param('keyword',null);
+        $this->keyword = $this->request->param('keyword', null);
         $this->keyword = $this->keyword ? '%'.$this->keyword.'%' : null;
     }
 
@@ -72,19 +72,16 @@ class BaseSearch
      * @param Query $query Query查询对象
      * @param string $table_alias 排序的字段名加上的table表的别名
      */
-    protected function orderBy(Query &$query,$table_alias = '')
+    protected function orderBy(Query &$query, $table_alias = '')
     {
         foreach ($this->order as $order) {
-            if(isset($this->columns[$order['column']]['data']))
-            {
+            if (isset($this->columns[$order['column']]['data'])) {
                 $columnName = $this->columns[$order['column']]['data'];
-                if($columnName == 'operate')
-                {
+                if ($columnName == 'operate') {
                     continue;
                 }
                 // 附加别名
-                if(!empty($table_alias))
-                {
+                if (!empty($table_alias)) {
                     $columnName = $table_alias.'.'.$columnName;
                 }
                 $sort = $order['dir'] == 'desc' ? 'DESC' : 'ASC';
@@ -99,18 +96,16 @@ class BaseSearch
      * @param array $columns 待检索的字段数组，可带别名
      * @param null $keyword  检索的关键词，关键词构造函数已自动补充好两边的百分号模糊条件，无需再额外补充百分号
      */
-    protected function keywordSearch(Query &$query,$columns = array(),$keyword = null)
+    protected function keywordSearch(Query &$query, $columns = array(), $keyword = null)
     {
-        if(!empty($keyword))
-        {
+        if (!empty($keyword)) {
             $like = [];
             $bind = [];
-            foreach ($columns as $key => $value)
-            {
+            foreach ($columns as $key => $value) {
                 $like[]            = $value.' LIKE :key'.$key;
                 $bind['key'.$key]  = $keyword;
             }
-            $query->where(implode(' OR ',$like),$bind);
+            $query->where(implode(' OR ', $like), $bind);
         }
     }
 
@@ -121,27 +116,23 @@ class BaseSearch
      * @param string $begin_date 指定的检索的开始时间，不传则获取变量中名为begin_date的值
      * @param string $end_date   指定的减速偶的结束时间，不传则获取变量中名为end_date的值
      */
-    protected function dateTimeSearch(Query &$query,$column,$begin_date = null,$end_date = null)
+    protected function dateTimeSearch(Query &$query, $column, $begin_date = null, $end_date = null)
     {
-        if(is_null($begin_date))
-        {
+        if (is_null($begin_date)) {
             $begin_date = $this->request->param('begin_date');
         }
-        if(is_null($end_date))
-        {
+        if (is_null($end_date)) {
             $end_date = $this->request->param('end_date');
         }
-        $begin_date = $begin_date ? date('Y-m-d H:i:s',strtotime($begin_date)) : null;
-        $end_date   = $end_date ? date('Y-m-d H:i:s',strtotime($end_date)) : null;
-        if(!empty($begin_date) && empty($end_date))
-        {
-            $query->where($column,'>=',$begin_date);
+        $begin_date = $begin_date ? date('Y-m-d H:i:s', strtotime($begin_date)) : null;
+        $end_date   = $end_date ? date('Y-m-d H:i:s', strtotime($end_date)) : null;
+        if (!empty($begin_date) && empty($end_date)) {
+            $query->where($column, '>=', $begin_date);
         }
-        if(empty($begin_date) && !empty($end_date))
-        {
-            $query->where($column,'<=',$end_date);
+        if (empty($begin_date) && !empty($end_date)) {
+            $query->where($column, '<=', $end_date);
         }
-        if(!empty($begin_date) && !empty($end_date)) {
+        if (!empty($begin_date) && !empty($end_date)) {
             $query->where($column, '>=', $begin_date);
             $query->where($column, '<=', $end_date);
         }

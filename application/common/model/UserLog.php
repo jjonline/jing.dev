@@ -21,15 +21,15 @@ class UserLog extends Model
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getLimitListByUserId($user_id,$limit = 10)
+    public function getLimitListByUserId($user_id, $limit = 10)
     {
         $data = $this->db()->alias('user_log')
-              ->join('user user','user.id = user_log.user_id')
-              ->join('department department','department.id = user_log.dept_id')
+              ->join('user user', 'user.id = user_log.user_id')
+              ->join('department department', 'department.id = user_log.dept_id')
               ->field(['user_log.*','user.real_name','department.name as dept_name'])
-              ->where('user_log.user_id',$user_id)
+              ->where('user_log.user_id', $user_id)
               ->limit($limit)
-              ->order('user_log.create_time','DESC')
+              ->order('user_log.create_time', 'DESC')
               ->select();
         return $data->isEmpty() ? [] : $data->toArray();
     }

@@ -23,8 +23,7 @@ class Role extends Model
      */
     public function getRoleInfoById($id)
     {
-        if(empty($id))
-        {
+        if (empty($id)) {
             return [];
         }
         $role = $this->find($id);
@@ -41,11 +40,10 @@ class Role extends Model
      */
     public function getRoleInfoByName($name)
     {
-        if(empty($name))
-        {
+        if (empty($name)) {
             return [];
         }
-        $role = $this->where('name',trim($name))->find();
+        $role = $this->where('name', trim($name))->find();
         return $role ? $role->toArray() : [];
     }
 

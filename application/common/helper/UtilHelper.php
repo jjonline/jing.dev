@@ -23,8 +23,7 @@ class UtilHelper
     {
         $defense_key   = '__LoginDefense__'.$user_id;
         $defense_times = Cache::get($defense_key);
-        if(empty($defense_times))
-        {
+        if (empty($defense_times)) {
             $defense_times = 0;
         }
         return $defense_times >= 10;
@@ -44,14 +43,12 @@ class UtilHelper
     {
         $defense_key   = '__LoginDefense__'.$user_id;
         $defense_times = Cache::get($defense_key);
-        if(empty($defense_times))
-        {
+        if (empty($defense_times)) {
             $defense_times = 0;
         }
         $defense_times++;//自增记录防御次数
-        Cache::set($defense_key,$defense_times,900);//缓存15分钟
-        if($defense_times >= 10)
-        {
+        Cache::set($defense_key, $defense_times, 900);//缓存15分钟
+        if ($defense_times >= 10) {
             throw new Exception('密码连续错误次数过多，请15分钟后再试');
         }
     }
@@ -73,17 +70,14 @@ class UtilHelper
      * @param array $map 所有字段数组
      * @return array
      */
-    public static function getExportField(array $selected,array $map)
+    public static function getExportField(array $selected, array $map)
     {
         //导出的字段
         $export_field = [];
-        foreach ($map as $key => $value)
-        {
-            foreach ($selected as $_key => $_value)
-            {
-                if ($value == $_value)
-                {
-                    $index = explode('.',$key);
+        foreach ($map as $key => $value) {
+            foreach ($selected as $_key => $_value) {
+                if ($value == $_value) {
+                    $index = explode('.', $key);
                     $new_key = $index[1];
                     $export_field[] = [$new_key,$_value];
                 }
@@ -102,14 +96,13 @@ class UtilHelper
      */
     public static function getColumnsCharByIndex($idx)
     {
-        if($idx >= 0 && $idx <= 25)
-        {
+        if ($idx >= 0 && $idx <= 25) {
             $char_idx = $idx + 65;
             return chr($char_idx);
         }
         $ary    = floor(($idx + 1) / 26);
         $prefix = chr($ary + 64);
-        $suffix = chr( $idx - $ary * 25 + 64);
+        $suffix = chr($idx - $ary * 25 + 64);
         return $prefix.$suffix;
     }
 
@@ -119,9 +112,9 @@ class UtilHelper
      * @param int $length
      * @return string
      */
-    public static function leftZeroPadding($number,$length = 7)
+    public static function leftZeroPadding($number, $length = 7)
     {
-        return str_pad($number,$length,'0',STR_PAD_LEFT);
+        return str_pad($number, $length, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -147,22 +140,21 @@ class UtilHelper
             $prop = preg_split('/\s+/', trim($match[2]));
             // 去除所有属性中以on开头的属性名和属性值
             foreach ($prop as $key => $value) {
-                if(preg_match('/^on/', $value))
-                {
+                if (preg_match('/^on/', $value)) {
                     unset($prop[$key]);
                 }
             }
             // self::dump($prop);
             return empty($prop) ? '<'.$match[1].'>' : '<'.$match[1].' '.implode(' ', $prop).'>';
-            /**
-             * 2017-8-7 Bug
-             *
-             * 下面这种方式可以规避清理掉onxx事件，例如：
-             * <p onclick="alert("dd")" oonload="ds" nloadonload="ds" ="load">string</p>
-             *
-             * $Attribute = trim(preg_replace('/on\w+=.*?\s/is', '', $match[2].' '));
-             * return empty($Attribute) ? '<'.$match[1].'>' : '<'.$match[1].' '.$Attribute.'>';
-             */
+        /**
+         * 2017-8-7 Bug
+         *
+         * 下面这种方式可以规避清理掉onxx事件，例如：
+         * <p onclick="alert("dd")" oonload="ds" nloadonload="ds" ="load">string</p>
+         *
+         * $Attribute = trim(preg_replace('/on\w+=.*?\s/is', '', $match[2].' '));
+         * return empty($Attribute) ? '<'.$match[1].'>' : '<'.$match[1].' '.$Attribute.'>';
+         */
         }, $content);
     }
 
@@ -190,40 +182,38 @@ class UtilHelper
      * @param  string $baseUrl 该页面的Url，例如：http://blog.jjonline.cn/sort/php/area/article/173.html
      * @return string
      */
-    public static function to_absolute_url($sUrl,$baseUrl)
+    public static function to_absolute_url($sUrl, $baseUrl)
     {
         $src_info  = parse_url($sUrl);
-        if(isset($src_info['scheme'])) {
+        if (isset($src_info['scheme'])) {
             ##完整的Url无需转换
             return $sUrl;
         }
         $base_info  = parse_url($baseUrl);
         $url        = $base_info['scheme'].'://'.$base_info['host'];##识别出基础的根Url
         ##识别出待转换Url中的路径部分
-        if(substr($src_info['path'], 0, 1) == '/') {
+        if (substr($src_info['path'], 0, 1) == '/') {
             $path   = $src_info['path'];
-        }else{
+        } else {
             $path   = dirname($base_info['path']).'/'.$src_info['path'];
         }
         $rst        = array();##保存待转换Url中的路径部分，索引数组，一个元素是一个文件夹名或.和.. 下方对.和..进行替换
         $path_array = explode('/', $path);
-        if(!$path_array[0]) {
+        if (!$path_array[0]) {
             $rst[]  = '';
         }
         foreach ($path_array as $key => $dir) {
-            if ($dir == '..')
-            {
-                if (end($rst) == '..')
-                {
+            if ($dir == '..') {
+                if (end($rst) == '..') {
                     $rst[] = '..';
-                }elseif(!array_pop($rst)) {
+                } elseif (!array_pop($rst)) {
                     $rst[] = '..';
                 }
-            }elseif($dir && $dir != '.') {
+            } elseif ($dir && $dir != '.') {
                 $rst[]     = $dir;
             }
         }
-        if(!end($path_array)) {
+        if (!end($path_array)) {
             $rst[] = '';
         }
         $url .= implode('/', $rst);
@@ -238,8 +228,10 @@ class UtilHelper
     public static function time_ago($timestamp)
     {
         $e_time = time() - $timestamp;
-        if ($e_time < 1) return '刚刚';
-        $interval = array (
+        if ($e_time < 1) {
+            return '刚刚';
+        }
+        $interval = array(
             12 * 30 * 24 * 60 * 60  =>  '年前 ('.date('Y-m-d', $timestamp).')',
             30 * 24 * 60 * 60       =>  '个月前 ('.date('m-d', $timestamp).')',
             7 * 24 * 60 * 60        =>  '周前 ('.date('m-d', $timestamp).')',
@@ -265,8 +257,7 @@ class UtilHelper
     public static function hide_ipv4($ip_v4)
     {
         $ip = explode('.', $ip_v4);
-        if(count($ip) == 4)
-        {
+        if (count($ip) == 4) {
             $ip[1] = '**';
             $ip[2] = '**';
             return implode('.', $ip);
@@ -292,14 +283,13 @@ class UtilHelper
      */
     public static function hide_name($nickname)
     {
-        if(mb_strlen($nickname) <= 4)
-        {
+        if (mb_strlen($nickname) <= 4) {
             return '***';
         }
         // 隐藏中间4位
         $begin_len = intval(ceil((mb_strlen($nickname) - 4) / 2));
-        $replace   = mb_substr($nickname,$begin_len,4,'utf8');
-        return self::mb_str_replace($replace,'****',$nickname);
+        $replace   = mb_substr($nickname, $begin_len, 4, 'utf8');
+        return self::mb_str_replace($replace, '****', $nickname);
     }
 
     /**
@@ -309,7 +299,7 @@ class UtilHelper
      */
     public static function hide_phone($phone)
     {
-        return substr_replace($phone,'****',3,4);
+        return substr_replace($phone, '****', 3, 4);
     }
 
     /**
@@ -320,7 +310,8 @@ class UtilHelper
      * @param int $count
      * @return bool|string
      */
-    public static function mb_str_replace($search, $replace, $subject, &$count=0) {
+    public static function mb_str_replace($search, $replace, $subject, &$count=0)
+    {
         if (!is_array($search) && is_array($replace)) {
             return false;
         }
@@ -362,137 +353,76 @@ class UtilHelper
     {
         $agent = empty($user_agent) ? $_SERVER['HTTP_USER_AGENT'] : $user_agent;//获取用户代理字符串
         $ret   = self::parse_user_agent($agent);
-        if(!empty($ret) && !empty($ret['platform']) && $ret['platform'] != 'Windows')
-        {
+        if (!empty($ret) && !empty($ret['platform']) && $ret['platform'] != 'Windows') {
             return $ret['platform'];
         }
-        if(preg_match('/Mobile/i',$agent))
-        {
+        if (preg_match('/Mobile/i', $agent)) {
             $os = '移动设备';
-            if(preg_match('/Android/i',$agent))
-            {
+            if (preg_match('/Android/i', $agent)) {
                 $os = 'Android';
             }
-            if(preg_match('/iPhone/i',$agent))
-            {
+            if (preg_match('/iPhone/i', $agent)) {
                 $os = 'iPhone';
             }
-        }else if (preg_match('/win/i', $agent) && strpos($agent, '95'))
-        {
+        } elseif (preg_match('/win/i', $agent) && strpos($agent, '95')) {
             $os = 'Windows 95';
-        }
-        else if(preg_match('/win 9x/i', $agent) && strpos($agent, '4.90'))
-        {
+        } elseif (preg_match('/win 9x/i', $agent) && strpos($agent, '4.90')) {
             $os = 'Windows ME';
-        }
-        else if(preg_match('/win/i', $agent) && preg_match('/98/i', $agent))
-        {
+        } elseif (preg_match('/win/i', $agent) && preg_match('/98/i', $agent)) {
             $os = 'Windows 98';
-        }
-        else if(preg_match('/win/i', $agent) && preg_match('/nt 6.0/i', $agent))
-        {
+        } elseif (preg_match('/win/i', $agent) && preg_match('/nt 6.0/i', $agent)) {
             $os = 'Windows Vista';
-        }
-        else if(preg_match('/win/i', $agent) && preg_match('/nt 6.1/i', $agent))
-        {
+        } elseif (preg_match('/win/i', $agent) && preg_match('/nt 6.1/i', $agent)) {
             $os = 'Windows 7';
-        }
-        else if(preg_match('/win/i', $agent) && preg_match('/nt 6.2/i', $agent))
-        {
+        } elseif (preg_match('/win/i', $agent) && preg_match('/nt 6.2/i', $agent)) {
             $os = 'Windows 8';
-        }else if(preg_match('/win/i', $agent) && preg_match('/nt 10.0/i', $agent))
-        {
+        } elseif (preg_match('/win/i', $agent) && preg_match('/nt 10.0/i', $agent)) {
             $os = 'Windows 10';
-        }else if(preg_match('/win/i', $agent) && preg_match('/nt 5.1/i', $agent))
-        {
+        } elseif (preg_match('/win/i', $agent) && preg_match('/nt 5.1/i', $agent)) {
             $os = 'Windows XP';
-        }
-        else if(preg_match('/win/i', $agent) && preg_match('/nt 5/i', $agent))
-        {
+        } elseif (preg_match('/win/i', $agent) && preg_match('/nt 5/i', $agent)) {
             $os = 'Windows 2000';
-        }
-        else if(preg_match('/win/i', $agent) && preg_match('/nt/i', $agent))
-        {
+        } elseif (preg_match('/win/i', $agent) && preg_match('/nt/i', $agent)) {
             $os = 'Windows NT';
-        }
-        else if(preg_match('/win/i', $agent) && preg_match('/32/i', $agent))
-        {
+        } elseif (preg_match('/win/i', $agent) && preg_match('/32/i', $agent)) {
             $os = 'Windows 32';
-        }
-        else if(preg_match('/linux/i', $agent))
-        {
+        } elseif (preg_match('/linux/i', $agent)) {
             $os = 'Linux';
-        }
-        else if(preg_match('/unix/i', $agent))
-        {
+        } elseif (preg_match('/unix/i', $agent)) {
             $os = 'Unix';
-        }
-        else if(preg_match('/sun/i', $agent) && preg_match('/os/i', $agent))
-        {
+        } elseif (preg_match('/sun/i', $agent) && preg_match('/os/i', $agent)) {
             $os = 'SunOS';
-        }
-        else if(preg_match('/ibm/i', $agent) && preg_match('/os/i', $agent))
-        {
+        } elseif (preg_match('/ibm/i', $agent) && preg_match('/os/i', $agent)) {
             $os = 'IBM OS/2';
-        }
-        else if(preg_match('/Mac/i', $agent) && preg_match('/PC/i', $agent))
-        {
+        } elseif (preg_match('/Mac/i', $agent) && preg_match('/PC/i', $agent)) {
             $os = 'iMac Pc';
-        }
-        else if(preg_match('/Mac/i', $agent) && preg_match('/OS\s+X/i', $agent))
-        {
+        } elseif (preg_match('/Mac/i', $agent) && preg_match('/OS\s+X/i', $agent)) {
             $os = 'Mac';
-        }
-        else if(preg_match('/PowerPC/i', $agent))
-        {
+        } elseif (preg_match('/PowerPC/i', $agent)) {
             $os = 'PowerPC';
-        }
-        else if(preg_match('/AIX/i', $agent))
-        {
+        } elseif (preg_match('/AIX/i', $agent)) {
             $os = 'AIX';
-        }
-        else if(preg_match('/HPUX/i', $agent))
-        {
+        } elseif (preg_match('/HPUX/i', $agent)) {
             $os = 'HPUX';
-        }
-        else if(preg_match('/NetBSD/i', $agent))
-        {
+        } elseif (preg_match('/NetBSD/i', $agent)) {
             $os = 'NetBSD';
-        }
-        else if(preg_match('/BSD/i', $agent))
-        {
+        } elseif (preg_match('/BSD/i', $agent)) {
             $os = 'BSD';
-        }
-        else if(preg_match('/OSF1/i', $agent))
-        {
+        } elseif (preg_match('/OSF1/i', $agent)) {
             $os = 'OSF1';
-        }
-        else if(preg_match('/IRIX/i', $agent))
-        {
+        } elseif (preg_match('/IRIX/i', $agent)) {
             $os = 'IRIX';
-        }
-        else if(preg_match('/FreeBSD/i', $agent))
-        {
+        } elseif (preg_match('/FreeBSD/i', $agent)) {
             $os = 'FreeBSD';
-        }
-        else if(preg_match('/teleport/i', $agent))
-        {
+        } elseif (preg_match('/teleport/i', $agent)) {
             $os = 'teleport';
-        }
-        else if(preg_match('/flashget/i', $agent))
-        {
+        } elseif (preg_match('/flashget/i', $agent)) {
             $os = 'flashget';
-        }
-        else if(preg_match('/webzip/i', $agent))
-        {
+        } elseif (preg_match('/webzip/i', $agent)) {
             $os = 'webzip';
-        }
-        else if(preg_match('/offline/i', $agent))
-        {
+        } elseif (preg_match('/offline/i', $agent)) {
             $os = 'offline';
-        }
-        else
-        {
+        } else {
             Log::record('无法识别操作系统信息的UserAgent:'.$agent);
             $os = '未知操作系统';
         }
@@ -508,78 +438,72 @@ class UtilHelper
     {
         $sys = empty($user_agent) ? $_SERVER['HTTP_USER_AGENT'] : $user_agent;//获取用户代理字符串
         $ret = self::parse_user_agent($sys);
-        if(!empty($ret) && !empty($ret['browser']) && !empty($ret['version']))
-        {
+        if (!empty($ret) && !empty($ret['browser']) && !empty($ret['version'])) {
             return $ret['browser'].'('.$ret['version'].')';
         }
-        if(preg_match('/Mobile/i',$sys))
-        {
+        if (preg_match('/Mobile/i', $sys)) {
             $exp[0] = '移动浏览器';
             $exp[1] = '';
-            if(preg_match('/Android/i',$sys))
-            {
-                if(preg_match('/MicroMessenger/i',$sys))
-                {
+            if (preg_match('/Android/i', $sys)) {
+                if (preg_match('/MicroMessenger/i', $sys)) {
                     $exp[0] = 'Android微信浏览器';
-                }else if(preg_match('/MQQBrowser/i',$sys)) {
+                } elseif (preg_match('/MQQBrowser/i', $sys)) {
                     $exp[0] = '安卓QQ浏览器';
-                }else if(preg_match('/UCBrowser/i',$sys)) {
+                } elseif (preg_match('/UCBrowser/i', $sys)) {
                     $exp[0] = '安卓UC浏览器';
-                }else if(stripos($sys, "Chrome") > 0){
+                } elseif (stripos($sys, "Chrome") > 0) {
                     $exp[0] = 'Chrome内核浏览器';
-                }else {
+                } else {
                     $exp[0] = '安卓浏览器';
                 }
             }
-            if(preg_match('/iPhone/i',$sys) && preg_match('/MicroMessenger/i',$sys))
-            {
-                if(preg_match('/MicroMessenger/i',$sys))
-                {
+            if (preg_match('/iPhone/i', $sys) && preg_match('/MicroMessenger/i', $sys)) {
+                if (preg_match('/MicroMessenger/i', $sys)) {
                     $exp[0] = 'iPhone微信浏览器';
-                }else if(preg_match('/MQQBrowser/i',$sys)) {
+                } elseif (preg_match('/MQQBrowser/i', $sys)) {
                     $exp[0] = 'iPhoneQQ浏览器';
-                }else if(preg_match('/UCBrowser/i',$sys)) {
+                } elseif (preg_match('/UCBrowser/i', $sys)) {
                     $exp[0] = 'iPhoneUC浏览器';
-                }else if(stripos($sys, "Chrome") > 0){
+                } elseif (stripos($sys, "Chrome") > 0) {
                     $exp[0] = 'Chrome内核浏览器';
-                }else{
+                } else {
                     $exp[0] = 'iPhone浏览器';
                 }
             }
-        }else if (stripos($sys, "Firefox/") > 0) {
+        } elseif (stripos($sys, "Firefox/") > 0) {
             preg_match("/Firefox\/([^;)]+)+/i", $sys, $b);
             $exp[0] = "Firefox";
             $exp[1] = $b[1];  //获取火狐浏览器的版本号
-        } else if(stripos($sys, "Maxthon") > 0) {
+        } elseif (stripos($sys, "Maxthon") > 0) {
             preg_match("/Maxthon\/([\d\.]+)/", $sys, $aoyou);
             $exp[0] = "傲游";
             $exp[1] = $aoyou[1];
-        } else if(stripos($sys, "MSIE") > 0) {
+        } elseif (stripos($sys, "MSIE") > 0) {
             preg_match("/MSIE\s+([^;)]+)+/i", $sys, $ie);
             $exp[0] = "IE";
             $exp[1] = $ie[1];  //获取IE的版本号
-        } else if(stripos($sys, "OPR") > 0) {
+        } elseif (stripos($sys, "OPR") > 0) {
             preg_match("/OPR\/([\d\.]+)/", $sys, $opera);
             $exp[0] = "Opera";
             $exp[1] = $opera[1];  //获取opera浏览器版本号,今天下载一个opera浏览器做测试，发现opera竟然也换成谷歌的内核了，囧
-        } else if(stripos($sys, "Edge") > 0) {
+        } elseif (stripos($sys, "Edge") > 0) {
             //win10 Edge浏览器 添加了chrome内核标记 在判断Chrome之前匹配
             preg_match("/Edge\/([\d\.]+)/", $sys, $Edge);
             $exp[0] = "Edge";
             $exp[1] = $Edge[1];
-        } else if(preg_match("/Version\/(\d+\.\d+\.\d)\s+Safari/", $sys, $safari)) {
+        } elseif (preg_match("/Version\/(\d+\.\d+\.\d)\s+Safari/", $sys, $safari)) {
             // safari
             $exp[0] = "Safari";
             $exp[1] = $safari[1];
-        } else if (stripos($sys, "Chrome") > 0) {
+        } elseif (stripos($sys, "Chrome") > 0) {
             preg_match("/Chrome\/([\d\.]+)/", $sys, $google);
             $exp[0] = "Chrome";
             $exp[1] = $google[1];  //获取google chrome的版本号
-        } else if(stripos($sys,'rv:')>0 && stripos($sys,'Gecko')>0){
+        } elseif (stripos($sys, 'rv:')>0 && stripos($sys, 'Gecko')>0) {
             preg_match("/rv:([\d\.]+)/", $sys, $IE);
             $exp[0] = "IE";
             $exp[1] = $IE[1];
-        }else {
+        } else {
             Log::record('无法识别浏览器版本的UserAgent:'.$sys);
             $exp[0] = "未知浏览器";
             $exp[1] = '';
@@ -592,50 +516,52 @@ class UtilHelper
      * @param string $u_agent
      * @return array
      */
-    public static function parse_user_agent( $u_agent = null ) {
+    public static function parse_user_agent($u_agent = null)
+    {
         $u_agent  = empty($u_agent) ? $_SERVER['HTTP_USER_AGENT'] : $u_agent;
         $platform = null;
         $browser  = null;
         $version  = null;
         $empty    = ['platform' => $platform, 'browser' => $browser, 'version' => $version];
-        if( !$u_agent )
-        {
+        if (!$u_agent) {
             return $empty;
         }
-        if( preg_match('/\((.*?)\)/im', $u_agent, $parent_matches) ) {
+        if (preg_match('/\((.*?)\)/im', $u_agent, $parent_matches)) {
             preg_match_all('/(?P<platform>BB\d+;|Android|CrOS|Tizen|iPhone|iPad|iPod|Linux|(Open|Net|Free)BSD|Macintosh|Windows(\ Phone)?|Silk|linux-gnu|BlackBerry|PlayBook|X11|(New\ )?Nintendo\ (WiiU?|3?DS|Switch)|Xbox(\ One)?)
 				(?:\ [^;]*)?
 				(?:;|$)/imx', $parent_matches[1], $result, PREG_PATTERN_ORDER);
             $priority = array( 'Xbox One', 'Xbox', 'Windows Phone', 'Tizen', 'Android', 'FreeBSD', 'NetBSD', 'OpenBSD', 'CrOS', 'X11' );
             $result['platform'] = array_unique($result['platform']);
-            if( count($result['platform']) > 1 ) {
-                if( $keys = array_intersect($priority, $result['platform']) ) {
+            if (count($result['platform']) > 1) {
+                if ($keys = array_intersect($priority, $result['platform'])) {
                     $platform = reset($keys);
                 } else {
                     $platform = $result['platform'][0];
                 }
-            } elseif( isset($result['platform'][0]) ) {
+            } elseif (isset($result['platform'][0])) {
                 $platform = $result['platform'][0];
             }
         }
-        if( $platform == 'linux-gnu' || $platform == 'X11' ) {
+        if ($platform == 'linux-gnu' || $platform == 'X11') {
             $platform = 'Linux';
-        } elseif( $platform == 'CrOS' ) {
+        } elseif ($platform == 'CrOS') {
             $platform = 'Chrome OS';
         }
-        preg_match_all('%(?P<browser>MiuiBrowser|MicroMessenger|MQQBrowser|QQBrowser|Maxthon|Camino|Kindle(\ Fire)?|Firefox|Iceweasel|IceCat|Safari|MSIE|Trident|AppleWebKit|
+        preg_match_all(
+            '%(?P<browser>MiuiBrowser|MicroMessenger|MQQBrowser|QQBrowser|Maxthon|Camino|Kindle(\ Fire)?|Firefox|Iceweasel|IceCat|Safari|MSIE|Trident|AppleWebKit|
 				TizenBrowser|Chrome|Vivaldi|IEMobile|Opera|OPR|Silk|Midori|Edge|CriOS|UCBrowser|Puffin|SamsungBrowser|
 				Baiduspider|Googlebot|YandexBot|bingbot|Lynx|Version|Wget|curl|
 				Valve\ Steam\ Tenfoot|
 				NintendoBrowser|PLAYSTATION\ (\d|Vita)+)
 				(?:\)?;?)
 				(?:(?:[:/ ])(?P<version>[0-9A-Z.]+)|/(?:[A-Z]*))%ix',
-            $u_agent, $result, PREG_PATTERN_ORDER);
+            $u_agent,
+            $result,
+            PREG_PATTERN_ORDER
+        );
         // If nothing matched, return null (to avoid undefined index errors)
-        if( !isset($result['browser'][0]) || !isset($result['version'][0]) )
-        {
-            if( preg_match('%^(?!Mozilla)(?P<browser>[A-Z0-9\-]+)(/(?P<version>[0-9A-Z.]+))?%ix', $u_agent, $result) )
-            {
+        if (!isset($result['browser'][0]) || !isset($result['version'][0])) {
+            if (preg_match('%^(?!Mozilla)(?P<browser>[A-Z0-9\-]+)(/(?P<version>[0-9A-Z.]+))?%ix', $u_agent, $result)) {
                 return array(
                     'platform' => $platform ?: null,
                     'browser'  => $result['browser'],
@@ -644,19 +570,18 @@ class UtilHelper
             }
             return $empty;
         }
-        if( preg_match('/rv:(?P<version>[0-9A-Z.]+)/si', $u_agent, $rv_result) )
-        {
+        if (preg_match('/rv:(?P<version>[0-9A-Z.]+)/si', $u_agent, $rv_result)) {
             $rv_result = $rv_result['version'];
         }
         // dump($result);
         $browser      = $result['browser'][0];
         $version      = $result['version'][0];
         $lowerBrowser = array_map('strtolower', $result['browser']);
-        $find = function ( $search, &$key, &$value = null ) use ( $lowerBrowser ) {
+        $find = function ($search, &$key, &$value = null) use ($lowerBrowser) {
             $search = (array)$search;
-            foreach( $search as $val ) {
+            foreach ($search as $val) {
                 $xkey = array_search(strtolower($val), $lowerBrowser);
-                if( $xkey !== false ) {
+                if ($xkey !== false) {
                     $value = $val;
                     $key   = $xkey;
                     return true;
@@ -666,34 +591,34 @@ class UtilHelper
         };
         $key = 0;
         $val = '';
-        if( $browser == 'Iceweasel' || strtolower($browser) == 'icecat' ) {
+        if ($browser == 'Iceweasel' || strtolower($browser) == 'icecat') {
             $browser = 'Firefox';
-        } elseif( $find('Playstation Vita', $key) ) {
+        } elseif ($find('Playstation Vita', $key)) {
             $platform = 'PlayStation Vita';
             $browser  = 'Browser';
-        } elseif( $find(array( 'Kindle Fire', 'Silk' ), $key, $val) ) {
+        } elseif ($find(array( 'Kindle Fire', 'Silk' ), $key, $val)) {
             $browser  = $val == 'Silk' ? 'Silk' : 'Kindle';
             $platform = 'Kindle Fire';
-            if( !($version = $result['version'][$key]) || !is_numeric($version[0]) ) {
+            if (!($version = $result['version'][$key]) || !is_numeric($version[0])) {
                 $version = $result['version'][array_search('Version', $result['browser'])];
             }
-        } elseif( $find('NintendoBrowser', $key) || $platform == 'Nintendo 3DS' ) {
+        } elseif ($find('NintendoBrowser', $key) || $platform == 'Nintendo 3DS') {
             $browser = 'NintendoBrowser';
             $version = $result['version'][$key];
-        } elseif( $find('Kindle', $key, $platform) ) {
+        } elseif ($find('Kindle', $key, $platform)) {
             $browser = $result['browser'][$key];
             $version = $result['version'][$key];
-        } elseif( $find('OPR', $key) ) {
+        } elseif ($find('OPR', $key)) {
             $browser = 'Opera';
             $version = $result['version'][$key];
-        } elseif( $find('Opera', $key, $browser) ) {
+        } elseif ($find('Opera', $key, $browser)) {
             $find('Version', $key);
             $version = $result['version'][$key];
-        } elseif( $find('Puffin', $key, $browser) ) {
+        } elseif ($find('Puffin', $key, $browser)) {
             $version = $result['version'][$key];
-            if( strlen($version) > 3 ) {
+            if (strlen($version) > 3) {
                 $part = substr($version, -2);
-                if( ctype_upper($part) ) {
+                if (ctype_upper($part)) {
                     $version = substr($version, 0, -2);
                     $flags   = [
                         'IP' => 'iPhone',
@@ -703,51 +628,51 @@ class UtilHelper
                         'WP' => 'Windows Phone',
                         'WT' => 'Windows'
                     ];
-                    if( isset($flags[$part]) ) {
+                    if (isset($flags[$part])) {
                         $platform = $flags[$part];
                     }
                 }
             }
-        }elseif ($find('MiuiBrowser',$key)) {
+        } elseif ($find('MiuiBrowser', $key)) {
             $browser = 'XiaoMi';
             $version = $result['version'][$key];
-        }elseif ($find('MicroMessenger',$key)) {
+        } elseif ($find('MicroMessenger', $key)) {
             $browser = '微信';
             $version = $result['version'][$key];
-        }elseif ($find('Maxthon',$key)) {
+        } elseif ($find('Maxthon', $key)) {
             $browser = '遨游';
             $version = $result['version'][$key];
-        }elseif ($find('MSIE',$key)) {
+        } elseif ($find('MSIE', $key)) {
             $browser = 'IE';
             $version = $result['version'][$key];
-        }elseif ($find(['MQQBrowser','QQBrowser'],$key)) {
+        } elseif ($find(['MQQBrowser','QQBrowser'], $key)) {
             $browser = 'QQ浏览器';
             $version = $result['version'][$key];
-        }elseif( $find(['IEMobile', 'Edge', 'Midori', 'Vivaldi', 'SamsungBrowser', 'Valve Steam Tenfoot', 'Chrome'], $key, $browser) ) {
+        } elseif ($find(['IEMobile', 'Edge', 'Midori', 'Vivaldi', 'SamsungBrowser', 'Valve Steam Tenfoot', 'Chrome'], $key, $browser)) {
             $version = $result['version'][$key];
-        } elseif( $rv_result && $find('Trident', $key) ) {
+        } elseif ($rv_result && $find('Trident', $key)) {
             $browser = 'IE';
             $version = $rv_result;
-        } elseif( $find('UCBrowser', $key) ) {
+        } elseif ($find('UCBrowser', $key)) {
             $browser = 'UC浏览器';
             $version = $result['version'][$key];
-        } elseif( $find('CriOS', $key) ) {
+        } elseif ($find('CriOS', $key)) {
             $browser = 'Chrome';
             $version = $result['version'][$key];
-        } elseif( $browser == 'AppleWebKit' ) {
-            if( $platform == 'Android' && !($key = 0) ) {
+        } elseif ($browser == 'AppleWebKit') {
+            if ($platform == 'Android' && !($key = 0)) {
                 $browser = 'Android浏览器';
-            } elseif( strpos($platform, 'BB') === 0 ) {
+            } elseif (strpos($platform, 'BB') === 0) {
                 $browser  = 'BlackBerry浏览器';
                 $platform = 'BlackBerry';
-            } elseif( $platform == 'BlackBerry' || $platform == 'PlayBook' ) {
+            } elseif ($platform == 'BlackBerry' || $platform == 'PlayBook') {
                 $browser = 'BlackBerry Browser';
             } else {
                 $find('Safari', $key, $browser) || $find('TizenBrowser', $key, $browser);
             }
             $find('Version', $key);
             $version = $result['version'][$key];
-        } elseif( $pKey = preg_grep('/playstation \d/i', array_map('strtolower', $result['browser'])) ) {
+        } elseif ($pKey = preg_grep('/playstation \d/i', array_map('strtolower', $result['browser']))) {
             $pKey = reset($pKey);
             $platform = 'PlayStation ' . preg_replace('/[^\d]/i', '', $pKey);
             $browser  = 'NetFront';
@@ -758,5 +683,4 @@ class UtilHelper
             'version'  => $version ?: null
         ];
     }
-
 }

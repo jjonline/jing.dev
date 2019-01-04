@@ -31,19 +31,17 @@ class UserService
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function searchUserList($keyword,$act_user_info)
+    public function searchUserList($keyword, $act_user_info)
     {
-        if(empty($act_user_info) || empty($act_user_info['dept_auth']))
-        {
+        if (empty($act_user_info) || empty($act_user_info['dept_auth'])) {
             return ['error_code' => -1,'error_msg' => '请先登录'];
         }
         $dept_auth = $act_user_info['dept_auth'];
-        if(empty($keyword))
-        {
+        if (empty($keyword)) {
             $data = $this->User->db()->alias('user')
-                ->leftJoin('department department','department.id = user.dept_id')
-                ->where('user.dept_id','IN',$dept_auth['dept_id_vector'])
-                ->order('user.create_time','DESC')
+                ->leftJoin('department department', 'department.id = user.dept_id')
+                ->where('user.dept_id', 'IN', $dept_auth['dept_id_vector'])
+                ->order('user.create_time', 'DESC')
                 ->field([
                     'user.id',
                     'user.user_name',
@@ -57,12 +55,12 @@ class UserService
             return ['error_code' => 0,'error_msg'   => '请求成功','data' => $data];
         }
         $data = $this->User->db()->alias('user')
-            ->leftJoin('department department','department.id = user.dept_id')
-            ->where(function (Query $query) use($keyword,$dept_auth){
-            $query->where('user.dept_id','IN',$dept_auth['dept_id_vector'])
-                  ->where('user.user_name|user.real_name|user.mobile','LIKE','%'.$keyword.'%');
-        })
-            ->order('user.create_time','DESC')
+            ->leftJoin('department department', 'department.id = user.dept_id')
+            ->where(function (Query $query) use ($keyword,$dept_auth) {
+                $query->where('user.dept_id', 'IN', $dept_auth['dept_id_vector'])
+                  ->where('user.user_name|user.real_name|user.mobile', 'LIKE', '%'.$keyword.'%');
+            })
+            ->order('user.create_time', 'DESC')
             ->field([
                 'user.id',
                 'user.user_name',

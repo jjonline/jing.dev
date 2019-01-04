@@ -8,7 +8,6 @@
 
 namespace app\common\service;
 
-
 use app\common\helper\StringHelper;
 
 class IpLocationService
@@ -47,7 +46,7 @@ class IpLocationService
     public function __construct($filename = "qqwry.dat")
     {
         $this->fp = 0;
-        if(!is_file($filename)) {
+        if (!is_file($filename)) {
             $filename = dirname(__FILE__) . '/' . $filename;
         }
         if (($this->fp = fopen($filename, 'rb')) !== false) {

@@ -25,7 +25,9 @@ class BaseTask
      * 异步任务执行的入口方法
      * @param array $param
      */
-    public function execute(array $param) {}
+    public function execute(array $param)
+    {
+    }
 
     /**
      * 标记任务已开始
@@ -34,9 +36,8 @@ class BaseTask
      */
     protected function start($async_task_id)
     {
-        if(!empty($async_task_id))
-        {
-            try{
+        if (!empty($async_task_id)) {
+            try {
                 $ret = Db::name('async_task')->update([
                     'title'         => $this->title,// 回写任务标题
                     'id'            => $async_task_id,
@@ -44,7 +45,8 @@ class BaseTask
                     'delivery_time' => date('Y-m-d H:i:s')
                 ]);
                 return !!$ret;
-            }catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+            }
         }
         return false;
     }
@@ -55,11 +57,10 @@ class BaseTask
      * @param string $result        执行任务的结果字符串
      * @return bool
      */
-    protected function finishSuccess($async_task_id,$result = '')
+    protected function finishSuccess($async_task_id, $result = '')
     {
-        if(!empty($async_task_id))
-        {
-            try{
+        if (!empty($async_task_id)) {
+            try {
                 $ret = Db::name('async_task')->update([
                     'title'         => $this->title,// 回写任务标题
                     'id'            => $async_task_id,
@@ -68,7 +69,8 @@ class BaseTask
                     'finish_time'   => date('Y-m-d H:i:s')
                 ]);
                 return !!$ret;
-            }catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+            }
         }
         return false;
     }
@@ -79,11 +81,10 @@ class BaseTask
      * @param string $result        执行任务的结果字符串
      * @return bool
      */
-    protected function finishFail($async_task_id,$result = '')
+    protected function finishFail($async_task_id, $result = '')
     {
-        if(!empty($async_task_id))
-        {
-            try{
+        if (!empty($async_task_id)) {
+            try {
                 $ret = Db::name('async_task')->update([
                     'title'         => $this->title,// 回写任务标题
                     'id'            => $async_task_id,
@@ -92,7 +93,8 @@ class BaseTask
                     'finish_time'   => date('Y-m-d H:i:s')
                 ]);
                 return !!$ret;
-            }catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+            }
         }
         return false;
     }

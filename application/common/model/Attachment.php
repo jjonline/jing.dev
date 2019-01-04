@@ -23,11 +23,10 @@ class Attachment extends Model
      */
     public function getAttachmentById($id)
     {
-        if(empty($id))
-        {
+        if (empty($id)) {
             return [];
         }
-        $data = $this->where('id',$id)->find();
+        $data = $this->where('id', $id)->find();
         return $data ? $data->toArray() : [];
     }
 
@@ -40,20 +39,17 @@ class Attachment extends Model
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getAttachmentByUserFileSha1($file_sha1,$user_id = null)
+    public function getAttachmentByUserFileSha1($file_sha1, $user_id = null)
     {
-        if(empty($user_id) && Session::get('user_id'))
-        {
+        if (empty($user_id) && Session::get('user_id')) {
             $user_id = Session::get('user_id');
         }
-        if(!empty($user_id))
-        {
+        if (!empty($user_id)) {
             $data = $this->where(['user_id' => $user_id,'file_sha1' => $file_sha1])->find();
             return $data ? $data->toArray() : [];
-        }else {
+        } else {
             $data = $this->where(['file_sha1' => $file_sha1])->select();// 不同用户的相同资源有多条的问题
             return $data->isEmpty() ? [] : $data->toArray();
         }
     }
-
 }

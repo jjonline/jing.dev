@@ -24,8 +24,7 @@ class User extends Model
      */
     public function getUserInfoById($user_id)
     {
-        if(empty($user_id))
-        {
+        if (empty($user_id)) {
             return [];
         }
         $data = $this->get(['id' => $user_id]);
@@ -40,8 +39,7 @@ class User extends Model
      */
     public function getUserInfoByUserName($user_name)
     {
-        if(empty($user_name))
-        {
+        if (empty($user_name)) {
             return [];
         }
         $data = $this->get(['user_name' => $user_name]);
@@ -56,8 +54,7 @@ class User extends Model
      */
     public function getUserInfoByEmail($email)
     {
-        if(empty($email))
-        {
+        if (empty($email)) {
             return [];
         }
         $data = $this->get(['email' => $email]);
@@ -72,8 +69,7 @@ class User extends Model
      */
     public function getUserInfoByMobile($mobile)
     {
-        if(empty($mobile))
-        {
+        if (empty($mobile)) {
             return [];
         }
         $data = $this->get(['mobile' => $mobile]);
@@ -88,12 +84,10 @@ class User extends Model
      */
     public function getUserInfoAutoByUniqueKey($user_unique_key_field_value)
     {
-        if(FilterValidHelper::is_mail_valid($user_unique_key_field_value))
-        {
+        if (FilterValidHelper::is_mail_valid($user_unique_key_field_value)) {
             return $this->getUserInfoByEmail($user_unique_key_field_value);
         }
-        if(FilterValidHelper::is_phone_valid($user_unique_key_field_value))
-        {
+        if (FilterValidHelper::is_phone_valid($user_unique_key_field_value)) {
             return $this->getUserInfoByMobile($user_unique_key_field_value);
         }
         return $this->getUserInfoByUserName($user_unique_key_field_value);
@@ -109,10 +103,10 @@ class User extends Model
     public function getFullUserInfoById($user_id)
     {
         $data = Db::name('user u')
-              ->join('department dept','dept.id = u.dept_id')
-              ->join('role r','r.id = u.role_id')
+              ->join('department dept', 'dept.id = u.dept_id')
+              ->join('role r', 'r.id = u.role_id')
               ->field(['u.*','dept.name as dept_name','r.name as role_name'])
-              ->where('u.id',$user_id)
+              ->where('u.id', $user_id)
               ->find();
         return $data ? $data : [];
     }
@@ -124,12 +118,11 @@ class User extends Model
      */
     public function updateUserAuthCode($user_id)
     {
-        if(empty($user_id))
-        {
+        if (empty($user_id)) {
             return false;
         }
         $_user              = [];
         $_user['auth_code'] = GenerateHelper::makeNonceStr(8);
-        return $this->update($_user,['id' => $user_id]);
+        return $this->update($_user, ['id' => $user_id]);
     }
 }

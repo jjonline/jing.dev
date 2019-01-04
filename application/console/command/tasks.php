@@ -41,14 +41,12 @@ class tasks extends Command
      */
     protected function execute(Input $input, Output $output)
     {
-        if(!extension_loaded('swoole'))
-        {
+        if (!extension_loaded('swoole')) {
             throw new Exception("`php think task` need swoole php extension.");
         }
         $env = trim($input->getArgument('env'));
         $env = $env ?: 'dev';
-        if(empty($env) || !in_array($env,['dev','test','beta','prod']))
-        {
+        if (empty($env) || !in_array($env, ['dev','test','beta','prod'])) {
             throw new Exception("Usage:`php think task [dev|test|beta|prod]` Start Task TCP Server.");
         }
 
@@ -58,17 +56,14 @@ class tasks extends Command
         $socket = Config::get('swoole.socket');
         $port   = Config::get('swoole.port');
         $ip     = Config::get('swoole.ip');
-        if(!empty($ip))
-        {
+        if (!empty($ip)) {
             $output->writeln('IP模式开始执行:'.$ip);
             Log::record('IP模式开始执行:'.$ip);
-            $server = new Server($ip,Config::get('swoole.port'),SWOOLE_BASE);
-        }
-        else
-        {
+            $server = new Server($ip, Config::get('swoole.port'), SWOOLE_BASE);
+        } else {
             $output->writeln('Unix Socket模式开始执行:'.$socket);
             Log::record('Unix Socket模式开始执行:'.$socket);
-            $server = new Server($socket,$port,SWOOLE_BASE,SWOOLE_UNIX_STREAM);
+            $server = new Server($socket, $port, SWOOLE_BASE, SWOOLE_UNIX_STREAM);
         }
 
         // Config
@@ -80,54 +75,48 @@ class tasks extends Command
             'worker_num'      => Config::get('swoole.worker_num'),
         ];
         // 判断是否启用子进程指定用户
-        if(Config::get('swoole.user'))
-        {
+        if (Config::get('swoole.user')) {
             $config['user']  = Config::get('swoole.user');
         }
         $server->set($config);
 
         // onWorkerStart Event
-        $server->on('WorkerStart',[$swooleService,'onWorkerStart']);
+        $server->on('WorkerStart', [$swooleService,'onWorkerStart']);
 
         // onConnect Event 连接时触发的事件，主要用于debug
-        $server->on('connect',[$swooleService,'onConnect']);
+        $server->on('connect', [$swooleService,'onConnect']);
 
         // lpush往队列推任务的handler--redis的lpush命令处理函数
-        $server->setHandler('LPUSH',function ($fd, $data) use ($server,$output) {
-            try{
+        $server->setHandler('LPUSH', function ($fd, $data) use ($server,$output) {
+            try {
                 /**
                  * 确保传递给task异步执行的参数是pair形式的数组
                  */
-                if(!is_array($data) || count($data) < 2)
-                {
-                    throw new Exception('写入队列的数据格式有误:'.json_encode($data,JSON_UNESCAPED_UNICODE));
+                if (!is_array($data) || count($data) < 2) {
+                    throw new Exception('写入队列的数据格式有误:'.json_encode($data, JSON_UNESCAPED_UNICODE));
                 }
                 // 一次往队列里塞入多个值的情况，拆分成多个任务塞进去
-                if(is_array($data) && count($data) > 2)
-                {
+                if (is_array($data) && count($data) > 2) {
                     $result = ArrayHelper::segmentToPairArray($data);
-                }else {
+                } else {
                     $result = [$data];
                 }
-                foreach ($result as $key => $value)
-                {
+                foreach ($result as $key => $value) {
                     $task_id  = $server->task($value);
-                    if($task_id === false)
-                    {
-                        throw new Exception('拒绝任务：'.json_encode($value,JSON_UNESCAPED_UNICODE));
+                    if ($task_id === false) {
+                        throw new Exception('拒绝任务：'.json_encode($value, JSON_UNESCAPED_UNICODE));
                     }
                     $value['task_id'] = $task_id;
                     $output->writeln('接收任务：List='.$value[0].',RunningId='.$task_id);
-                    Log::record('接收任务'.$value[0].':'.json_encode($value,JSON_UNESCAPED_UNICODE));
+                    Log::record('接收任务'.$value[0].':'.json_encode($value, JSON_UNESCAPED_UNICODE));
                 }
 
                 // 向客户端返回队列长度
-                $server->send($fd,Server::format(Server::INT, count($result)));
-
-            }catch (\Throwable $e) {
+                $server->send($fd, Server::format(Server::INT, count($result)));
+            } catch (\Throwable $e) {
                 $output->writeln($e->getMessage());
                 Log::record($e->getMessage());
-                $server->send($fd,Server::format(Server::ERROR));
+                $server->send($fd, Server::format(Server::ERROR));
             }
         });
 

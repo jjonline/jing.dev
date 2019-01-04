@@ -36,10 +36,11 @@ class DepartmentService
      */
     public $cache_tag = 'Dept';
 
-    public function __construct(Department $department,
-                                User $user,
-                                LogService $logService)
-    {
+    public function __construct(
+        Department $department,
+        User $user,
+        LogService $logService
+    ) {
         $this->Department = $department;
         $this->LogService = $logService;
         $this->User       = $user;
@@ -56,16 +57,13 @@ class DepartmentService
     public function save(Request $request)
     {
         $dept = $request->post('Dept/a');
-        if(empty($dept['name']) || $dept['parent_id'] == -1)
-        {
+        if (empty($dept['name']) || $dept['parent_id'] == -1) {
             return ['error_code' => 400,'error_msg' => '上级部门或部门名称缺失'];
         }
         $is_edit = !empty($dept['id']);
-        if($is_edit)
-        {
+        if ($is_edit) {
             $exist_dept = $this->Department->getDeptInfoById($dept['id']);
-            if(empty($exist_dept))
-            {
+            if (empty($exist_dept)) {
                 return ['error_code' => 400,'error_msg' => '拟编辑部门不存在'];
             }
         }
@@ -76,31 +74,26 @@ class DepartmentService
         $Dept['remark'] = trim($dept['remark']);
         $Dept['level']  = 1;
         // 上级部门和层级
-        if($dept['parent_id'] != 0)
-        {
+        if ($dept['parent_id'] != 0) {
             $parent_dept= $this->Department->getDeptInfoById($dept['parent_id']);
-            if(empty($parent_dept))
-            {
+            if (empty($parent_dept)) {
                 return ['error_code' => 400,'error_msg' => '所选上级部门不存在'];
             }
-            if($parent_dept['level'] >= 5)
-            {
+            if ($parent_dept['level'] >= 5) {
                 return ['error_code' => 400,'error_msg' => '部门最大允许5级'];
             }
             $Dept['level']     = $parent_dept['level'] + 1;
             $Dept['parent_id'] = $dept['parent_id'];
         }
-        if($is_edit)
-        {
+        if ($is_edit) {
             $Dept['id'] = $dept['id'];
             $result     = $this->Department->isUpdate(true)->data($Dept)->save();
-        }else {
+        } else {
             $result     = $this->Department->isUpdate(false)->data($Dept)->save();
         }
-        if($result >= 0)
-        {
+        if ($result >= 0) {
             Cache::clear($this->cache_tag);// 按标签清理部门缓存
-            $this->LogService->logRecorder($result,$is_edit ? '编辑部门' :'新增部门');
+            $this->LogService->logRecorder($result, $is_edit ? '编辑部门' :'新增部门');
             return ['error_code' => 0,'error_msg'   => '部门保存成功'];
         }
         return ['error_code' => 500,'error_msg' => '部门保存失败：系统异常'];
@@ -118,16 +111,14 @@ class DepartmentService
     {
         $id   = $request->post('id/i');
         $sort = intval($request->post('sort'));
-        if($sort <= 0)
-        {
+        if ($sort <= 0) {
             return ['error_code' => 400,'error_msg' => '排序数字有误'];
         }
         $dept = $this->Department->getDeptInfoById($id);
-        if(empty($dept))
-        {
+        if (empty($dept)) {
             return ['error_code' => 400,'error_msg' => '拟编辑排序的部门数据不存在'];
         }
-        $ret = $this->Department->isUpdate(true)->save(['sort' => intval($sort)],['id' => $id]);
+        $ret = $this->Department->isUpdate(true)->save(['sort' => intval($sort)], ['id' => $id]);
         Cache::clear($this->cache_tag);// 按标签清理部门缓存
         return $ret >= 0 ?
             ['error_code' => 0,'error_msg' => '排序调整成功'] :
@@ -148,24 +139,21 @@ class DepartmentService
     {
         $id   = $request->post('id/i');
         $dept = $this->Department->getDeptInfoById($id);
-        if(empty($dept))
-        {
+        if (empty($dept)) {
             return ['error_code' => 400,'error_msg' => '拟删除的部门数据不存在'];
         }
         // 检查是否有子部门、检查是否有分配
-        $exist_user = $this->User->db()->where('dept_id',$id)->select();
-        if(!$exist_user->isEmpty())
-        {
+        $exist_user = $this->User->db()->where('dept_id', $id)->select();
+        if (!$exist_user->isEmpty()) {
             return ['error_code' => 400,'error_msg' => '无法删除：拟删除的部门已分配用户'];
         }
         $exist_child = $this->Department->getDeptInfoByParentId($id);
-        if(!empty($exist_child))
-        {
+        if (!empty($exist_child)) {
             return ['error_code' => 400,'error_msg' => '无法删除：拟删除的部门存在子部门'];
         }
-        $ret = $this->Department->db()->where('id',$id)->delete();
+        $ret = $this->Department->db()->where('id', $id)->delete();
         // 日志方式备份保存原始菜单信息
-        $this->LogService->logRecorder($dept,'删除部门');
+        $this->LogService->logRecorder($dept, '删除部门');
         Cache::clear($this->cache_tag);// 按标签清理部门缓存
         return $ret >= 0 ?
             ['error_code' => 0,'error_msg' => '部门删除成功'] :
@@ -184,14 +172,12 @@ class DepartmentService
     public function getDeptTreeList()
     {
         $dept = $this->getDeptList();
-        foreach ($dept as $key => $value)
-        {
+        foreach ($dept as $key => $value) {
             $dept[$key]['name_format1'] = $value['name'];
             $dept[$key]['name_format2'] = $value['name'];
-            if($value['level'] > 1)
-            {
-                $dept[$key]['name_format1']   = str_repeat('&nbsp;&nbsp;├&nbsp;&nbsp;',$value['level']).$value['name'];
-                $dept[$key]['name_format2']   = str_repeat('&nbsp;',floor(pow(($value['level'] - 1),1.8) * 2)).'└─'.$value['name'];
+            if ($value['level'] > 1) {
+                $dept[$key]['name_format1']   = str_repeat('&nbsp;&nbsp;├&nbsp;&nbsp;', $value['level']).$value['name'];
+                $dept[$key]['name_format2']   = str_repeat('&nbsp;', floor(pow(($value['level'] - 1), 1.8) * 2)).'└─'.$value['name'];
             }
         }
         return TreeHelper::vTree($dept);
@@ -216,24 +202,21 @@ class DepartmentService
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getAuthDeptInfoByDeptId($dept_id,$user_is_leader = 0)
+    public function getAuthDeptInfoByDeptId($dept_id, $user_is_leader = 0)
     {
         $user_id = Session::get('user_id');
-        if(empty($user_id))
-        {
+        if (empty($user_id)) {
             throw new Exception('未登录状态不允许检查用户所辖部门信息');
         }
         // 生产环境缓存用户所辖部门数据
-        if(!Config::get('app.app_debug'))
-        {
+        if (!Config::get('app.app_debug')) {
             $vector = Cache::get('User_Auth_Dept'.$user_id);
-            if(!empty($vector))
-            {
+            if (!empty($vector)) {
                 return $vector;
             }
         }
-        $vector = $this->getChildDeptInfoByParentDeptId($dept_id,$user_is_leader);
-        $vector && Cache::tag($this->cache_tag)->set('User_Auth_Dept'.$user_id,$vector,3600*12);
+        $vector = $this->getChildDeptInfoByParentDeptId($dept_id, $user_is_leader);
+        $vector && Cache::tag($this->cache_tag)->set('User_Auth_Dept'.$user_id, $vector, 3600*12);
         return $vector;
     }
 
@@ -251,20 +234,17 @@ class DepartmentService
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getChildDeptInfoByParentDeptId($parent_id,$user_is_leader = 0)
+    public function getChildDeptInfoByParentDeptId($parent_id, $user_is_leader = 0)
     {
         $dept_list   = $this->getDeptList();
-        $vector_list = TreeHelper::child($dept_list,$parent_id);
+        $vector_list = TreeHelper::child($dept_list, $parent_id);
         $vector      = [];
         $begin_level = 0;//所辖部门开始层级
         // 若$user_is_leader为1表示为$dept_id指定部门的领导--将本部门信息也附加进去
-        foreach ($dept_list as $key => $value)
-        {
-            if($parent_id == $value['id'])
-            {
+        foreach ($dept_list as $key => $value) {
+            if ($parent_id == $value['id']) {
                 $begin_level = $value['level'];
-                if($user_is_leader)
-                {
+                if ($user_is_leader) {
                     $value['name_format1']      = $value['name'];
                     $value['name_format2']      = $value['name'];
                     $vector['dept_id_vector'][] = $value['id'];
@@ -273,19 +253,17 @@ class DepartmentService
                 break;
             }
         }
-        foreach ($vector_list as $key => $value)
-        {
+        foreach ($vector_list as $key => $value) {
             // 附加部门名称的层级标识
-            $value['name_format1']      = str_repeat('&nbsp;&nbsp;├&nbsp;&nbsp;',$value['level'] - $begin_level).$value['name'];
-            $value['name_format2']      = str_repeat('&nbsp;',floor(pow(($value['level'] - $begin_level - 1),1.8) * 2)).'└─'.$value['name'];
+            $value['name_format1']      = str_repeat('&nbsp;&nbsp;├&nbsp;&nbsp;', $value['level'] - $begin_level).$value['name'];
+            $value['name_format2']      = str_repeat('&nbsp;', floor(pow(($value['level'] - $begin_level - 1), 1.8) * 2)).'└─'.$value['name'];
             $vector['dept_id_vector'][] = $value['id'];
             $vector['dept_list'][]      = $value;
         }
         // 将所辖部门处理成具有层级的纵向树顺序
         // 1、基层职员可能没有任何下辖部门的权限
         // 2、没有子部门的成员被设置成了非领导也没有下辖部门权限
-        if(empty($vector))
-        {
+        if (empty($vector)) {
             $vector = [
                 'dept_id_vector' => [],
                 'dept_list'      => []
@@ -304,17 +282,15 @@ class DepartmentService
      */
     protected function getDeptList()
     {
-        if(Config::get('app.app_debug'))
-        {
+        if (Config::get('app.app_debug')) {
             return $this->Department->getDeptList();
         }
         $dept = Cache::get('All_Dept');
-        if(!empty($dept))
-        {
+        if (!empty($dept)) {
             return $dept;
         }
         $dept = $this->Department->getDeptList();
-        $dept && Cache::tag($this->cache_tag)->set('All_Dept',$dept,3600*12);// 生产环境缓存所有部门列表数据
+        $dept && Cache::tag($this->cache_tag)->set('All_Dept', $dept, 3600*12);// 生产环境缓存所有部门列表数据
         return $dept;
     }
 }

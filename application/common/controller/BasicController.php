@@ -34,11 +34,10 @@ class BasicController extends Controller
         $this->LogService = $LogService = Container::get('app\common\service\LogService');
 
         // 闭包传参执行钩子行为的最终写入Db或其他永久存储
-        Hook::add('response_end',function () use ($LogService) {
-            $except_controller = Config::get('local.log_except_controller',[]);
-            $except_action     = Config::get('local.log_except_action',[]);
-            if(!in_array($this->request->controller(),$except_controller) && !in_array($this->request->action(),$except_action))
-            {
+        Hook::add('response_end', function () use ($LogService) {
+            $except_controller = Config::get('local.log_except_controller', []);
+            $except_action     = Config::get('local.log_except_action', []);
+            if (!in_array($this->request->controller(), $except_controller) && !in_array($this->request->action(), $except_action)) {
                 $LogService->save('normal');
             }
         });
@@ -50,9 +49,9 @@ class BasicController extends Controller
      * @param string $description 记录日志的描述内容
      * @return bool
      */
-    protected function logRecorder($data = null,$description = null)
+    protected function logRecorder($data = null, $description = null)
     {
-        return $this->LogService->logRecorder($data,$description);
+        return $this->LogService->logRecorder($data, $description);
     }
 
     /**
@@ -75,17 +74,15 @@ class BasicController extends Controller
      * @param mixed  $data       json自定义输出数据内容，可空
      * @return Response
      */
-    protected function renderJson($error_msg , $error_code = 0 , $data = null)
+    protected function renderJson($error_msg, $error_code = 0, $data = null)
     {
         $json = [
             'error_code' => $error_code,
             'error_msg'  => $error_msg
         ];
-        if(!empty($data))
-        {
+        if (!empty($data)) {
             $json['data'] = $data;
         }
-        return Response::create($json,'json',200);
+        return Response::create($json, 'json', 200);
     }
-
 }

@@ -18,20 +18,17 @@ class OperationRecord extends Model
      * @param int    $business_id  具体的业务ID
      * @param string $order        获取记录的排序规则，默认按时间降序排列DESC，可传ASC升序
      * @return array
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getOperationRecordList($operate_name,$business_id,$order = 'DESC')
+    public function getOperationRecordList($operate_name, $business_id, $order = 'DESC')
     {
-        if(empty($operate_name) || empty($business_id))
-        {
+        if (empty($operate_name) || empty($business_id)) {
             return [];
         }
         $order = $order == 'DESC' ? 'DESC' : 'ASC';
         $data  = $this->where(['operation_name' => $operate_name,'business_id' => $business_id])
-               ->order('create_time',$order)
-               ->paginate(10,false,[
+               ->order('create_time', $order)
+               ->paginate(10, false, [
                    'query' => [
                        'name' => $operate_name,
                        'id'   => $business_id,

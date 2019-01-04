@@ -59,13 +59,14 @@ class AuthService
      */
     public $cache_tag = 'auth';
 
-    public function __construct(LogService $logService,
+    public function __construct(
+        LogService $logService,
                                 User $User,
                                 Role $Role,
                                 Menu $Menu,
                                 RoleMenu $roleMenu,
-                                DepartmentService $departmentService)
-    {
+                                DepartmentService $departmentService
+    ) {
         $this->User              = $User;
         $this->DepartmentService = $departmentService;
         $this->Role              = $Role;
@@ -90,21 +91,17 @@ class AuthService
         $highLight = false;//当前高亮的层级
         $request   = request();
         $now_url   = $this->generateRequestMenuUrl($request);
-        foreach ($data as $key => $value)
-        {
+        foreach ($data as $key => $value) {
             $value['active']    = false;//高亮
-            if($value['url'] == $now_url)
-            {
+            if ($value['url'] == $now_url) {
                 $value['active'] = true;
                 $highLight       = $value;//当前高亮的菜单
             }
-            if($value['level'] == 1)
-            {
+            if ($value['level'] == 1) {
                 $value['menu_open'] = false;//仅一级导航栏需要标记是否展开，默认不展开后方设置高亮再处理
             }
             // 仅处理三级菜单
-            switch ($value['level'])
-            {
+            switch ($value['level']) {
                 case 1:
                     $menu1[] = $value;
                     break;
@@ -115,31 +112,25 @@ class AuthService
                     $menu3[] = $value;
                     break;
             }
-            if(empty($value['url']))
-            {
+            if (empty($value['url'])) {
                 $this->MenuMap[$value['url']] = $value;//以url为键名的数组
             }
         }
         // 按层级处理菜单数组--仅到3级
-        foreach ($menu1 as $key1 => $value1)
-        {
+        foreach ($menu1 as $key1 => $value1) {
             // 二级菜单
             $_menu2 = [];
-            foreach ($menu2 as $key2 => $value2)
-            {
+            foreach ($menu2 as $key2 => $value2) {
                 // 三级菜单
                 $_menu3 = [];
-                foreach ($menu3 as $key3 => $value3)
-                {
-                    if($value2['id'] == $value3['parent_id'])
-                    {
+                foreach ($menu3 as $key3 => $value3) {
+                    if ($value2['id'] == $value3['parent_id']) {
                         $_menu3[] = $value3;
                     }
                 }
                 $value2['children'] = $_menu3;
 
-                if($value1['id'] == $value2['parent_id'])
-                {
+                if ($value1['id'] == $value2['parent_id']) {
                     $_menu2[] = $value2;
                 }
             }
@@ -152,7 +143,7 @@ class AuthService
         //dump($this->userHasPermission());
 
         // 设置高亮
-        $menu = $this->setHighLight($menu,$highLight);
+        $menu = $this->setHighLight($menu, $highLight);
 
         return $menu;
     }
@@ -167,25 +158,21 @@ class AuthService
     {
         // 未登录直接抛异常终止执行
         $user_id = Session::get('user_id');
-        if(empty($user_id))
-        {
-            throw new Exception('未初始化用户登录状态不可调用userHasPermission方法',500);
+        if (empty($user_id)) {
+            throw new Exception('未初始化用户登录状态不可调用userHasPermission方法', 500);
         }
 
         // 如果未传参则拼接当前url
-        if(empty($auth_tag))
-        {
+        if (empty($auth_tag)) {
             $request  = request();
             $auth_tag = $this->generateRequestMenuUrl($request);
         }
 
         // 缓存数据的Key
         $user_menu_cache_Map_key = 'User_menu_cache_Map_key'.$user_id;
-        if(!Config::get('app.app_debug'))
-        {
+        if (!Config::get('app.app_debug')) {
             $user_menu_map = Cache::get($user_menu_cache_Map_key);
-            if(!empty($user_menu_map))
-            {
+            if (!empty($user_menu_map)) {
                 // 查找到缓存 直接从缓存中判断
                 return isset($user_menu_map[$auth_tag]);
                 // return array_key_exists($auth_tag,$user_menu_map);
@@ -194,20 +181,18 @@ class AuthService
 
         // 处理菜单数据
         $user_menu_map = $this->getUserMenuList();
-        if(empty($user_menu_map))
-        {
+        if (empty($user_menu_map)) {
             return false;
         }
 
         // 按url和tag分组，url和tag成为数组的键名
-        $user_menu_map1 = ArrayHelper::group($user_menu_map,'url');
-        $user_menu_map2 = ArrayHelper::group($user_menu_map,'tag');
-        $user_menu_map  = array_merge($user_menu_map1,$user_menu_map2);
+        $user_menu_map1 = ArrayHelper::group($user_menu_map, 'url');
+        $user_menu_map2 = ArrayHelper::group($user_menu_map, 'tag');
+        $user_menu_map  = array_merge($user_menu_map1, $user_menu_map2);
 
         // 依据开发模式与否将全新Map数组缓存
-        if(!Config::get('app.app_debug'))
-        {
-            Cache::tag($this->cache_tag)->set($user_menu_cache_Map_key,$user_menu_map,3600 * 12);
+        if (!Config::get('app.app_debug')) {
+            Cache::tag($this->cache_tag)->set($user_menu_cache_Map_key, $user_menu_map, 3600 * 12);
         }
         return isset($user_menu_map[$auth_tag]);
         // return array_key_exists($auth_tag,$user_menu_map);
@@ -227,40 +212,34 @@ class AuthService
      */
     public function getUserSingleMenuInfo($url = null)
     {
-        if(!$this->userHasPermission($url))
-        {
-            throw new Exception('用户无该菜单权限，获取菜单权限信息失败',500);
+        if (!$this->userHasPermission($url)) {
+            throw new Exception('用户无该菜单权限，获取菜单权限信息失败', 500);
         }
         $user_id = Session::get('user_id');
         $request = request();
-        if(empty($url))
-        {
+        if (empty($url)) {
             $url = $this->generateRequestMenuUrl($request);
         }
         $user_menu_cache_Map_key = 'User_menu_cache_Map_key'.$user_id;
-        if(!Config::get('app.app_debug'))
-        {
+        if (!Config::get('app.app_debug')) {
             $user_menu_map = Cache::get($user_menu_cache_Map_key);
-        }else {
+        } else {
             $user_menu_map = $this->getUserMenuList();
-            if(empty($user_menu_map))
-            {
-                throw new Exception('用户无该菜单权限，获取菜单权限信息失败',500);
+            if (empty($user_menu_map)) {
+                throw new Exception('用户无该菜单权限，获取菜单权限信息失败', 500);
             }
             // 按url和tag分组，url和tag成为数组的键名
-            $user_menu_map1 = ArrayHelper::group($user_menu_map,'url');
-            $user_menu_map2 = ArrayHelper::group($user_menu_map,'tag');
-            $user_menu_map  = array_merge($user_menu_map1,$user_menu_map2);
+            $user_menu_map1 = ArrayHelper::group($user_menu_map, 'url');
+            $user_menu_map2 = ArrayHelper::group($user_menu_map, 'tag');
+            $user_menu_map  = array_merge($user_menu_map1, $user_menu_map2);
             //依据开发模式与否将全新Map数组缓存
-            if(!Config::get('app.app_debug'))
-            {
-                Cache::tag($this->cache_tag)->set($user_menu_cache_Map_key,$user_menu_map,3600 * 12);
+            if (!Config::get('app.app_debug')) {
+                Cache::tag($this->cache_tag)->set($user_menu_cache_Map_key, $user_menu_map, 3600 * 12);
             }
         }
         // 前方菜单权限已检查通过，此处值绝对存在，前方按url排序后是一个只有一个元素的二维数组，还原
         $info = $user_menu_map[$url][0];
-        if(!empty($info['extra_param']))
-        {
+        if (!empty($info['extra_param'])) {
             // 还原额外参数的数组格式
             $info['extra_param'] = (array)$info['extra_param'];
         }
@@ -308,35 +287,29 @@ class AuthService
     public function getUserMenuList($user_id = null)
     {
         $user_id   = !empty($user_id) ? $user_id : Session::get('user_id');
-        if(empty($user_id))
-        {
+        if (empty($user_id)) {
             return [];
         }
         // 开发者账号，显示所有菜单具有所有超级权限
-        if($user_id === 1)
-        {
+        if ($user_id === 1) {
             $data = $this->Menu->getMenuList();
-            foreach ($data as $key => $value)
-            {
+            foreach ($data as $key => $value) {
                 $data[$key]['permissions'] = 'super';
             }
             return $data;
         }
         // 依据开发模式自动选择是否启用户菜单缓存
         $user_menu_cache_key = 'User_Menu_Cache_Origin_key'.$user_id;
-        if(!Config::get('app.app_debug'))
-        {
+        if (!Config::get('app.app_debug')) {
             $user_menu = Cache::get($user_menu_cache_key);
-            if(!empty($user_menu))
-            {
+            if (!empty($user_menu)) {
                 return $user_menu;
             }
         }
         $user_menu = $this->RoleMenu->getRoleMenuListByUserId($user_id);
         // 将结果集缓存
-        if(!Config::get('app.app_debug'))
-        {
-            Cache::tag($this->cache_tag)->set($user_menu_cache_key,$user_menu,3600 * 12);//缓存12小时
+        if (!Config::get('app.app_debug')) {
+            Cache::tag($this->cache_tag)->set($user_menu_cache_key, $user_menu, 3600 * 12);//缓存12小时
         }
         return $user_menu;
     }
@@ -347,18 +320,15 @@ class AuthService
      * @param array $highLight 检测到的当前高亮菜单数组
      * @return array
      */
-    protected function setHighLight($UserAuthMenu = [],$highLight)
+    protected function setHighLight($UserAuthMenu = [], $highLight)
     {
-        if(empty($highLight))
-        {
+        if (empty($highLight)) {
             return $UserAuthMenu;
         }
         // 1级高亮
-        if($highLight['level'] == 1)
-        {
+        if ($highLight['level'] == 1) {
             foreach ($UserAuthMenu as $key => $value) {
-                if($value['id'] == $highLight['id'])
-                {
+                if ($value['id'] == $highLight['id']) {
                     $UserAuthMenu[$key]['menu_open'] = true;
                     $UserAuthMenu[$key]['active']    = true;
                 }
@@ -366,11 +336,9 @@ class AuthService
             return $UserAuthMenu;
         }
         // 2级高亮
-        if($highLight['level'] == 2)
-        {
+        if ($highLight['level'] == 2) {
             foreach ($UserAuthMenu as $key => $value) {
-                if($value['id'] == $highLight['parent_id'])
-                {
+                if ($value['id'] == $highLight['parent_id']) {
                     $UserAuthMenu[$key]['menu_open'] = true;
                     $UserAuthMenu[$key]['active']    = true;
                 }
@@ -378,19 +346,15 @@ class AuthService
             return $UserAuthMenu;
         }
         // 3级高亮
-        if($highLight['level'] == 3)
-        {
+        if ($highLight['level'] == 3) {
             foreach ($UserAuthMenu as $key1 => $value1) {
                 // 遍历二级
-                if(!empty($value1['children']))
-                {
+                if (!empty($value1['children'])) {
                     foreach ($value1['children'] as $key2 => $value2) {
                         // 遍历三级
-                        if(!empty($value2['children']))
-                        {
+                        if (!empty($value2['children'])) {
                             foreach ($value2['children'] as $key3 => $value3) {
-                                if($highLight['id'] == $value3['id'])
-                                {
+                                if ($highLight['id'] == $value3['id']) {
                                     // 1级
                                     $UserAuthMenu[$key1]['menu_open'] = true;
                                     $UserAuthMenu[$key1]['active']    = true;
@@ -416,6 +380,6 @@ class AuthService
     protected function generateRequestMenuUrl(Request $request)
     {
         $component = $request->module().'/'.$request->controller().'/'.$request->action();
-        return trim(Url::build($component,'',''),'/');
+        return trim(Url::build($component, '', ''), '/');
     }
 }

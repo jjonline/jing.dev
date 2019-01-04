@@ -162,7 +162,6 @@ class CommonController extends BasicController
      * 手机号查询相关地域信息
      * @param UtilService $utilService
      * @return mixed|\think\Response
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getAreaInfoByMobileAction(UtilService $utilService)
     {

@@ -8,7 +8,6 @@
 
 namespace app\manage\model;
 
-
 use think\Model;
 
 class User extends Model
@@ -24,12 +23,11 @@ class User extends Model
      */
     public function getUserById($id)
     {
-        if(empty($id))
-        {
+        if (empty($id)) {
             return [];
         }
         $data = $this->alias('user')
-            ->leftJoin('department department','department.id = user.dept_id')
+            ->leftJoin('department department', 'department.id = user.dept_id')
             ->where('user.id', $id)
             ->field(['user.*','department.name as dept_name'])
             ->find();
@@ -47,11 +45,10 @@ class User extends Model
      */
     public function getUserByUserName($user_name)
     {
-        if(empty($user_name))
-        {
+        if (empty($user_name)) {
             return [];
         }
-        $data = $this->where('user_name',$user_name)->find();
+        $data = $this->where('user_name', $user_name)->find();
         return !$data ? [] : $data->toArray();
     }
 }

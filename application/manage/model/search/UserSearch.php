@@ -33,8 +33,7 @@ class UserSearch extends BaseSearch
         // 3、leader菜单权限但不是领导只能看本部门下的子部门的会员数据
         $menu_auth = $user_info['menu_auth'];
         $dept_auth = $user_info['dept_auth'];
-        if(!in_array($menu_auth['permissions'],['super','leader']))
-        {
+        if (!in_array($menu_auth['permissions'], ['super','leader'])) {
             $this->pageError = '抱歉，您没有操作权限';
             return $this->handleResult();
         }
@@ -58,13 +57,12 @@ class UserSearch extends BaseSearch
                    'role.name as role_name',
                    'department.name as dept_name',
                ])
-               ->leftJoin('role role','role.id = user.role_id')
-               ->leftJoin('department department','department.id = user.dept_id');
+               ->leftJoin('role role', 'role.id = user.role_id')
+               ->leftJoin('department department', 'department.id = user.dept_id');
 
         // 如果是部门领导数据权限，限定只能查看该部门下的用户列表
-        if($menu_auth['permissions'] == 'leader')
-        {
-            $Query->where('user.dept_id','IN',$dept_auth['dept_id_vector']);
+        if ($menu_auth['permissions'] == 'leader') {
+            $Query->where('user.dept_id', 'IN', $dept_auth['dept_id_vector']);
         }
 
         /**
@@ -72,26 +70,25 @@ class UserSearch extends BaseSearch
          */
         // 关键词搜索--方法体内部自动判断$this->keyword是否有值并执行sql构造
         $search_columns = ['user.user_name', 'user.real_name', 'user.mobile', 'user.email', 'user.remark'];
-        $this->keywordSearch($Query,$search_columns,$this->keyword);
+        $this->keywordSearch($Query, $search_columns, $this->keyword);
 
         // 选择了部门
         $select_dept_id = $this->request->param('dept_id/i');
-        if(!empty($select_dept_id))
-        {
-            $Query->where('user.dept_id',$select_dept_id);
+        if (!empty($select_dept_id)) {
+            $Query->where('user.dept_id', $select_dept_id);
         }
 
         // 时间范围检索
-        $this->dateTimeSearch($Query,'user.create_time');
+        $this->dateTimeSearch($Query, 'user.create_time');
 
         // 克隆Query对象读取总记录数
         $countQuery       = clone $Query;
         $this->totalCount = $countQuery->count();
 
         // 字段排序以及没有排序的情况下设定一个默认排序字段
-        $this->orderBy($Query,'user');
+        $this->orderBy($Query, 'user');
         if ($Query->getOptions('order') === null) {
-            $Query->order('user.create_time','DESC');
+            $Query->order('user.create_time', 'DESC');
         }
 
         // 查询当前分页列表数据

@@ -67,8 +67,8 @@ class BaseController extends BaseAuthController
     protected function error($msg = '', $url = null, $data = '', $wait = 3, array $header = [])
     {
         $msg = $msg ? $msg : '系统错误';
-        $this->assign('title','系统错误');
-        $this->assign('msg',$msg);
+        $this->assign('title', '系统错误');
+        $this->assign('msg', $msg);
         // 关闭全局设定的模板布局功能
         $this->view->engine->layout(false);
         /**
@@ -90,25 +90,23 @@ class BaseController extends BaseAuthController
     public function _empty($name)
     {
         // Debug模式提示更具体一些 非debug模式仅提示404
-        if(Config::get('app_debug'))
-        {
+        if (Config::get('app_debug')) {
             $msg = '控制器【'.$this->request->controller().'】下的操作【'.$name.'】不存在';
-        }else {
+        } else {
             $msg = '请确认您访问的是有效的地址';
         }
 
         // 依据请求类型返回
-        if($this->request->isAjax())
-        {
+        if ($this->request->isAjax()) {
             // ajax响应 - http code 200
             return Response::create(['error_code' => 500,'error_msg' => $msg], 'json');
-        }else {
+        } else {
             // html输出响应
             $this->view->engine->layout(false);// 关闭全局设定的模板布局功能
             $response = app('response');
             $response->code(404);// http code 404
-            $this->assign('title','控制器下操作不存在');
-            $this->assign('msg',$msg);
+            $this->assign('title', '控制器下操作不存在');
+            $this->assign('msg', $msg);
             return $this->fetch('../application/common/view/error.html');
         }
     }

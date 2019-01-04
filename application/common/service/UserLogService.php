@@ -23,7 +23,7 @@ class UserLogService
      */
     public $IpLocationService;
 
-    public function __construct(UserLog $userLog,IpLocationService $ipLocationService)
+    public function __construct(UserLog $userLog, IpLocationService $ipLocationService)
     {
         $this->UserLog           = $userLog;
         $this->IpLocationService = $ipLocationService;
@@ -35,10 +35,9 @@ class UserLogService
      * @param array  $act_user_info 操作用户信息
      * @return false|int
      */
-    public function insert($title,$act_user_info)
+    public function insert($title, $act_user_info)
     {
-        if(empty($act_user_info))
-        {
+        if (empty($act_user_info)) {
             return false;
         }
         $request    = app('request');
@@ -69,6 +68,6 @@ class UserLogService
      */
     public function getLastTenItemByUserId($user_id)
     {
-        return $this->UserLog->getLimitListByUserId($user_id,10);
+        return $this->UserLog->getLimitListByUserId($user_id, 10);
     }
 }

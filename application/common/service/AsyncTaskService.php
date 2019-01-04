@@ -38,8 +38,7 @@ class AsyncTaskService
      */
     protected function connect()
     {
-        if(!extension_loaded('redis'))
-        {
+        if (!extension_loaded('redis')) {
             throw new Exception("need redis php extension.");
         }
 
@@ -50,9 +49,8 @@ class AsyncTaskService
         $socket  = Config::get('swoole.socket');
         $timeout = Config::get('swoole.timeout');
         // 依据配置选择tcp连接方式
-        if($host)
-        {
-            $this->Client->connect($host,$port,$timeout);
+        if ($host) {
+            $this->Client->connect($host, $port, $timeout);
         } else {
             $this->Client->connect($socket);
         }
@@ -69,9 +67,9 @@ class AsyncTaskService
      * @param int    $dept_id 用户所属部门ID
      * @return bool|string 任务投递成功返回任务ID（UUID形式），任务投递失败返回false
      */
-    public function delivery($task,array $task_data,$user_id = 0,$dept_id = 0)
+    public function delivery($task, array $task_data, $user_id = 0, $dept_id = 0)
     {
-        try{
+        try {
             // 将task即任务类名塞入task_data
             $id                         = GenerateHelper::uuid();// 任务ID
             $task_data['async_task_id'] = $id; // 异步class的execute方法的参数数组中可以拿到该值
@@ -92,15 +90,13 @@ class AsyncTaskService
             $this->AsyncTask->isUpdate(false)->save($async_task);
 
             // 链接异步服务器投递任务
-            if(empty($this->Client))
-            {
+            if (empty($this->Client)) {
                 $this->connect();
             }
-            $result = $this->Client->lPush($task,json_encode($data));
+            $result = $this->Client->lPush($task, json_encode($data));
 
             return $result !== false ? $id : false;
-
-        }catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             Log::record('投递异步任务失败：'.$e->getMessage().'['.json_encode($data).']');
             return false;
         }
@@ -118,11 +114,9 @@ class AsyncTaskService
     {
         $id   = $request->get('id/i');
         $data = $this->AsyncTask->getDetailById($id);
-        if(!empty($data) && !empty($data['result']))
-        {
+        if (!empty($data) && !empty($data['result'])) {
             $data['result'] = UtilHelper::nl2p($data['result']);
         }
         return ['error_code' => 0,'error_msg'=>'Success:请求成功','data'=>$data];
     }
-
 }

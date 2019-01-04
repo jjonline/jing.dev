@@ -8,7 +8,8 @@
 
 namespace app\common\helper;
 
-class MoneyConvertHelper {
+class MoneyConvertHelper
+{
 
     //大写数字
     private $NUMBER_STR = array(
@@ -55,8 +56,7 @@ class MoneyConvertHelper {
      */
     public static function toChineseCny($numberStr)
     {
-        if(empty(self::$_instance))
-        {
+        if (empty(self::$_instance)) {
             self::$_instance = new self();
         }
         return self::$_instance->convert($numberStr);
@@ -68,23 +68,28 @@ class MoneyConvertHelper {
      * @param	$numberStr	string	将要转换的小写数字金额
      * @return 	string
      */
-    public function convert($numberStr) {
+    public function convert($numberStr)
+    {
 
         //处理小数位为0
-        if(preg_match('/^[0-9]+\.[0]+$/',$numberStr))
+        if (preg_match('/^[0-9]+\.[0]+$/', $numberStr)) {
             $numberStr = intval($numberStr);
+        }
 
         //补齐类似.5这样的无整数位数字
-        if(substr($numberStr, 0, 1) == '.')
+        if (substr($numberStr, 0, 1) == '.') {
             number_format($numberStr);
+        }
 
         //如果带逗号分隔符的数字
-        if(strpos($numberStr, ','))
-            $numberStr = str_replace(",","",$numberStr);
+        if (strpos($numberStr, ',')) {
+            $numberStr = str_replace(",", "", $numberStr);
+        }
 
         //判断是否为数字
-        if (!is_numeric($numberStr))
+        if (!is_numeric($numberStr)) {
             return '不是有效的货币数值';
+        }
 
         //执行转换
         self::convertor($numberStr);
@@ -99,7 +104,8 @@ class MoneyConvertHelper {
      * @param 	$str string 需要转换的UTF-8字符串
      * @return 	string
      */
-    public function str_reverse($str) {
+    public function str_reverse($str)
+    {
         //判断输入的是不是utf8类型的字符，否则退出
         if (!is_string($str) || !mb_check_encoding($str, 'UTF-8')) {
             return '';
@@ -124,12 +130,13 @@ class MoneyConvertHelper {
      * @param	$numberStr	mixed 将要转换的小写数字金额
      * @return 	void
      */
-    private function convertor($numberStr){
+    private function convertor($numberStr)
+    {
         //分差整数与浮点位，整数和小数部分分开，分别进行转换
         $cutedNumber = explode('.', (string)$numberStr);
         //如果只有整数部分
         if (count($cutedNumber) == 1) {
-            self::convertInteger($numberStr, TRUE);
+            self::convertInteger($numberStr, true);
         } else {
             self::convertInteger($cutedNumber[0]);
             self::convertDecimal($cutedNumber[1]);
@@ -147,7 +154,8 @@ class MoneyConvertHelper {
      *
      * @return 	$this
      */
-    private function convertInteger($integer, $without_fractional = false) {
+    private function convertInteger($integer, $without_fractional = false)
+    {
         $resultString = null;
 
         for ($i = 0; $i < strlen($integer); $i++) {
@@ -165,8 +173,8 @@ class MoneyConvertHelper {
      * @param	$integer float 将要转换的小数点后三位部分
      * @return 	$this
      */
-    private function convertDecimal($decimal) {
-
+    private function convertDecimal($decimal)
+    {
         $resultString = null;
 
         for ($i = 0; $i < strlen($decimal); $i++) {
@@ -181,7 +189,8 @@ class MoneyConvertHelper {
      * ------------------------------------------------------------------
      * @return 	$this
      */
-    private function removeZero() {
+    private function removeZero()
+    {
         while (strpos($this->resultString, "零拾") || strpos($this->resultString, "零佰") || strpos($this->resultString, "零仟") || strpos($this->resultString, "零万") || strpos($this->resultString, "零亿") || strpos($this->resultString, "零角") || strpos($this->resultString, "零分") || strpos($this->resultString, "零厘") || strpos($this->resultString, "零零") || strpos($this->resultString, "亿万") || strpos($this->resultString, "零元")) {
             $this->resultString = str_replace("零拾", "零", $this->resultString);
             $this->resultString = str_replace("零佰", "零", $this->resultString);

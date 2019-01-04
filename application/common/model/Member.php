@@ -23,8 +23,7 @@ class Member extends Model
      */
     public function getMemberInfoById($member_id)
     {
-        if(empty($member_id))
-        {
+        if (empty($member_id)) {
             return [];
         }
         $data = $this->find($member_id);
@@ -41,11 +40,10 @@ class Member extends Model
      */
     public function getMemberInfoByUserName($user_name)
     {
-        if(empty($user_name))
-        {
+        if (empty($user_name)) {
             return [];
         }
-        $data = $this->where('user_name',$user_name)->find();
+        $data = $this->where('user_name', $user_name)->find();
         return $data ? $data->toArray() : [];
     }
 
@@ -59,8 +57,7 @@ class Member extends Model
      */
     public function getMemberInfoByEmail($email)
     {
-        if(empty($email))
-        {
+        if (empty($email)) {
             return [];
         }
         $data = $this->find(['email' => $email]);
@@ -77,8 +74,7 @@ class Member extends Model
      */
     public function getMemberInfoByMobile($mobile)
     {
-        if(empty($mobile))
-        {
+        if (empty($mobile)) {
             return [];
         }
         $data = $this->find(['mobile' => $mobile]);
@@ -95,12 +91,10 @@ class Member extends Model
      */
     public function getUserInfoAutoByUniqueKey($user_unique_key_field_value)
     {
-        if(FilterValidHelper::is_mail_valid($user_unique_key_field_value))
-        {
+        if (FilterValidHelper::is_mail_valid($user_unique_key_field_value)) {
             return $this->getMemberInfoByEmail($user_unique_key_field_value);
         }
-        if(FilterValidHelper::is_phone_valid($user_unique_key_field_value))
-        {
+        if (FilterValidHelper::is_phone_valid($user_unique_key_field_value)) {
             return $this->getMemberInfoByMobile($user_unique_key_field_value);
         }
         return $this->getMemberInfoByUserName($user_unique_key_field_value);

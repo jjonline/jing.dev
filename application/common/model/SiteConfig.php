@@ -24,11 +24,10 @@ class SiteConfig extends Model
      */
     public function getSiteConfigById($id)
     {
-        if(empty($id))
-        {
+        if (empty($id)) {
             return [];
         }
-        $data = $this->where('id',$id)->find();
+        $data = $this->where('id', $id)->find();
         return empty($data) ? [] : $data->toArray();
     }
 
@@ -55,11 +54,10 @@ class SiteConfig extends Model
      */
     public function getSiteConfigByKey($key)
     {
-        if(empty($key))
-        {
+        if (empty($key)) {
             return [];
         }
-        $data = $this->where('key',$key)->find();
+        $data = $this->where('key', $key)->find();
         return empty($data) ? [] : $data->toArray();
     }
 
@@ -69,13 +67,12 @@ class SiteConfig extends Model
      * @param mixed  $default_val
      * @return mixed
      */
-    public function getSitConfigValueByKey($key,$default_val = null)
+    public function getSitConfigValueByKey($key, $default_val = null)
     {
-        if(empty($key))
-        {
+        if (empty($key)) {
             return $default_val;
         }
-        $value = $this->where('key',$key)->value('value');
+        $value = $this->where('key', $key)->value('value');
         return is_null($value) ? $default_val : $value;
     }
 }

@@ -8,13 +8,15 @@
 
 namespace app\common\helper;
 
-class DatetimeHelper {
+class DatetimeHelper
+{
 
     /**
      * 获取日期字符串
      * @param string $input 完整时间字符串
      */
-    public static function getDate($input, $max = null, $min = null) {
+    public static function getDate($input, $max = null, $min = null)
+    {
         if (empty($input)) {
             return '';
         } else {
@@ -41,7 +43,8 @@ class DatetimeHelper {
     /**
      * 根据时间戳获取时间字符串
      */
-    public static function formatTime($time, $timezone = 'PRC') {
+    public static function formatTime($time, $timezone = 'PRC')
+    {
         date_default_timezone_set($timezone);
         return date('Y-m-d H:i:s', $time);
     }
@@ -49,7 +52,8 @@ class DatetimeHelper {
     /**
      * 获取x个小时后的整点时间
      */
-    public static function getRelativeWholeTimeByHours($time, $hours) {
+    public static function getRelativeWholeTimeByHours($time, $hours)
+    {
         if (strtotime(date("Y-m-d H", $time) . ":00:00") == $time) {
             return strtotime("+{$hours} hours", $time);
         } else {
@@ -64,7 +68,8 @@ class DatetimeHelper {
      * @param string $timezone 时区
      * @return bool|string
      */
-    public static function now($timezone = 'PRC') {
+    public static function now($timezone = 'PRC')
+    {
         date_default_timezone_set($timezone);
         return date('Y-m-d H:i:s', time());
     }
@@ -74,7 +79,8 @@ class DatetimeHelper {
      * @param string $timezone 时区
      * @return bool|string
      */
-    public static function today($timezone = 'PRC') {
+    public static function today($timezone = 'PRC')
+    {
         date_default_timezone_set($timezone);
         return date('Y-m-d', time());
     }
@@ -86,7 +92,8 @@ class DatetimeHelper {
      * @param string $num 正负月份数
      * @return array
      */
-    public static function getYearMonthByYmn($year, $month, $num = '+1') {
+    public static function getYearMonthByYmn($year, $month, $num = '+1')
+    {
         $date   = date('Y-m', strtotime("{$num} month", strtotime("{$year}-{$month}")));
         $result = explode('-', $date);
         return [
@@ -99,7 +106,8 @@ class DatetimeHelper {
      * 返回最近的5号日期
      * @return bool|string
      */
-    public static function nearest5th() {
+    public static function nearest5th()
+    {
         $time = time();
         return date('j', $time) <= 5 ? date('Y-m', $time) . '-05 00:00:00' : date('Y-m-d H:i:s', strtotime('+1 month', strtotime(date('Y-m', $time) . '-05 00:00:00')));
     }
@@ -108,7 +116,8 @@ class DatetimeHelper {
      * 返回当月5号
      * @return bool|string
      */
-    public static function fifthDayOfAMonth() {
+    public static function fifthDayOfAMonth()
+    {
         return date('Y-m-05 00:00:00');
     }
 
@@ -117,7 +126,8 @@ class DatetimeHelper {
      * @param string $format N时7为周日，w时0为周日
      * @return string
      */
-    public static function formatDateN($val, $format = 'N') {
+    public static function formatDateN($val, $format = 'N')
+    {
         $num = ($format === 'N') ? 7 : 0;
         switch ($val) {
             case 1:
@@ -144,7 +154,8 @@ class DatetimeHelper {
      * @param string $day2 可主啊喂linux时间戳的结束时间字符串
      * @return number
      */
-    public static function durationDays($day1, $day2) {
+    public static function durationDays($day1, $day2)
+    {
         $second1 = strtotime(date('Y-m-d', strtotime($day1)));
         $second2 = strtotime(date('Y-m-d', strtotime($day2)));
         return abs(intval(($second1 - $second2) / 86400)) + 1;
@@ -155,7 +166,8 @@ class DatetimeHelper {
      * @param string $date
      * @return array
      */
-    public static function getYearMonthByDate($date) {
+    public static function getYearMonthByDate($date)
+    {
         $time = strtotime($date);
         return [
             'y' => date('Y', $time),
@@ -175,13 +187,15 @@ class DatetimeHelper {
         return $d && $d->format($format) == $date;
     }
     
-    public static function getYearMonthStr($date, $timezone = 'PRC') {
+    public static function getYearMonthStr($date, $timezone = 'PRC')
+    {
         date_default_timezone_set($timezone);
         $time = strtotime($date);
         return date('Y-m', $time);
     }
 
-    public static function getDurationByMonth($yearMonth) {
+    public static function getDurationByMonth($yearMonth)
+    {
         $begin_date = $yearMonth . '-01';
         $end_date   = date('Y-m-d', (strtotime('-1 day', (strtotime("+1 months", (strtotime($yearMonth . '-01')))))));
         
@@ -219,7 +233,8 @@ class DatetimeHelper {
      * @param string $date2 日期
      * @return bool|string 日期格式错误将返回false
      */
-    public static function diffDays($date1, $date2) {
+    public static function diffDays($date1, $date2)
+    {
         $second1 = strtotime($date1);
         $second2 = strtotime($date2);
         if ($second1 === false || $second2 === false) {
@@ -270,22 +285,23 @@ class DatetimeHelper {
      * @param bool $isTimestamp 是否输出时间戳，否则输出具体日期时间
      * @return bool|int|string
      */
-    public static function getNextWeekTime($datetime, $toWeek, $toTime, $isTimestamp = true){
+    public static function getNextWeekTime($datetime, $toWeek, $toTime, $isTimestamp = true)
+    {
         $timestamp = strtotime($datetime);
         $w = date('w', $timestamp);
-        if($toWeek < 0 || $toWeek > 6){
+        if ($toWeek < 0 || $toWeek > 6) {
             return false;
         }
-        if($w == $toWeek){
+        if ($w == $toWeek) {
             $date = date('Y-m-d', $timestamp);
             $toTimestamp = strtotime("{$date} {$toTime}");
-            if($timestamp < $toTimestamp){
+            if ($timestamp < $toTimestamp) {
                 return $isTimestamp ? $toTimestamp : "{$date} {$toTime}";
-            }else{
+            } else {
                 $afterTime = strtotime('+7 days', $timestamp);
                 return $isTimestamp ? $afterTime : date("Y-m-d {$toTime}", $afterTime);
             }
-        }else{
+        } else {
             $addDay = $w < $toWeek ? $toWeek - $w : 7 - $w + $toWeek;
             $afterTime = strtotime("+{$addDay} days", $timestamp);
             return $isTimestamp ? $afterTime : date("Y-m-d {$toTime}", $afterTime);
@@ -297,17 +313,19 @@ class DatetimeHelper {
      * @param $birthday
      * @return bool|int
      */
-    public static function getAge($birthday){
+    public static function getAge($birthday)
+    {
         $age = strtotime($birthday);
-        if($age === false){
+        if ($age === false) {
             return false;
         }
-        list($y1,$m1,$d1) = explode("-",date("Y-m-d", $age));
+        list($y1, $m1, $d1) = explode("-", date("Y-m-d", $age));
         $now = strtotime("now");
-        list($y2,$m2,$d2) = explode("-",date("Y-m-d", $now));
+        list($y2, $m2, $d2) = explode("-", date("Y-m-d", $now));
         $age = $y2 - $y1;
-        if((int)($m2 . $d2) < (int)($m1 . $d1))
+        if ((int)($m2 . $d2) < (int)($m1 . $d1)) {
             $age -= 1;
+        }
         return $age;
     }
 
@@ -316,7 +334,8 @@ class DatetimeHelper {
      * @param $birthday
      * @return bool|string
      */
-    public static function getOccupation($birthday){
+    public static function getOccupation($birthday)
+    {
         $signs = array( array('20' => '宝瓶座'), array('19' => '双鱼座'), array('21' => '白羊座'), array('20' => '金牛座'), array('21' => '双子座'), array('22' => '巨蟹座'), array('23' => '狮子座'), array('23' => '处女座'), array('23' => '天秤座'), array('24' => '天蝎座'), array('22' => '射手座'), array('22' => '摩羯座'));
         $age = strtotime($birthday);
         if ($age === false) {
@@ -343,16 +362,17 @@ class DatetimeHelper {
      * @param $endDate2
      * @return bool|int|string
      */
-    public static function intersectDays($beginDate1, $endDate1, $beginDate2, $endDate2){
-        if(empty($beginDate1) || empty($endDate1)  || empty($beginDate2)  || empty($endDate2) || $beginDate1 >= $endDate1 || $beginDate2 >= $endDate2){
+    public static function intersectDays($beginDate1, $endDate1, $beginDate2, $endDate2)
+    {
+        if (empty($beginDate1) || empty($endDate1)  || empty($beginDate2)  || empty($endDate2) || $beginDate1 >= $endDate1 || $beginDate2 >= $endDate2) {
             return false;
         }
 
         $days = 0;
-        if($beginDate1 < $beginDate2 && $endDate1 >= $beginDate2){
+        if ($beginDate1 < $beginDate2 && $endDate1 >= $beginDate2) {
             $endDate = min($endDate1, $endDate2);
             $days = static::diffDays($beginDate2, $endDate);
-        }elseif($beginDate1 >= $beginDate2 && $beginDate1 <= $endDate2){
+        } elseif ($beginDate1 >= $beginDate2 && $beginDate1 <= $endDate2) {
             $endDate = min($endDate1, $endDate2);
             $days = static::diffDays($beginDate1, $endDate);
         }
@@ -368,7 +388,7 @@ class DatetimeHelper {
     {
         $time = empty($time) ? 'now' : $time;
         $week = ['日','一','二','三','四','五','六'];
-        $key  = date('w',strtotime($time));
+        $key  = date('w', strtotime($time));
         return '星期'.$week[$key];
     }
 
@@ -382,15 +402,13 @@ class DatetimeHelper {
     {
         $begin_time = strtotime($day1);
         $end_time   = strtotime($day2);
-        if($begin_time > $end_time)
-        {
+        if ($begin_time > $end_time) {
             return [];
         }
         $duration   = self::durationDays($day1, $day2);
         $period_arr = [];
-        for ($i = 0;$i < $duration;$i++)
-        {
-            $period_arr[] = date('Y-m-d',$begin_time + 86400 * $i);
+        for ($i = 0;$i < $duration;$i++) {
+            $period_arr[] = date('Y-m-d', $begin_time + 86400 * $i);
         }
         return $period_arr;
     }
@@ -403,7 +421,7 @@ class DatetimeHelper {
     {
         return [
             date('Y-m-d 00:00:00'),
-            date('Y-m-d 00:00:00',strtotime('+1 days'))
+            date('Y-m-d 00:00:00', strtotime('+1 days'))
         ];
     }
 
@@ -413,7 +431,7 @@ class DatetimeHelper {
      */
     public static function getTodayRemainingSeconds()
     {
-        $tomorrow_begin = strtotime(date('Y-m-d',strtotime('+1 days')));
+        $tomorrow_begin = strtotime(date('Y-m-d', strtotime('+1 days')));
         $now            = time();
         return $tomorrow_begin - $now;
     }

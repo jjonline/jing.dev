@@ -8,7 +8,6 @@
 
 namespace app\common\helper;
 
-
 class TreeHelper
 {
     /**
@@ -16,15 +15,13 @@ class TreeHelper
      * @param int $paren_id 需要查找所有子节点
      * @return array|mixed
      */
-    public static function child($arr,$paren_id)
+    public static function child($arr, $paren_id)
     {
         // $child = [];
-        foreach ($arr as $key => $value)
-        {
-            if($value['parent_id'] == $paren_id)
-            {
+        foreach ($arr as $key => $value) {
+            if ($value['parent_id'] == $paren_id) {
                 $child[$value['id']] = $value;
-                $child              += self::child($arr,$value['id']);
+                $child              += self::child($arr, $value['id']);
             }
         }
         return isset($child) ? $child : [];
@@ -36,20 +33,17 @@ class TreeHelper
      * @param $cols
      * @return mixed
      */
-    public static function sort($arr,$cols)
+    public static function sort($arr, $cols)
     {
         //子分类排序
         $sort = [];
-        foreach ($arr as $k => &$v)
-        {
-            if(!empty($v['children']))
-            {
+        foreach ($arr as $k => &$v) {
+            if (!empty($v['children'])) {
                 $v['children'] = self::sort($v['children'], $cols);
             }
             $sort[$k] = $v[$cols];
         }
-        if (!empty($sort))
-        {
+        if (!empty($sort)) {
             array_multisort($sort, SORT_DESC, $arr);
         }
         return $arr;
@@ -61,13 +55,12 @@ class TreeHelper
      * @param int $parent_id 默认0表示按parent_id字段来处理，传值则只获取该父ID指定的单棵树
      * @return array
      */
-    public static function hTree($arr,$parent_id = 0)
+    public static function hTree($arr, $parent_id = 0)
     {
-        foreach($arr as $k => $v)
-        {
-            if($v['parent_id'] == $parent_id){
+        foreach ($arr as $k => $v) {
+            if ($v['parent_id'] == $parent_id) {
                 $data[$v['id']]        = $v;
-                $data[$v['id']]['children'] = self::hTree($arr,$v['id']);
+                $data[$v['id']]['children'] = self::hTree($arr, $v['id']);
             }
         }
         return isset($data) ? $data : array();
@@ -79,13 +72,12 @@ class TreeHelper
      * @param int $parent_id 默认0表示按parent_id字段来处理，传值则只获取该父ID指定的单棵树
      * @return array|mixed
      */
-    public static function vTree($arr,$parent_id = 0)
+    public static function vTree($arr, $parent_id = 0)
     {
-        foreach($arr as $k => $v)
-        {
-            if($v['parent_id'] == $parent_id){
+        foreach ($arr as $k => $v) {
+            if ($v['parent_id'] == $parent_id) {
                 $data[$v['id']] = $v;
-                $data += self::vTree($arr,$v['id']);
+                $data += self::vTree($arr, $v['id']);
             }
         }
         return isset($data) ? $data : array();

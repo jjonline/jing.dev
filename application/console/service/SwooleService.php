@@ -29,25 +29,23 @@ class SwooleService
      * @param Server $server
      * @param $worker_id
      */
-    public function onWorkerStart(Server $server,$worker_id)
+    public function onWorkerStart(Server $server, $worker_id)
     {
         // global $argv;
         $this->Output = new Output();
         // 仅Worker进程可调用task方法 <--> worker进程传递任务给task进程
-        if(!$server->taskworker)
-        {
+        if (!$server->taskworker) {
             // 读取可能存在的未执行的任务
             try {
                 $AsyncTaskModel   = new AsyncTask();
                 $unExecuted_tasks = $AsyncTaskModel->getUnExecutedTasks();
 
-                foreach ($unExecuted_tasks as $key => $value)
-                {
+                foreach ($unExecuted_tasks as $key => $value) {
                     // 往任务进程塞任务，先构造redis链表List传参的参数结构
                     $param0 = $value['task'];
                     $param1 = [
                         'task' => $value['task'],
-                        'data' => json_decode($value['task_data'],true)
+                        'data' => json_decode($value['task_data'], true)
                     ];
                     $task_data = [$param0, json_encode($param1)];
                     $server->task($task_data);
@@ -57,7 +55,7 @@ class SwooleService
 
                 // 手动清理模型对象
                 unset($AsyncTaskModel);
-            }catch (\Throwable $e) {
+            } catch (\Throwable $e) {
                 $this->log('初始化启动服务器时读取上次未执行完的任务出错：'.$e->getMessage());
             }
         }
@@ -68,7 +66,7 @@ class SwooleService
      * @param Server $server
      * @param $fd
      */
-    public function onConnect(Server $server,$fd)
+    public function onConnect(Server $server, $fd)
     {
         $this->log($fd.' link connected,worker_id='.$server->worker_id);
     }
@@ -93,12 +91,11 @@ class SwooleService
             1 => '任务参数，是一个json字符串，对redis来说就是LIst列表中的值'
         ]
         */
-        try{
+        try {
             // 处理任务参数
-            $task_data = json_decode($data[1],true);
-            if(empty($task_data) || empty($task_data['task']) || empty($task_data['data']))
-            {
-                throw  new Exception('任务传递的参数缺失或错误:'.json_encode($data,JSON_UNESCAPED_UNICODE));
+            $task_data = json_decode($data[1], true);
+            if (empty($task_data) || empty($task_data['task']) || empty($task_data['data'])) {
+                throw  new Exception('任务传递的参数缺失或错误:'.json_encode($data, JSON_UNESCAPED_UNICODE));
             }
 
             // 实例化任务对象类
@@ -115,8 +112,7 @@ class SwooleService
 
             // 清理实例化对象
             Container::remove($task_class);
-
-        }catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             $this->log('任务执行抛出异常：'.$e->getMessage());
         }
         return 'ok';
@@ -154,6 +150,7 @@ class SwooleService
             // 防止输出抛出异常终止进程
             $this->Output->writeln($str);
             Log::record($str);
-        }catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
     }
 }

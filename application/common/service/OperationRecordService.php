@@ -28,7 +28,7 @@ class OperationRecordService
      */
     public $User;
 
-    public function __construct(OperationRecord $operationRecord , User $user)
+    public function __construct(OperationRecord $operationRecord, User $user)
     {
         $this->User            = $user;
         $this->OperationRecord = $operationRecord;
@@ -40,13 +40,11 @@ class OperationRecordService
      * @param int    $business_id  具体的业务ID
      * @param string $order        获取记录的排序规则，默认按时间降序排列DESC，可传ASC升序
      * @return array
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getOperationRecordList($operate_name,$business_id,$order = 'DESC')
+    public function getOperationRecordList($operate_name, $business_id, $order = 'DESC')
     {
-        return $this->OperationRecord->getOperationRecordList($operate_name,$business_id,$order);
+        return $this->OperationRecord->getOperationRecordList($operate_name, $business_id, $order);
     }
 
     /**
@@ -59,28 +57,23 @@ class OperationRecordService
      * @return bool
      * @throws Exception
      */
-    public function save($operation_name,$business_id,$title,$desc,$operate_user_id = null)
+    public function save($operation_name, $business_id, $title, $desc, $operate_user_id = null)
     {
-        if(empty($operation_name) || empty($business_id) || empty($title) || empty($desc))
-        {
+        if (empty($operation_name) || empty($business_id) || empty($title) || empty($desc)) {
             throw new Exception('参数错误：第1个参数操作流程标识，第2个参数业务ID，第3个参数业务标题，第4个参数业务描述');
         }
-        if(!empty($operate_user_id))
-        {
+        if (!empty($operate_user_id)) {
             $user = $this->User->getFullUserInfoById($operate_user_id);
-            if(empty($user))
-            {
+            if (empty($user)) {
                 throw new Exception('第5个参数指定的用户ID标识的用户不存在');
             }
-        }else {
+        } else {
             $user = Session::get('user_info');
         }
-        if(mb_strlen($operation_name,'utf-8') > 64)
-        {
+        if (mb_strlen($operation_name, 'utf-8') > 64) {
             throw new Exception('第1个参数操作简要标题不得操作64字');
         }
-        if(mb_strlen($desc,'utf-8') > 512)
-        {
+        if (mb_strlen($desc, 'utf-8') > 512) {
             throw new Exception('第4个参数操作流程的说明不得大于512字');
         }
         // 构造记录数组
@@ -98,5 +91,4 @@ class OperationRecordService
 
         return !!$ret;
     }
-
 }

@@ -25,8 +25,8 @@ class RoleMenu extends Model
     public function getRoleMenuListByRoleId($role_id)
     {
         $data = Db::name('menu menu')
-              ->join('role_menu role_menu','menu.id = role_menu.menu_id')
-              ->where('role_menu.role_id',$role_id)
+              ->join('role_menu role_menu', 'menu.id = role_menu.menu_id')
+              ->where('role_menu.role_id', $role_id)
               ->field(['menu.*','role_menu.permissions as permissions'])
               ->order(['menu.sort' => 'ASC','menu.level' => 'ASC'])
               ->select();
@@ -44,9 +44,9 @@ class RoleMenu extends Model
     public function getRoleMenuListByUserId($user_id)
     {
         $data = Db::name('menu menu')
-              ->join('role_menu role_menu','menu.id = role_menu.menu_id')
-              ->join('user user','user.role_id = role_menu.role_id')
-              ->where('user.id',$user_id)
+              ->join('role_menu role_menu', 'menu.id = role_menu.menu_id')
+              ->join('user user', 'user.role_id = role_menu.role_id')
+              ->where('user.id', $user_id)
               ->field(['menu.*','role_menu.permissions as permissions'])
               ->order(['menu.sort' => 'ASC','menu.level' => 'ASC'])
               ->select();

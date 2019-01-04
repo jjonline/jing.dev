@@ -22,8 +22,8 @@ class AsyncTask extends Model
      */
     public function getUnExecutedTasks()
     {
-        $data = $this->where('task_status','IN',[0,1])
-              ->order('create_time','DESC')
+        $data = $this->where('task_status', 'IN', [0,1])
+              ->order('create_time', 'DESC')
               ->select();
         return $data->isEmpty() ? [] : $data->toArray();
     }
@@ -38,8 +38,7 @@ class AsyncTask extends Model
      */
     public function getDetailById($id)
     {
-        if(empty($id))
-        {
+        if (empty($id)) {
             return [];
         }
         $data = $this->alias('async_task')
@@ -48,9 +47,9 @@ class AsyncTask extends Model
                 'user.real_name',
                 'dept.name as dept_name'
             ])
-            ->where('async_task.id',$id)
-            ->leftJoin('user user','user.id = async_task.user_id')
-            ->leftJoin('department dept','dept.id = async_task.dept_id')
+            ->where('async_task.id', $id)
+            ->leftJoin('user user', 'user.id = async_task.user_id')
+            ->leftJoin('department dept', 'dept.id = async_task.dept_id')
             ->find();
         return empty($data) ? [] : $data->toArray();
     }

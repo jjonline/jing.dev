@@ -8,7 +8,6 @@
 
 namespace app\common\helper;
 
-
 class GenerateHelper
 {
 
@@ -93,11 +92,10 @@ class GenerateHelper
      * @param bool $except_str 是否去除易混淆的字符oOLl和数字01，默认不去除
      * @return string
      */
-    public static function makeNonceStr($length = 32,$except_str = false)
+    public static function makeNonceStr($length = 32, $except_str = false)
     {
         $chars  = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        if($except_str)
-        {
+        if ($except_str) {
             // 默认去掉了容易混淆的字符oOLl和数字01，要添加请使用addChars参数
             $chars  = 'ABCDEFGHIJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
         }
@@ -118,18 +116,15 @@ class GenerateHelper
     {
         $sn         = uniqid('', true);
         $sn_array   = explode('.', $sn);
-        if(count($sn_array) == 2)
-        {
+        if (count($sn_array) == 2) {
             $rand_number = str_split($sn_array[1]);
-            foreach ($rand_number as $key => $value)
-            {
-                if(mt_rand(0,1))
-                {
-                    $rand_number[$key] = chr($value + mt_rand(65,81));
+            foreach ($rand_number as $key => $value) {
+                if (mt_rand(0, 1)) {
+                    $rand_number[$key] = chr($value + mt_rand(65, 81));
                 }
             }
-            return $prefix.strtoupper($sn_array[0].implode('',$rand_number));
+            return $prefix.strtoupper($sn_array[0].implode('', $rand_number));
         }
-        return $prefix.strtoupper(str_replace('.','',$sn));
+        return $prefix.strtoupper(str_replace('.', '', $sn));
     }
 }

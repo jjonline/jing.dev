@@ -35,13 +35,15 @@ class init extends Command
     protected function execute(Input $input, Output $output)
     {
         $env = strtolower($input->getOption('env'));
-        if(empty($env) || !in_array($env,['dev','test','beta']))
-        {
+        if (empty($env) || !in_array($env, ['dev','test','beta'])) {
             throw new Exception("Usage:`php think init --env=dev` init development Environments");
         }
         $project_dir = realpath(__DIR__.'/../../../');
-        $this->circleCopyFile($project_dir.'/environments/'.$env,
-                                  $project_dir.'/config',$output);
+        $this->circleCopyFile(
+            $project_dir.'/environments/'.$env,
+                                  $project_dir.'/config',
+            $output
+        );
         $output->writeln("<info>Init Finish.<info>");
     }
 
@@ -51,34 +53,29 @@ class init extends Command
      * @param $target
      * @param Output $output
      */
-    protected function circleCopyFile($destination,$target, Output $output)
+    protected function circleCopyFile($destination, $target, Output $output)
     {
         $destination = rtrim($destination, '/') . '/';
         $target      = rtrim($target, '/') . '/';
         $iterator    = new \DirectoryIterator($destination);
-        while($iterator->valid())
-        {
+        while ($iterator->valid()) {
             // 文件
-            if($iterator->isFile() && $iterator->getExtension() == 'php')
-            {
+            if ($iterator->isFile() && $iterator->getExtension() == 'php') {
                 $destination_file = $destination.$iterator->getFilename();
                 $target_file      = $target.$iterator->getFilename();
-                $result           = copy($destination_file,$target_file);
-                if($result)
-                {
+                $result           = copy($destination_file, $target_file);
+                if ($result) {
                     $output->writeln('<info>Copy File:'.$iterator->getFilename().'</info>');
                 }
             }
             // 目录
-            if($iterator->isDir() && !$iterator->isDot())
-            {
+            if ($iterator->isDir() && !$iterator->isDot()) {
                 $_target = $target.$iterator->getFilename();
                 // 目录不存在，新建目录
-                if(!file_exists($_target))
-                {
+                if (!file_exists($_target)) {
                     mkdir($_target);
                 }
-                $this->circleCopyFile($destination.$iterator->getFilename(),$_target,$output);
+                $this->circleCopyFile($destination.$iterator->getFilename(), $_target, $output);
             }
             $iterator->next();
         }

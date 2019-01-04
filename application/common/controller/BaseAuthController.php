@@ -21,7 +21,6 @@ use think\exception\HttpResponseException;
 use think\Response;
 use think\facade\Session;
 
-
 class BaseAuthController extends BasicController
 {
     /**
@@ -56,35 +55,30 @@ class BaseAuthController extends BasicController
          * @var [] 不需要登录状态即可渲染的控制器和不需要验证权限的公共ajax控制器，所有模块下的site、common两个控制器不做菜单权限检查和登录效验
          */
         $except_controller = ['site','common'];
-        if(in_array(strtolower($this->request->controller()),$except_controller))
-        {
+        if (in_array(strtolower($this->request->controller()), $except_controller)) {
             return true;
         }
         // 检查是否登录
-        if(!$this->isUserLogin())
-        {
+        if (!$this->isUserLogin()) {
             // ajax请求返回json 非ajax跳转至登录页面
-            if($this->request->isAjax())
-            {
+            if ($this->request->isAjax()) {
                 $response = Response::create(['error_code' => -1,'error_msg' => '您尚未登录，请保留好编辑的内容后刷新页面~'], 'json');
                 //抛出异常并输出，终止后续业务代码执行
                 throw new HttpResponseException($response);
-            }else {
+            } else {
                 //跳转隐式抛出异常，终止后续业务代码执行
                 $this->redirect('site/login');
             }
         }
         // 检查权限
-        if(!$this->AuthService->userHasPermission())
-        {
+        if (!$this->AuthService->userHasPermission()) {
             $response = app('response');//读取单例
             $response->code(404);
             $this->view->engine->layout(false);//关闭layout 防止死循环
-            if($this->request->isAjax())
-            {
+            if ($this->request->isAjax()) {
                 $response = Response::create(['error_code' => -1,'error_msg' => '没有操作权限'], 'json');
-            }else {
-                $error = $this->fetch('../application/common/view/error.html',[
+            } else {
+                $error = $this->fetch('../application/common/view/error.html', [
                     'title' => '没有操作权限',
                     'msg'   => '抱歉，您没有操作该页面的权限！'
                 ]);
@@ -98,11 +92,11 @@ class BaseAuthController extends BasicController
         // 当前菜单权限的一些信息
         $this->UserInfo['menu_auth'] = $this->AuthService->getUserSingleMenuInfo();
         // 会员可操作的部门列表信息
-        $this->UserInfo['dept_auth'] = $this->DepartmentService->getAuthDeptInfoByDeptId($this->UserInfo['dept_id'],$this->UserInfo['is_leader']);
+        $this->UserInfo['dept_auth'] = $this->DepartmentService->getAuthDeptInfoByDeptId($this->UserInfo['dept_id'], $this->UserInfo['is_leader']);
         // 获取管理菜单
         $UserAuthMenu                = $this->AuthService->getUserAuthMenu();
         // 输出管理菜单
-        $this->assign('UserAuthMenu',$UserAuthMenu);
+        $this->assign('UserAuthMenu', $UserAuthMenu);
     }
 
     /**

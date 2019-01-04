@@ -45,12 +45,13 @@ class RoleService
      */
     public $cache_tag = 'auth';
 
-    public function __construct(Role $role ,
-                                User $user ,
-                                Menu $menu ,
-                                RoleMenu $roleMenu ,
-                                LogService $logService)
-    {
+    public function __construct(
+        Role $role,
+        User $user,
+        Menu $menu,
+        RoleMenu $roleMenu,
+        LogService $logService
+    ) {
         $this->Role       = $role;
         $this->Menu       = $menu;
         $this->RoleMenu   = $roleMenu;
@@ -71,18 +72,15 @@ class RoleService
     {
         // 未传角色ID则读取当前登录用户的role_id
         $user_info = Session::get('user_info');
-        if(empty($role_id) && empty($user_info))
-        {
+        if (empty($role_id) && empty($user_info)) {
             throw new Exception('用户未登录且未传参数role_id');
         }
-        if(!empty($user_info) && $user_info['id'] == 1 && empty($role_id))
-        {
+        if (!empty($user_info) && $user_info['id'] == 1 && empty($role_id)) {
             // 超级管理员所有菜单权限
             $menu = $this->Menu->getMenuList();
-        }else{
+        } else {
             // 普通管理员按角色权限分配进行读取
-            if(empty($role_id))
-            {
+            if (empty($role_id)) {
                 $role_id = $user_info['role_id'];
             }
             $menu = $this->RoleMenu->getRoleMenuListByRoleId($role_id);
@@ -93,8 +91,7 @@ class RoleService
         $menu3 = [];
         foreach ($menu as $key => $value) {
             // 超级管理员补充菜单权限标记
-            if(!isset($menu[$key]['permissions']))
-            {
+            if (!isset($menu[$key]['permissions'])) {
                 $value['permissions'] = 'super';
             }
             // 仅处理三级菜单
@@ -112,25 +109,20 @@ class RoleService
         }
         // 按层级处理菜单数组--仅到3级
         $_menu = [];
-        foreach ($menu1 as $key1 => $value1)
-        {
+        foreach ($menu1 as $key1 => $value1) {
             // 二级菜单
             $_menu2 = [];
-            foreach ($menu2 as $key2 => $value2)
-            {
+            foreach ($menu2 as $key2 => $value2) {
                 // 三级菜单
                 $_menu3 = [];
-                foreach ($menu3 as $key3 => $value3)
-                {
-                    if($value2['id'] == $value3['parent_id'])
-                    {
+                foreach ($menu3 as $key3 => $value3) {
+                    if ($value2['id'] == $value3['parent_id']) {
                         $_menu3[] = $value3;
                     }
                 }
                 $value2['children'] = $_menu3;
 
-                if($value1['id'] == $value2['parent_id'])
-                {
+                if ($value1['id'] == $value2['parent_id']) {
                     $_menu2[] = $value2;
                 }
             }
@@ -153,18 +145,15 @@ class RoleService
     {
         // 未传角色ID则读取当前登录用户的role_id
         $user_info = Session::get('user_info');
-        if(empty($role_id) && empty($user_info))
-        {
+        if (empty($role_id) && empty($user_info)) {
             throw new Exception('用户未登录且未传参数role_id');
         }
-        if(!empty($user_info) && $user_info['id'] == 1 && empty($role_id))
-        {
+        if (!empty($user_info) && $user_info['id'] == 1 && empty($role_id)) {
             // 超级管理员所有菜单权限
             $menu = $this->Menu->getMenuList();
-        }else{
+        } else {
             // 普通管理员按角色权限分配进行读取
-            if(empty($role_id))
-            {
+            if (empty($role_id)) {
                 $role_id = $user_info['role_id'];
             }
             $menu = $this->RoleMenu->getRoleMenuListByRoleId($role_id);
@@ -175,8 +164,7 @@ class RoleService
         $menu3 = [];
         foreach ($menu as $key => $value) {
             // 超级管理员补充菜单权限标记
-            if(!isset($menu[$key]['permissions']))
-            {
+            if (!isset($menu[$key]['permissions'])) {
                 $value['permissions'] = 'super';
             }
             // 处理zTree所需的各种属性
@@ -185,8 +173,7 @@ class RoleService
             $value['open'] = true;
             $value['node'] = $value['id'];
             // 必选-不可取消
-            if($value['is_required'])
-            {
+            if ($value['is_required']) {
                 $value['checked']     = true;
                 $value['chkDisabled'] = true;
             }
@@ -199,8 +186,7 @@ class RoleService
                     /**
                      * 将二级菜单虚拟一个到三级中，启用联动效应
                      */
-                    if($value['is_required'] == 0)
-                    {
+                    if ($value['is_required'] == 0) {
                         $v_value3              = $value;
                         $value['id']           = $value['id'].'_v';
                         $value['name']         = $value['name'].'*';
@@ -208,19 +194,17 @@ class RoleService
                         $menu2[]               = $value;
                         $v_value3['parent_id'] = $value['id'];
                         // 如果有数据权限范围
-                        if($value['is_permissions'] == 1)
-                        {
-                            $v_value3['children']  = $this->getPermissionTreeData($value['permissions'],$v_value3['id']);
+                        if ($value['is_permissions'] == 1) {
+                            $v_value3['children']  = $this->getPermissionTreeData($value['permissions'], $v_value3['id']);
                         }
                         $menu3[]               = $v_value3;
-                    }else {
+                    } else {
                         $menu2[]               = $value;
                     }
                     break;
                 case 3:
-                    if($value['is_required'] == 0) {
-                        if($value['is_permissions'] == 1)
-                        {
+                    if ($value['is_required'] == 0) {
+                        if ($value['is_permissions'] == 1) {
                             $value['children'] = $this->getPermissionTreeData($value['permissions'], $value['id']);
                         }
                     }
@@ -230,25 +214,20 @@ class RoleService
         }
         // 按层级处理菜单数组--仅到3级
         $tree  = [];
-        foreach ($menu1 as $key1 => $value1)
-        {
+        foreach ($menu1 as $key1 => $value1) {
             // 二级菜单
             $_menu2 = [];
-            foreach ($menu2 as $key2 => $value2)
-            {
+            foreach ($menu2 as $key2 => $value2) {
                 // 三级菜单
                 $_menu3 = [];
-                foreach ($menu3 as $key3 => $value3)
-                {
-                    if($value2['id'] == $value3['parent_id'])
-                    {
+                foreach ($menu3 as $key3 => $value3) {
+                    if ($value2['id'] == $value3['parent_id']) {
                         $_menu3[] = $value3;
                     }
                 }
                 $value2['children'] = $_menu3;
 
-                if($value1['id'] == $value2['parent_id'])
-                {
+                if ($value1['id'] == $value2['parent_id']) {
                     $_menu2[] = $value2;
                 }
             }
@@ -265,7 +244,7 @@ class RoleService
      * @return mixed
      * @throws Exception
      */
-    protected function getPermissionTreeData($permission,$parent_id)
+    protected function getPermissionTreeData($permission, $parent_id)
     {
         $per = [
             'super'  => [
@@ -427,8 +406,7 @@ class RoleService
                 ],
             ],
         ];
-        if(empty($per[$permission]))
-        {
+        if (empty($per[$permission])) {
             throw new Exception('权限级别数据致命错误');
         }
         return $per[$permission];
@@ -447,30 +425,25 @@ class RoleService
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function checkRoleEditorAuth($edit_role_id,$editor_role_id)
+    public function checkRoleEditorAuth($edit_role_id, $editor_role_id)
     {
         $edit_role_menu_list   = $this->RoleMenu->getRoleMenuListByRoleId($edit_role_id);
         $editor_role_menu_list = $this->RoleMenu->getRoleMenuListByRoleId($editor_role_id);
         // 循环对比和检查
         $check_data = $edit_role_menu_list;
-        foreach ($edit_role_menu_list as $key => $value)
-        {
-            foreach ($editor_role_menu_list as $_key => $_value)
-            {
-                if($value['id'] == $_value['id'])
-                {
+        foreach ($edit_role_menu_list as $key => $value) {
+            foreach ($editor_role_menu_list as $_key => $_value) {
+                if ($value['id'] == $_value['id']) {
                     unset($check_data[$key]);
                     // 检查权限，不符直接返回false不再执行
-                    $permissions = $this->comparePermissions($_value['permissions'],$value['permissions']);
-                    if(!$permissions)
-                    {
+                    $permissions = $this->comparePermissions($_value['permissions'], $value['permissions']);
+                    if (!$permissions) {
                         return false;
                     }
                 }
             }
         }
-        if(empty($check_data))
-        {
+        if (empty($check_data)) {
             return true;
         }
         return false;
@@ -482,7 +455,7 @@ class RoleService
      * @param string $per2 预期小的权限
      * @return bool
      */
-    protected function comparePermissions($per1,$per2)
+    protected function comparePermissions($per1, $per2)
     {
         $per = [
             'super'  => ['super','leader','staff','guest'],
@@ -490,11 +463,10 @@ class RoleService
             'staff'  => ['staff','guest'],
             'guest'  => ['guest'],
         ];
-        if(empty($per[$per1]))
-        {
+        if (empty($per[$per1])) {
             return false;
         }
-        return in_array($per2,$per[$per1]);
+        return in_array($per2, $per[$per1]);
     }
 
     /**
@@ -508,41 +480,34 @@ class RoleService
     public function save(Request $request)
     {
         $data = $request->post();
-        if(empty($data['name']))
-        {
+        if (empty($data['name'])) {
             return ['error_code' => 400,'error_msg' => '角色名称不得为空'];
         }
         // 是否编辑模式
-        $is_edit    = $request->has('id','post');
+        $is_edit    = $request->has('id', 'post');
         $exist_role = $this->Role->getRoleInfoByName($data['name']);
-        if($is_edit)
-        {
+        if ($is_edit) {
             // 检查拟编辑角色是否存在
             $repeat_role = $this->Role->getRoleInfoById($request->post('id'));
-            if(empty($repeat_role))
-            {
+            if (empty($repeat_role)) {
                 return ['error_code' => 400,'error_msg' => '拟编辑角色不存在'];
             }
-            if($repeat_role['name'] != trim($data['name']) && !empty($exist_role))
-            {
+            if ($repeat_role['name'] != trim($data['name']) && !empty($exist_role)) {
                 return ['error_code' => 400,'error_msg' => '角色名称已存在，角色名称不能重复'];
             }
-        }else {
-            if(!empty($exist_role))
-            {
+        } else {
+            if (!empty($exist_role)) {
                 return ['error_code' => 400,'error_msg' => '角色名称已存在，角色名称不能重复'];
             }
         }
         // 检查权限菜单是否存在
         $menu_ids = $request->post('ids/a');
-        $menus    = $this->Menu->db()->where('id','IN',$menu_ids)->select();
-        if(count($menus) != count($menu_ids))
-        {
+        $menus    = $this->Menu->db()->where('id', 'IN', $menu_ids)->select();
+        if (count($menus) != count($menu_ids)) {
             return ['error_code' => 400,'error_msg' => '菜单数据已变动请刷新页面后再试'];
         }
         $permissions = $request->post('permissions/a');
-        if(count($permissions) != count($menu_ids))
-        {
+        if (count($permissions) != count($menu_ids)) {
             return ['error_code' => 400,'error_msg' => '菜单权限数据有误'];
         }
         // 角色菜单及权限
@@ -555,11 +520,9 @@ class RoleService
         }
 
         // 检查当前用户所具备的菜单权限级别是否超限，开发者角色具有所有权限
-        if(Session::get('user_info.role_id') != 1)
-        {
+        if (Session::get('user_info.role_id') != 1) {
             // 开发者角色仅允许拥有开发者角色的账号进行编辑
-            if($is_edit == 1)
-            {
+            if ($is_edit == 1) {
                 return ['error_code' => 400, 'error_msg' => '开发者角色不允许非开发者编辑'];
             }
             $user_role_menu = $this->RoleMenu->getRoleMenuListByRoleId(Session::get('user_info.role_id'));
@@ -588,15 +551,14 @@ class RoleService
         $role['remark'] = !empty($data['remark']) ? trim($data['remark']) : '';
         // 事务开始写入角色数据
         Db::startTrans();
-        try{
-            if($is_edit)
-            {
+        try {
+            if ($is_edit) {
                 $role_id = $repeat_role['id'];
                 // 更新角色
-                Db::name('role')->where('id',$role_id)->update($role);
+                Db::name('role')->where('id', $role_id)->update($role);
                 // 编辑模式 删除原先角色的菜单数据
-                Db::name('role_menu')->where('role_id',$role_id)->delete();
-            }else{
+                Db::name('role_menu')->where('role_id', $role_id)->delete();
+            } else {
                 $role_id = Db::name('role')->insertGetId($role);
             }
             // insert新增角色的菜单权限
@@ -604,12 +566,12 @@ class RoleService
                 $role_menu[$key]['role_id'] = $role_id;
             }
             Db::name('role_menu')->insertAll($role_menu);
-            $this->LogService->logRecorder([$role,$role_menu],$is_edit ? '编辑角色' : '新增角色');
+            $this->LogService->logRecorder([$role,$role_menu], $is_edit ? '编辑角色' : '新增角色');
             // 编辑角色之后清空缓存
             Cache::clear($this->cache_tag);
             Db::commit();
             return ['error_code' => 0,'error_msg' => '保存成功'];
-        }catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             Db::rollback();
             return ['error_code' => 400,'error_msg' => '保存失败：'.$e->getMessage()];
         }
@@ -628,16 +590,14 @@ class RoleService
     {
         $id   = $request->post('id/i');
         $sort = intval($request->post('sort'));
-        if($sort <= 0)
-        {
+        if ($sort <= 0) {
             return ['error_code' => 400,'error_msg' => '排序数字有误'];
         }
         $role = $this->Role->getRoleInfoById($id);
-        if(empty($role))
-        {
+        if (empty($role)) {
             return ['error_code' => 400,'error_msg' => '拟编辑排序的角色数据不存在'];
         }
-        $ret = $this->Role->isUpdate(true)->save(['sort' => intval($sort)],['id' => $id]);
+        $ret = $this->Role->isUpdate(true)->save(['sort' => intval($sort)], ['id' => $id]);
         // 编辑角色之后清空缓存
         Cache::clear($this->cache_tag);
         return $ret >= 0 ?
@@ -660,32 +620,29 @@ class RoleService
         $id   = $request->post('id/i');
         $role = $this->Role->getRoleInfoById($id);
         $role_menu = $this->RoleMenu->getRoleMenuListByRoleId($id);
-        if($id == 1)
-        {
+        if ($id == 1) {
             return ['error_code' => 400,'error_msg' => '开发者角色不允许删除'];
         }
-        if(empty($role))
-        {
+        if (empty($role)) {
             return ['error_code' => 400,'error_msg' => '拟删除的角色数据不存在'];
         }
         // 检查有木有用户已使用该角色
-        $role_user = $this->User->where('role_id',$id)->select();
-        if(!$role_user->isEmpty())
-        {
+        $role_user = $this->User->where('role_id', $id)->select();
+        if (!$role_user->isEmpty()) {
             return ['error_code' => 400,'error_msg' => '拟删除的角色已分配用户，请先调整用户所属角色'];
         }
         // 事务进行角色数据删除
         Db::startTrans();
         try {
-            Db::name('role')->where('id',$id)->delete();
-            Db::name('role_menu')->where('role_id',$id)->delete();
+            Db::name('role')->where('id', $id)->delete();
+            Db::name('role_menu')->where('role_id', $id)->delete();
             // 日志方式备份保存原始菜单信息
-            $this->LogService->logRecorder(array_merge($role,$role_menu));
+            $this->LogService->logRecorder(array_merge($role, $role_menu));
             // 编辑角色之后清空缓存
             Cache::clear($this->cache_tag);
             Db::commit();
             return ['error_code' => 0,'error_msg' => '角色删除成功'];
-        }catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             Db::rollback();
             return ['error_code' => 0,'error_msg' => '角色删除失败：'.$e->getMessage()];
         }
