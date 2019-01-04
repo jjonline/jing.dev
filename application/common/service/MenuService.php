@@ -116,7 +116,8 @@ class MenuService
         // 菜单级别处理
         if (empty($menu['level1']) && empty($menu['level2'])) {
             // 一级菜单
-            $Menu['level']    = 1;
+            $Menu['level']     = 1;
+            $Menu['parent_id'] = 0;
         } elseif (empty($menu['level2']) && !empty($menu['level1'])) {
             // 二级菜单
             $level1 = $this->Menu->getMenuById($menu['level1']);
