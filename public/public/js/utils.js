@@ -563,7 +563,7 @@ var utils = {
     /**
      * 检查是否合符天朝规范的身份证号，不是返回false，是返回身份证读取出的信息
      * @param match
-     * @returns false|[]
+     * @return false|[]
      */
     isID:function(match) {
         var id = match.toUpperCase();//18位身份证中的x为大写
@@ -656,7 +656,17 @@ var utils = {
         if(BirthObj == null) {return false;}//出生日期基本的组合规则不符合要求
         var d = new Date(BirthObj[1], BirthObj[2] - 1, BirthObj[3]); //效验出生日期的数字年份是否符合要求
         if(d.getFullYear() == BirthObj[1] && (d.getMonth() + 1) == BirthObj[2] && d.getDate() == BirthObj[3]) {
-            return {'ID':id,'Y':BirthYear,'m':BirthMonth,'d':BirthDay,'YmdNumber':Number(StrData),'YmdString':BirthYear+'-'+BirthMonth+'-'+BirthDay,'sexInt':Sex,'sexCn':Sexcn,'local':oCity[parseInt(City)]};
+            return {
+                'ID':id,
+                'Y':BirthYear,
+                'm':BirthMonth,
+                'd':BirthDay,
+                'YmdNumber':Number(StrData),
+                'YmdString':BirthYear+'-'+BirthMonth+'-'+BirthDay,
+                'sexInt':Sex,
+                'sexCn':Sexcn,
+                'local':oCity[parseInt(City)]
+            };
         }
         return false;
     },
@@ -682,7 +692,7 @@ var utils = {
         });
     },
     /**
-     * 精简的没有精度条的单个文件ajax上传
+     * 精简的没有进度条的单个文件ajax上传
      * @param id
      * @param success
      * @param error

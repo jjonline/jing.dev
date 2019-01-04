@@ -21,19 +21,27 @@ class MemberController extends BaseController
             $result = $memberSearch->lists($this->UserInfo);
             return $this->asJson($result);
         }
-        $this->title            = '会员管理 - '.config('local.site_name');
-        $this->content_title    = '会员列表';
-        $this->content_subtitle = '前台会员管理';
-        $this->breadcrumb       = [
-            ['label' => '会员管理','url' => url('member/list')],
-            ['label' => '会员列表','url'  => ''],
+        $common = [
+            'title'            => '会员管理 - ' . config('local.site_name'),
+            'content_title'    => '会员管理',
+            'content_subtitle' => '前台会员管理',
+            'breadcrumb'       => [
+                ['label' => '会员管理', 'url' => url('member/list')],
+                ['label' => '会员管理', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         return $this->fetch();
     }
 
+    /**
+     * 后台创建前台会员
+     * @param MemberService $memberService
+     * @return mixed
+     */
     public function createAction(MemberService $memberService)
     {
         if ($this->request->isAjax()) {

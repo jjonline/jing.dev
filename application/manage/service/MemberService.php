@@ -30,7 +30,7 @@ class MemberService
 
     public function __construct(
         Member $member,
-                                LogService $logService
+        LogService $logService
     ) {
         $this->Member         = $member;
         $this->LogService     = $logService;
