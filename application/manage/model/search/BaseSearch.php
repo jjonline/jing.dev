@@ -139,6 +139,30 @@ class BaseSearch
     }
 
     /**
+     * 范围检索
+     * @param Query  $query       引用模式的Query查询对象
+     * @param string $column      待检索的单个datetime类型的字段，可带别名
+     * @param string $begin_range 检索开始值，可空
+     * @param string $end_range   检索结束值，可空
+     */
+    protected function rangeSearch(Query &$query, $column, $begin_range = null, $end_range = null)
+    {
+        if (empty($begin_range) && empty($end_range)) {
+            return;
+        }
+        if (!empty($begin_range) && empty($end_range)) {
+            $query->where($column, '>=', $begin_range);
+        }
+        if (empty($begin_range) && !empty($end_range)) {
+            $query->where($column, '<=', $end_range);
+        }
+        if (!empty($begin_range) && !empty($end_range)) {
+            $query->where($column, '>=', $begin_range);
+            $query->where($column, '<=', $end_range);
+        }
+    }
+
+    /**
      * 处理返回查询的数据结构数组
      * @return array
      */
