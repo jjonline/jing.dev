@@ -33,7 +33,7 @@ $(function () {
                 if(data.error_code == 0)
                 {
                     btnLogin.prop('disabled',true).text('登录成功，请稍后');
-                    location.href = '/?token='+utils.randString();
+                    location.href = '/manage?token='+utils.randString();
                     return false;
                 }
                 if(data.error_code == -2)
