@@ -39,7 +39,7 @@ class DepartmentController extends BaseController
 
         $dept_list = $departmentService->getDeptTreeList();
 
-        $this->assign('dept_list',$dept_list);
+        $this->assign('dept_list', $dept_list);
 
         return $this->fetch();
     }
@@ -53,10 +53,9 @@ class DepartmentController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function createAction(Request $request , DepartmentService $departmentService)
+    public function createAction(Request $request, DepartmentService $departmentService)
     {
-        if($request->isPost() && $request->isAjax())
-        {
+        if ($request->isPost() && $request->isAjax()) {
             return $departmentService->save($request);
         }
         $common = [
@@ -73,7 +72,7 @@ class DepartmentController extends BaseController
         $this->assign($common);
 
         $dept_list = $departmentService->getDeptTreeList();
-        $this->assign('dept_list',$dept_list);
+        $this->assign('dept_list', $dept_list);
 
         return $this->fetch();
     }
@@ -87,10 +86,9 @@ class DepartmentController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function editAction(Request $request , DepartmentService $departmentService)
+    public function editAction(Request $request, DepartmentService $departmentService)
     {
-        if($request->isPost() && $request->isAjax())
-        {
+        if ($request->isPost() && $request->isAjax()) {
             return $departmentService->save($request);
         }
         $common = [
@@ -107,13 +105,12 @@ class DepartmentController extends BaseController
         $this->assign($common);
 
         $Dept = $departmentService->Department->getDeptInfoById($request->param('id'));
-        if(empty($Dept))
-        {
+        if (empty($Dept)) {
             $this->redirect(url('department/list'));
         }
         $dept_list = $departmentService->getDeptTreeList();
-        $this->assign('dept_list',$dept_list);
-        $this->assign('dept',$Dept);
+        $this->assign('dept_list', $dept_list);
+        $this->assign('dept', $Dept);
         return $this->fetch();
     }
 
@@ -126,10 +123,9 @@ class DepartmentController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function sortAction(Request $request , DepartmentService $departmentService)
+    public function sortAction(Request $request, DepartmentService $departmentService)
     {
-        if($request->isPost() && $request->isAjax())
-        {
+        if ($request->isPost() && $request->isAjax()) {
             // 编辑menu菜单后端检测和操作
             return $this->asJson($departmentService->sort($request));
         }
@@ -146,10 +142,9 @@ class DepartmentController extends BaseController
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    public function deleteAction(Request $request , DepartmentService $departmentService)
+    public function deleteAction(Request $request, DepartmentService $departmentService)
     {
-        if($request->isPost() && $request->isAjax())
-        {
+        if ($request->isPost() && $request->isAjax()) {
             // 编辑menu菜单后端检测和操作
             return $this->asJson($departmentService->delete($request));
         }

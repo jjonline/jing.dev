@@ -14,11 +14,9 @@ use app\manage\service\MemberService;
 
 class MemberController extends BaseController
 {
-
     public function listAction(MemberSearch $memberSearch)
     {
-        if($this->request->isAjax())
-        {
+        if ($this->request->isAjax()) {
             // 将当前登录用户信息传递过去
             $result = $memberSearch->lists($this->UserInfo);
             return $this->asJson($result);
@@ -38,9 +36,8 @@ class MemberController extends BaseController
 
     public function createAction(MemberService $memberService)
     {
-        if($this->request->isAjax())
-        {
-            $result = $memberService->insert($this->request,$this->UserInfo);
+        if ($this->request->isAjax()) {
+            $result = $memberService->insert($this->request, $this->UserInfo);
             return $this->asJson($result);
         }
     }
@@ -55,9 +52,8 @@ class MemberController extends BaseController
      */
     public function editAction(MemberService $memberService)
     {
-        if($this->request->isAjax())
-        {
-            $result = $memberService->update($this->request,$this->UserInfo);
+        if ($this->request->isAjax()) {
+            $result = $memberService->update($this->request, $this->UserInfo);
             return $this->asJson($result);
         }
     }
@@ -72,11 +68,9 @@ class MemberController extends BaseController
      */
     public function enableToggleAction(MemberService $memberService)
     {
-        if($this->request->isAjax())
-        {
-            $result = $memberService->enableToggle($this->request,$this->UserInfo);
+        if ($this->request->isAjax()) {
+            $result = $memberService->enableToggle($this->request, $this->UserInfo);
             return $this->asJson($result);
         }
     }
-
 }

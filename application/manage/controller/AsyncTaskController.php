@@ -22,8 +22,7 @@ class AsyncTaskController extends BaseController
      */
     public function listAction(AsyncTaskSearch $asyncTaskSearch)
     {
-        if($this->request->isAjax())
-        {
+        if ($this->request->isAjax()) {
             // 将当前登录用户信息传递过去
             return $this->asJson($asyncTaskSearch->list($this->UserInfo));
         }
@@ -42,7 +41,7 @@ class AsyncTaskController extends BaseController
 
         // 仅能分配当前账号所下辖的部门
         $dept_list  = $this->UserInfo['dept_auth']['dept_list_tree'];
-        $this->assign('dept_list',$dept_list);
+        $this->assign('dept_list', $dept_list);
         return $this->fetch();
     }
 
@@ -55,10 +54,9 @@ class AsyncTaskController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function detailAction(Request $request,AsyncTaskService $asyncTaskService)
+    public function detailAction(Request $request, AsyncTaskService $asyncTaskService)
     {
-        if($request->isAjax())
-        {
+        if ($request->isAjax()) {
             return $this->asJson($asyncTaskService->getDetailById($request));
         }
     }

@@ -41,7 +41,7 @@ class RoleController extends BaseController
         $RoleModel = new Role();
         $list      = $RoleModel->getRoleList();
 
-        $this->assign('list',$list);
+        $this->assign('list', $list);
         return $this->fetch();
     }
 
@@ -55,10 +55,9 @@ class RoleController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function createAction(Request $request , RoleService $roleService)
+    public function createAction(Request $request, RoleService $roleService)
     {
-        if($request->isPost() && $request->isAjax())
-        {
+        if ($request->isPost() && $request->isAjax()) {
             // 保存角色
             return $roleService->save($request);
         }
@@ -76,7 +75,7 @@ class RoleController extends BaseController
         $this->assign($common);
 
         $menu_list = $roleService->getRoleMenuTreeDataByRoleId();
-        $this->assign('menu_list',$menu_list);
+        $this->assign('menu_list', $menu_list);
         return $this->fetch();
     }
 
@@ -90,10 +89,9 @@ class RoleController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function editAction(Request $request , RoleService $roleService)
+    public function editAction(Request $request, RoleService $roleService)
     {
-        if($request->isPost() && $request->isAjax())
-        {
+        if ($request->isPost() && $request->isAjax()) {
             // 保存角色
             return $roleService->save($request);
         }
@@ -113,25 +111,23 @@ class RoleController extends BaseController
         // 角色数据
         $RoleModel = new Role();
         $Role      = $RoleModel->getRoleInfoById($request->get('id'));
-        if(empty($Role))
-        {
+        if (empty($Role)) {
             $this->redirect(url('role/list'));
         }
         // 检查编辑者的角色权限是否有权编辑该角色
-        $has_edit_auth = $roleService->checkRoleEditorAuth($Role['id'],$this->UserInfo['role_id']);
-        if(!$has_edit_auth)
-        {
+        $has_edit_auth = $roleService->checkRoleEditorAuth($Role['id'], $this->UserInfo['role_id']);
+        if (!$has_edit_auth) {
             $this->error('您的权限级无法编辑该角色数据，请联系上级进行编辑');
         }
         // 当前账号具备的所有菜单权限
         $menu_list = $roleService->getRoleMenuTreeDataByRoleId();
-        $this->assign('menu_list',$menu_list);
+        $this->assign('menu_list', $menu_list);
 
         // 待编辑的菜单权限列表
         $role_menu     = $roleService->RoleMenu->getRoleMenuListByRoleId($Role['id']);
-        $this->assign('role_menu',$role_menu);
+        $this->assign('role_menu', $role_menu);
 
-        $this->assign('role',$Role);
+        $this->assign('role', $Role);
         return $this->fetch();
     }
 
@@ -144,10 +140,9 @@ class RoleController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function sortAction(Request $request , RoleService $roleService)
+    public function sortAction(Request $request, RoleService $roleService)
     {
-        if($request->isPost() && $request->isAjax())
-        {
+        if ($request->isPost() && $request->isAjax()) {
             return $this->asJson($roleService->sort($request));
         }
     }
@@ -163,15 +158,13 @@ class RoleController extends BaseController
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    public function deleteAction(Request $request , RoleService $roleService)
+    public function deleteAction(Request $request, RoleService $roleService)
     {
-        if($request->isPost() && $request->isAjax())
-        {
+        if ($request->isPost() && $request->isAjax()) {
             // 检查编辑者的角色权限是否有权编辑该角色
-            $has_edit_auth = $roleService->checkRoleEditorAuth($request->post('id'),$this->UserInfo['role_id']);
-            if(!$has_edit_auth)
-            {
-                return $this->renderJson('您的权限级无法删除该角色，请联系上级删除',400);
+            $has_edit_auth = $roleService->checkRoleEditorAuth($request->post('id'), $this->UserInfo['role_id']);
+            if (!$has_edit_auth) {
+                return $this->renderJson('您的权限级无法删除该角色，请联系上级删除', 400);
             }
             return $this->asJson($roleService->delete($request));
         }

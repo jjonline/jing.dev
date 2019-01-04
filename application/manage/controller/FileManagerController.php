@@ -22,15 +22,14 @@ class FileManagerController extends BaseController
      * @param Request $request
      * @return \think\response\Json
      */
-    public function FileManagerAction(Request $request)
+    public function fileManagerAction(Request $request)
     {
         // 浏览文件类型标识符
         $paramDir    =   $request->param('dir');
         // 排序规则 NAME(文件名) 、SIZE(文件大小)、 TYPE(文件类型)
-        $this->Order =   strtolower($request->param('order','name'));
-        $paramPath   =   $request->param('path','');//浏览的目录层级
-        if (!in_array($paramDir, array('', 'image', 'flash', 'media', 'file','music')))
-        {
+        $this->Order =   strtolower($request->param('order', 'name'));
+        $paramPath   =   $request->param('path', '');//浏览的目录层级
+        if (!in_array($paramDir, array('', 'image', 'flash', 'media', 'file','music'))) {
             return json(['error' => 1, 'message' => 'Invalid Directory name.']);
         }
         //指定不同类型浏览目录的相对目录位置 === 添加了文件类型
@@ -64,11 +63,12 @@ class FileManagerController extends BaseController
         //遍历目录取得文件信息
         $file_list = array();
         $ext_arr   = array('gif', 'jpg', 'jpeg', 'png', 'bmp');//图片扩展名
-        if ($handle = opendir($current_path))
-        {
+        if ($handle = opendir($current_path)) {
             $i = 0;
             while (false !== ($filename = readdir($handle))) {
-                if ($filename{0} == '.') continue;
+                if ($filename{0} == '.') {
+                    continue;
+                }
                 $file = $current_path . $filename;
                 if (is_dir($file)) {
                     $file_list[$i]['is_dir']   = true; //是否文件夹
@@ -92,21 +92,21 @@ class FileManagerController extends BaseController
             closedir($handle);
         }
         //进行结果排序
-        usort($file_list, function ($a,$b) {
+        usort($file_list, function ($a, $b) {
             if ($a['is_dir'] && !$b['is_dir']) {
                 return -1;
-            } else if (!$a['is_dir'] && $b['is_dir']) {
+            } elseif (!$a['is_dir'] && $b['is_dir']) {
                 return 1;
             } else {
                 if ($this->Order == 'size') {
                     if ($a['filesize'] > $b['filesize']) {
                         return 1;
-                    } else if ($a['filesize'] < $b['filesize']) {
+                    } elseif ($a['filesize'] < $b['filesize']) {
                         return -1;
                     } else {
                         return 0;
                     }
-                } else if ($this->Order == 'type') {
+                } elseif ($this->Order == 'type') {
                     return strcmp($a['filetype'], $b['filetype']);
                 } else {
                     return strcmp($a['filename'], $b['filename']);
@@ -132,10 +132,9 @@ class FileManagerController extends BaseController
      * @param Request $request
      * @return \think\response\Json
      */
-    public function UploadFileAction(Request $request)
+    public function uploadFileAction(Request $request)
     {
-        if(!$request->isPost())
-        {
+        if (!$request->isPost()) {
             return json(['error' => 1, 'message' => '403 Forbiden']);
         }
         //检查上传文件的允许类型
@@ -147,15 +146,14 @@ class FileManagerController extends BaseController
             'file'  =>  array('doc', 'docx', 'xls', 'xlsx', 'ppt', 'pdf', 'txt', 'zip', 'rar', 'gz', 'bz2','7z'),
             'music' =>  array('mp3','mp4'),//音乐类型仅允许mp3、mp4两种
         );
-        if(!isset($allowedExt[$paramDir])) {
+        if (!isset($allowedExt[$paramDir])) {
             //上传的类型或参数错误
             return json(['error' => 1, 'message' => '不允许上传的文件类型']);
         }
         //检查通过 开始处理上传的文件
         $saveDir        =    './uploads/'.$paramDir.'/';//不同类型文件存储的根目录 如图片则是./Uploads/Image/
         //检查文件夹权限
-        if(!is_dir($saveDir))
-        {
+        if (!is_dir($saveDir)) {
             mkdir($saveDir);
         }
         /**
@@ -168,12 +166,11 @@ class FileManagerController extends BaseController
         $fileInfo = $file->validate(['ext' => $file_ext])
                   ->rule('sha1')
                   ->move($saveDir);
-        if(!$fileInfo)
-        {
+        if (!$fileInfo) {
             return json(['error' => 1, 'message' => $file->getError()]);
         }
         //上传成功，记录日志
-        $this->logRecorder(trim($saveDir.$fileInfo->getSaveName(),'.'),'上传文件');
-        return json(['error' => 0, 'message' => '上传成功','url'=>trim($saveDir.$fileInfo->getSaveName(),'.')]);
+        $this->logRecorder(trim($saveDir.$fileInfo->getSaveName(), '.'), '上传文件');
+        return json(['error' => 0, 'message' => '上传成功','url'=>trim($saveDir.$fileInfo->getSaveName(), '.')]);
     }
 }

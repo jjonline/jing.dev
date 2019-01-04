@@ -27,11 +27,10 @@ class OperationController extends BaseController
      */
     public function recordAction(OperationRecordService $operationRecordService)
     {
-        if($this->request->isAjax())
-        {
+        if ($this->request->isAjax()) {
             $operate_name = $this->request->get('name');
             $business_id  = $this->request->get('id');
-            $result = $operationRecordService->getOperationRecordList($operate_name,$business_id);
+            $result = $operationRecordService->getOperationRecordList($operate_name, $business_id);
             return $this->asJson(['error_code' => 0 ,'error_msg' => 'ok','data' => $result]);
         }
     }

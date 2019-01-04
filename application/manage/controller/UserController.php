@@ -24,10 +24,9 @@ class UserController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function listAction(Request $request,UserSearch $userSearch,UserService $userService)
+    public function listAction(Request $request, UserSearch $userSearch, UserService $userService)
     {
-        if($request->isAjax())
-        {
+        if ($request->isAjax()) {
             // 将当前登录用户信息传递过去
             $result = $userSearch->list($this->UserInfo);
             return $this->asJson($result);
@@ -49,8 +48,8 @@ class UserController extends BaseController
         $dept_list = $this->UserInfo['dept_auth']['dept_list_tree'];
         $role_list = $userService->Role->getRoleList(); // 角色显示所有
 
-        $this->assign('dept_list',$dept_list);
-        $this->assign('role_list',$role_list);
+        $this->assign('dept_list', $dept_list);
+        $this->assign('role_list', $role_list);
 
         return $this->fetch();
     }
@@ -64,10 +63,9 @@ class UserController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function createAction(Request $request,UserService $userService)
+    public function createAction(Request $request, UserService $userService)
     {
-        if($request->isAjax())
-        {
+        if ($request->isAjax()) {
             // 将当前登录用户信息传递过去
             $result = $userService->superUserInsertUser($request);
             return $this->asJson($result);
@@ -89,8 +87,8 @@ class UserController extends BaseController
         $dept_list = $this->UserInfo['dept_auth']['dept_list_tree'];
         $role_list = $userService->Role->getRoleList(); // 角色显示所有
 
-        $this->assign('dept_list',$dept_list);
-        $this->assign('role_list',$role_list);
+        $this->assign('dept_list', $dept_list);
+        $this->assign('role_list', $role_list);
 
         return $this->fetch();
     }
@@ -104,12 +102,11 @@ class UserController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function editAction(Request $request,UserService $userService)
+    public function editAction(Request $request, UserService $userService)
     {
-        if($request->isAjax())
-        {
+        if ($request->isAjax()) {
             // 将当前登录用户信息传递过去
-            $result = $userService->superUserUpdateUser($request,$this->UserInfo);
+            $result = $userService->superUserUpdateUser($request, $this->UserInfo);
             return $this->asJson($result);
         }
         $common = [
@@ -126,20 +123,19 @@ class UserController extends BaseController
         $this->assign($common);
 
         $user = $userService->User->getUserInfoById($request->get('id'));
-        if(empty($user) || !in_array($user['dept_id'],$this->UserInfo['dept_auth']['dept_id_vector']))
-        {
+        if (empty($user) || !in_array($user['dept_id'], $this->UserInfo['dept_auth']['dept_id_vector'])) {
             $this->error('您无权限编辑该账户信息');
         }
 
         // 待编辑用户信息
-        $this->assign('user',$user);
+        $this->assign('user', $user);
 
         // 仅能分配当前账号所下辖的部门
         $dept_list = $this->UserInfo['dept_auth']['dept_list_tree'];
         $role_list = $userService->Role->getRoleList(); // 角色显示所有
 
-        $this->assign('dept_list',$dept_list);
-        $this->assign('role_list',$role_list);
+        $this->assign('dept_list', $dept_list);
+        $this->assign('role_list', $role_list);
 
         return $this->fetch();
     }
@@ -151,13 +147,12 @@ class UserController extends BaseController
      * @return mixed
      * @throws \think\exception\DbException
      */
-    public function enableToggleAction(Request $request,UserService $userService)
+    public function enableToggleAction(Request $request, UserService $userService)
     {
-        if($request->isPost() && $request->isAjax())
-        {
-            $result = $userService->enableUserToggle($request->post('id/i'),$this->UserInfo);
+        if ($request->isPost() && $request->isAjax()) {
+            $result = $userService->enableUserToggle($request->post('id/i'), $this->UserInfo);
             return $this->asJson($result);
         }
-        return $this->renderJson('请求失败',404);
+        return $this->renderJson('请求失败', 404);
     }
 }

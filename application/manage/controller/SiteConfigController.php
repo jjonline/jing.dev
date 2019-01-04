@@ -37,7 +37,7 @@ class SiteConfigController extends BaseController
         $this->assign($common);
 
         $list = $siteConfigService->SiteConfig->getSiteConfigList();
-        $this->assign('list',$list);
+        $this->assign('list', $list);
 
         return $this->fetch();
     }
@@ -84,8 +84,7 @@ class SiteConfigController extends BaseController
      */
     public function sortAction(SiteConfigService $siteConfigService)
     {
-        if($this->request->isPost() && $this->request->isAjax())
-        {
+        if ($this->request->isPost() && $this->request->isAjax()) {
             return $this->asJson($siteConfigService->sort($this->request));
         }
     }
@@ -102,8 +101,7 @@ class SiteConfigController extends BaseController
      */
     public function deleteAction(SiteConfigService $siteConfigService)
     {
-        if($this->request->isPost() && $this->request->isAjax())
-        {
+        if ($this->request->isPost() && $this->request->isAjax()) {
             $result = $siteConfigService->delete($this->request->param('id'));
             return $this->asJson($result);
         }

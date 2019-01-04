@@ -47,19 +47,17 @@ class CommonController extends BasicController
      */
     protected function getUserInfo()
     {
-        if(!empty($this->UserInfo))
-        {
+        if (!empty($this->UserInfo)) {
             return $this->UserInfo;
         }
         // 登录状态下初始化用户信息
         $UserService = Container::get('app\common\service\UserService');
-        if($UserService->isUserLogin())
-        {
+        if ($UserService->isUserLogin()) {
             $this->DepartmentService     = Container::get('app\common\service\DepartmentService');
             // 初始化User属性
             $this->UserInfo              = Session::get('user_info');
             // 会员可操作的部门列表信息
-            $this->UserInfo['dept_auth'] = $this->DepartmentService->getAuthDeptInfoByDeptId($this->UserInfo['dept_id'],$this->UserInfo['is_leader']);
+            $this->UserInfo['dept_auth'] = $this->DepartmentService->getAuthDeptInfoByDeptId($this->UserInfo['dept_id'], $this->UserInfo['is_leader']);
 
             return $this->UserInfo;
         }
@@ -78,31 +76,28 @@ class CommonController extends BasicController
     {
         $expire_in  = $this->request->param('expire_in/i');
         $access_key = $this->request->param('access_key');
-        if($expire_in < time())
-        {
+        if ($expire_in < time()) {
             return xml([
-                    'Code'    => '404',
-                    'Key'     => 'Expired',
-                    'Message' => 'Link has expired.',
-                ],200,[],['root_node' => 'Error']);
+                'Code'    => '404',
+                'Key'     => 'Expired',
+                'Message' => 'Link has expired.',
+            ], 200, [], ['root_node' => 'Error']);
         }
-        $attachment_id = AttachmentHelper::transfer_decrypt($access_key,Config::get('local.auth_key'));
-        if(empty($attachment_id))
-        {
+        $attachment_id = AttachmentHelper::transfer_decrypt($access_key, Config::get('local.auth_key'));
+        if (empty($attachment_id)) {
             return xml([
                 'Code'    => '500',
                 'Key'     => 'NoSuchKey',
                 'Message' => 'The specified key does not exist.',
-            ],200,[],['root_node' => 'Error']);
+            ], 200, [], ['root_node' => 'Error']);
         }
         $attachment  = $attachmentService->Attachment->getAttachmentById($attachment_id);
-        if(empty($attachment) || !file_exists('.'.$attachment['file_path']))
-        {
+        if (empty($attachment) || !file_exists('.'.$attachment['file_path'])) {
             return xml([
                 'Code'    => '404',
                 'Key'     => 'Expired',
                 'Message' => 'Link has expired or File Not Found.',
-            ],200,[],['root_node' => 'Error']);
+            ], 200, [], ['root_node' => 'Error']);
         }
         $filename = realpath('.'.$attachment['file_path']);
         ob_start();
@@ -122,8 +117,7 @@ class CommonController extends BasicController
     {
         $attachment_id = $this->request->get('id');
         $file_path     = $attachmentService->getAttachmentPathById($attachment_id);
-        if(empty($file_path))
-        {
+        if (empty($file_path)) {
             $this->redirect('/public/images/no.png');
         }
         $this->redirect($file_path);
@@ -136,12 +130,11 @@ class CommonController extends BasicController
     public function chineseToPinyinAction()
     {
         $chinese = $this->request->param('chinese');
-        if(empty($chinese))
-        {
-            return $this->renderJson('待转换中文不得为空',404);
+        if (empty($chinese)) {
+            return $this->renderJson('待转换中文不得为空', 404);
         }
         $pinyin = StringHelper::convertToPinyin($chinese);
-        return $this->renderJson('success',0,$pinyin);
+        return $this->renderJson('success', 0, $pinyin);
     }
 
     /**
@@ -155,15 +148,13 @@ class CommonController extends BasicController
      */
     public function getUserListAction(UserService $userService)
     {
-        if($this->request->isAjax())
-        {
-            if($this->getUserInfo())
-            {
+        if ($this->request->isAjax()) {
+            if ($this->getUserInfo()) {
                 $keyword = $this->request->param('query');
-                $result  = $userService->searchUserList($keyword,$this->UserInfo);
+                $result  = $userService->searchUserList($keyword, $this->UserInfo);
                 return $this->asJson($result);
             }
-            return $this->renderJson('未登录，请先登录',-1);
+            return $this->renderJson('未登录，请先登录', -1);
         }
     }
 
@@ -176,9 +167,8 @@ class CommonController extends BasicController
     public function getAreaInfoByMobileAction(UtilService $utilService)
     {
         $mobile = $this->request->param('mobile');
-        if(!FilterValidHelper::is_phone_valid($mobile))
-        {
-            return $this->renderJson('手机号格式有误',500);
+        if (!FilterValidHelper::is_phone_valid($mobile)) {
+            return $this->renderJson('手机号格式有误', 500);
         }
         $result = $utilService->getAreaInfoByMobile($mobile);
         return $this->asJson($result);
