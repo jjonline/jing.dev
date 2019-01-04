@@ -136,6 +136,7 @@ var utils = {
      * @param callCallBack     取消不执行后的回调函数
      */
     ajaxConfirm: function (message,request_url,data,successCallBack,toastTime,callCallBack) {
+        toastTime = toastTime || 3000;
         bootbox.dialog({
             message: message,
             title: '操作确认',
@@ -154,19 +155,8 @@ var utils = {
                             success: function (data) {
                                 utils.hideLoading();
                                 if(data.error_code == 0){
-                                    if(toastTime > 0)
-                                    {
-                                        // toast方式提示
-                                        utils.toast(data.error_msg ? data.error_msg : '操作成功',toastTime,successCallBack);
-                                    }else {
-                                        // alert方式提示
-                                        utils.alert(data.error_msg ? data.error_msg : '操作成功',function () {
-                                            // 回调延时0.5s触发 防止按钮点击后的卡顿感受
-                                            setTimeout(function () {
-                                                successCallBack && successCallBack();
-                                            },500);
-                                        });
-                                    }
+                                    // toast方式提示
+                                    utils.toast(data.error_msg ? data.error_msg : '操作成功',toastTime,successCallBack);
                                 }else{
                                     utils.alert(data.error_msg ? data.error_msg : '未知错误');
                                 }
