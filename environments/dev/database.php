@@ -15,9 +15,9 @@ return [
     // 服务器地址
     'hostname'        => 'mysql',
     // 数据库名
-    'database'        => '',
+    'database'        => 'component',
     // 用户名
-    'username'        => '',
+    'username'        => 'root',
     // 密码
     'password'        => '',
     // 端口
