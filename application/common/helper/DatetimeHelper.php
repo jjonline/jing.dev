@@ -407,7 +407,7 @@ class DatetimeHelper
         }
         $duration   = self::durationDays($day1, $day2);
         $period_arr = [];
-        for ($i = 0;$i < $duration;$i++) {
+        for ($i = 0; $i < $duration; $i++) {
             $period_arr[] = date('Y-m-d', $begin_time + 86400 * $i);
         }
         return $period_arr;

@@ -51,7 +51,7 @@ class AttachmentHelper
      * @param  int     $expiry    密钥有效期 单位：秒 默认0为永不过期
      * @return string 空字符串表示解密失败|密文已过期
      */
-    public static function reversible_crypt($string, $isEncode = false, $key = 'jjonline', $expiry = 0)
+    public static function reversibleCrypt($string, $isEncode = false, $key = 'jjonline', $expiry = 0)
     {
         $ckey_length            =   4;
         // 密匙
@@ -117,9 +117,9 @@ class AttachmentHelper
      * @param  integer $expiry 加密的密文失效时间，单位：秒 0默认表示：永不失效
      * @return string
      */
-    public static function transfer_encrypt($string, $key = 'jjonline', $expiry = 0)
+    public static function transferEncrypt($string, $key = 'jjonline', $expiry = 0)
     {
-        return self::reversible_crypt($string, false, $key, $expiry);
+        return self::reversibleCrypt($string, false, $key, $expiry);
     }
 
     /**
@@ -135,8 +135,8 @@ class AttachmentHelper
      * @param  string $key    解密秘钥
      * @return string
      */
-    public static function transfer_decrypt($string, $key = 'jjonline')
+    public static function transferDecrypt($string, $key = 'jjonline')
     {
-        return self::reversible_crypt($string, true, $key);
+        return self::reversibleCrypt($string, true, $key);
     }
 }

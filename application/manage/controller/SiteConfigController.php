@@ -56,6 +56,7 @@ class SiteConfigController extends BaseController
             $result =  $siteConfigService->save($this->request);
             return $this->asJson($result);
         }
+        return $this->renderJson('error', 400);
     }
 
     /**
@@ -72,6 +73,7 @@ class SiteConfigController extends BaseController
             $result = $siteConfigService->save($this->request);
             return $this->asJson($result);
         }
+        return $this->renderJson('error', 400);
     }
 
     /**
@@ -87,6 +89,7 @@ class SiteConfigController extends BaseController
         if ($this->request->isPost() && $this->request->isAjax()) {
             return $this->asJson($siteConfigService->sort($this->request));
         }
+        return $this->renderJson('error', 400);
     }
 
     /**
@@ -105,5 +108,6 @@ class SiteConfigController extends BaseController
             $result = $siteConfigService->delete($this->request->param('id'));
             return $this->asJson($result);
         }
+        return $this->renderJson('error', 400);
     }
 }
