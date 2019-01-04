@@ -32,15 +32,18 @@ class UserController extends BaseController
             $result = $userSearch->list($this->UserInfo);
             return $this->asJson($result);
         }
-        $this->title            = '用户管理 - '.config('local.site_name');
-        $this->content_title    = '用户列表';
-        $this->content_subtitle = '后台用户列表管理';
-        $this->breadcrumb       = [
-            ['label' => '用户管理','url' => url('user/list')],
-            ['label' => '用户列表','url'  => ''],
+        $common = [
+            'title'            => '用户管理 - ' . config('local.site_name'),
+            'content_title'    => '用户列表',
+            'content_subtitle' => '后台用户列表管理',
+            'breadcrumb'       => [
+                ['label' => '用户管理', 'url' => url('user/list')],
+                ['label' => '用户列表', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         // 仅能分配当前账号所下辖的部门
         $dept_list = $this->UserInfo['dept_auth']['dept_list_tree'];
@@ -69,15 +72,18 @@ class UserController extends BaseController
             $result = $userService->superUserInsertUser($request);
             return $this->asJson($result);
         }
-        $this->title            = '用户管理 - '.config('local.site_name');
-        $this->content_title    = '新增用户';
-        $this->content_subtitle = '新增后台用户';
-        $this->breadcrumb       = [
-            ['label' => '用户管理','url' => url('user/list')],
-            ['label' => '新增用户','url'  => url('user/create')],
+        $common = [
+            'title'            => '用户管理 - ' . config('local.site_name'),
+            'content_title'    => '新增用户',
+            'content_subtitle' => '后台用户列表管理',
+            'breadcrumb'       => [
+                ['label' => '用户管理', 'url' => url('user/list')],
+                ['label' => '新增用户', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         // 仅能分配当前账号所下辖的部门
         $dept_list = $this->UserInfo['dept_auth']['dept_list_tree'];
@@ -106,15 +112,18 @@ class UserController extends BaseController
             $result = $userService->superUserUpdateUser($request,$this->UserInfo);
             return $this->asJson($result);
         }
-        $this->title            = '用户管理 - '.config('local.site_name');
-        $this->content_title    = '编辑用户';
-        $this->content_subtitle = '编辑后台用户（此处不涉及职员信息的维护，仅维护后台账号信息）';
-        $this->breadcrumb       = [
-            ['label' => '用户管理','url' => url('user/list')],
-            ['label' => '编辑用户','url'  => ''],
+        $common = [
+            'title'            => '用户管理 - ' . config('local.site_name'),
+            'content_title'    => '编辑用户',
+            'content_subtitle' => '后台用户列表管理',
+            'breadcrumb'       => [
+                ['label' => '用户管理', 'url' => url('user/list')],
+                ['label' => '编辑用户', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         $user = $userService->User->getUserInfoById($request->get('id'));
         if(empty($user) || !in_array($user['dept_id'],$this->UserInfo['dept_auth']['dept_id_vector']))

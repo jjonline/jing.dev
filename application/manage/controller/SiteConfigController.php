@@ -23,15 +23,18 @@ class SiteConfigController extends BaseController
      */
     public function listAction(SiteConfigService $siteConfigService)
     {
-        $this->title            = '配置设置 - '.config('local.site_name');
-        $this->content_title    = '配置设置列表';
-        $this->content_subtitle = '配置设置列表';
-        $this->breadcrumb       = [
-            ['label' => '配置设置','url' => url('site_config/list')],
-            ['label' => '配置设置','url'  => ''],
+        $common = [
+            'title'            => '配置设置 - ' . config('local.site_name'),
+            'content_title'    => '配置项目管理',
+            'content_subtitle' => '配置项目管理：用于新增编辑配置项本身的信息，配置值设置请移步系统配置',
+            'breadcrumb'       => [
+                ['label' => '配置设置', 'url' => url('site_config/list')],
+                ['label' => '配置设置', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         $list = $siteConfigService->SiteConfig->getSiteConfigList();
         $this->assign('list',$list);

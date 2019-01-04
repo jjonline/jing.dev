@@ -18,15 +18,18 @@ class IndexController extends BaseController
      */
     public function indexAction()
     {
-        $this->title            = '工作台 - '.config('local.site_name');
-        $this->content_title    = '工作台';
-        $this->content_subtitle = '工作流概要统计';
-        $this->breadcrumb       = [
-            ['label' => '工作台','url' => url('index/index')],
-            ['label' => '概要','url'  => ''],
+        $common = [
+            'title'            => '工作台 - ' . config('local.site_name'),
+            'content_title'    => '工作台',
+            'content_subtitle' => '工作台',
+            'breadcrumb'       => [
+                ['label' => '工作台', 'url' => url('index/index')],
+                ['label' => '工作台', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => false,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = false;
+        $this->assign($common);
 
         return $this->fetch();
     }

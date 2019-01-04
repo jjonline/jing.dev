@@ -25,15 +25,18 @@ class RoleController extends BaseController
      */
     public function listAction()
     {
-        $this->title            = '人事设置 - '.config('local.site_name');
-        $this->content_title    = '角色管理';
-        $this->content_subtitle = '系统角色管理工具';
-        $this->breadcrumb       = [
-            ['label' => '人事设置','url' => url('role/list')],
-            ['label' => '角色管理','url'  => ''],
+        $common = [
+            'title'            => '人事设置 - ' . config('local.site_name'),
+            'content_title'    => '角色管理',
+            'content_subtitle' => '系统角色管理工具',
+            'breadcrumb'       => [
+                ['label' => '人事设置', 'url' => url('role/list')],
+                ['label' => '角色管理', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         $RoleModel = new Role();
         $list      = $RoleModel->getRoleList();
@@ -59,15 +62,18 @@ class RoleController extends BaseController
             // 保存角色
             return $roleService->save($request);
         }
-        $this->title            = '人事设置 - '.config('local.site_name');
-        $this->content_title    = '新增角色';
-        $this->content_subtitle = '人事设置-新增角色';
-        $this->breadcrumb       = [
-            ['label' => '角色管理','url'  => url('role/list')],
-            ['label' => '新增角色','url'  => ''],
+        $common = [
+            'title'            => '人事设置 - ' . config('local.site_name'),
+            'content_title'    => '新增角色',
+            'content_subtitle' => '人事设置-新增角色',
+            'breadcrumb'       => [
+                ['label' => '人事设置', 'url' => url('role/list')],
+                ['label' => '角色管理', 'url' => ''],
+            ],
+            'load_layout_css'  => true,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = true;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         $menu_list = $roleService->getRoleMenuTreeDataByRoleId();
         $this->assign('menu_list',$menu_list);
@@ -91,15 +97,18 @@ class RoleController extends BaseController
             // 保存角色
             return $roleService->save($request);
         }
-        $this->title            = '角色管理 - '.config('local.site_name');
-        $this->content_title    = '编辑角色';
-        $this->content_subtitle = '人事设置-角色编辑';
-        $this->breadcrumb       = [
-            ['label' => '角色管理','url'  => url('role/list')],
-            ['label' => '编辑角色','url'  => ''],
+        $common = [
+            'title'            => '角色管理 - ' . config('local.site_name'),
+            'content_title'    => '编辑角色',
+            'content_subtitle' => '人事设置-角色编辑',
+            'breadcrumb'       => [
+                ['label' => '角色管理', 'url' => url('role/list')],
+                ['label' => '编辑角色', 'url' => ''],
+            ],
+            'load_layout_css'  => true,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = true;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         // 角色数据
         $RoleModel = new Role();

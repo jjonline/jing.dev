@@ -24,15 +24,18 @@ class DepartmentController extends BaseController
      */
     public function listAction(DepartmentService $departmentService)
     {
-        $this->title            = '部门管理 - '.config('local.site_name');
-        $this->content_title    = '部门管理';
-        $this->content_subtitle = '部门管理工具，设置和管理系统部门数据';
-        $this->breadcrumb       = [
-            ['label' => '系统管理','url' => url('department/list')],
-            ['label' => '部门管理','url'  => ''],
+        $common = [
+            'title'            => '部门管理 - ' . config('local.site_name'),
+            'content_title'    => '部门管理',
+            'content_subtitle' => '部门管理工具，设置和管理系统部门数据',
+            'breadcrumb'       => [
+                ['label' => '系统管理', 'url' => url('department/list')],
+                ['label' => '部门管理', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         $dept_list = $departmentService->getDeptTreeList();
 
@@ -56,15 +59,18 @@ class DepartmentController extends BaseController
         {
             return $departmentService->save($request);
         }
-        $this->title            = '新增部门 - '.config('local.site_name');
-        $this->content_title    = '新增部门';
-        $this->content_subtitle = '新增部门--即新增公司、公司下部门（系统的部门是一个抽象的概念）';
-        $this->breadcrumb       = [
-            ['label' => '系统管理','url' => url('department/list')],
-            ['label' => '新增部门','url'  => ''],
+        $common = [
+            'title'            => '新增部门 - ' . config('local.site_name'),
+            'content_title'    => '新增部门',
+            'content_subtitle' => '新增部门--即新增公司、公司下部门（系统的部门是一个抽象的概念）',
+            'breadcrumb'       => [
+                ['label' => '系统管理', 'url' => url('department/list')],
+                ['label' => '新增部门', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         $dept_list = $departmentService->getDeptTreeList();
         $this->assign('dept_list',$dept_list);
@@ -87,15 +93,18 @@ class DepartmentController extends BaseController
         {
             return $departmentService->save($request);
         }
-        $this->title            = '编辑部门 - '.config('local.site_name');
-        $this->content_title    = '编辑部门';
-        $this->content_subtitle = '编辑公司、公司下信息';
-        $this->breadcrumb       = [
-            ['label' => '系统管理','url' => url('department/list')],
-            ['label' => '编辑部门','url'  => ''],
+        $common = [
+            'title'            => '编辑部门 - ' . config('local.site_name'),
+            'content_title'    => '编辑部门',
+            'content_subtitle' => '编辑公司、公司下信息',
+            'breadcrumb'       => [
+                ['label' => '系统管理', 'url' => url('department/list')],
+                ['label' => '编辑部门', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         $Dept = $departmentService->Department->getDeptInfoById($request->param('id'));
         if(empty($Dept))

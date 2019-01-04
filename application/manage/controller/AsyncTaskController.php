@@ -27,15 +27,18 @@ class AsyncTaskController extends BaseController
             // 将当前登录用户信息传递过去
             return $this->asJson($asyncTaskSearch->list($this->UserInfo));
         }
-        $this->title            = '异步任务状态 - '.config('local.site_name');
-        $this->content_title    = '异步任务状态';
-        $this->content_subtitle = '查看异步任务完成状态';
-        $this->breadcrumb = [
-            ['label' => '个人中心','url' => url('async_task/list')],
-            ['label' => '异步任务状态','url' => ''],
+        $common = [
+            'title'            => '异步任务状态 - ' . config('local.site_name'),
+            'content_title'    => '异步任务状态',
+            'content_subtitle' => '查看异步任务完成状态',
+            'breadcrumb'       => [
+                ['label' => '个人中心', 'url' => url('async_task/list')],
+                ['label' => '异步任务状态', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         // 仅能分配当前账号所下辖的部门
         $dept_list  = $this->UserInfo['dept_auth']['dept_list_tree'];

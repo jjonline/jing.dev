@@ -8,7 +8,6 @@
 
 namespace app\manage\controller;
 
-
 use app\common\controller\BaseController;
 use app\common\model\Menu;
 use app\common\service\MenuService;
@@ -26,19 +25,22 @@ class MenuController extends BaseController
      */
     public function listAction()
     {
-        $this->title            = '菜单管理 - '.config('local.site_name');
-        $this->content_title    = '菜单管理';
-        $this->content_subtitle = '开发者模式下的菜单管理工具';
-        $this->breadcrumb       = [
-            ['label' => '系统管理','url' => url('develop/menu')],
-            ['label' => '菜单管理','url'  => ''],
+        $common = [
+            'title'            => '菜单管理 - ' . config('local.site_name'),
+            'content_title'    => '菜单管理',
+            'content_subtitle' => '开发者模式下的菜单管理工具',
+            'breadcrumb'       => [
+                ['label' => '系统管理', 'url' => url('develop/menu')],
+                ['label' => '菜单管理', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         $MenuModel = new Menu();
         $list      = $MenuModel->getFormatMenuList();
-        $this->assign('list',$list);
+        $this->assign('list', $list);
         return $this->fetch();
     }
 
@@ -51,26 +53,28 @@ class MenuController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function createAction(Request $request , MenuService $menuService)
+    public function createAction(Request $request, MenuService $menuService)
     {
-        if($request->isPost() && $request->isAjax())
-        {
+        if ($request->isPost() && $request->isAjax()) {
             // 新增menu菜单后端检测和操作
             return $menuService->save($request);
         }
-        $this->title            = '新增菜单 - '.config('local.site_name');
-        $this->content_title    = '新增菜单';
-        $this->content_subtitle = '开发者模式下新增菜单';
-        $this->breadcrumb       = [
-            ['label' => 'Developer','url' => url('menu/list')],
-            ['label' => '新增菜单','url'  => url('menu/create')],
+        $common = [
+            'title'            => '新增菜单 - ' . config('local.site_name'),
+            'content_title'    => '菜单管理',
+            'content_subtitle' => '开发者模式下的菜单管理工具',
+            'breadcrumb'       => [
+                ['label' => '新增菜单', 'url' => url('menu/menu')],
+                ['label' => '菜单管理', 'url' => 'menu/create'],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         $MenuModel = new Menu();
         $list      = $MenuModel->getMenuList();
-        $this->assign('list',$list);
+        $this->assign('list', $list);
         return $this->fetch();
     }
 
@@ -83,32 +87,33 @@ class MenuController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function editAction(Request $request , MenuService $menuService)
+    public function editAction(Request $request, MenuService $menuService)
     {
-        if($request->isPost() && $request->isAjax())
-        {
+        if ($request->isPost() && $request->isAjax()) {
             // 编辑menu菜单后端检测和操作
             return $menuService->save($request);
         }
-        $this->title            = '编辑菜单 - '.config('local.site_name');
-        $this->content_title    = '编辑菜单';
-        $this->content_subtitle = '开发者模式下修改菜单';
-        $this->breadcrumb       = [
-            ['label' => '菜单管理','url'  => url('menu/list')],
-            ['label' => '编辑菜单','url'  => ''],
+        $common = [
+            'title'            => '编辑菜单 - ' . config('local.site_name'),
+            'content_title'    => '菜单管理',
+            'content_subtitle' => '开发者模式下的菜单管理工具',
+            'breadcrumb'       => [
+                ['label' => '新增菜单', 'url' => url('menu/menu')],
+                ['label' => '编辑菜单', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = false;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         $MenuModel = new Menu();
         $menu      = $MenuModel->getMenuById($request->param('id'));
         $list      = $MenuModel->getMenuList();
-        if(empty($menu))
-        {
+        if (empty($menu)) {
             $this->redirect(url('menu/list'));
         }
-        $this->assign('menu_edit',$menu);
-        $this->assign('list',$list);
+        $this->assign('menu_edit', $menu);
+        $this->assign('list', $list);
         return $this->fetch();
     }
 
@@ -121,10 +126,9 @@ class MenuController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function sortAction(Request $request , MenuService $menuService)
+    public function sortAction(Request $request, MenuService $menuService)
     {
-        if($request->isPost() && $request->isAjax())
-        {
+        if ($request->isPost() && $request->isAjax()) {
             // 编辑menu菜单后端检测和操作
             return $this->asJson($menuService->sort($request));
         }
@@ -141,13 +145,11 @@ class MenuController extends BaseController
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    public function deleteAction(Request $request , MenuService $menuService)
+    public function deleteAction(Request $request, MenuService $menuService)
     {
-        if($request->isPost() && $request->isAjax())
-        {
+        if ($request->isPost() && $request->isAjax()) {
             // 编辑menu菜单后端检测和操作
             return $this->asJson($menuService->delete($request));
         }
     }
-
 }

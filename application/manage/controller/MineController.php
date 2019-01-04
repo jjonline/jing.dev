@@ -24,15 +24,18 @@ class MineController extends BaseController
      */
     public function profileAction(UserOpenService $userOpenService,UserLogService $userLogService)
     {
-        $this->title            = '个人中心 - '.config('local.site_name');
-        $this->content_title    = '个人中心';
-        $this->content_subtitle = '个人中心-个人资料概要';
-        $this->breadcrumb       = [
-            ['label' => '个人中心','url' => url('mine/profile')],
-            ['label' => '个人资料概要','url'  => ''],
+        $common = [
+            'title'            => '个人中心 - ' . config('local.site_name'),
+            'content_title'    => '个人中心',
+            'content_subtitle' => '个人中心-个人资料概要',
+            'breadcrumb'       => [
+                ['label' => '个人中心', 'url' => url('mine/profile')],
+                ['label' => '个人资料概要', 'url' => ''],
+            ],
+            'load_layout_css'  => true,
+            'load_layout_js'   => true,
         ];
-        $this->load_layout_css = true;
-        $this->load_layout_js  = true;
+        $this->assign($common);
 
         // 是否有权编辑个人信息
         // $can_edit = $this->userHasPermission('manage/mine/edit'); // 无前后缀菜单url方法检查权限，全部使用小写
