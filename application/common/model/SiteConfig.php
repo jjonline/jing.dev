@@ -12,7 +12,7 @@ use think\Model;
 
 class SiteConfig extends Model
 {
-    protected $json = ['val'];
+    protected $json = ['select_items'];
 
     /**
      * 主键查询站点配置单条记录

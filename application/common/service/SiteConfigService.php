@@ -44,15 +44,17 @@ class SiteConfigService
         if (empty($site_config['type'])) {
             return ['error_code' => 400,'error_msg' => '请选择配置项类型'];
         }
-        if ($site_config['type'] == 'radio') {
-            if (empty($site_config['val'])) {
-                return ['error_code' => 400,'error_msg' => '请按格式设置radio选项值'];
+        if ($site_config['type'] == 'select') {
+            if (empty($site_config['select_items'])) {
+                return ['error_code' => 400,'error_msg' => '请按格式设置select选项值'];
             }
-            $val = $this->parseVal($site_config['val']);
-            if (empty($val)) {
-                return ['error_code' => 400,'error_msg' => 'radio选项值格式有误'];
+            $select_items = $this->parseVal($site_config['select_items']);
+            if (empty($select_items)) {
+                return ['error_code' => 400,'error_msg' => 'select选项值格式有误'];
             }
-            $site_config['val'] = $val;
+            $site_config['select_items'] = $select_items;
+        } else {
+            $site_config['select_items'] = null;
         }
         if (empty($site_config['key'])) {
             return ['error_code' => 400,'error_msg' => '配置项Key不得为空'];

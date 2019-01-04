@@ -16,16 +16,16 @@
                     <form action="" class="form-horizontal" id="<%{$key}%>">
                         <%{volist name="list_group" id="item"}%>
                         <div class="form-group" data-toggle="tooltip" title="<%{$item.description}%>">
-                            <label class="col-sm-4 control-label"><%{$item.name}%></label>
-                            <div class="col-sm-6">
+                            <label class="col-sm-3 control-label"><%{$item.name}%></label>
+                            <div class="col-sm-7">
                                 <%{if condition="$item.type EQ 'text'"}%>
                                     <input type="text" name="<%{$item.key}%>" value="<%{$item.value}%>" placeholder="<%{$item.description}%>" class="form-control">
                                 <%{/if}%>
 
-                                <%{if condition="$item.type EQ 'radio'"}%>
+                                <%{if condition="$item.type EQ 'select'"}%>
                                     <select name="<%{$item.key}%>" class="form-control select2" style="width: 100%;">
                                         <option value="">--请选择--</option>
-                                        <%{volist name="$item.var" id="radio"}%>
+                                        <%{volist name="$item.select_items" id="radio"}%>
                                             <option value="<%{$radio.value}%>"<%{if condition="$radio.value EQ $item.value"}%> selected="selected"<%{/if}%>><%{$radio.name}%></option>
                                         <%{/volist}%>
                                     </select>

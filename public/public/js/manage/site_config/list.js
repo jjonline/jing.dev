@@ -59,7 +59,7 @@ $(function () {
         $('#name').val(data.name);
         $('#description').val(data.description);
         $('#sort').val(data.sort);
-        $('#val').val(parseVal(data.val));
+        $('#select_items').val(parseVal(data.select_items));
         $('#type').val(data.type).trigger('change');
 
         $('#SiteConfigModal').modal('show');
@@ -98,13 +98,15 @@ $(function () {
         if($('#type').val() == '-1')
         {
             utils.toast('请完善配置项类型');
+            $('#type').focus();
             return false;
         }
-        if($('#type').val() == 'radio')
+        if($('#type').val() == 'select')
         {
-            if(utils.isEmpty($('#val').val()))
+            if(utils.isEmpty($('#select_items').val()))
             {
-                utils.toast('请完善radio选项值');
+                utils.toast('请完善select选项值');
+                $('#select_items').focus();
                 return false;
             }
         }
@@ -114,12 +116,6 @@ $(function () {
             utils.toast('请完善配置项Key');
             return false;
         }
-        // if(utils.isEmpty($('#default').val()))
-        // {
-        //     $('#default').focus();
-        //     utils.toast('请完善配置项默认值');
-        //     return false;
-        // }
         if(utils.isEmpty($('#name').val()))
         {
             $('#name').focus();
@@ -147,10 +143,9 @@ $(function () {
             data: data,
             success: function (data) {
                 if(data.error_code == 0){
-                    utils.alert(data.error_msg,function () {
-                        setTimeout(function () {
-                            location.href = '/manage/site_config/list';
-                        },300);
+                    $('#SiteConfigModal').modal('hide');
+                    utils.toast(data.error_msg,2000,function () {
+                        window.location.reload();
                     });
                 }else{
                     utils.alert(data.error_msg ? data.error_msg : '未知错误');
@@ -162,6 +157,14 @@ $(function () {
                 utils.alert('网络或服务器异常，请稍后再试');
             }
         });
+    });
+
+    // select类型才显示输入框
+    $("#type").on("select2:select",function(e) {
+        $("#select_wrap").hide();
+        if ($(this).val() == 'select') {
+            $("#select_wrap").show();
+        }
     });
 
     // 提交创建
@@ -185,12 +188,6 @@ $(function () {
             utils.toast('请完善配置项Key');
             return false;
         }
-        // if(utils.isEmpty($('#default').val()))
-        // {
-        //     $('#default').focus();
-        //     utils.toast('请完善配置项默认值');
-        //     return false;
-        // }
         if(utils.isEmpty($('#name').val()))
         {
             $('#name').focus();
@@ -218,10 +215,9 @@ $(function () {
             data: data,
             success: function (data) {
                 if(data.error_code == 0){
-                    utils.alert(data.error_msg,function () {
-                        setTimeout(function () {
-                            location.href = '/manage/site_config/list';
-                        },300);
+                    $('#SiteConfigModal').modal('hide');
+                    utils.toast(data.error_msg,2000,function () {
+                        window.location.reload();
                     });
                 }else{
                     utils.alert(data.error_msg ? data.error_msg : '未知错误');

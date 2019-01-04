@@ -49,10 +49,6 @@ class BaseController extends BaseAuthController
     protected function initialize()
     {
         parent::initialize();
-        // 默认关闭每个操作下都载入特定css的特性
-        $this->load_layout_css = false;
-        // 默认关闭每个操作下都载入特定js的特性
-        $this->load_layout_js  = false;
     }
 
     /**

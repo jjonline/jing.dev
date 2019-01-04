@@ -42,8 +42,9 @@ class SiteConfigService
         $_result = $this->SiteConfig->getSiteConfigList();
         foreach ($_result as $key => $value) {
             $_result[$key]['value'] = $value['value'] ?: $value['default']; // 没有值的结果集将默认值赋值
-            if ($value['type'] == 'radio' && !empty($value['var'])) {
-                $_result[$key]['var'] = json_decode($value['var'], true);
+            if ($value['type'] == 'select' && !empty($value['select_items'])) {
+                // select下拉框值转换成数组
+                $_result[$key]['select_items'] = json_decode(json_encode($value['select_items']), true);
             }
         }
         $result  = ArrayHelper::group($_result, 'flag');
