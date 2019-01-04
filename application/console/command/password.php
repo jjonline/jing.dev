@@ -44,6 +44,6 @@ class password extends Command
             throw new Exception("Password Text Format Not Allowed.Text Need Word And Number,length at least 8");
         }
         $crypt_text = password_hash(config('local.auth_key').trim($text), PASSWORD_BCRYPT);
-        $output->writeln($crypt_text);
+        $output->writeln("<info>Generate Success</info>\n".$crypt_text);
     }
 }
