@@ -11,7 +11,7 @@
  Target Server Version : 50723
  File Encoding         : utf-8
 
- Date: 01/04/2019 22:25:57 PM
+ Date: 01/04/2019 23:51:10 PM
 */
 
 SET NAMES utf8mb4;
@@ -331,8 +331,8 @@ CREATE TABLE `com_site_config` (
   `default` varchar(1024) NOT NULL DEFAULT '' COMMENT '配置项默认值',
   `name` varchar(128) NOT NULL DEFAULT '' COMMENT '配置项中文名称',
   `description` varchar(1024) NOT NULL DEFAULT '' COMMENT '配置项中文功能说明',
-  `type` enum('text','radio','textarea') NOT NULL DEFAULT 'text' COMMENT '配置项后台显示的类型:输入框、单选项、大段文本',
-  `var` json NOT NULL COMMENT 'radio单选框待选值列表',
+  `type` enum('text','select','textarea') NOT NULL DEFAULT 'text' COMMENT '配置项后台显示的类型:输入框、单选项、大段文本',
+  `select_items` json NOT NULL COMMENT 'radio单选框待选值列表',
   `sort` bigint(20) DEFAULT NULL COMMENT '部门排序，数字越小越靠前',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
