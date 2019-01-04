@@ -1,6 +1,6 @@
 <?php
 /**
- * AES加解密
+ * 数据加解密
  * @user Jea杨 (JJonline@JJonline.Cn)
  * @date 2018-12-30 22:28
  * @file AesCryptHelper.php
@@ -25,6 +25,7 @@ class AesCryptHelper
     {
         if (empty(self::$key)) {
             self::$key = (new SiteConfig())->getSitConfigValueByKey('crypt_key');
+            self::$key = trim(self::$key);
         }
         return self::$key;
     }
@@ -33,23 +34,23 @@ class AesCryptHelper
      * 加密
      * @param $str
      * @param $localIV
-     * @param $encryptKey
      * @return string
      */
-    public static function encrypt($str, $localIV = '')
+    public static function encrypt($str, $localIV = '1234567890123456')
     {
-        return openssl_encrypt($str, 'AES-128-CBC', self::getCryptKey(),0, $localIV);
+        $data = openssl_encrypt($str, 'AES-128-CBC', self::getCryptKey(), OPENSSL_RAW_DATA, $localIV);
+        return base64_encode($data);
     }
 
     /**
      * 解密
      * @param $str
      * @param $localIV
-     * @param $encryptKey
      * @return string
      */
-    public static function decrypt($str, $localIV = '')
+    public static function decrypt($str, $localIV = '1234567890123456')
     {
-        return openssl_decrypt($str, 'AES-128-CBC', self::getCryptKey(), 0, $localIV);
+        $str = base64_decode($str);
+        return openssl_decrypt($str, 'AES-128-CBC', self::getCryptKey(), OPENSSL_RAW_DATA, $localIV);
     }
 }
