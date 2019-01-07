@@ -57,7 +57,10 @@ class CommonController extends BasicController
             // 初始化User属性
             $this->UserInfo              = Session::get('user_info');
             // 会员可操作的部门列表信息
-            $this->UserInfo['dept_auth'] = $this->DepartmentService->getAuthDeptInfoByDeptId($this->UserInfo['dept_id'], $this->UserInfo['is_leader']);
+            $this->UserInfo['dept_auth'] = $this->DepartmentService->getAuthDeptInfoByDeptId(
+                $this->UserInfo['dept_id'],
+                $this->UserInfo['is_leader']
+            );
 
             return $this->UserInfo;
         }
@@ -83,7 +86,7 @@ class CommonController extends BasicController
                 'Message' => 'Link has expired.',
             ], 200, [], ['root_node' => 'Error']);
         }
-        $attachment_id = AttachmentHelper::transfer_decrypt($access_key, Config::get('local.auth_key'));
+        $attachment_id = AttachmentHelper::transferDecrypt($access_key, Config::get('local.auth_key'));
         if (empty($attachment_id)) {
             return xml([
                 'Code'    => '500',

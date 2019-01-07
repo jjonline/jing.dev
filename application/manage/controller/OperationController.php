@@ -20,9 +20,7 @@ class OperationController extends BaseController
      * 请求方式：get
      * ---
      * @param OperationRecordService $operationRecordService
-     * @return array
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
+     * @return mixed|\think\Response
      * @throws \think\exception\DbException
      */
     public function recordAction(OperationRecordService $operationRecordService)
@@ -30,8 +28,9 @@ class OperationController extends BaseController
         if ($this->request->isAjax()) {
             $operate_name = $this->request->get('name');
             $business_id  = $this->request->get('id');
-            $result = $operationRecordService->getOperationRecordList($operate_name, $business_id);
+            $result       = $operationRecordService->getOperationRecordList($operate_name, $business_id);
             return $this->asJson(['error_code' => 0 ,'error_msg' => 'ok','data' => $result]);
         }
+        return $this->renderJson('error', 500);
     }
 }

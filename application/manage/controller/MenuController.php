@@ -132,6 +132,7 @@ class MenuController extends BaseController
             // 编辑menu菜单后端检测和操作
             return $this->asJson($menuService->sort($request));
         }
+        return $this->renderJson('error', 500);
     }
 
     /**
@@ -151,5 +152,6 @@ class MenuController extends BaseController
             // 编辑menu菜单后端检测和操作
             return $this->asJson($menuService->delete($request));
         }
+        return $this->renderJson('error', 500);
     }
 }

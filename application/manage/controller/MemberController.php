@@ -64,6 +64,7 @@ class MemberController extends BaseController
             $result = $memberService->update($this->request, $this->UserInfo);
             return $this->asJson($result);
         }
+        return $this->renderJson('error', 500);
     }
 
     /**
@@ -80,5 +81,6 @@ class MemberController extends BaseController
             $result = $memberService->enableToggle($this->request, $this->UserInfo);
             return $this->asJson($result);
         }
+        return $this->renderJson('error', 500);
     }
 }

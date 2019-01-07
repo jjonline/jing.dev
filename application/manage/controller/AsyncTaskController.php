@@ -59,5 +59,6 @@ class AsyncTaskController extends BaseController
         if ($request->isAjax()) {
             return $this->asJson($asyncTaskService->getDetailById($request));
         }
+        return $this->renderJson('error', 500);
     }
 }

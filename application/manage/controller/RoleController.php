@@ -145,6 +145,7 @@ class RoleController extends BaseController
         if ($request->isPost() && $request->isAjax()) {
             return $this->asJson($roleService->sort($request));
         }
+        return $this->renderJson('error', 500);
     }
 
     /**
@@ -168,5 +169,6 @@ class RoleController extends BaseController
             }
             return $this->asJson($roleService->delete($request));
         }
+        return $this->renderJson('error', 500);
     }
 }

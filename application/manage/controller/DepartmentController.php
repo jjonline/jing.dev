@@ -148,5 +148,6 @@ class DepartmentController extends BaseController
             // 编辑menu菜单后端检测和操作
             return $this->asJson($departmentService->delete($request));
         }
+        return $this->renderJson('error', 500);
     }
 }
