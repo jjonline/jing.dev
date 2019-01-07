@@ -10,6 +10,8 @@
 > 
 > Redis缓存
 
+本地开发地址：http://component.xnn.fun/
+
 ### 功能概要
 
 1、管理系统角色、部门
