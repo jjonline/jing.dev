@@ -1,11 +1,11 @@
 /*!
- * Distpicker v2.0.3
- * https://github.com/fengyuanchen/distpicker
+ * Distpicker v2.0.5
+ * https://fengyuanchen.github.io/distpicker
  *
- * Copyright (c) 2014-2018 Chen Fengyuan
+ * Copyright 2014-present Chen Fengyuan
  * Released under the MIT license
  *
- * Date: 2018-03-01T12:52:03.658Z
+ * Date: 2018-12-01T09:59:25.126Z
  */
 
 'use strict';
@@ -14,6 +14,28 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var $ = _interopDefault(require('jquery'));
 
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+
 var DEFAULTS = {
   // Selects the districts automatically.
   // 0 -> Disable autoselect
@@ -21,19 +43,14 @@ var DEFAULTS = {
   // 2 -> Autoselect province and city only
   // 3 -> Autoselect all (province, city and district)
   autoselect: 0,
-
   // Show placeholder.
   placeholder: true,
-
   // Select value. Options: 'name' and 'code'
   valueType: 'name',
-
   // Defines the initial value of province.
   province: '—— 省 ——',
-
   // Defines the initial value of city.
   city: '—— 市 ——',
-
   // Defines the initial value of district.
   district: '—— 区 ——'
 };
@@ -1199,10 +1216,10 @@ var DISTRICTS = {
     330109: '萧山区',
     330110: '余杭区',
     330111: '富阳区',
+    330112: '临安区',
     330122: '桐庐县',
     330127: '淳安县',
-    330182: '建德市',
-    330185: '临安区'
+    330182: '建德市'
   },
   330200: {
     330203: '海曙区',
@@ -1472,14 +1489,14 @@ var DISTRICTS = {
     350104: '仓山区',
     350105: '马尾区',
     350111: '晋安区',
+    350112: '长乐区',
     350121: '闽侯县',
     350122: '连江县',
     350123: '罗源县',
     350124: '闽清县',
     350125: '永泰县',
     350128: '平潭县',
-    350181: '福清市',
-    350182: '长乐区'
+    350181: '福清市'
   },
   350200: {
     350203: '思明区',
@@ -1609,7 +1626,7 @@ var DISTRICTS = {
   360400: {
     360402: '濂溪区',
     360403: '浔阳区',
-    360421: '柴桑区',
+    360404: '柴桑区',
     360423: '武宁县',
     360424: '修水县',
     360425: '永修县',
@@ -1742,8 +1759,8 @@ var DISTRICTS = {
     370212: '崂山区',
     370213: '李沧区',
     370214: '城阳区',
+    370215: '即墨区',
     370281: '胶州市',
-    370282: '即墨区',
     370283: '平度市',
     370285: '莱西市'
   },
@@ -2288,8 +2305,8 @@ var DISTRICTS = {
     430111: '雨花区',
     430112: '望城区',
     430121: '长沙县',
-    430124: '宁乡市',
-    430181: '浏阳市'
+    430181: '浏阳市',
+    430182: '宁乡市'
   },
   430200: {
     430202: '荷塘区',
@@ -2492,7 +2509,8 @@ var DISTRICTS = {
   440400: {
     440402: '香洲区',
     440403: '斗门区',
-    440404: '金湾区'
+    440404: '金湾区',
+    440499: '澳门大学横琴校区(由澳门管辖)'
   },
   440500: {
     440507: '龙湖区',
@@ -2728,7 +2746,7 @@ var DISTRICTS = {
   },
   451000: {
     451002: '右江区',
-    451021: '田阳县',
+    451021: '田阳区',
     451022: '田东县',
     451023: '平果县',
     451024: '德保县',
@@ -2891,11 +2909,11 @@ var DISTRICTS = {
     500151: '铜梁区',
     500152: '潼南区',
     500153: '荣昌区',
-    500154: '开州区'
+    500154: '开州区',
+    500155: '梁平区',
+    500156: '武隆区'
   },
   500200: {
-    500155: '梁平区',
-    500156: '武隆区',
     500229: '城口县',
     500230: '丰都县',
     500231: '垫江县',
@@ -3109,7 +3127,7 @@ var DISTRICTS = {
     513222: '理县',
     513223: '茂县',
     513224: '松潘县',
-    513225: '九寨沟县',
+    513225: '九寨沟市',
     513226: '金川县',
     513227: '小金县',
     513228: '黑水县',
@@ -3459,17 +3477,17 @@ var DISTRICTS = {
     540300: '昌都市',
     540400: '林芝市',
     540500: '山南市',
-    542400: '那曲地区',
+    540600: '那曲市',
     542500: '阿里地区'
   },
   540100: {
     540102: '城关区',
     540103: '堆龙德庆区',
+    540104: '达孜区',
     540121: '林周县',
     540122: '当雄县',
     540123: '尼木县',
     540124: '曲水县',
-    540126: '达孜县',
     540127: '墨竹工卡县'
   },
   540200: {
@@ -3528,18 +3546,18 @@ var DISTRICTS = {
     540530: '错那县',
     540531: '浪卡子县'
   },
-  542400: {
-    542421: '那曲县',
-    542422: '嘉黎县',
-    542423: '比如县',
-    542424: '聂荣县',
-    542425: '安多县',
-    542426: '申扎县',
-    542427: '索县',
-    542428: '班戈县',
-    542429: '巴青县',
-    542430: '尼玛县',
-    542431: '双湖县'
+  540600: {
+    540602: '色尼区',
+    540621: '嘉黎县',
+    540622: '比如县',
+    540623: '聂荣县',
+    540624: '安多县',
+    540625: '申扎县',
+    540626: '索县',
+    540627: '班戈县',
+    540628: '巴青县',
+    540629: '尼玛县',
+    540630: '双湖县'
   },
   542500: {
     542521: '普兰县',
@@ -3643,7 +3661,7 @@ var DISTRICTS = {
   },
   610700: {
     610702: '汉台区',
-    610721: '南郑区',
+    610703: '南郑区',
     610722: '城固县',
     610723: '洋县',
     610724: '西乡县',
@@ -4147,16 +4165,14 @@ var WINDOW = typeof window !== 'undefined' ? window : {};
 var NAMESPACE = 'distpicker';
 var EVENT_CHANGE = 'change';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 var DEFAULT_CODE = 100000;
 var PROVINCE = 'province';
 var CITY = 'city';
 var DISTRICT = 'district';
 
-var Distpicker = function () {
+var Distpicker =
+/*#__PURE__*/
+function () {
   function Distpicker(element, options) {
     _classCallCheck(this, Distpicker);
 
@@ -4168,56 +4184,51 @@ var Distpicker = function () {
   }
 
   _createClass(Distpicker, [{
-    key: 'init',
+    key: "init",
     value: function init() {
       var _this = this;
 
       var options = this.options;
-
       var $selects = this.$element.find('select');
       var length = $selects.length;
-
       var data = {};
-
       $selects.each(function (i, select) {
         return $.extend(data, $(select).data());
       });
-
       $.each([PROVINCE, CITY, DISTRICT], function (i, type) {
         if (data[type]) {
           options[type] = data[type];
-          _this['$' + type] = $selects.filter('[data-' + type + ']');
+          _this["$".concat(type)] = $selects.filter("[data-".concat(type, "]"));
         } else {
-          _this['$' + type] = length > i ? $selects.eq(i) : null;
+          _this["$".concat(type)] = length > i ? $selects.eq(i) : null;
         }
       });
+      this.bind(); // Reset all the selects (after event binding)
 
-      this.bind();
-
-      // Reset all the selects (after event binding)
       this.reset();
       this.ready = true;
     }
   }, {
-    key: 'bind',
+    key: "bind",
     value: function bind() {
       var _this2 = this;
 
       if (this.$province) {
         this.$province.on(EVENT_CHANGE, this.onChangeProvince = $.proxy(function () {
           _this2.output(CITY);
-          _this2.output(DISTRICT);
+
+          _this2.output(DISTRICT, true);
         }, this));
       }
 
       if (this.$city) {
         this.$city.on(EVENT_CHANGE, this.onChangeCity = $.proxy(function () {
-          return _this2.output(DISTRICT);
+          return _this2.output(DISTRICT, true);
         }, this));
       }
     }
   }, {
-    key: 'unbind',
+    key: "unbind",
     value: function unbind() {
       if (this.$province) {
         this.$province.off(EVENT_CHANGE, this.onChangeProvince);
@@ -4228,18 +4239,18 @@ var Distpicker = function () {
       }
     }
   }, {
-    key: 'output',
+    key: "output",
     value: function output(type) {
+      var triggerEvent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       var options = this.options,
           placeholders = this.placeholders;
-
-      var $select = this['$' + type];
+      var $select = this["$".concat(type)];
 
       if (!$select || !$select.length) {
         return;
       }
 
-      var code = void 0;
+      var code;
 
       switch (type) {
         case PROVINCE:
@@ -4262,21 +4273,17 @@ var Distpicker = function () {
 
       if ($.isPlainObject(districts)) {
         $.each(districts, function (i, name) {
-          var selected = name === value;
-
-          if (options.valueType === 'code') {
-            selected = i === String(value);
-          }
+          var selected = name === value || i === String(value);
 
           if (selected) {
             matched = true;
           }
 
           data.push({
-            code: i,
             name: name,
-            value: options.valueType === 'name' ? name : i,
-            selected: selected
+            selected: selected,
+            code: i,
+            value: options.valueType === 'name' ? name : i
           });
         });
       }
@@ -4286,15 +4293,15 @@ var Distpicker = function () {
 
         if (data.length && (type === PROVINCE && autoselect > 0 || type === CITY && autoselect > 1 || type === DISTRICT && autoselect > 2)) {
           data[0].selected = true;
-        }
+        } // Save the unmatched value as a placeholder at the first output
 
-        // Save the unmatched value as a placeholder at the first output
+
         if (!this.ready && value) {
           placeholders[type] = value;
         }
-      }
+      } // Add placeholder option
 
-      // Add placeholder option
+
       if (options.placeholder) {
         data.unshift({
           code: '',
@@ -4310,40 +4317,35 @@ var Distpicker = function () {
         $select.empty();
       }
 
-      $select.trigger(EVENT_CHANGE);
-    }
-
-    // eslint-disable-next-line class-methods-use-this
+      if (triggerEvent) {
+        $select.trigger(EVENT_CHANGE);
+      }
+    } // eslint-disable-next-line class-methods-use-this
 
   }, {
-    key: 'getList',
+    key: "getList",
     value: function getList(data) {
       var list = [];
-
       $.each(data, function (i, n) {
-        var attrs = ['data-code="' + n.code + '"', 'data-text="' + n.name + '"', 'value="' + n.value + '"'];
+        var attrs = ["data-code=\"".concat(n.code, "\""), "data-text=\"".concat(n.name, "\""), "value=\"".concat(n.value, "\"")];
 
         if (n.selected) {
           attrs.push('selected');
         }
 
-        list.push('<option ' + attrs.join(' ') + '>' + n.name + '</option>');
+        list.push("<option ".concat(attrs.join(' '), ">").concat(n.name, "</option>"));
       });
-
       return list.join('');
-    }
-
-    // eslint-disable-next-line class-methods-use-this
+    } // eslint-disable-next-line class-methods-use-this
 
   }, {
-    key: 'getDistricts',
+    key: "getDistricts",
     value: function getDistricts() {
       var code = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT_CODE;
-
       return DISTRICTS[code] || null;
     }
   }, {
-    key: 'reset',
+    key: "reset",
     value: function reset(deep) {
       if (!deep) {
         this.output(PROVINCE);
@@ -4354,12 +4356,12 @@ var Distpicker = function () {
       }
     }
   }, {
-    key: 'destroy',
+    key: "destroy",
     value: function destroy() {
       this.unbind();
     }
   }], [{
-    key: 'setDefaults',
+    key: "setDefaults",
     value: function setDefaults(options) {
       $.extend(DEFAULTS, $.isPlainObject(options) && options);
     }
@@ -4372,12 +4374,11 @@ if ($.fn) {
   var AnotherDistpicker = $.fn.distpicker;
 
   $.fn.distpicker = function jQueryDistpicker(option) {
-    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
       args[_key - 1] = arguments[_key];
     }
 
-    var result = void 0;
-
+    var result;
     this.each(function (i, element) {
       var $element = $(element);
       var isDestroy = option === 'destroy';
@@ -4389,7 +4390,6 @@ if ($.fn) {
         }
 
         var options = $.extend({}, $element.data(), $.isPlainObject(option) && option);
-
         distpicker = new Distpicker(element, options);
         $element.data(NAMESPACE, distpicker);
       }
@@ -4406,7 +4406,6 @@ if ($.fn) {
         }
       }
     });
-
     return typeof result === 'undefined' ? this : result;
   };
 
@@ -4421,6 +4420,6 @@ if ($.fn) {
 
 if (WINDOW.document) {
   $(function () {
-    $('[data-toggle="' + NAMESPACE + '"]').distpicker();
+    $("[data-toggle=\"".concat(NAMESPACE, "\"]")).distpicker();
   });
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * 前台会员模型
  * @user Jea杨 (JJonline@JJonline.Cn)
  * @date 2018-04-29 14:34
  * @file Member.php
@@ -60,7 +60,7 @@ class Member extends Model
         if (empty($email)) {
             return [];
         }
-        $data = $this->find(['email' => $email]);
+        $data = $this->where(['email' => $email])->find();
         return $data ? $data->toArray() : [];
     }
 
@@ -77,7 +77,7 @@ class Member extends Model
         if (empty($mobile)) {
             return [];
         }
-        $data = $this->find(['mobile' => $mobile]);
+        $data = $this->where(['mobile' => $mobile])->find();
         return $data ? $data->toArray() : [];
     }
 

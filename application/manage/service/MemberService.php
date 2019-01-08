@@ -12,8 +12,8 @@ use app\common\helper\FilterValidHelper;
 use app\common\helper\GenerateHelper;
 use app\common\model\Member;
 use app\common\service\LogService;
-use app\common\service\UserLogService;
 use think\Db;
+use think\Exception;
 use think\facade\Config;
 use think\Request;
 
@@ -36,15 +36,75 @@ class MemberService
         $this->LogService     = $logService;
     }
 
+    /**
+     * 新增前台会员
+     * @param Request $request
+     * @param $act_user_info
+     * @return array
+     */
     public function insert(Request $request, $act_user_info)
     {
-        $menu_auth = $act_user_info['menu_auth'];
-        if (!in_array($menu_auth['permissions'], ['super','leader'])) {
-            return ['error_code' => 500,'error_msg' => '您没有操作权限，仅允许管理员和部门领导进行编辑'];
-        }
-        $member = $request->post('Member/a');
-        if (empty($member) || empty($member['id']) || empty($member['real_name']) || empty($member['user_name']) || empty($member['password'])) {
-            return ['error_code' => 500,'error_msg' => '参数有误'];
+        Db::startTrans();
+        try {
+            $menu_auth = $act_user_info['menu_auth'];
+            if (!in_array($menu_auth['permissions'], ['super','leader'])) {
+                throw new Exception('您没有操作权限，仅允许管理员和部门领导进行编辑');
+            }
+            $member = $request->post('Member/a');
+            if (empty($member)) {
+                throw new Exception('参数有误');
+            }
+            $_member = [];
+            // 用户名
+            $repeat_member = $this->Member->getMemberInfoByUserName($member['user_name']);
+            if ($repeat_member) {
+                throw new Exception('用户名['.$member['user_name'].']已存在');
+            }
+            $_member['user_name'] = $member['user_name'];
+            // 手机号
+            if (!FilterValidHelper::is_phone_valid($member['mobile'])) {
+                throw new Exception('手机号格式有误');
+            }
+            $repeat_member = $this->Member->getMemberInfoByMobile($member['mobile']);
+            if ($repeat_member) {
+                throw new Exception('手机号['.$member['mobile'].']已存在');
+            }
+            $_member['mobile'] = $member['mobile'];
+            // 邮箱
+            $repeat_member = $this->Member->getMemberInfoByEmail($member['email']);
+            if ($repeat_member) {
+                throw new Exception('邮箱['.$member['email'].']已存在');
+            }
+            $_member['email'] = $member['email'];
+            // 密码
+            if (!FilterValidHelper::is_password_valid($member['password'])) {
+                throw new Exception('密码格式有误，6至18位同时包含字母和数字');
+            }
+            $_member['password'] = $this->generateUserPassword($member['password']);
+            // 真实姓名
+            if (!empty($member['real_name'])) {
+                $_member['real_name'] = $member['real_name'];
+            }
+            // 联系电话、座机、办公电话等
+            $_member['telephone'] = $member['telephone'];
+            $_member['remark']    = empty($member['remark']) ? '' : $member['remark'];
+            $_member['gender']    = in_array($member['gender'], [-1,0,1]) ? $member['gender'] : -1;
+            $_member['auth_code'] = GenerateHelper::makeNonceStr(8);
+            $_member['enable']    = empty($member['enable']) ? 0 : 1;
+
+            $_member['province'] = $member['province'];
+            $_member['city']     = $member['city'];
+            $_member['district'] = $member['district'];
+            $_member['address']  = $member['address'];
+
+            $this->Member->isUpdate(false)->save($_member);
+            $this->LogService->logRecorder([$_member,$member], '新增前台用户信息');
+
+            Db::commit();
+            return ['error_code' => 0,'error_msg' => '新增成功'];
+        } catch (\Throwable $e) {
+            Db::rollback();
+            return ['error_code' => 505, 'error_msg' => '新增失败：'.$e->getMessage()];
         }
     }
 
@@ -53,82 +113,79 @@ class MemberService
      * @param Request $request
      * @param $act_user_info
      * @return array
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     public function update(Request $request, $act_user_info)
     {
-        $menu_auth = $act_user_info['menu_auth'];
-        if (!in_array($menu_auth['permissions'], ['super','leader'])) {
-            return ['error_code' => 500,'error_msg' => '您没有操作权限，仅允许管理员和部门领导进行编辑'];
-        }
-        $member = $request->post('Member/a');
-        if (empty($member) || empty($member['id'])) {
-            return ['error_code' => 500,'error_msg' => '参数有误'];
-        }
-        $exist_member = $this->Member->getMemberInfoById($member['id']);
-        if (empty($exist_member)) {
-            return ['error_code' => 500,'error_msg' => '拟编辑用户不存在'];
-        }
-        $_member = [];
-        // 用户名
-        if ($exist_member['user_name'] != $member['user_name']) {
-            $repeat_member = $this->Member->getMemberInfoByUserName($member['user_name']);
-            if ($repeat_member) {
-                return ['error_code' => 500,'error_msg' => '用户名['.$member['user_name'].']已存在'];
-            }
-            $_member['user_name'] = $member['user_name'];
-        }
-        // 手机号
-        if ($exist_member['mobile'] != $member['mobile']) {
-            if (!FilterValidHelper::is_phone_valid($member['mobile'])) {
-                return ['error_code' => 500,'error_msg' => '新手机号格式有误'];
-            }
-            $repeat_member = $this->Member->getMemberInfoByMobile($member['mobile']);
-            if ($repeat_member) {
-                return ['error_code' => 500,'error_msg' => '手机号['.$member['mobile'].']已存在'];
-            }
-            $_member['mobile'] = $member['mobile'];
-        }
-        // 邮箱
-        if ($exist_member['email'] != $member['email']) {
-            $repeat_member = $this->Member->getMemberInfoByEmail($member['email']);
-            if ($repeat_member) {
-                return ['error_code' => 500,'error_msg' => '邮箱['.$member['email'].']已存在'];
-            }
-            $_member['email'] = $member['email'];
-        }
-        // 修改密码
-        if (!empty($member['password'])) {
-            if (!FilterValidHelper::is_password_valid($member['password'])) {
-                return ['error_code' => 500,'error_msg' => '新密码格式有误，6至18位同时包含字母和数字'];
-            }
-            $_member['password'] = $this->generateUserPassword($member['password']);
-        }
-        // 真实姓名
-        if (!empty($member['real_name']) && $exist_member['real_name'] != $member['real_name']) {
-            $_member['real_name'] = $member['real_name'];
-        }
-        // 联系电话、座机、办公电话等
-        if (!empty($member['telephone']) && $exist_member['telephone'] != $member['telephone']) {
-            $_member['telephone'] = $member['telephone'];
-        }
-        $_member['remark']    = empty($member['remark']) ? '' : $member['remark'];
-        $_member['gender']    = isset($member['gender']) && in_array($member['gender'], [-1,0,1]) ? $member['gender'] : -1;
-        $_member['auth_code'] = GenerateHelper::makeNonceStr(8);
-        $_member['enable']    = empty($member['enable']) ? 0 : 1;
-
-        $_member['province'] = $member['province'];
-        $_member['city']     = $member['city'];
-        $_member['district'] = $member['district'];
-        $_member['address']  = $member['address'];
-        $_member['id']       = $member['id'];//更新ID
-
-        // dump($_member);
-
         Db::startTrans();
         try {
+            $menu_auth = $act_user_info['menu_auth'];
+            if (!in_array($menu_auth['permissions'], ['super','leader'])) {
+                throw new Exception('您没有操作权限，仅允许管理员和部门领导进行编辑');
+            }
+            $member = $request->post('Member/a');
+            if (empty($member) || empty($member['id'])) {
+                throw new Exception('参数有误');
+            }
+            $exist_member = $this->Member->getMemberInfoById($member['id']);
+            if (empty($exist_member)) {
+                throw new Exception('拟编辑用户不存在');
+            }
+            $_member = [];
+            // 用户名
+            if ($exist_member['user_name'] != $member['user_name']) {
+                $repeat_member = $this->Member->getMemberInfoByUserName($member['user_name']);
+                if ($repeat_member) {
+                    throw new Exception('用户名['.$member['user_name'].']已存在');
+                }
+                $_member['user_name'] = $member['user_name'];
+            }
+            // 手机号
+            if ($exist_member['mobile'] != $member['mobile']) {
+                if (!FilterValidHelper::is_phone_valid($member['mobile'])) {
+                    throw new Exception('新手机号格式有误');
+                }
+                $repeat_member = $this->Member->getMemberInfoByMobile($member['mobile']);
+                if ($repeat_member) {
+                    throw new Exception('手机号['.$member['mobile'].']已存在');
+                }
+                $_member['mobile'] = $member['mobile'];
+            }
+            // 邮箱
+            if ($exist_member['email'] != $member['email']) {
+                $repeat_member = $this->Member->getMemberInfoByEmail($member['email']);
+                if ($repeat_member) {
+                    throw new Exception('邮箱['.$member['email'].']已存在');
+                }
+                $_member['email'] = $member['email'];
+            }
+            // 修改密码
+            if (!empty($member['password'])) {
+                if (!FilterValidHelper::is_password_valid($member['password'])) {
+                    throw new Exception('新密码格式有误，6至18位同时包含字母和数字');
+                }
+                $_member['password'] = $this->generateUserPassword($member['password']);
+            }
+            // 真实姓名
+            if (!empty($member['real_name']) && $exist_member['real_name'] != $member['real_name']) {
+                $_member['real_name'] = $member['real_name'];
+            }
+            // 联系电话、座机、办公电话等
+            if (!empty($member['telephone']) && $exist_member['telephone'] != $member['telephone']) {
+                $_member['telephone'] = $member['telephone'];
+            }
+            $_member['remark']    = empty($member['remark']) ? '' : $member['remark'];
+            $_member['gender']    = in_array($member['gender'], [-1,0,1]) ? $member['gender'] : -1;
+            $_member['auth_code'] = GenerateHelper::makeNonceStr(8);
+            $_member['enable']    = empty($member['enable']) ? 0 : 1;
+
+            $_member['province']  = $member['province'];
+            $_member['city']      = $member['city'];
+            $_member['district']  = $member['district'];
+            $_member['address']   = $member['address'];
+            $_member['id']        = $member['id'];//更新ID
+
+
+            // 锁定
             $this->Member->db()->failException(true)->lock(true)->where('id', $member['id'])->find();
             // 开始更新
             $this->Member->isUpdate(true)->save($_member);

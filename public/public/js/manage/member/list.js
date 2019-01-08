@@ -16,11 +16,6 @@ $(function () {
     }
 
     var bindSearchEvents = function () {
-        $("#task_status button").on("click", function () {
-            $(this).parent().children("button.btn-primary").removeClass("btn-primary").removeClass('active').addClass('btn-default');
-            $(this).removeClass('btn-default').addClass("btn-primary").addClass('active');
-            refreshTable();
-        });
 
         txtSearch.on("keyup", function () {
             keyUpHandle && clearTimeout(keyUpHandle);
@@ -52,7 +47,7 @@ $(function () {
         /**
          * 绑定选择字段事件
          */
-        $('#table').on('init.dt',function () {
+        $("#table").on('init.dt',function () {
             utils.bindColumnSelector('table-columns',pageDataSearch);
             $('.tooltips').tooltip({container: 'body'});
         });
@@ -61,7 +56,7 @@ $(function () {
         $('#adv_picker').distpicker();
 
         // tr行记录双击事件
-        $('#table').on('dblclick','tr',function () {
+        $("#table").on('dblclick','tr',function () {
             if($(this).hasClass('selected'))
             {
                 $('.check_all').prop('checked',false);
@@ -251,8 +246,12 @@ $(function () {
         return false;
     // 显示编辑浮层
     }).on('click','.edit',function () {
-        $('#id').val($(this).data('id'));
+        $('#id').val($(this).data('id')).prop('disabled',false);
         var member = $(this).data('json');
+
+        $("#MemberModalLabel").text("编辑会员");
+        $(".btn-edit-submit").show();
+        $(".btn-create-submit").hide();
 
         $('#address_picker').distpicker();
 
@@ -299,6 +298,26 @@ $(function () {
         }
     });
 
+    // 新增会员
+    $("#create").on('click',function () {
+        $('#id').val('').prop('disabled',true);
+        $("#MemberEditForm").get(0).reset();
+        $("#MemberModalLabel").text("新增会员");
+        $(".btn-edit-submit").hide();
+        $(".btn-create-submit").show();
+
+        $('#address_picker').distpicker();
+
+        $('#gender').val(-1).trigger('change');
+        $('#enable').bootstrapSwitch('state',true);
+        $('#province').trigger('change');
+        $('#city').trigger('change');
+        $('#district').trigger('change');
+
+        $('#MemberEditModal').modal('show');
+        return false;
+    });
+
     // 提交编辑
     $('.btn-edit-submit').click(function () {
         if(utils.isEmpty($('#real_name').val()))
@@ -342,24 +361,89 @@ $(function () {
         $('.btn-edit-submit').prop('disabled',true).text('提交中...');
         utils.showLoading('提交中，请稍后...');
         $.ajax({
-            url: $('#MemberEditForm').attr('action'),
+            url: $('#MemberEditForm').data('edit'),
             type: 'POST',
             data: data,
             success: function (data) {
                 utils.hideLoading();
                 if(data.error_code == 0){
-                    utils.alert(data.error_msg,function () {
+                    utils.toast(data.error_msg, 2000,function () {
                         $('#MemberEditModal').modal('hide');
                         refreshTable();
                     });
                 }else{
-                    utils.toast(data.error_msg ? data.error_msg : '未知错误');
+                    utils.alert(data.error_msg ? data.error_msg : '未知错误');
                 }
                 $('.btn-edit-submit').prop('disabled',false).text('提交');
             },
             error:function () {
                 utils.hideLoading();
                 $('.btn-edit-submit').prop('disabled',false).text('提交');
+                utils.alert('网络或服务器异常，请稍后再试');
+            }
+        });
+        return false;
+    });
+
+    // 提交新增
+    $('.btn-create-submit').click(function () {
+        if(utils.isEmpty($('#real_name').val()))
+        {
+            $('#real_name').focus();
+            utils.toast('输入真实姓名');
+            return false;
+        }
+        if(utils.isEmpty($('#user_name').val()))
+        {
+            $('#user_name').focus();
+            utils.toast('输入用户名');
+            return false;
+        }
+        if (!utils.isPassWord($('#password').val())) {
+            $('#password').focus();
+            utils.toast('登录密码必须有字母和数字构成');
+            return false;
+        }
+        if(!utils.isEmpty($('#mobile').val()))
+        {
+            if(!utils.isPhone($('#mobile').val()))
+            {
+                $('#mobile').focus();
+                utils.toast('手机号格式有误');
+                return false;
+            }
+        }
+        if(!utils.isEmpty($('#email').val()))
+        {
+            if(!utils.isMail($('#email').val()))
+            {
+                $('#email').focus();
+                utils.toast('邮箱格式有误');
+                return false;
+            }
+        }
+        var data = $('#MemberEditForm').serializeArray();
+        $('.btn-create-submit').prop('disabled',true).text('提交中...');
+        utils.showLoading('提交中，请稍后...');
+        $.ajax({
+            url: $('#MemberEditForm').data('create'),
+            type: 'POST',
+            data: data,
+            success: function (data) {
+                utils.hideLoading();
+                if(data.error_code == 0){
+                    utils.toast(data.error_msg, 2000,function () {
+                        $('#MemberEditModal').modal('hide');
+                        refreshTable();
+                    });
+                }else{
+                    utils.alert(data.error_msg ? data.error_msg : '未知错误');
+                }
+                $('.btn-create-submit').prop('disabled',false).text('提交');
+            },
+            error:function () {
+                utils.hideLoading();
+                $('.btn-create-submit').prop('disabled',false).text('提交');
                 utils.alert('网络或服务器异常，请稍后再试');
             }
         });

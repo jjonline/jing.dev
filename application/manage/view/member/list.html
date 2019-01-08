@@ -83,6 +83,7 @@
     </div>
 </div>
 
+<!--新增编辑会员-->
 <div class="modal fade" id="MemberEditModal" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -91,7 +92,7 @@
                 <h4 class="modal-title" id="MemberModalLabel">编辑会员</h4>
             </div>
             <div class="modal-body">
-                <form action="<%{:url('member/edit')}%>" class="form-horizontal" id="MemberEditForm">
+                <form data-edit="<%{:url('member/edit')}%>" data-create="<%{:url('member/create')}%>" class="form-horizontal" id="MemberEditForm">
                     <div class="box-body">
                         <div class="form-group">
                             <label class="col-sm-3 control-label">真实姓名 <span class="required">*</span></label>
@@ -120,9 +121,9 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="col-sm-3 control-label">新登录密码 </label>
+                            <label class="col-sm-3 control-label">登录密码 </label>
                             <div class="col-sm-7">
-                                <input type="text" id="password" class="form-control" name="Member[password]" placeholder="数字和字母6至18位，不修改请留空">
+                                <input type="text" id="password" class="form-control" name="Member[password]" placeholder="数字和字母6至18位，新增必须设置，修改模式若无需修改请留空">
                             </div>
                         </div>
 
@@ -189,8 +190,11 @@
                         <div class="col-xs-6 text-right">
                             <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                         </div>
-                        <div class="col-xs-6 text-left">
+                        <div class="col-xs-6 text-left edit_sub">
                             <button type="button" class="btn btn-info btn-edit-submit">提交</button>
+                        </div>
+                        <div class="col-xs-6 text-left create_sub">
+                            <button type="button" class="btn btn-info btn-create-submit">提交</button>
                         </div>
                     </div>
                 </div>
@@ -290,5 +294,5 @@
 <!--高级查询结束-->
 <script>
     var has_edit_permission = <%{:user_has_permission('manage/member/edit') ? 'true' : 'false'}%>;
-    var has_enable_permission = <%{:user_has_permission('manage/member/enabletoggle') ? 'true' : 'false'}%>;
+    var has_enable_permission = <%{:user_has_permission('manage/member/enable') ? 'true' : 'false'}%>;
 </script>

@@ -14,6 +14,11 @@ use app\manage\service\MemberService;
 
 class MemberController extends BaseController
 {
+    /**
+     * 列表
+     * @param MemberSearch $memberSearch
+     * @return mixed
+     */
     public function listAction(MemberSearch $memberSearch)
     {
         if ($this->request->isAjax()) {
