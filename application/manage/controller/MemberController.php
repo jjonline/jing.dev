@@ -80,7 +80,7 @@ class MemberController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function enableToggleAction(MemberService $memberService)
+    public function enableAction(MemberService $memberService)
     {
         if ($this->request->isAjax()) {
             $result = $memberService->enableToggle($this->request, $this->UserInfo);

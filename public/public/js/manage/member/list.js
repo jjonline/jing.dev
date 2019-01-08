@@ -149,9 +149,9 @@ $(function () {
                             {
                                 if(json.data[n].enable == 1)
                                 {
-                                    json.data[n].operate += ' <a href="javascript:;" data-href="/manage/member/enableToggle?id='+json.data[n].id+'" class="btn btn-xs btn-danger enableToggle" data-id="'+json.data[n].id+'" data-enable="'+ json.data[n].enable +'"><i class="fa fa-toggle-off"></i> 禁用</a>';
+                                    json.data[n].operate += ' <a href="javascript:;" data-href="/manage/member/enable?id='+json.data[n].id+'" class="btn btn-xs btn-danger enableToggle" data-id="'+json.data[n].id+'" data-enable="'+ json.data[n].enable +'"><i class="fa fa-toggle-off"></i> 禁用</a>';
                                 }else{
-                                    json.data[n].operate += ' <a href="javascript:;" data-href="/manage/member/enableToggle?id='+json.data[n].id+'" class="btn btn-xs btn-success enableToggle" data-id="'+json.data[n].id+'" data-enable="'+ json.data[n].enable +'"><i class="fa fa-toggle-on"></i> 启用</a>';
+                                    json.data[n].operate += ' <a href="javascript:;" data-href="/manage/member/enable?id='+json.data[n].id+'" class="btn btn-xs btn-success enableToggle" data-id="'+json.data[n].id+'" data-enable="'+ json.data[n].enable +'"><i class="fa fa-toggle-on"></i> 启用</a>';
                                 }
                             }
                             // 账号状态
