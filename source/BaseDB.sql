@@ -357,3 +357,33 @@ CREATE TABLE `com_user_open` (
   KEY `user_id` (`user_id`) USING BTREE,
   KEY `union_id` (`union_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='多平台开放平台登录账户信息（用户和开放平台一对多）';
+
+
+-- 文章
+CREATE TABLE `com_article` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `title` varchar(64) NOT NULL DEFAULT '' COMMENT '标题',
+  `sub_title` varchar(64) NOT NULL DEFAULT '' COMMENT '小标题：精简标题',
+  `cat_id` int(11) NOT NULL DEFAULT '0' COMMENT '分类',
+  `tag_id` json NOT NULL COMMENT 'tag关键词的id构成的json',
+  `summary` varchar(255) NOT NULL DEFAULT '' COMMENT '导读摘要，最多140字',
+  `content` text NOT NULL COMMENT '图文正文富文本',
+
+  `dept_id` int(11) NOT NULL DEFAULT '0' COMMENT '所属部门ID',
+  `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '所属用户ID',
+
+  `author_id` int(11) NOT NULL DEFAULT '0' COMMENT '作者表的ID',
+  `source_url` varchar(255) NOT NULL DEFAULT '' COMMENT '转载情况下的原始来源url',
+
+  `click` int(11) NOT NULL DEFAULT '0' COMMENT '点击次数',
+  `is_top` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否置顶',
+  `enable` tinyint(1) NOT NULL DEFAULT '0' COMMENT '启用禁用标记：1启用0禁用',
+  `sort` bigint(20) DEFAULT NULL COMMENT '部门排序，数字越小越靠前',
+  `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注信息',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`),
+  KEY `cat_id` (`cat_id`),
+  KEY `dept_id` (`dept_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='图文表';
