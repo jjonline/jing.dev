@@ -59,9 +59,6 @@ class MemberController extends BaseController
      * 后台管理员编辑修改前台用户信息
      * @param MemberService $memberService
      * @return mixed
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     public function editAction(MemberService $memberService)
     {
