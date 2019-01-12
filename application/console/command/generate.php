@@ -137,12 +137,12 @@ class generate extends Command
             '__CONTROLLER__'       => $file_name,
             '__CONTROLLER_LOWER__' => $file_lower_name,
         ];
-        $this->generateFile($temp_controller_file, $controller_file_dir.$controller_file, $replacement);
-        $this->generateFile($temp_model_file, $model_file_dir.$model_file, $replacement);
-        $this->generateFile($temp_service_file, $service_file_dir.$service_file, $replacement);
-        $this->generateFile($temp_search_file, $search_file_dir.$search_file, $replacement);
-        $this->generateFile($temp_html_file, $html_file_dir.$html_file, $replacement);
-        $this->generateFile($temp_js_file, $js_file_dir.$js_file, $replacement);
+        $this->generateFile($temp_controller_file, $controller_file_dir.$controller_file, $replacement, $output);
+        $this->generateFile($temp_model_file, $model_file_dir.$model_file, $replacement, $output);
+        $this->generateFile($temp_service_file, $service_file_dir.$service_file, $replacement, $output);
+        $this->generateFile($temp_search_file, $search_file_dir.$search_file, $replacement, $output);
+        $this->generateFile($temp_html_file, $html_file_dir.$html_file, $replacement, $output);
+        $this->generateFile($temp_js_file, $js_file_dir.$js_file, $replacement, $output);
     }
 
     /**
@@ -150,11 +150,13 @@ class generate extends Command
      * @param string $source 模板文件完整路径
      * @param string $target 生成的文件完整路径
      * @param array $replacement 替换的key-value文本
+     * @param Output $output
      */
-    protected function generateFile($source, $target, $replacement = [])
+    protected function generateFile($source, $target, $replacement, Output $output)
     {
         $template = file_get_contents($source);
         $content  = str_replace(array_keys($replacement), array_values($replacement), $template);
         file_put_contents($target, $content);
+        $output->writeln("<info>Generate {".pathinfo($target, PATHINFO_BASENAME)."} Success!<info>");
     }
 }
