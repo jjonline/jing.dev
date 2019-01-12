@@ -70,9 +70,9 @@ class generate extends Command
         $controller_file_dir = $project_dir . 'application/manage/controller/';// 控制器文件路径
         $model_file_dir      = $project_dir . 'application/manage/model/';// 模型文件路径
         $service_file_dir    = $project_dir . 'application/manage/service/';// 服务文件路径
-        $search_file_dir     = $project_dir . 'application/manage/service/';// 检索文件路径
-        $html_file_dir       = $project_dir . 'public/js/manage/' . $file_lower_name . '/';// html文件路径
-        $js_file_dir         = $project_dir . 'application/manage/view/' . $file_lower_name . '/';// js文件路径
+        $search_file_dir     = $project_dir . 'application/manage/model/search/';// 检索文件路径
+        $html_file_dir       = $project_dir . 'application/manage/view/' . $file_lower_name . '/';// html文件路径
+        $js_file_dir         = $project_dir . 'public/public/js/manage/' . $file_lower_name . '/';// js文件路径
         $controller_file     = $file_name . 'Controller.php';
         $model_file          = $file_name . '.php';
         $service_file        = $file_name . 'Service.php';
