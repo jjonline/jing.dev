@@ -143,12 +143,11 @@ $(function () {
                 }
             },
             columns: [
-                {data: function (row,type,val,meta) {
-                    if(type == 'display')
-                    {
-                        return '<input type="checkbox" id="check_'+row.id+'" class="check_item" name="check" value="'+row.id+'">';
+                {data: function (row,type) {
+                    if(type === "display") {
+                        return "<input type=\"checkbox\" id=\""+row.id+"\" class=\"check_item\" value=\""+row.id+"\">";
                     }
-                    return '';
+                    return "";
                 }},
                 {data: 'id'},
                 {data: 'user_name'},

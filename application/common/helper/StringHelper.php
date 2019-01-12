@@ -12,6 +12,40 @@ class StringHelper
 {
 
     /**
+     * 下划线风格字符串转首字母小写驼峰命名法字符串
+     * @param string $str
+     * @return string
+     */
+    public static function toCamelCase($str)
+    {
+        if (false === strpos($str, '_')) {
+            return lcfirst($str);
+        }
+        $para = explode('_', $str);
+        foreach ($para as $key => $value) {
+            $para[$key] = ucfirst($value);
+        }
+        return lcfirst(implode('', $para));
+    }
+
+    /**
+     * 下划线风格字符串转首字母大写驼峰命名法字符串
+     * @param string $str
+     * @return string
+     */
+    public static function toUcCamelCase($str)
+    {
+        if (false === strpos($str, '_')) {
+            return ucfirst($str);
+        }
+        $para = explode('_', $str);
+        foreach ($para as $key => $value) {
+            $para[$key] = ucfirst($value);
+        }
+        return implode('', $para);
+    }
+
+    /**
      * 检查字符串是否以某个子串开始
      * @param $str      string 拟检测字符串
      * @param $pattern  string 匹配检测的子串
