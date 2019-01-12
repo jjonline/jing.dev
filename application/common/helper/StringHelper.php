@@ -10,6 +10,20 @@ namespace app\common\helper;
 
 class StringHelper
 {
+    /**
+     * 驼峰转小写下划线
+     * @param $str
+     * @return string
+     */
+    public static function toUnderScore($str)
+    {
+        // 大写字母转换为下划线加小写字母
+        $str = preg_replace_callback('/([A-Z]{1})/', function ($result) {
+            return '_'.strtolower($result[0]);
+        }, $str);
+        // 两根及以上的下划线转换为一根下划线并去除收尾下划线后全部转为小写
+        return strtolower(trim(preg_replace('/_{2,}/', '_', $str), '_'));
+    }
 
     /**
      * 下划线风格字符串转首字母小写驼峰命名法字符串

@@ -34,7 +34,7 @@ class generate extends Command
      */
     protected function execute(Input $input, Output $output)
     {
-        $controller = strtolower($input->getOption('controller'));
+        $controller = $input->getOption('controller');
         if (empty($controller)) {
             throw new Exception("Usage:`php think generate --controller=xxx --name=xxx`");
         }
@@ -67,12 +67,13 @@ class generate extends Command
         $project_dir         = rtrim($project_dir, '/') . '/';
         $file_name           = StringHelper::toUcCamelCase($controller); // 控制器首字母大写名称
         $file_lower_name     = StringHelper::toCamelCase($controller);// 控制器首字母小写名称
+        $file_under_name     = StringHelper::toUnderScore($controller);// 控制器转为全小写的下划线风格
         $controller_file_dir = $project_dir . 'application/manage/controller/';// 控制器文件路径
         $model_file_dir      = $project_dir . 'application/manage/model/';// 模型文件路径
         $service_file_dir    = $project_dir . 'application/manage/service/';// 服务文件路径
         $search_file_dir     = $project_dir . 'application/manage/model/search/';// 检索文件路径
-        $html_file_dir       = $project_dir . 'application/manage/view/' . $file_lower_name . '/';// html文件路径
-        $js_file_dir         = $project_dir . 'public/public/js/manage/' . $file_lower_name . '/';// js文件路径
+        $html_file_dir       = $project_dir . 'application/manage/view/' . $file_under_name . '/';// html文件路径
+        $js_file_dir         = $project_dir . 'public/public/js/manage/' . $file_under_name . '/';// js文件路径
         $controller_file     = $file_name . 'Controller.php';
         $model_file          = $file_name . '.php';
         $service_file        = $file_name . 'Service.php';
@@ -133,6 +134,7 @@ class generate extends Command
 
         // 生成文件
         $replacement = [
+            '__CREATE_TIME__'      => date('Y-m-d H:i:00'),
             '__LIST_NAME__'        => trim($name),
             '__CONTROLLER__'       => $file_name,
             '__CONTROLLER_LOWER__' => $file_lower_name,
