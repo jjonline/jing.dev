@@ -1,12 +1,12 @@
 <div class="row">
     <div class="col-md-12">
 
-        <%{if condition = "user_has_permission('manage/__CONTROLLER__/create')"}%>
+        <%{if condition = "user_has_permission('manage/__CONTROLLER_UNDER_SCORE__/create')"}%>
             <div class="box box-solid">
                 <div class="box-body">
                     <div class="row">
                         <div class="col-xs-12 col-sm-2">
-                            <a href="javascript:;" data-href="<%{:url('manage/__CONTROLLER__/create')}%>"  class="btn btn-primary" id="create"><i class="fa fa-plus"></i> 新增__LIST_NAME__</a>
+                            <a href="javascript:;" data-href="<%{:url('manage/__CONTROLLER_UNDER_SCORE__/create')}%>"  class="btn btn-primary" id="create"><i class="fa fa-plus"></i> 新增__LIST_NAME__</a>
                         </div>
                     </div>
                 </div>
@@ -78,7 +78,7 @@
                 <h4 class="modal-title" id="SaveModalLabel">编辑__LIST_NAME__</h4>
             </div>
             <div class="modal-body">
-                <form data-edit="<%{:url('manage/__CONTROLLER__/edit')}%>" data-create="<%{:url('manage/__CONTROLLER__/create')}%>" class="form-horizontal" id="SaveModalForm">
+                <form data-edit="<%{:url('manage/__CONTROLLER_UNDER_SCORE__/edit')}%>" data-create="<%{:url('manage/__CONTROLLER_UNDER_SCORE__/create')}%>" class="form-horizontal" id="SaveModalForm">
                     <div class="box-body">
                         <div class="form-group">
                             <label class="col-sm-3 control-label">真实姓名 <span class="required">*</span></label>
@@ -205,5 +205,5 @@
 <!--高级查询结束-->
 
 <script>
-    var has_edit_permission   = <%{:user_has_permission('manage/__CONTROLLER__/edit') ? 'true' : 'false'}%>;
+    var has_edit_permission   = <%{:user_has_permission('manage/__CONTROLLER_UNDER_SCORE__/edit') ? 'true' : 'false'}%>;
 </script>

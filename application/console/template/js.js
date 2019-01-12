@@ -100,7 +100,7 @@ $(function () {
          * +++++++++++++++++++++++++++++++++++++++++++
          * +++++++++++++++++++++++++++++++++++++++++++
          */
-        url : "/manage/__CONTROLLER__/lists",
+        url : "/manage/__CONTROLLER_UNDER_SCORE__/lists",
         /**
          * +++++++++++++++++++++++++++++++++++++++++++
          * +++++++++++++++++++++++++++++++++++++++++++
@@ -137,7 +137,7 @@ $(function () {
                      * 拥有编辑权限，则显示编辑按钮
                      */
                     if (has_edit_permission) {
-                        items[n].operate += " <a data-href=\"/manage/__CONTROLLER__/edit?id="+data.id+"\" class=\"btn btn-xs btn-primary edit\" data-id=\""+data.id+"\"><i class=\"fa fa-pencil-square-o\"></i> 编辑</a>";
+                        items[n].operate += " <a data-href=\"/manage/__CONTROLLER_UNDER_SCORE__/edit?id="+data.id+"\" class=\"btn btn-xs btn-primary edit\" data-id=\""+data.id+"\"><i class=\"fa fa-pencil-square-o\"></i> 编辑</a>";
                     }
                 }
             }
