@@ -21,6 +21,7 @@
         "ext-openssl": "*",
         "ext-mbstring": "*",
         "ext-redis": "*",
+        "ext-bcmath": "*",
         "topthink/framework": "5.1.*",
         "topthink/think-image": "1.*",
         "endroid/qr-code": "2.5.0",

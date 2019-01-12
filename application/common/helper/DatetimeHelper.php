@@ -10,6 +10,44 @@ namespace app\common\helper;
 
 class DatetimeHelper
 {
+    /**
+     * linux时间戳转自然语言字符串 刚刚、1分钟前、3小时前、昨天9:01、9-11 11:01、2017-11-11 11:10
+     * @param int $time
+     * @return false|string
+     */
+    public static function timeToNatural($time)
+    {
+        $sysTime = time();
+        $gap     = $sysTime - $time;
+        $oBefore = strtotime(date("Y-m-d")); //今天0点时间戳
+        $tBefore = strtotime(date("Y-m-d", strtotime("-1 day"))); //昨天0点时间戳
+        $sBefore = strtotime(date("Y-m-d", strtotime("-2 day"))); //前天0点时间戳
+        $y       = date("y", $time); // 时间的年份
+        $py      = date("y", $sysTime); //今年的年份
+        if ($gap < 60) {
+            // 1分钟内，显示 刚刚
+            $str = '刚刚';
+        } elseif ($gap < 3600) {
+            // 1小时内，显示 XX分钟前
+            $str = round($gap / 60) . '分钟前';
+        } elseif ($time > $oBefore) {
+            // 1小时~昨天之前，显示 XX小时前
+            $str = '今天 '.date('H:i', $time);
+        } elseif ($time > $tBefore) {
+            // 昨天0点~24点，显示 昨天 HH:mm
+            $str = '昨天 ' . date("H:i", $time);
+        } elseif ($time > $sBefore) {
+            // 前天0点~24点，显示 前天 HH:mm
+            $str = '前天 ' . date("H:i", $time);
+        } elseif ($py <= $y) {
+            // 前天0点之前，显示 MM-dd HH:mm
+            $str = date("m-d H:i", $time);
+        } else {
+            // 不是当年的，显示 yyyy-MM-dd HH:mm
+            $str = date("Y-m-d H:i", $time);
+        }
+        return $str;
+    }
 
     /**
      * 获取日期字符串
@@ -103,16 +141,6 @@ class DatetimeHelper
     }
 
     /**
-     * 返回最近的5号日期
-     * @return bool|string
-     */
-    public static function nearest5th()
-    {
-        $time = time();
-        return date('j', $time) <= 5 ? date('Y-m', $time) . '-05 00:00:00' : date('Y-m-d H:i:s', strtotime('+1 month', strtotime(date('Y-m', $time) . '-05 00:00:00')));
-    }
-
-    /**
      * 返回当月5号
      * @return bool|string
      */
@@ -186,13 +214,7 @@ class DatetimeHelper
         $d = \DateTime::createFromFormat($format, $date);
         return $d && $d->format($format) == $date;
     }
-    
-    public static function getYearMonthStr($date, $timezone = 'PRC')
-    {
-        date_default_timezone_set($timezone);
-        $time = strtotime($date);
-        return date('Y-m', $time);
-    }
+
 
     public static function getDurationByMonth($yearMonth)
     {
@@ -336,13 +358,26 @@ class DatetimeHelper
      */
     public static function getOccupation($birthday)
     {
-        $signs = array( array('20' => '宝瓶座'), array('19' => '双鱼座'), array('21' => '白羊座'), array('20' => '金牛座'), array('21' => '双子座'), array('22' => '巨蟹座'), array('23' => '狮子座'), array('23' => '处女座'), array('23' => '天秤座'), array('24' => '天蝎座'), array('22' => '射手座'), array('22' => '摩羯座'));
+        $signs = [
+            ['20' => '宝瓶座'],
+            ['19' => '双鱼座'],
+            ['21' => '白羊座'],
+            ['20' => '金牛座'],
+            ['21' => '双子座'],
+            ['22' => '巨蟹座'],
+            ['23' => '狮子座'],
+            ['23' => '处女座'],
+            ['23' => '天秤座'],
+            ['24' => '天蝎座'],
+            ['22' => '射手座'],
+            ['22' => '摩羯座']
+        ];
         $age = strtotime($birthday);
         if ($age === false) {
             return false;
         }
 
-        list($y1, $m1, $d1) = explode("-", date("Y-m-d", $age));
+        list($m1, $d1) = explode("-", date("m-d", $age));
 
         //星座
         $key = (int)$m1 - 1;
