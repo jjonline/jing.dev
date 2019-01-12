@@ -48,13 +48,13 @@ class __CONTROLLER__Search extends BaseSearch
         }
 
         // 构造Query对象
-        $Query = Db::name('__CONTROLLER_LOWER__ __CONTROLLER_LOWER__')
+        $Query = Db::name('__CONTROLLER_UNDER_SCORE__ __CONTROLLER_UNDER_SCORE__')
                ->field([
                    //'CONCAT("DT_Member_",member.id) as DT_RowId',
-                   '__CONTROLLER_LOWER__.id',
+                   '__CONTROLLER_UNDER_SCORE__.id',
 
-                   '__CONTROLLER_LOWER__.create_time',
-                   '__CONTROLLER_LOWER__.remark'
+                   '__CONTROLLER_UNDER_SCORE__.create_time',
+                   '__CONTROLLER_UNDER_SCORE__.remark'
                ]);
                // ->leftJoin('member_level member_level', 'member_level.id = member.member_level_id');
 
@@ -62,29 +62,29 @@ class __CONTROLLER__Search extends BaseSearch
          * 检索条件
          */
         // 关键词搜索--方法体内部自动判断$this->keyword是否有值并执行sql构造
-        $search_columns = ['__CONTROLLER_LOWER__.remark'];
+        $search_columns = ['__CONTROLLER_UNDER_SCORE__.remark'];
         $this->keywordSearch($Query, $search_columns, $this->keyword);
 
         // 禁用|启用状态
         // $enable = $this->request->param('enable');
         // if (in_array($enable, ['0','1'])) {
-        //    $Query->where('__CONTROLLER_LOWER__.enable', $enable);
+        //    $Query->where('__CONTROLLER_UNDER_SCORE__.enable', $enable);
         //}
 
         // 时间范围检索
-        $this->dateTimeSearch($Query, '__CONTROLLER_LOWER__.create_time');
+        $this->dateTimeSearch($Query, '__CONTROLLER_UNDER_SCORE__.create_time');
 
         // 数字范围检索
-        // $this->rangeSearch($Query, $column, $begin_range, $end_range);
+        // $this->rangeSearch($Query, '__CONTROLLER_UNDER_SCORE__.xxx', $begin_range, $end_range);
 
         // 克隆Query对象读取总记录数
         $countQuery       = clone $Query;
         $this->totalCount = $countQuery->count();
 
         // 字段排序以及没有排序的情况下设定一个默认排序字段
-        $this->orderBy($Query, '__CONTROLLER_LOWER__');
+        $this->orderBy($Query, '__CONTROLLER_UNDER_SCORE__');
         if ($Query->getOptions('order') === null) {
-            $Query->order('__CONTROLLER_LOWER__.id', 'DESC');
+            $Query->order('__CONTROLLER_UNDER_SCORE__.id', 'DESC');
         }
 
         // 查询当前分页列表数据

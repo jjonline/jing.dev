@@ -134,10 +134,11 @@ class generate extends Command
 
         // 生成文件
         $replacement = [
-            '__CREATE_TIME__'      => date('Y-m-d H:i:00'),
-            '__LIST_NAME__'        => trim($name),
-            '__CONTROLLER__'       => $file_name,
-            '__CONTROLLER_LOWER__' => $file_lower_name,
+            '__CREATE_TIME__'            => date('Y-m-d H:i:00'),
+            '__LIST_NAME__'              => trim($name),
+            '__CONTROLLER__'             => $file_name,
+            '__CONTROLLER_LOWER__'       => $file_lower_name,
+            '__CONTROLLER_UNDER_SCORE__' => $file_under_name,
         ];
         $this->generateFile($temp_controller_file, $controller_file_dir.$controller_file, $replacement, $output);
         $this->generateFile($temp_model_file, $model_file_dir.$model_file, $replacement, $output);
