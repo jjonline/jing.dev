@@ -49,8 +49,8 @@ class MemberLogService
             'id'        => GenerateHelper::uuid(),
             'member_id' => $member_id,
             'title'     => $title,
-            'os'        => UtilHelper::get_os_info($user_agent),
-            'browser'   => UtilHelper::get_browser_info($user_agent),
+            'os'        => UtilHelper::getOsInfo($user_agent),
+            'browser'   => UtilHelper::getBrowserInfo($user_agent),
             'location'  => $location['country'] . $location['area'],
             'ip'        => $ip,
         ];

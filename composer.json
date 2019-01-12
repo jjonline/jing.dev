@@ -18,6 +18,9 @@
     "require": {
         "php": ">=7.2.0",
         "ext-json": "*",
+        "ext-openssl": "*",
+        "ext-mbstring": "*",
+        "ext-redis": "*",
         "topthink/framework": "5.1.*",
         "topthink/think-image": "1.*",
         "endroid/qr-code": "2.5.0",

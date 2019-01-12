@@ -61,11 +61,11 @@ class AuthService
 
     public function __construct(
         LogService $logService,
-                                User $User,
-                                Role $Role,
-                                Menu $Menu,
-                                RoleMenu $roleMenu,
-                                DepartmentService $departmentService
+        User $User,
+        Role $Role,
+        Menu $Menu,
+        RoleMenu $roleMenu,
+        DepartmentService $departmentService
     ) {
         $this->User              = $User;
         $this->DepartmentService = $departmentService;
@@ -320,7 +320,7 @@ class AuthService
      * @param array $highLight 检测到的当前高亮菜单数组
      * @return array
      */
-    protected function setHighLight($UserAuthMenu = [], $highLight)
+    protected function setHighLight($UserAuthMenu, $highLight)
     {
         if (empty($highLight)) {
             return $UserAuthMenu;

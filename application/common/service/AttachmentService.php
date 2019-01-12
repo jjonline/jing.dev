@@ -11,7 +11,7 @@ namespace app\common\service;
 use app\common\helper\AttachmentHelper;
 use app\common\helper\GenerateHelper;
 use app\common\model\Attachment;
-use think\facade\Config;
+use think\File;
 use think\Image;
 use think\Request;
 
@@ -50,7 +50,7 @@ class AttachmentService
             'image' =>  array('gif', 'jpg', 'jpeg', 'png', 'bmp'),
             'flash' =>  array('swf', 'flv'),
             'media' =>  array('swf', 'flv', 'mp4'),//媒体类型 仅允许该三种
-            'file'  =>  array('doc', 'docx', 'xls', 'xlsx', 'ppt', 'pdf', 'txt', 'zip', 'rar', 'gz', 'bz2','7z'),
+            'file'  =>  array('csv','doc', 'docx', 'xls', 'xlsx', 'ppt', 'pdf', 'txt', 'zip', 'rar', 'gz', 'bz2','7z'),
             'music' =>  array('mp3','mp4','m4a','amr'),// 媒体语音音乐类型
         );
         // 补充未知file_type（即未指定file_type参数的上传请求）
@@ -145,6 +145,80 @@ class AttachmentService
     }
 
     /**
+     * 服务器内部文件移动处理，便于同于管理
+     * @param $local_file_path
+     * @param string $relative_dir
+     * @param int $is_safe
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function saveAttachment($local_file_path, $relative_dir = 'ticket', $is_safe = 0)
+    {
+        if (!is_file($local_file_path)) {
+            return ['error_code' => 404,'error_msg' => '待记录的文件信息不存在'];
+        }
+        $file      = new File($local_file_path);
+        $file_sha1 = $file->hash('sha1');
+
+        // 检查用户级别的资源重复
+        $exist_attachment = $this->Attachment->getAttachmentByUserFileSha1($file_sha1);
+        if (!empty($exist_attachment)) {
+            // 存在的文件使用安全域
+            if ($exist_attachment['is_safe']) {
+                $exist_attachment['file_path'] = AttachmentHelper::generateSafeAttachmentPath($exist_attachment['id']);
+            }
+            return ['error_code' => 0,'error_msg' => '处理成功：文件曾上传过','data' => $exist_attachment];
+        }
+
+        // 设置文件移动规则
+        $upload_file_path = './uploads/'.$relative_dir.'/'.date('Y').'/'.substr($file_sha1, 0, 2).'/';
+        $upload_file_name = $file_sha1.'.'.$file->getExtension();
+        if (!is_dir($upload_file_path)) {
+            mkdir($upload_file_path, 0755, true);
+        }
+
+        // 记录attachment
+        $attachment                     = [];
+        $attachment['id']               = GenerateHelper::uuid();
+        $attachment['user_id']          = session('user_id') ? session('user_id') : 0;
+        $attachment['file_origin_name'] = $file->getFilename();
+        $attachment['file_name']        = $file->getFilename();
+        $attachment['file_path']        = trim($upload_file_path.$upload_file_name, '.');
+        $attachment['file_mime']        = $file->getMime();
+        $attachment['file_size']        = $file->getSize();
+        $attachment['file_sha1']        = $file->hash('sha1');
+        $attachment['is_safe']          = $is_safe ? 1 : 0;
+        // 图片情况下读取图片尺寸
+        if (in_array($file->getExtension(), ['gif', 'jpg', 'jpeg', 'bmp', 'png'])) {
+            try {
+                $Image                      = Image::open($local_file_path);
+                $attachment['image_width']  = $Image->width();
+                $attachment['image_height'] = $Image->height();
+            } catch (\Throwable $e) {
+                return ['error_code' => 500,'error_msg' => '图片处理失败，保存文件失败'];
+            }
+        }
+        if (!is_file($upload_file_path.$upload_file_name)) {
+            copy($local_file_path, $upload_file_path.$upload_file_name);
+        }
+
+        // 记录文件信息
+        $result = $this->Attachment->isUpdate(false)->data($attachment)->save();
+        if (false !== $result) {
+            // 上传成功，记录日志
+            $this->LogService->logRecorder($attachment['file_path'], '服务器内部文件格式化存储');
+        }
+        // 如果是安全资源，返回的资源地址修改为安全地址
+        if ($is_safe) {
+            $attachment['file_path'] = AttachmentHelper::generateSafeAttachmentPath($attachment['id']);
+        }
+        // 无论attachment是否成功 文件上传完成均返回文件信息数组
+        return ['error_code' => 0,'error_msg' => '处理成功：新记录','data' => $attachment];
+    }
+
+    /**
      * 通过资源ID获取资源地址
      * @param string $attachment_id 主键ID
      * @return string
@@ -166,5 +240,34 @@ class AttachmentService
         }
         // 当前返回本地带域名Url 切换cdn后再行修改
         return app('request')->domain().$path;
+    }
+
+    /**
+     * 通过资源ID数组获取
+     * @param $attachment_ids
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getAttachmentByIds($attachment_ids)
+    {
+        $attachments = $this->Attachment->getAttachmentByIds($attachment_ids);
+        if (empty($attachments)) {
+            return [];
+        }
+        // 检查是否安全资源并生成资源Url  后续切换cdn修改此处代码即可
+        foreach ($attachments as $key => $value) {
+            $new_array = explode('/', $value['file_mime']);
+            $attachments[$key]['is_image'] = $new_array[0] == 'image';
+            if (!!$value['is_safe']) {
+                $path = AttachmentHelper::generateSafeAttachmentPath($value['id']);
+            } else {
+                $path = $value['file_path'];
+            }
+            // 当前返回本地带域名Url 切换cdn后再行修改
+            $attachments[$key]['file_path'] = app('request')->domain().$path;
+        }
+        return $attachments;
     }
 }

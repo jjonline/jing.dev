@@ -22,6 +22,16 @@ class AttachmentHelper
     }
 
     /**
+     * 通过附件ID数组获取
+     * @param string $attachment_id attachment表主键ID
+     * @return mixed
+     */
+    public static function getAttachmentByIds($attachment_ids)
+    {
+        return app('app\common\service\AttachmentService')->getAttachmentByIds($attachment_ids);
+    }
+
+    /**
      * 生成安全资源访问Url
      * @param  string $attachment_id 资源ID
      * @return string
@@ -31,7 +41,7 @@ class AttachmentHelper
         $param              = [];
         $param['expire_in'] = time() + 1800;
         //生成ID的加密字符串 半小时有效
-        $param['access_key']= self::transfer_encrypt($attachment_id, config('local.auth_key'), 1800);
+        $param['access_key']= self::transferEncrypt($attachment_id, config('local.auth_key'), 1800);
         return '/manage/common/attachment?'.http_build_query($param);
     }
 

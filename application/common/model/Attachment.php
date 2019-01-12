@@ -14,7 +14,7 @@ use think\facade\Session;
 class Attachment extends Model
 {
     /**
-     * 静态资源ID查找资源信息
+     * 静态资源ID查找资源完整信息
      * @param string $id UUID形式的资源ID
      * @return array
      * @throws \think\db\exception\DataNotFoundException
@@ -28,6 +28,31 @@ class Attachment extends Model
         }
         $data = $this->where('id', $id)->find();
         return $data ? $data->toArray() : [];
+    }
+
+    /**
+     * 静态资源ID数组查找资源完整信息
+     * @param string $id UUID形式的资源ID
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getAttachmentByIds($ids)
+    {
+        if (empty($ids)) {
+            return [];
+        }
+        $data = $this->field([
+            'id',
+            'file_origin_name',
+            'file_name',
+            'file_path',
+            'is_safe',
+            'file_mime',
+            'create_time',
+        ])->where('id', 'IN', $ids)->select();
+        return !$data->isEmpty() ? $data->toArray() : [];
     }
 
     /**

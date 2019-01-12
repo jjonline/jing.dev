@@ -15,10 +15,6 @@ class HttpHelper
      * @var Client
      */
     protected static $guzzleHttpClient;
-    /**
-     * @var HttpHelper 静态调用底层单例
-     */
-    protected static $_instance;
 
     /**
      * 执行guzzleHttp的请求方法，与guzzleHttp参数非常类似
@@ -41,7 +37,7 @@ class HttpHelper
                 'decode_content'   => false, // 是否解码结果集
                 'headers'          => [
                     'user-agent' => $_SERVER['HTTP_USER_AGENT'],
-                    'Referer'    => 'parking.system.dd01',
+                    'Referer'    => 'https://www.google.com/',
                 ],
             ]);
         }

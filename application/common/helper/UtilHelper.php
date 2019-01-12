@@ -127,7 +127,7 @@ class UtilHelper
      * @param  string $content 待清理的html文本
      * @return string 清理妥善的html文本
      */
-    public static function clear_js_code($content)
+    public static function clearJsCode($content)
     {
         ##去除所有JavaScript代码
         $content = preg_replace('/<script(.*?)<\/?script>/is', "", $content);
@@ -182,7 +182,7 @@ class UtilHelper
      * @param  string $baseUrl 该页面的Url，例如：http://blog.jjonline.cn/sort/php/area/article/173.html
      * @return string
      */
-    public static function to_absolute_url($sUrl, $baseUrl)
+    public static function toAbsoluteUrl($sUrl, $baseUrl)
     {
         $src_info  = parse_url($sUrl);
         if (isset($src_info['scheme'])) {
@@ -225,7 +225,7 @@ class UtilHelper
      * @param  mixed $timestamp Unix时间戳
      * @return boolean
      */
-    public static function time_ago($timestamp)
+    public static function timeAgo($timestamp)
     {
         $e_time = time() - $timestamp;
         if ($e_time < 1) {
@@ -254,7 +254,7 @@ class UtilHelper
      * @param  string $ip_v4 ipV4的地址
      * @return string 处理隐藏后的地址
      */
-    public static function hide_ipv4($ip_v4)
+    public static function hideIpv4($ip_v4)
     {
         $ip = explode('.', $ip_v4);
         if (count($ip) == 4) {
@@ -281,7 +281,7 @@ class UtilHelper
      * @param  string $nickname 用户名、昵称
      * @return string 隐藏处理后的用户名、昵称
      */
-    public static function hide_name($nickname)
+    public static function hideName($nickname)
     {
         if (mb_strlen($nickname) <= 4) {
             return '***';
@@ -289,7 +289,7 @@ class UtilHelper
         // 隐藏中间4位
         $begin_len = intval(ceil((mb_strlen($nickname) - 4) / 2));
         $replace   = mb_substr($nickname, $begin_len, 4, 'utf8');
-        return self::mb_str_replace($replace, '****', $nickname);
+        return self::mbStrReplace($replace, '****', $nickname);
     }
 
     /**
@@ -297,7 +297,7 @@ class UtilHelper
      * @param $phone
      * @return string
      */
-    public static function hide_phone($phone)
+    public static function hidePhone($phone)
     {
         return substr_replace($phone, '****', 3, 4);
     }
@@ -310,7 +310,7 @@ class UtilHelper
      * @param int $count
      * @return bool|string
      */
-    public static function mb_str_replace($search, $replace, $subject, &$count=0)
+    public static function mbStrReplace($search, $replace, $subject, &$count = 0)
     {
         if (!is_array($search) && is_array($replace)) {
             return false;
@@ -318,19 +318,19 @@ class UtilHelper
         if (is_array($subject)) {
             // call mb_replace for each single string in $subject
             foreach ($subject as &$string) {
-                $string = self::mb_str_replace($search, $replace, $string, $c);
+                $string = self::mbStrReplace($search, $replace, $string, $c);
                 $count += $c;
             }
         } elseif (is_array($search)) {
             if (!is_array($replace)) {
                 foreach ($search as &$string) {
-                    $subject = self::mb_str_replace($string, $replace, $subject, $c);
+                    $subject = self::mbStrReplace($string, $replace, $subject, $c);
                     $count += $c;
                 }
             } else {
                 $n = max(count($search), count($replace));
                 while ($n--) {
-                    $subject = self::mb_str_replace(current($search), current($replace), $subject, $c);
+                    $subject = self::mbStrReplace(current($search), current($replace), $subject, $c);
                     $count += $c;
                     next($search);
                     next($replace);
@@ -349,10 +349,10 @@ class UtilHelper
      * @param string $user_agent
      * @return string
      */
-    public static function get_os_info($user_agent = null)
+    public static function getOsInfo($user_agent = null)
     {
         $agent = empty($user_agent) ? $_SERVER['HTTP_USER_AGENT'] : $user_agent;//获取用户代理字符串
-        $ret   = self::parse_user_agent($agent);
+        $ret   = self::parseUserAgent($agent);
         if (!empty($ret) && !empty($ret['platform']) && $ret['platform'] != 'Windows') {
             return $ret['platform'];
         }
@@ -434,10 +434,10 @@ class UtilHelper
      * @param string $user_agent 浏览器userAgent
      * @return string
      */
-    public static function get_browser_info($user_agent = null)
+    public static function getBrowserInfo($user_agent = null)
     {
         $sys = empty($user_agent) ? $_SERVER['HTTP_USER_AGENT'] : $user_agent;//获取用户代理字符串
-        $ret = self::parse_user_agent($sys);
+        $ret = self::parseUserAgent($sys);
         if (!empty($ret) && !empty($ret['browser']) && !empty($ret['version'])) {
             return $ret['browser'].'('.$ret['version'].')';
         }
@@ -516,7 +516,7 @@ class UtilHelper
      * @param string $u_agent
      * @return array
      */
-    public static function parse_user_agent($u_agent = null)
+    public static function parseUserAgent($u_agent = null)
     {
         $u_agent  = empty($u_agent) ? $_SERVER['HTTP_USER_AGENT'] : $u_agent;
         $platform = null;

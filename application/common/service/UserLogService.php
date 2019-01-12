@@ -50,8 +50,8 @@ class UserLogService
             'user_id'  => $act_user_info['id'],
             'dept_id'  => $act_user_info['dept_id'],
             'title'    => $title,
-            'os'       => UtilHelper::get_os_info($user_agent),
-            'browser'  => UtilHelper::get_browser_info($user_agent),
+            'os'       => UtilHelper::getOsInfo($user_agent),
+            'browser'  => UtilHelper::getBrowserInfo($user_agent),
             'location' => $location['country'].$location['area'],
             'ip'       => $ip,
         ];
