@@ -65,8 +65,8 @@ class generate extends Command
         // 目标文件名称和目录
         $project_dir         = realpath(__DIR__ . '/../../../');
         $project_dir         = rtrim($project_dir, '/') . '/';
-        $file_name           = StringHelper::toCamelCase($controller); // 控制器首字母大写名称
-        $file_lower_name     = StringHelper::toUcCamelCase($controller);// 控制器首字母小写名称
+        $file_name           = StringHelper::toUcCamelCase($controller); // 控制器首字母大写名称
+        $file_lower_name     = StringHelper::toCamelCase($controller);// 控制器首字母小写名称
         $controller_file_dir = $project_dir . 'application/manage/controller/';// 控制器文件路径
         $model_file_dir      = $project_dir . 'application/manage/model/';// 模型文件路径
         $service_file_dir    = $project_dir . 'application/manage/service/';// 服务文件路径
@@ -127,7 +127,7 @@ class generate extends Command
         if (!is_dir($html_file_dir)) {
             mkdir($html_file_dir, 0755, true);
         }
-        if (!is_dir($controller_file_dir)) {
+        if (!is_dir($js_file_dir)) {
             mkdir($js_file_dir, 0755, true);
         }
 
