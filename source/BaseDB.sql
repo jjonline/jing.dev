@@ -356,34 +356,118 @@ CREATE TABLE `com_user_open` (
   UNIQUE KEY `open_id` (`open_id`,`open_type`) USING BTREE,
   KEY `user_id` (`user_id`) USING BTREE,
   KEY `union_id` (`union_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='多平台开放平台登录账户信息（用户和开放平台一对多）';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='多平台开放平台登录账户信息（用户和开放平台一对多）';
 
 
 -- 文章
 CREATE TABLE `com_article` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `title` varchar(64) NOT NULL DEFAULT '' COMMENT '标题',
-  `sub_title` varchar(64) NOT NULL DEFAULT '' COMMENT '小标题：精简标题',
+  `sub_title` varchar(32) NOT NULL DEFAULT '' COMMENT '小标题：精简标题',
+  `cover_id` char(36) NOT NULL DEFAULT '' COMMENT '封面图ID',
   `cat_id` int(11) NOT NULL DEFAULT '0' COMMENT '分类',
-  `tag_id` json NOT NULL COMMENT 'tag关键词的id构成的json',
+  `tag_ids` json NOT NULL COMMENT 'tag关键词的id构成的json',
+  `content_type` tinyint(1) NOT NULL COMMENT '文章类型1-文本 2-图片、3-音乐、4-视频...',
   `summary` varchar(255) NOT NULL DEFAULT '' COMMENT '导读摘要，最多140字',
   `content` text NOT NULL COMMENT '图文正文富文本',
-
-  `dept_id` int(11) NOT NULL DEFAULT '0' COMMENT '所属部门ID',
-  `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '所属用户ID',
-
   `author_id` int(11) NOT NULL DEFAULT '0' COMMENT '作者表的ID',
   `source_url` varchar(255) NOT NULL DEFAULT '' COMMENT '转载情况下的原始来源url',
-
   `click` int(11) NOT NULL DEFAULT '0' COMMENT '点击次数',
-  `is_top` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否置顶',
+  `awesome` int(11) NOT NULL DEFAULT '0' COMMENT '点赞次数：各种awesome总数',
+  `is_top` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否栏目置顶推荐',
+  `is_home` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否首页置顶推荐',
+  `allow_comment` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否允许评论',
+  `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '所属后台用户ID',
+  `dept_id` int(11) NOT NULL DEFAULT '0' COMMENT '所属后台部门ID',
   `enable` tinyint(1) NOT NULL DEFAULT '0' COMMENT '启用禁用标记：1启用0禁用',
   `sort` bigint(20) DEFAULT NULL COMMENT '部门排序，数字越小越靠前',
   `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注信息',
+  `delete_time` datetime DEFAULT NULL COMMENT '删除时间',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
   PRIMARY KEY (`id`),
   KEY `cat_id` (`cat_id`),
-  KEY `dept_id` (`dept_id`),
-  KEY `user_id` (`user_id`)
+  KEY `author_id` (`author_id`),
+  KEY `user` (`user_id`,`dept_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='图文表';
+
+-- 图文分类表
+CREATE TABLE `com_article_cat` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `name` varchar(128) NOT NULL DEFAULT '' COMMENT '分类名称',
+  `parent_id` int(11) DEFAULT NULL COMMENT '父分类ID，为NUll则是顶级分类',
+  `level` int(11) NOT NULL COMMENT '分类层级：1->2->3逐次降低',
+  `sort` bigint(20) NOT NULL DEFAULT '0' COMMENT '排序，数字越小越靠前',
+  `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='图文分类表';
+
+-- 关键词列表
+CREATE TABLE `com_tag` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `cover_id` char(36) NOT NULL DEFAULT '' COMMENT '封面图ID',
+  `icon_id` char(36) NOT NULL DEFAULT '' COMMENT 'ICON图标ID',
+  `tag` varchar(64) NOT NULL DEFAULT '' COMMENT 'tag关键词',
+  `reference_times` int(11) NOT NULL DEFAULT '0' COMMENT '大致的引用次数',
+  `summary` varchar(255) NOT NULL DEFAULT '' COMMENT '概要介绍，最多140字',
+  `introduction` text NOT NULL COMMENT '详细介绍',
+  `sort` bigint(20) NOT NULL DEFAULT '0' COMMENT '排序，数字越小越靠前',
+  `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tag` (`tag`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='关键词列表';
+
+-- 图文评论表
+CREATE TABLE `com_article_comment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `article_id` int(11) NOT NULL DEFAULT '0' COMMENT '被评论的文章ID',
+  `member_id` int(11) NOT NULL DEFAULT '0' COMMENT '评论者会员ID',
+  `parent_id` int(11) DEFAULT NULL COMMENT '父级ID',
+  `level` int(11) NOT NULL COMMENT '层级：1->2->3逐次降低',
+  `context` varchar(1024) NOT NULL DEFAULT '' COMMENT '评论内容',
+  `delete_time` datetime DEFAULT NULL COMMENT '删除时间',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`),
+  KEY `article_id` (`article_id`),
+  KEY `member_id` (`member_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='图文评论表';
+
+-- 作者投稿者信息表
+CREATE TABLE `com_author` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `figure_id` char(36) NOT NULL DEFAULT '0' COMMENT '头像ID',
+  `name` varchar(64) NOT NULL DEFAULT '' COMMENT '作者名称',
+  `type` tinyint(1) NOT NULL DEFAULT '0' COMMENT '作者类型1-个人、2-机构 ...',
+  `summary` varchar(255) NOT NULL DEFAULT '' COMMENT '概要介绍，最多140字',
+  `introduction` text NOT NULL COMMENT '详细介绍',
+  `member_id` int(11) NOT NULL DEFAULT '0' COMMENT '可能关联的前台会员ID',
+  `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '所属后台用户ID',
+  `dept_id` int(11) NOT NULL DEFAULT '0' COMMENT '所属后台部门ID',
+  `sort` bigint(20) NOT NULL DEFAULT '0' COMMENT '排序，数字越小越靠前',
+  `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='作者信息表';
+
+-- 作者属性表
+CREATE TABLE `com_author_property` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `author_id` int(11) NOT NULL DEFAULT '0' COMMENT '作者ID',
+  `type` tinyint(1) NOT NULL DEFAULT '0' COMMENT '属性类型，由应用硬编码决定，譬如1-微信公众号 2-头条号 等',
+  `name` varchar(64) NOT NULL DEFAULT '' COMMENT '属性名称',
+  `source_account` varchar(255) NOT NULL DEFAULT '' COMMENT '属性源账号',
+  `cover_id` char(36) NOT NULL DEFAULT '' COMMENT '属性图片ID，二维码图片、头像等',
+  `summary` varchar(255) NOT NULL DEFAULT '' COMMENT '属性概要介绍，最多140字',
+  `introduction` text NOT NULL COMMENT '属性详细介绍',
+  `sort` bigint(20) NOT NULL DEFAULT '0' COMMENT '排序，数字越小越靠前',
+  `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='作者属性表';
