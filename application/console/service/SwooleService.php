@@ -14,7 +14,6 @@ use think\console\Output;
 use think\Container;
 use think\Exception;
 use think\facade\Log;
-use app\console\task;
 
 class SwooleService
 {
@@ -54,6 +53,7 @@ class SwooleService
                 }
 
                 // 手动清理模型对象
+                $AsyncTaskModel = null;
                 unset($AsyncTaskModel);
             } catch (\Throwable $e) {
                 $this->log('初始化启动服务器时读取上次未执行完的任务出错：'.$e->getMessage());
@@ -111,6 +111,7 @@ class SwooleService
             $this->log('任务['.$worker_id.'_'.$task_id.']执行完毕，耗时:'.$use_time.'秒');
 
             // 清理实例化对象
+            $task = null;
             Container::remove($task_class);
         } catch (\Throwable $e) {
             $this->log('任务执行抛出异常：'.$e->getMessage());
