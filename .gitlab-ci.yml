@@ -1,5 +1,10 @@
 stages:
+    - build
     - test
+build:
+    stage: build
+    script:
+        composer update -no-dev
 test:
     stage: test
     script:
