@@ -29,6 +29,9 @@
         "guzzlehttp/guzzle": "6.3.*",
         "jjonline/aliyun-dysms-php-sdk": "2.0"
     },
+    "require-dev": {
+        "topthink/think-testing": "^2.0"
+    },
     "autoload": {
         "psr-4": {
             "app\\": "application"
