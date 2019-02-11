@@ -1,8 +1,8 @@
 <?php
 /**
- *
+ * 前台图文检索类
  * @user Jea杨 (JJonline@JJonline.Cn)
- * @date 2019-01-08 22:46
+ * @date 2019-02-11 11:19:00
  * @file ArticleSearch.php
  */
 
@@ -28,7 +28,7 @@ class ArticleSearch extends BaseSearch
     }
 
     /**
-     * 前台用户搜索
+     * 前台前台图文搜索
      * @param $act_member_info
      * @return array
      * @throws \think\db\exception\DataNotFoundException
@@ -49,64 +49,58 @@ class ArticleSearch extends BaseSearch
 
         // 构造Query对象
         $Query = Db::name('article article')
-            ->field([
-                //'CONCAT("DT_Member_",member.id) as DT_RowId',
-                'article.id',
-                'article.user_name',
-                'article.real_name',
-                'article.mobile',
-                'article.telephone',
-            ])
-            ->leftJoin('member_level member_level', 'member_level.id = member.member_level_id');
+               ->field([
+                   //'CONCAT("DT_Member_",member.id) as DT_RowId',
+                   'article.id',
+                   'article.cat_id',
+                   'article.author_id',
+                   'article.title',
+                   'article.click',
+                   'article.awesome',
+                   'article.is_top',
+                   'article.is_home',
+                   'article.allow_comment',
+                   'article.enable',
+                   'article.sort',
+                   'article.enable',
+                   'article.display_time',
+                   'article.create_time',
+                   'article.update_time',
+                   'article.remark',
+                   'article.content_type',
+                   'article_cat.name as article_cat_name',
+                   'author.name as article_author_name',
+               ])
+               ->leftJoin('article_cat article_cat', 'article_cat.id = article.cat_id')
+               ->leftJoin('author author', 'author.id = article.author_id');
 
         /**
          * 检索条件
          */
         // 关键词搜索--方法体内部自动判断$this->keyword是否有值并执行sql构造
-        $search_columns = ['member.user_name', 'member.real_name', 'member.mobile', 'member.email', 'member.remark'];
+        $search_columns = ['article.remark'];
         $this->keywordSearch($Query, $search_columns, $this->keyword);
 
         // 禁用|启用状态
-        $enable = $this->request->param('enable');
-        if (in_array($enable, ['0','1'])) {
-            $Query->where('member.enable', $enable);
-        }
-
-        // 性别
-        $gender = $this->request->param('gender');
-        if (in_array($gender, ['-1','0','1'])) {
-            $Query->where('member.gender', $gender);
-        }
-
-        // 省份
-        $province = $this->request->param('province');
-        if (!empty($province)) {
-            $Query->where('member.province', $province);
-        }
-
-        // 地区
-        $city = $this->request->param('city');
-        if (!empty($city)) {
-            $Query->where('member.city', $city);
-        }
-
-        // 县级
-        $district = $this->request->param('district');
-        if (!empty($district)) {
-            $Query->where('member.district', $district);
-        }
+        // $enable = $this->request->param('enable');
+        // if (in_array($enable, ['0','1'])) {
+        //    $Query->where('article.enable', $enable);
+        //}
 
         // 时间范围检索
-        $this->dateTimeSearch($Query, 'member.create_time');
+        $this->dateTimeSearch($Query, 'article.create_time');
+
+        // 数字范围检索
+        // $this->rangeSearch($Query, 'article.xxx', $begin_range, $end_range);
 
         // 克隆Query对象读取总记录数
         $countQuery       = clone $Query;
         $this->totalCount = $countQuery->count();
 
         // 字段排序以及没有排序的情况下设定一个默认排序字段
-        $this->orderBy($Query, 'member');
+        $this->orderBy($Query, 'article');
         if ($Query->getOptions('order') === null) {
-            $Query->order('member.create_time', 'DESC');
+            $Query->order('article.id', 'DESC');
         }
 
         // 查询当前分页列表数据
