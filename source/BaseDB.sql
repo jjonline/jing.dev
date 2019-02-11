@@ -200,7 +200,7 @@ CREATE TABLE `com_menu` (
   `is_badge` tinyint(1) NOT NULL DEFAULT '0' COMMENT '菜单所标识的功能中是否需要使用badge统计，显示待办事项等badge',
   `level` int(11) NOT NULL COMMENT '当前层级 1为一级导航2为二级导航3为二级导航页面中的功能按钮',
   `sort` int(11) NOT NULL COMMENT '排序数字越小越靠前',
-  `extra_param` json DEFAULT NULL COMMENT '额外存储的菜单对应操作所需要的限定参数，json格式',
+  `extra_param` text DEFAULT NULL COMMENT '额外存储的菜单对应操作所需要的限定参数，json格式',
   `is_system` tinyint(1) NOT NULL DEFAULT '0' COMMENT '标记是否系统菜单，1不允许删除0允许',
   `is_permissions` tinyint(1) NOT NULL DEFAULT '0' COMMENT '标记是否有数据范围控制',
   `is_column` tinyint(1) NOT NULL DEFAULT '0' COMMENT '标记是否需要控制字段显示，1：是 0:否',
@@ -273,7 +273,7 @@ CREATE TABLE `com_site_config` (
   `name` varchar(128) NOT NULL DEFAULT '' COMMENT '配置项中文名称',
   `description` varchar(1024) NOT NULL DEFAULT '' COMMENT '配置项中文功能说明',
   `type` enum('text','select','textarea') NOT NULL DEFAULT 'text' COMMENT '配置项后台显示的类型:输入框、单选项、大段文本',
-  `select_items` json NOT NULL COMMENT 'radio单选框待选值列表',
+  `select_items` text NOT NULL COMMENT 'radio单选框待选值列表',
   `sort` bigint(20) DEFAULT NULL COMMENT '部门排序，数字越小越靠前',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
@@ -342,7 +342,7 @@ CREATE TABLE `com_user_log` (
 CREATE TABLE `com_user_open` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '后台管理系统统一用户ID，为0则表示尚未与用户绑定',
-  `open_type` enum('qq','pc_weixin','mp_weixin','xiaochengxu','weibo') NOT NULL COMMENT '开放平台登录类型qq-QQ开放登录 pc_weixin-Pc网站版微信扫码登录 mp_weixin-微信公众号版微信登录 xiaochengxu-微信小程序登录 weibo-微博登录当(需要添加新类型时添加该枚举类型的待选值)',
+  `open_type` enum('qq','pc_wx','mp_wx','xcx','wb') NOT NULL COMMENT '开放平台登录类型qq-QQ开放登录 pc_wx-Pc网站版微信扫码登录 mp_wx-微信公众号版微信登录 xcx-微信小程序登录 wb-微博登录当(需要添加新类型时添加该枚举类型的待选值)',
   `open_id` varchar(128) NOT NULL DEFAULT '' COMMENT 'OpenID',
   `access_token` varchar(255) NOT NULL DEFAULT '' COMMENT 'AccessToken',
   `name` varchar(32) NOT NULL DEFAULT '' COMMENT '昵称',
@@ -366,7 +366,7 @@ CREATE TABLE `com_article` (
   `sub_title` varchar(32) NOT NULL DEFAULT '' COMMENT '小标题：精简标题',
   `cover_id` char(36) NOT NULL DEFAULT '' COMMENT '封面图ID',
   `cat_id` int(11) NOT NULL DEFAULT '0' COMMENT '分类',
-  `tag_ids` json NOT NULL COMMENT 'tag关键词的id构成的json',
+  `tag_ids` text NOT NULL COMMENT 'tag关键词的id构成的json',
   `content_type` tinyint(1) NOT NULL COMMENT '文章类型1-文本 2-图片、3-音乐、4-视频...',
   `summary` varchar(255) NOT NULL DEFAULT '' COMMENT '导读摘要，最多140字',
   `content` text NOT NULL COMMENT '图文正文富文本',
@@ -379,7 +379,7 @@ CREATE TABLE `com_article` (
   `allow_comment` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否允许评论',
   `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '所属后台用户ID',
   `dept_id` int(11) NOT NULL DEFAULT '0' COMMENT '所属后台部门ID',
-  `enable` tinyint(1) NOT NULL DEFAULT '0' COMMENT '启用禁用标记：1启用0禁用',
+  `is_effected` tinyint(1) NOT NULL DEFAULT '0' COMMENT '启用禁用标记：1启用0禁用',
   `sort` bigint(20) DEFAULT NULL COMMENT '部门排序，数字越小越靠前',
   `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注信息',
   `delete_time` datetime DEFAULT NULL COMMENT '删除时间',
@@ -405,7 +405,7 @@ CREATE TABLE `com_article_cat` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='图文分类表';
 
 -- 关键词列表
-CREATE TABLE `com_tag` (
+CREATE TABLE `com_article_tag` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `cover_id` char(36) NOT NULL DEFAULT '' COMMENT '封面图ID',
   `icon_id` char(36) NOT NULL DEFAULT '' COMMENT 'ICON图标ID',
@@ -424,10 +424,10 @@ CREATE TABLE `com_tag` (
 -- 图文评论表
 CREATE TABLE `com_article_comment` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `article_id` int(11) NOT NULL DEFAULT '0' COMMENT '被评论的文章ID',
-  `member_id` int(11) NOT NULL DEFAULT '0' COMMENT '评论者会员ID',
   `parent_id` int(11) DEFAULT NULL COMMENT '父级ID',
   `level` int(11) NOT NULL COMMENT '层级：1->2->3逐次降低',
+  `article_id` int(11) NOT NULL DEFAULT '0' COMMENT '被评论的文章ID',
+  `member_id` int(11) NOT NULL DEFAULT '0' COMMENT '评论者会员ID',
   `context` varchar(1024) NOT NULL DEFAULT '' COMMENT '评论内容',
   `delete_time` datetime DEFAULT NULL COMMENT '删除时间',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -442,7 +442,7 @@ CREATE TABLE `com_author` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `figure_id` char(36) NOT NULL DEFAULT '0' COMMENT '头像ID',
   `name` varchar(64) NOT NULL DEFAULT '' COMMENT '作者名称',
-  `type` tinyint(1) NOT NULL DEFAULT '0' COMMENT '作者类型1-个人、2-机构 ...',
+  `type` tinyint(1) NOT NULL DEFAULT '0' COMMENT '类型编码，1-公众号 2-头条 等',
   `summary` varchar(255) NOT NULL DEFAULT '' COMMENT '概要介绍，最多140字',
   `introduction` text NOT NULL COMMENT '详细介绍',
   `member_id` int(11) NOT NULL DEFAULT '0' COMMENT '可能关联的前台会员ID',
@@ -455,19 +455,3 @@ CREATE TABLE `com_author` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='作者信息表';
 
--- 作者属性表
-CREATE TABLE `com_author_property` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `author_id` int(11) NOT NULL DEFAULT '0' COMMENT '作者ID',
-  `type` tinyint(1) NOT NULL DEFAULT '0' COMMENT '属性类型，由应用硬编码决定，譬如1-微信公众号 2-头条号 等',
-  `name` varchar(64) NOT NULL DEFAULT '' COMMENT '属性名称',
-  `source_account` varchar(255) NOT NULL DEFAULT '' COMMENT '属性源账号',
-  `cover_id` char(36) NOT NULL DEFAULT '' COMMENT '属性图片ID，二维码图片、头像等',
-  `summary` varchar(255) NOT NULL DEFAULT '' COMMENT '属性概要介绍，最多140字',
-  `introduction` text NOT NULL COMMENT '属性详细介绍',
-  `sort` bigint(20) NOT NULL DEFAULT '0' COMMENT '排序，数字越小越靠前',
-  `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='作者属性表';
