@@ -133,6 +133,7 @@ $(function () {
         }
     }).on("click",".check_all",function () {
         // 全选和取消全选
+        alert("d");
         if($(this).prop("checked"))
         {
             $(".check_item").prop("checked",true).trigger("change");
@@ -303,8 +304,8 @@ $(function () {
             info: true,
             ordering: true,
             processing: true,
-            pageLength: 100,
-            lengthChange: false,
+            pageLength: 50,
+            lengthChange:true,
             AutoWidth: false,
             scrollX: true,
             fixedColumns: {

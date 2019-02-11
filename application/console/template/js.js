@@ -105,11 +105,10 @@ $(function () {
         var data = $(this).data("json");
         if (data) {
             var td_class = data.DT_RowClass;
-            if($(this).hasClass("selected"))
-            {
+            if ($(this).hasClass("selected")) {
                 $(".check_all").prop("checked",false);
                 $("." + td_class).find('.check_item').prop("checked",false).trigger("change");
-            }else {
+            } else {
                 $("." + td_class).find('.check_item').prop("checked",true).trigger("change");
             }
         }
@@ -119,8 +118,7 @@ $(function () {
         var data     = tr.data("json");
         var td_class = "DT_class" + data.id;
         var node     = $("." + td_class);
-        if($(this).prop("checked"))
-        {
+        if ($(this).prop("checked")) {
             node.addClass("selected");
         } else {
             $(".check_all").prop("checked",false);
@@ -152,7 +150,7 @@ $(function () {
         return false;
     });
 
-    // 新增会员
+    // 新增
     $("#create").on('click',function () {
         $("#id").val($(this).data("id")).prop("disabled",false);
         $("#SaveModalForm").get(0).reset();
@@ -299,8 +297,8 @@ $(function () {
             info: true,
             ordering: true,
             processing: true,
-            pageLength: 100,
-            lengthChange: false,
+            pageLength: 50,
+            lengthChange:true,
             AutoWidth: false,
             scrollX: true,
             fixedColumns: {
