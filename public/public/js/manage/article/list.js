@@ -133,11 +133,9 @@ $(function () {
         }
     }).on("click",".check_all",function () {
         // 全选和取消全选
-        alert("d");
-        if($(this).prop("checked"))
-        {
+        if ($(this).prop("checked")) {
             $(".check_item").prop("checked",true).trigger("change");
-        }else {
+        } else {
             $(".check_item").prop("checked",false).trigger("change");
         }
     }).on("click",'.edit',function () {
