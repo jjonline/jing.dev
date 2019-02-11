@@ -351,6 +351,8 @@ $(function () {
                  * +++++++++++++++++++++++++++++++++++++++++++
                  */
                 dataSrc: function (json) {
+                    // reset checkAll
+                    $(".check_all").prop('checked',false);
                     if (json.data && json.data.length > 0) {
                         var items = json.data;
                         for (var n in items) {
