@@ -99,7 +99,7 @@ $(function () {
      * +++++++++++++++++++++++++++++++++++++++++++
      * +++++++++++++++++++++++++++++++++++++++++++
      */
-    table.on("init.dt",function () {
+    $(".table").on("init.dt",function () {
         // 定制显示的字段
         utils.bindColumnSelector("table-columns",pageDataSearch);
         // 重新初始化tooltips
