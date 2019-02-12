@@ -1,5 +1,10 @@
-services:
-    - php:7.2
+image: tetraweb/php
+before_script:
+    - apt-get update
+    - apt-get install zip unzip
+    - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    - php composer-setup.php
+    - php -r "unlink('composer-setup.php');"
 stages:
     - build
     - test
