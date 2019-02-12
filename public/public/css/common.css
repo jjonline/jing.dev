@@ -60,6 +60,7 @@ tr.selected>td {}
 }
 .DTFC_RightWrapper {
     height:auto !important;
+    width:auto !important;
     right: -1px;
     box-shadow: -1px 0 8px rgba(0,0,0,.08);
 }
