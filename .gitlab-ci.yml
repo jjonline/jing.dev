@@ -1,3 +1,4 @@
+image: php:7.2
 stages:
     - build
     - test
