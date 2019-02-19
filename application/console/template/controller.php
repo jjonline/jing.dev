@@ -29,7 +29,7 @@ class __CONTROLLER__Controller extends BaseController
             'content_title'    => '__LIST_NAME__管理',
             'content_subtitle' => '__LIST_NAME__列表和管理',
             'breadcrumb'       => [
-                ['label' => '__LIST_NAME__管理', 'url' => url('__CONTROLLER_LOWER__Search/list')],
+                ['label' => '__LIST_NAME__管理', 'url' => url('__CONTROLLER_LOWER__/list')],
                 ['label' => '__LIST_NAME__列表和管理', 'url' => ''],
             ],
             'load_layout_css'  => false,

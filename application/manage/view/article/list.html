@@ -6,7 +6,7 @@
                 <div class="box-body">
                     <div class="row">
                         <div class="col-xs-12 col-sm-2">
-                            <a href="javascript:;" data-href="<%{:url('article/create')}%>"  class="btn btn-primary" id="create"><i class="fa fa-plus"></i> 新增图文</a>
+                            <a href="javascript:;" data-href="<%{:url('manage/article/create')}%>"  class="btn btn-primary" id="create"><i class="fa fa-plus"></i> 新增前台图文</a>
                         </div>
                     </div>
                 </div>
@@ -20,7 +20,7 @@
                         <div class="row">
                             <div class="col-xs-12 col-sm-3">
                                 <div class="has-feedback">
-                                    <input id="txt_search" type="text" class="form-control" placeholder="搜索文章标题、关键词">
+                                    <input id="txt_search" type="text" class="form-control" placeholder="搜索前台图文">
                                     <span class="glyphicon glyphicon-search form-control-feedback"></span>
                                 </div>
                             </div>
@@ -32,8 +32,8 @@
                             </div>
                             <div class="col-xs-12 col-sm-3 pull-right">
                                 <div class="btn-group pull-right">
-                                    <button class="btn btn-default search-btn"><i class="fa fa-cog"></i> 高级查询</button>
-                                    <button class="btn btn-default" id="table-refresh" data-toggle="tooltip" title="点击刷新当前列表">
+                                    <button class="btn btn-default" id="adv_search_btn"><i class="fa fa-cog"></i> 高级查询</button>
+                                    <button class="btn btn-default" id="refresh_table" data-toggle="tooltip" title="点击刷新当前列表">
                                         <i class="fa fa-refresh"></i>
                                     </button>
                                     <button type="button" class="btn btn-default" id="table-columns" data-toggle="tooltip" title="点击筛选字段">
@@ -49,7 +49,7 @@
 
         <div class="box box-primary">
             <div class="box-body">
-                <table class="table table-bordered table-striped table-hover display responsive nowrap" cellspacing="0" width="100%" id="table" data-order='[[ 2, "desc" ]]'>
+                <table class="table table-bordered table-striped table-hover display responsive nowrap" cellspacing="0" width="100%" id="table" data-order='[[ 1, "desc" ]]'>
                     <thead>
                     <tr>
                         <th data-priority="false" data-orderable="false">
@@ -57,14 +57,20 @@
                         </th>
                         <th data-priority="1">ID</th>
                         <th data-priority="2" data-orderable="false">标题</th>
-                        <th data-priority="3" data-orderable="false">分类</th>
-                        <th data-priority="4">排序</th>
-                        <th data-priority="5">点击数</th>
-                        <th data-priority="6">点赞数</th>
-                        <th data-priority="7">评论数</th>
-                        <th data-priority="8">创建时间</th>
-                        <th data-priority="9">状态</th>
-                        <th data-priority="10" data-orderable="false">操作</th>
+                        <th data-priority="3">分类</th>
+                        <th data-priority="4">作者</th>
+                        <th data-priority="10">图文类型</th>
+                        <th data-priority="11">排序</th>
+                        <th data-priority="5">点赞数</th>
+                        <th data-priority="6">阅读数</th>
+                        <th data-priority="7">首页推荐</th>
+                        <th data-priority="8">栏目推荐</th>
+                        <th data-priority="9">允许评论</th>
+                        <th data-priority="12">显示时间</th>
+                        <th data-priority="13">创建时间</th>
+                        <th data-priority="14">最后更新</th>
+                        <th data-priority="15">启用/禁用</th>
+                        <th data-priority="20" data-orderable="false">操作</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -76,16 +82,16 @@
     </div>
 </div>
 
-<!---->
-<div class="modal fade" id="MemberEditModal" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+<!--新增|编辑modal-->
+<div class="modal fade" id="SaveModal" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="MemberModalLabel">编辑会员</h4>
+                <h4 class="modal-title" id="SaveModalLabel">编辑前台图文</h4>
             </div>
             <div class="modal-body">
-                <form data-edit="<%{:url('member/edit')}%>" data-create="<%{:url('member/create')}%>" class="form-horizontal" id="MemberEditForm">
+                <form data-edit="<%{:url('manage/article/edit')}%>" data-create="<%{:url('manage/article/create')}%>" class="form-horizontal" id="SaveModalForm">
                     <div class="box-body">
                         <div class="form-group">
                             <label class="col-sm-3 control-label">真实姓名 <span class="required">*</span></label>
@@ -104,58 +110,6 @@
                                     <option value="0">女</option>
                                     <option value="-1">未知</option>
                                 </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">用户名 <span class="required">*</span></label>
-                            <div class="col-sm-7"><input type="text" id="user_name" class="form-control" name="Member[user_name]" placeholder="用户名，用于前台登录的账号">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">登录密码 </label>
-                            <div class="col-sm-7">
-                                <input type="text" id="password" class="form-control" name="Member[password]" placeholder="数字和字母6至18位，新增必须设置，修改模式若无需修改请留空">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">手机号 <span class="required">*</span></label>
-                            <div class="col-sm-7">
-                                <input type="text" id="mobile" class="form-control" name="Member[mobile]" placeholder="账号使用者的手机号，填写则可作为登录账号，可留空">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">邮箱地址 </label>
-                            <div class="col-sm-7">
-                                <input type="text" id="email" class="form-control" name="Member[email]" placeholder="账号使用者的邮箱，填写则可作为登录账号，可留空">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">联系电话 </label>
-                            <div class="col-sm-7">
-                                <input type="text" id="telephone" class="form-control" name="Member[telephone]" placeholder="账号使用者的办公电话等固定电话号码，可留空">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">选择省市县  <span class="required">*</span></label>
-                            <div class="col-sm-7">
-                                <div id="address_picker">
-                                    <select data-province="-- 选择省 --" class="form-control province select2" style="width: 100%;"  name="Member[province]" id="province"></select>
-                                    <select data-city="-- 选择市 --"  class="form-control city select2" style="width: 100%;" name="Member[city]" id="city"></select>
-                                    <select data-district="-- 选择区 --"  class="form-control district select2" style="width: 100%;" name="Member[district]" id="district"></select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label" for="address">详细地址  <span class="required">*</span></label>
-                            <div class="col-sm-7">
-                                <textarea name="Member[address]" id="address" cols="3" class="form-control" placeholder="选择省市县之后请完善详细地址"></textarea>
                             </div>
                         </div>
 
@@ -208,36 +162,24 @@
             <div class="modal-body">
                 <form action="" class="form-horizontal" id="SearchForm">
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">账号状态</label>
+                        <label class="col-sm-3 control-label">图文状态</label>
                         <div class="col-sm-8">
                             <select name="adv_enable" id="adv_enable" class="form-control select2" style="width: 100%;">
-                                <option value="">--选择账号状态--</option>
+                                <option value="">--选择图文状态--</option>
                                 <option value="0">禁用</option>
-                                <option value="1">启用</option>
+                                <option value="1" selected="selected">启用</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">性别</label>
-                        <div class="col-sm-8">
-                            <select name="adv_gender" id="adv_gender" class="form-control select2" style="width: 100%;">
-                                <option value="">--选择性别--</option>
-                                <option value="1">男</option>
-                                <option value="0">女</option>
-                                <option value="-1">未知</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="col-sm-3 control-label">注册时间</label>
+                        <label class="col-sm-3 control-label">显示时间</label>
                         <div class="col-sm-4">
                             <div class="input-group date">
                                 <div class="input-group-addon">
                                     <i class="fa fa-calendar"></i>
                                 </div>
-                                <input readonly id="search_begin_date" data-key="search_begin_date" type="text" class="form-control pull-right search_date" placeholder="创建时间开始">
+                                <input readonly id="search_begin_date" data-key="search_begin_date" type="text" class="form-control pull-right search_date" placeholder="显示时间开始">
                                 <div class="input-group-addon clear-begin-data" style="cursor: pointer;">
                                     <i class="fa fa-times"></i>
                                 </div>
@@ -248,7 +190,7 @@
                                 <div class="input-group-addon">
                                     <i class="fa fa-calendar"></i>
                                 </div>
-                                <input readonly id="search_end_date" data-key="search_end_date" type="text" class="form-control pull-right search_date" placeholder="创建时间结束">
+                                <input readonly id="search_end_date" data-key="search_end_date" type="text" class="form-control pull-right search_date" placeholder="显示时间结束">
                                 <div class="input-group-addon clear-end-data" style="cursor: pointer;">
                                     <i class="fa fa-times"></i>
                                 </div>
@@ -257,12 +199,53 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">省市县</label>
-                        <div class="col-sm-8">
-                            <div id="adv_picker">
-                                <select data-province="-- 选择省 --" class="form-control province select2" style="width: 100%;"  name="adv_province" id="adv_province"></select>
-                                <select data-city="-- 选择市 --"  class="form-control city select2" style="width: 100%;" name="adv_city" id="adv_city"></select>
-                                <select data-district="-- 选择区 --"  class="form-control district select2" style="width: 100%;" name="adv_district" id="adv_district"></select>
+                        <label class="col-sm-3 control-label">创建时间</label>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="search_begin_date1" type="text" class="form-control pull-right search_date" placeholder="创建时间开始">
+                                <div class="input-group-addon clear-begin-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="search_end_date1" type="text" class="form-control pull-right search_date" placeholder="创建时间结束">
+                                <div class="input-group-addon clear-end-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">最后更新时间</label>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="search_begin_date2" type="text" class="form-control pull-right search_date" placeholder="最后更新时间开始">
+                                <div class="input-group-addon clear-begin-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="search_end_date2" type="text" class="form-control pull-right search_date" placeholder="最后更新时间结束">
+                                <div class="input-group-addon clear-end-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -273,10 +256,10 @@
                 <div class="row">
                     <div class="col-sm-12 text-center">
                         <div class="col-xs-6 text-right">
-                            <button type="button" class="btn btn-default btn-reset">重置</button>
+                            <button type="button" class="btn btn-default" id="exec_reset">重置</button>
                         </div>
                         <div class="col-xs-6 text-left">
-                            <button type="button" class="btn btn-info btn-search">查询</button>
+                            <button type="button" class="btn btn-info" id="exec_search">查询</button>
                         </div>
                     </div>
                 </div>
@@ -285,7 +268,7 @@
     </div>
 </div>
 <!--高级查询结束-->
+
 <script>
-    var has_edit_permission = <%{:user_has_permission('manage/member/edit') ? 'true' : 'false'}%>;
-    var has_enable_permission = <%{:user_has_permission('manage/member/enable') ? 'true' : 'false'}%>;
+    var has_edit_permission   = <%{:user_has_permission('manage/article/edit') ? 'true' : 'false'}%>;
 </script>
