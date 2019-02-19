@@ -11,6 +11,7 @@ namespace app\manage\service;
 use app\common\helper\ArrayHelper;
 use app\common\model\SiteConfig;
 use app\common\service\LogService;
+use think\facade\Cache;
 use think\Request;
 
 class SiteConfigService
@@ -67,6 +68,10 @@ class SiteConfigService
                     $this->LogService->logRecorder([$config, $value], '修改站点配置');
                 }
             }
+
+            // 清理配置缓存
+            Cache::clear($this->SiteConfig->ConfigCacheTag);
+
             return ['error_code' => 0, 'error_msg' => '保存成功'];
         } catch (\Throwable $e) {
             return ['error_code' => 500, 'error_msg' => $e->getMessage()];
