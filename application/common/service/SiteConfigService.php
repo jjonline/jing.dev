@@ -9,6 +9,7 @@
 namespace app\common\service;
 
 use app\common\model\SiteConfig;
+use think\facade\Cache;
 use think\Request;
 
 class SiteConfigService
@@ -86,6 +87,9 @@ class SiteConfigService
         }
         $site_config['sort'] = intval($site_config['sort']) ? intval($site_config['sort']) : 0;
 
+        // 清理配置缓存
+        Cache::clear($this->SiteConfig->ConfigCacheTag);
+
         // 新增或更新
         $effect_num = $this->SiteConfig->allowField(true)->isUpdate($is_edit)->save($site_config);
         if (false !== $effect_num) {
@@ -118,6 +122,19 @@ class SiteConfigService
             }
         }
         return $_json;
+    }
+
+    /**
+     * @param $key
+     * @param $default
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function get($key, $default)
+    {
+        return $this->SiteConfig->getSitConfigValueByKey($key, $default);
     }
 
     /**
@@ -161,6 +178,10 @@ class SiteConfigService
         if (empty($site_config)) {
             return ['error_code' => 400,'error_msg' => '拟删除的数据不存在'];
         }
+
+        // 清理配置缓存
+        Cache::clear($this->SiteConfig->ConfigCacheTag);
+
         $this->SiteConfig->db()->where('id', $id)->delete();
         $this->LogService->logRecorder($site_config, '删除站点配置');
         return ['error_code' => 0,'error_msg' => '数据删除成功'];

@@ -8,10 +8,16 @@
 
 namespace app\common\model;
 
+use think\facade\Cache;
 use think\Model;
 
 class SiteConfig extends Model
 {
+    /**
+     * @var string 配置缓存tag
+     */
+    public $ConfigCacheTag = 'Site.Config.Tag';
+
     protected $json = ['select_items'];
 
     /**
@@ -72,7 +78,12 @@ class SiteConfig extends Model
         if (empty($key)) {
             return $default_val;
         }
-        $value = $this->where('key', $key)->value('value');
-        return is_null($value) ? $default_val : $value;
+        $result = Cache::get($key);
+        if (false === $result) {
+            $value  = $this->where('key', $key)->value('value');
+            $result = is_null($value) ? $default_val : $value;
+            Cache::tag($this->ConfigCacheTag)->set($key, $result);
+        }
+        return $result;
     }
 }
