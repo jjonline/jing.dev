@@ -50,7 +50,7 @@ class CreateFirstSuperUser extends Seeder
                 $posts = $this->table('user');
                 $posts->insert($data)->save();
             } else {
-                throw new \think\Exception('用户表user已存在id为1的super超级用户，请手动检查');
+                $this->output->warning(' == 用户表user已存在id为1的super超级用户，请手动检查，本次seed忽略');
             }
         } else {
             throw new \think\Exception('用户表user不存在，请先执行`php think migrate:run`数据库迁移命令');
