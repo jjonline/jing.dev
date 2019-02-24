@@ -26,6 +26,6 @@ class __CONTROLLER__ extends Model
             return [];
         }
         $result = $this->where('id', $id)->find();
-        return empty($result) ? [] : $result;
+        return empty($result) ? [] : $result->toArray();
     }
 }

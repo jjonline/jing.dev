@@ -49,7 +49,7 @@ $(function () {
     /**
      * 手动刷新表格
      */
-    $("#refresh_table").click(function () {
+    $("#refresh_table_btn").click(function () {
         pageDataSearch.ajax.reload(null, false);
     });
     /**
@@ -306,7 +306,7 @@ $(function () {
                 rightColumns: 1
             },
             ajax: {
-                url: "/manage/__CONTROLLER_UNDER_SCORE__/list",
+                url: "/manage/__CONTROLLER_UNDER_SCORE__/list.html",
                 type: "POST",
                 /**
                  * +++++++++++++++++++++++++++++++++++++++++++
