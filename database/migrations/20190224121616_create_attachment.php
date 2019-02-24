@@ -106,13 +106,13 @@ class CreateAttachment extends Migrator
      */
     public function down()
     {
-        if (\think\Db::name('attachment')->count() <= 0) {
-            parent::down();
-            if ($this->hasTable('attachment')) {
+        if ($this->hasTable('attachment')) {
+            if (\think\Db::name('attachment')->count() <= 0) {
+                parent::down();
                 $this->dropTable('attachment');
+            } else {
+                throw new \think\Exception('检测到attachment表非空，确需rollback请先手动清空该表数据，请不要随意执行`rollback`');
             }
-        } else {
-            throw new \think\Exception('检测到attachment表非空，确需rollback请先手动清空该表数据，请不要随意执行`rollback`');
         }
     }
 }

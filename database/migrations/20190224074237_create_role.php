@@ -67,13 +67,13 @@ class CreateRole extends Migrator
      */
     public function down()
     {
-        if (\think\Db::name('role')->count() == 1) {
-            parent::down();
-            if ($this->hasTable('role')) {
+        if ($this->hasTable('role')) {
+            if (\think\Db::name('role')->count() == 1) {
+                parent::down();
                 $this->dropTable('role');
+            } else {
+                throw new \think\Exception('检测到role表已有非seed填充的数据，请不要随意执行`php think migrate:rollback`');
             }
-        } else {
-            throw new \think\Exception('检测到role表已有非seed填充的数据，请不要随意执行`php think migrate:rollback`');
         }
     }
 }
