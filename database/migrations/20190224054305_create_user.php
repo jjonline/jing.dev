@@ -107,7 +107,7 @@ class CreateUser extends Migrator
                 ->addColumn('update_time', 'datetime', [
                     'default' => 'CURRENT_TIMESTAMP',
                     'update'  => 'CURRENT_TIMESTAMP',
-                    'comment' => '更新时间',
+                    'comment' => '最后修改时间',
                 ])
                 ->addIndex('user_name', [
                     'unique' => true
@@ -133,6 +133,7 @@ class CreateUser extends Migrator
      * ----
      * cli执行命令php think migrate:run所被执行的方法
      * ----
+     * @throws \think\Exception
      */
     public function down()
     {
