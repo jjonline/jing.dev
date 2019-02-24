@@ -1,6 +1,6 @@
 $(function () {
 
-    utils.hideNav();
+    // utils.hideNav();
 
     $(".btn-save").click(function () {
         var flag = $(this).data('flag');
