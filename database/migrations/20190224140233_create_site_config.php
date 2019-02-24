@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * 创建站点自定义配置表
+ */
 use think\migration\Migrator;
 use think\migration\db\Column;
 use Phinx\Db\Adapter\MysqlAdapter;
