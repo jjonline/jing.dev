@@ -16,7 +16,7 @@
 
 * 1、使用`environments`目录保存各种不同的开发环境配置
 * 2、使用`php think migration`管理数据表结构版本，在`database`目录下
-* 3、使用`php think init --env=dev`生成开发、生成等环境配置文件
+* 3、使用`php think init --env=dev`生成开发、生产等环境配置文件
 
 ### 初始化步骤
 
@@ -27,4 +27,8 @@
 * 5、执行数据表迁移命令，根目录下执行：`php think migrate:run`命令，生成各种数据表。
 * 6、初始化各种表的基本数据，根目录下执行：`php think seed:run`命令，为各种数据表填充必要的数据。
 
+### Git分支说明
 
+* `master`分支开发基于组件系统而成的自有cms
+* `framework`分支则是纯粹的组件系统，只有最基础的功能和表结构
+* 其他分支则一些特性分支或功能调试分支
