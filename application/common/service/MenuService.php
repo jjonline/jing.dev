@@ -9,12 +9,12 @@
 namespace app\common\service;
 
 use app\common\model\Menu;
+use think\Db;
 use think\facade\Cache;
 use think\Request;
 
 class MenuService
 {
-
     /**
      * @var Menu
      */
@@ -177,6 +177,135 @@ class MenuService
         return $ret >= 0 ?
                ['error_code' => 0,'error_msg' => '排序调整成功'] :
                ['error_code' => 500,'error_msg' => '排序调整失败：系统异常'];
+    }
+
+    /**
+     * 按层级、排序重新排列菜单数据并生成seed数组
+     * ---
+     * 1、按层级 + 排序排列所有菜单
+     * 2、重新生成递增ID
+     * ---
+     * @return array
+     */
+    public function reorganize()
+    {
+        try {
+            Db::startTrans();
+            $menus   = $this->Menu->getMenuList();
+            $primary = 1; // 重整主键
+            $menu1   = [];
+            $menu2   = [];
+            $menu3   = [];
+            foreach ($menus as $key => $value) {
+                // 仅处理三级菜单
+                $value['old_id'] = $value['id'];
+                // 额外参数为空的统一成null值
+                if (empty($value['extra_param'])) {
+                    $value['extra_param'] = null;
+                }
+                switch ($value['level']) {
+                    case 1:
+                        $menu1[] = $value;
+                        break;
+                    case 2:
+                        $menu2[] = $value;
+                        break;
+                    case 3:
+                        $menu3[] = $value;
+                        break;
+                }
+            }
+            // 按层级处理菜单数组--仅到3级
+            foreach ($menu1 as $key1 => $value1) {
+                // 二级菜单
+                $_menu2 = [];
+                foreach ($menu2 as $key2 => $value2) {
+                    // 三级菜单
+                    $_menu3 = [];
+                    foreach ($menu3 as $key3 => $value3) {
+                        if ($value2['id'] == $value3['parent_id']) {
+                            $_menu3[] = $value3;
+                        }
+                    }
+                    $value2['children'] = $_menu3;
+
+                    if ($value1['id'] == $value2['parent_id']) {
+                        $_menu2[] = $value2;
+                    }
+                }
+            }
+
+            // 按层级 + 排序重新处理主键ID
+            $reorganize = [];
+            foreach ($menu1 as $value1) {
+                $level1_id    = $primary;
+                $cache        = $value1;
+                $cache['id']  = $primary;
+                $reorganize[] = $cache;
+                // 处理1级菜单下的2级菜单
+                foreach ($menu2 as $value2) {
+                    if ($value1['old_id'] == $value2['parent_id']) {
+                        $primary++; // 主键自增
+                        $level2_id          = $primary;
+                        $cache              = $value2;
+                        $cache['id']        = $primary;
+                        $cache['parent_id'] = $level1_id;
+                        $reorganize[]       = $cache;
+                        // 处理2级菜单下的3级菜单
+                        foreach ($menu3 as $value3) {
+                            if ($value2['old_id'] == $value3['parent_id']) {
+                                $primary++; // 主键自增
+                                $cache              = $value3;
+                                $cache['id']        = $primary;
+                                $cache['parent_id'] = $level2_id;
+                                $reorganize[]       = $cache;
+                            }
+                        }
+                    }
+                }
+                $primary++; // 主键自增
+            }
+
+            // 清理old_id生成seed结构
+            foreach ($reorganize as $key => $value) {
+                unset($reorganize[$key]['old_id']);
+            }
+
+            // seed数组生成php字符串描述格式
+            $seeds = "[";
+            foreach ($reorganize as $value) {
+                $seeds .= "\n    [\n";
+                foreach ($value as $key => $val) {
+                    if (is_null($val)) {
+                        $seeds .= "        '".$key."'".' => null,';
+                    } else {
+                        if ($key == 'create_time' || $key == 'update_time') {
+                            $seeds .= "        '".$key."'".' => $date_time,';
+                        } else {
+                            $seeds .= "        '".$key."' => '".$val."',";
+                        }
+                    }
+                    $seeds .= "\n";
+                }
+                $seeds .= "    ],";
+            }
+            $seeds .= "\n]";
+
+            // 读取模板生成seed使用的php结构数组
+            $stub = file_get_contents('../database/stubs/menu_seed.stub');
+            $stub = str_replace('#dateTime#', date('Y-m-d H:i:s'), $stub);
+            $stub = str_replace('#menu#', $seeds, $stub);
+            file_put_contents('../database/stubs/menu_seed.php', $stub);
+
+            // 清空menu表后重新插入重排整理后的菜单记录数据
+            $this->Menu->db()->query('truncate table '.$this->Menu->getTable());
+            $this->Menu->db()->insertAll($reorganize);
+            Db::commit();
+            return ['error_code' => 0,'error_msg' => '重整菜单列表并生成seed完成'];
+        } catch (\Throwable $e) {
+            Db::rollback();
+            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
+        }
     }
 
     /**

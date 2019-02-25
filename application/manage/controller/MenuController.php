@@ -11,7 +11,6 @@ namespace app\manage\controller;
 use app\common\controller\BaseController;
 use app\common\model\Menu;
 use app\common\service\MenuService;
-use think\Request;
 
 class MenuController extends BaseController
 {
@@ -46,18 +45,17 @@ class MenuController extends BaseController
 
     /**
      * 新增菜单
-     * @param Request $request
      * @param MenuService $menuService
      * @return mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function createAction(Request $request, MenuService $menuService)
+    public function createAction(MenuService $menuService)
     {
-        if ($request->isPost() && $request->isAjax()) {
+        if ($this->request->isPost() && $this->request->isAjax()) {
             // 新增menu菜单后端检测和操作
-            return $menuService->save($request);
+            return $menuService->save($this->request);
         }
         $common = [
             'title'            => '新增菜单 - ' . config('local.site_name'),
@@ -80,18 +78,17 @@ class MenuController extends BaseController
 
     /**
      * 修改菜单
-     * @param Request $request
      * @param MenuService $menuService
      * @return array|mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function editAction(Request $request, MenuService $menuService)
+    public function editAction(MenuService $menuService)
     {
-        if ($request->isPost() && $request->isAjax()) {
+        if ($this->request->isPost() && $this->request->isAjax()) {
             // 编辑menu菜单后端检测和操作
-            return $menuService->save($request);
+            return $menuService->save($this->request);
         }
         $common = [
             'title'            => '编辑菜单 - ' . config('local.site_name'),
@@ -107,7 +104,7 @@ class MenuController extends BaseController
         $this->assign($common);
 
         $MenuModel = new Menu();
-        $menu      = $MenuModel->getMenuById($request->param('id'));
+        $menu      = $MenuModel->getMenuById($this->request->param('id'));
         $list      = $MenuModel->getMenuList();
         if (empty($menu)) {
             $this->redirect(url('menu/list'));
@@ -119,25 +116,40 @@ class MenuController extends BaseController
 
     /**
      * 菜单排序
-     * @param Request $request
      * @param MenuService $menuService
      * @return mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function sortAction(Request $request, MenuService $menuService)
+    public function sortAction(MenuService $menuService)
     {
-        if ($request->isPost() && $request->isAjax()) {
+        if ($this->request->isPost() && $this->request->isAjax()) {
             // 编辑menu菜单后端检测和操作
-            return $this->asJson($menuService->sort($request));
+            return $this->asJson($menuService->sort($this->request));
+        }
+        return $this->renderJson('error', 500);
+    }
+
+    /**
+     * 按层级、排序重新排列菜单数据并生成seed数组
+     * ---
+     * 1、按层级 + 排序排列所有菜单
+     * 2、重新生成递增ID
+     * ---
+     * @param MenuService $menuService
+     * @return mixed|\think\Response
+     */
+    public function reorganizeAction(MenuService $menuService)
+    {
+        if ($this->request->isAjax()) {
+            return $this->asJson($menuService->reorganize());
         }
         return $this->renderJson('error', 500);
     }
 
     /**
      * 删除菜单
-     * @param Request $request
      * @param MenuService $menuService
      * @return mixed
      * @throws \think\Exception
@@ -146,11 +158,11 @@ class MenuController extends BaseController
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    public function deleteAction(Request $request, MenuService $menuService)
+    public function deleteAction(MenuService $menuService)
     {
-        if ($request->isPost() && $request->isAjax()) {
+        if ($this->request->isPost() && $this->request->isAjax()) {
             // 编辑menu菜单后端检测和操作
-            return $this->asJson($menuService->delete($request));
+            return $this->asJson($menuService->delete($this->request));
         }
         return $this->renderJson('error', 500);
     }

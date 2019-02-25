@@ -54,13 +54,12 @@ class MineController extends BaseController
 
     /**
      * ajax提交编辑的用户个人资料|密码+真实姓名+手机号+邮箱+性别
-     * @param Request $request
      * @return array|\think\Response
      */
-    public function editAction(Request $request)
+    public function editAction()
     {
-        if ($request->isAjax() && $request->post('Profile.id') == $this->UserInfo['id']) {
-            return $this->UserService->userModifyOwnUserInfo($request);
+        if ($this->request->isAjax() && $this->request->post('Profile.id') == $this->UserInfo['id']) {
+            return $this->UserService->userModifyOwnUserInfo($this->request);
         }
         return $this->renderJson('异常错误', 500);
     }

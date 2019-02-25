@@ -22,20 +22,35 @@ class CreateBaseMenu extends Seeder
         // 检查存在表
         if ($this->hasTable('menu')) {
             // 检查不存在id为1的记录
-            $hasDepartment = \think\Db::name('menu')->count();
-            if (empty($hasDepartment)) {
-                $data = [
-                    [
-
-                    ]
-                ];
-                $posts = $this->table('menu');
-                $posts->insert($data)->save();
+            $hasMenu = \think\Db::name('menu')->count();
+            $data    = $this->getSeed();
+            // menu表为空且seed数据存在才执行seed
+            if (empty($hasMenu) && !empty($data)) {
+                if (empty($data)) {
+                    $this->output->warning(' == 菜单表seed数据不存在，请手动检查database/stubs/menu_seed.php，本次seed忽略');
+                } else {
+                    $posts = $this->table('menu');
+                    $posts->insert($data)->save();
+                }
             } else {
-                $this->output->warning(' == 菜单表menu已存在数据，请手动检查，本次seed忽略');
+                $this->output->warning(' == 菜单表menu已存在数据，若确需seed请先手动清空menu表，本次seed忽略');
             }
         } else {
             throw new \think\Exception('菜单表menu不存在，请先执行`php think migrate:run`数据库迁移命令');
         }
+    }
+
+    /**
+     * 读取seed数据
+     * @return array
+     */
+    protected function getSeed()
+    {
+        // 相对于cli的think文件
+        $seed_file = './database/stubs/menu_seed.php';
+        if (is_file($seed_file)) {
+            return include $seed_file;
+        }
+        return [];
     }
 }

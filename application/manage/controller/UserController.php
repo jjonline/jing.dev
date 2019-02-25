@@ -11,22 +11,20 @@ namespace app\manage\controller;
 use app\common\controller\BaseController;
 use app\common\service\UserService;
 use app\manage\model\search\UserSearch;
-use think\Request;
 
 class UserController extends BaseController
 {
     /**
      * 用户列表
-     * @param Request $request
      * @param UserSearch $userSearch
      * @return mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function listAction(Request $request, UserSearch $userSearch, UserService $userService)
+    public function listAction(UserSearch $userSearch, UserService $userService)
     {
-        if ($request->isAjax()) {
+        if ($this->request->isAjax()) {
             // 将当前登录用户信息传递过去
             $result = $userSearch->list($this->UserInfo);
             return $this->asJson($result);
@@ -56,18 +54,17 @@ class UserController extends BaseController
 
     /**
      * 超级管理员新增用户
-     * @param Request $request
      * @param UserService $userService
      * @return mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function createAction(Request $request, UserService $userService)
+    public function createAction(UserService $userService)
     {
-        if ($request->isAjax()) {
+        if ($this->request->isAjax()) {
             // 将当前登录用户信息传递过去
-            $result = $userService->superUserInsertUser($request);
+            $result = $userService->superUserInsertUser($this->request);
             return $this->asJson($result);
         }
         $common = [
@@ -95,18 +92,17 @@ class UserController extends BaseController
 
     /**
      * 编辑后台用户
-     * @param Request $request
      * @param UserService $userService
      * @return mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function editAction(Request $request, UserService $userService)
+    public function editAction(UserService $userService)
     {
-        if ($request->isAjax()) {
+        if ($this->request->isAjax()) {
             // 将当前登录用户信息传递过去
-            $result = $userService->superUserUpdateUser($request, $this->UserInfo);
+            $result = $userService->superUserUpdateUser($this->request, $this->UserInfo);
             return $this->asJson($result);
         }
         $common = [
@@ -122,7 +118,7 @@ class UserController extends BaseController
         ];
         $this->assign($common);
 
-        $user = $userService->User->getUserInfoById($request->get('id'));
+        $user = $userService->User->getUserInfoById($this->request->get('id'));
         if (empty($user) || !in_array($user['dept_id'], $this->UserInfo['dept_auth']['dept_id_vector'])) {
             $this->error('您无权限编辑该账户信息');
         }
@@ -142,15 +138,14 @@ class UserController extends BaseController
 
     /**
      * 启用|禁用用户
-     * @param Request $request
      * @param UserService $userService
      * @return mixed
      * @throws \think\exception\DbException
      */
-    public function enableToggleAction(Request $request, UserService $userService)
+    public function enableToggleAction(UserService $userService)
     {
-        if ($request->isPost() && $request->isAjax()) {
-            $result = $userService->enableUserToggle($request->post('id/i'), $this->UserInfo);
+        if ($this->request->isPost() && $this->request->isAjax()) {
+            $result = $userService->enableUserToggle($this->request->post('id/i'), $this->UserInfo);
             return $this->asJson($result);
         }
         return $this->renderJson('请求失败', 404);

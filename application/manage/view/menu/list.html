@@ -1,12 +1,21 @@
 <div class="row">
     <div class="col-md-12">
 
-        <%{if condition = "user_has_permission('manage/menu/create')"}%>
+        <%{if condition="user_has_permission('manage/menu/create') OR user_has_permission('manage/menu/reorganize')"}%>
         <div class="box box-solid">
             <div class="box-body">
                 <div class="row">
-                    <div class="col-xs-12 col-sm-2">
-                        <a href="<%{:url('manage/menu/create')}%>" class="btn btn-primary"><i class="fa fa-plus"></i> 新增菜单</a>
+                    <div class="col-xs-12 col-sm-6">
+                        <%{if condition="user_has_permission('manage/menu/create')"}%>
+                        <div class="btn-group">
+                            <a href="<%{:url('manage/menu/create')}%>" class="btn btn-primary"><i class="fa fa-plus"></i> 新增菜单</a>
+                        </div>
+                        <%{/if}%>
+                        <%{if condition="user_has_permission('manage/menu/reorganize')"}%>
+                        <div class="btn-group">
+                            <a href="<%{:url('manage/menu/reorganize')}%>" class="btn btn-danger" id="reorganize"><i class="fa fa-cogs"></i> 重整菜单</a>
+                        </div>
+                        <%{/if}%>
                     </div>
                 </div>
             </div>

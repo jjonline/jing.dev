@@ -10,7 +10,6 @@ namespace app\manage\controller;
 
 use app\common\controller\BaseController;
 use app\common\service\DepartmentService;
-use think\Request;
 
 class DepartmentController extends BaseController
 {
@@ -46,17 +45,16 @@ class DepartmentController extends BaseController
 
     /**
      * 创建部门
-     * @param Request $request
      * @param DepartmentService $departmentService
      * @return array|mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function createAction(Request $request, DepartmentService $departmentService)
+    public function createAction(DepartmentService $departmentService)
     {
-        if ($request->isPost() && $request->isAjax()) {
-            return $departmentService->save($request);
+        if ($this->request->isPost() && $this->request->isAjax()) {
+            return $departmentService->save($this->request);
         }
         $common = [
             'title'            => '新增部门 - ' . config('local.site_name'),
@@ -79,17 +77,16 @@ class DepartmentController extends BaseController
 
     /**
      * 编辑部门
-     * @param Request $request
      * @param DepartmentService $departmentService
      * @return array|mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function editAction(Request $request, DepartmentService $departmentService)
+    public function editAction(DepartmentService $departmentService)
     {
-        if ($request->isPost() && $request->isAjax()) {
-            return $departmentService->save($request);
+        if ($this->request->isPost() && $this->request->isAjax()) {
+            return $departmentService->save($this->request);
         }
         $common = [
             'title'            => '编辑部门 - ' . config('local.site_name'),
@@ -104,7 +101,7 @@ class DepartmentController extends BaseController
         ];
         $this->assign($common);
 
-        $Dept = $departmentService->Department->getDeptInfoById($request->param('id'));
+        $Dept = $departmentService->Department->getDeptInfoById($this->request->param('id'));
         if (empty($Dept)) {
             $this->redirect(url('department/list'));
         }
@@ -116,24 +113,22 @@ class DepartmentController extends BaseController
 
     /**
      * 跳转部门排序字段
-     * @param Request $request
      * @param DepartmentService $departmentService
      * @return mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function sortAction(Request $request, DepartmentService $departmentService)
+    public function sortAction(DepartmentService $departmentService)
     {
-        if ($request->isPost() && $request->isAjax()) {
+        if ($this->request->isPost() && $this->request->isAjax()) {
             // 编辑menu菜单后端检测和操作
-            return $this->asJson($departmentService->sort($request));
+            return $this->asJson($departmentService->sort($this->request));
         }
     }
 
     /**
      * 删除部门
-     * @param Request $request
      * @param DepartmentService $departmentService
      * @return mixed
      * @throws \think\Exception
@@ -142,11 +137,11 @@ class DepartmentController extends BaseController
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    public function deleteAction(Request $request, DepartmentService $departmentService)
+    public function deleteAction(DepartmentService $departmentService)
     {
-        if ($request->isPost() && $request->isAjax()) {
+        if ($this->request->isPost() && $this->request->isAjax()) {
             // 编辑menu菜单后端检测和操作
-            return $this->asJson($departmentService->delete($request));
+            return $this->asJson($departmentService->delete($this->request));
         }
         return $this->renderJson('error', 500);
     }

@@ -9,26 +9,24 @@
 namespace app\manage\controller;
 
 use app\common\controller\BaseController;
-use think\Request;
 
 class FileManagerController extends BaseController
 {
-    private $Order;
+    private $Order;//排序规则
     private $RootPath = './uploads/';//上传文件根目录 相对于入口文件
     private $RootUrl  = '/uploads/';//上传目录的url形式
 
     /**
      * KindEditor图片|文件浏览后端服务
-     * @param Request $request
      * @return \think\response\Json
      */
-    public function fileManagerAction(Request $request)
+    public function fileManagerAction()
     {
         // 浏览文件类型标识符
-        $paramDir    =   $request->param('dir');
+        $paramDir    =   $this->request->param('dir');
         // 排序规则 NAME(文件名) 、SIZE(文件大小)、 TYPE(文件类型)
-        $this->Order =   strtolower($request->param('order', 'name'));
-        $paramPath   =   $request->param('path', '');//浏览的目录层级
+        $this->Order =   strtolower($this->request->param('order', 'name'));
+        $paramPath   =   $this->request->param('path', '');//浏览的目录层级
         if (!in_array($paramDir, array('', 'image', 'flash', 'media', 'file','music'))) {
             return json(['error' => 1, 'message' => 'Invalid Directory name.']);
         }
@@ -129,16 +127,15 @@ class FileManagerController extends BaseController
 
     /**
      * KindEditor文件上传后端服务
-     * @param Request $request
      * @return \think\response\Json
      */
-    public function uploadFileAction(Request $request)
+    public function uploadFileAction()
     {
-        if (!$request->isPost()) {
+        if (!$this->request->isPost()) {
             return json(['error' => 1, 'message' => '403 Forbiden']);
         }
         //检查上传文件的允许类型
-        $paramDir       =   $request->param('dir');//上传文件类型标识符 也是保存文件的类型目录
+        $paramDir       =   $this->request->param('dir');//上传文件类型标识符 也是保存文件的类型目录
         $allowedExt     =   array(
             'image' =>  array('gif', 'jpg', 'jpeg', 'png', 'bmp'),
             'flash' =>  array('swf', 'flv'),
@@ -161,7 +158,7 @@ class FileManagerController extends BaseController
          * 2、检测允许上传的文件大小--暂不限制
          */
         $file_ext = $allowedExt[$paramDir];
-        $file     = $request->file('imgFile');
+        $file     = $this->request->file('imgFile');
         ## 自定义上传文件名 按hash来命名文件也达到了去重的作用
         $fileInfo = $file->validate(['ext' => $file_ext])
                   ->rule('sha1')

@@ -12,7 +12,6 @@ use app\common\controller\BaseController;
 use app\common\service\AuthService;
 use think\Exception;
 use think\facade\Session;
-use think\Request;
 
 class SiteController extends BaseController
 {
@@ -76,18 +75,17 @@ class SiteController extends BaseController
      * ---
      * 未检索到或检索到的记录没有权限则回到检索前的页面
      * ---
-     * @param Request $request
      * @param AuthService $authService
      * @throws Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function menuSearchAction(Request $request, AuthService $authService)
+    public function menuSearchAction(AuthService $authService)
     {
-        $menu_name = $request->get('q');
+        $menu_name = $this->request->get('q');
         if (empty($menu_name)) {
-            $this->redirect($request->header('Referer'));
+            $this->redirect($this->request->header('Referer'));
         }
         // 模糊搜索出所有菜单，注意检索出第一条有权限的记录并跳转
         $menu = $authService->Menu->db()
@@ -101,6 +99,6 @@ class SiteController extends BaseController
                 }
             }
         }
-        $this->redirect($request->header('Referer'));
+        $this->redirect($this->request->header('Referer'));
     }
 }

@@ -11,7 +11,6 @@ namespace app\manage\controller;
 use app\common\controller\BaseController;
 use app\common\service\AsyncTaskService;
 use app\manage\model\search\AsyncTaskSearch;
-use think\Request;
 
 class AsyncTaskController extends BaseController
 {
@@ -47,17 +46,16 @@ class AsyncTaskController extends BaseController
 
     /**
      * 查看任务详情
-     * @param Request $request
      * @param AsyncTaskService $asyncTaskService
      * @return mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function detailAction(Request $request, AsyncTaskService $asyncTaskService)
+    public function detailAction(AsyncTaskService $asyncTaskService)
     {
-        if ($request->isAjax()) {
-            return $this->asJson($asyncTaskService->getDetailById($request));
+        if ($this->request->isAjax()) {
+            return $this->asJson($asyncTaskService->getDetailById($this->request));
         }
         return $this->renderJson('error', 500);
     }

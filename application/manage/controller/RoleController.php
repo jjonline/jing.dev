@@ -11,7 +11,6 @@ namespace app\manage\controller;
 use app\common\controller\BaseController;
 use app\common\model\Role;
 use app\common\service\RoleService;
-use think\Request;
 
 class RoleController extends BaseController
 {
@@ -47,7 +46,6 @@ class RoleController extends BaseController
 
     /**
      * 新增角色
-     * @param Request $request
      * @param RoleService $roleService
      * @return array|mixed
      * @throws \think\Exception
@@ -55,11 +53,11 @@ class RoleController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function createAction(Request $request, RoleService $roleService)
+    public function createAction(RoleService $roleService)
     {
-        if ($request->isPost() && $request->isAjax()) {
+        if ($this->request->isPost() && $this->request->isAjax()) {
             // 保存角色
-            return $roleService->save($request);
+            return $roleService->save($this->request);
         }
         $common = [
             'title'            => '人事设置 - ' . config('local.site_name'),
@@ -81,7 +79,6 @@ class RoleController extends BaseController
 
     /**
      * 修改角色
-     * @param Request $request
      * @param RoleService $roleService
      * @return array|mixed
      * @throws \think\Exception
@@ -89,11 +86,11 @@ class RoleController extends BaseController
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function editAction(Request $request, RoleService $roleService)
+    public function editAction(RoleService $roleService)
     {
-        if ($request->isPost() && $request->isAjax()) {
+        if ($this->request->isPost() && $this->request->isAjax()) {
             // 保存角色
-            return $roleService->save($request);
+            return $roleService->save($this->request);
         }
         $common = [
             'title'            => '角色管理 - ' . config('local.site_name'),
@@ -110,7 +107,7 @@ class RoleController extends BaseController
 
         // 角色数据
         $RoleModel = new Role();
-        $Role      = $RoleModel->getRoleInfoById($request->get('id'));
+        $Role      = $RoleModel->getRoleInfoById($this->request->get('id'));
         if (empty($Role)) {
             $this->redirect(url('role/list'));
         }
@@ -133,24 +130,22 @@ class RoleController extends BaseController
 
     /**
      * 角色排序
-     * @param Request $request
      * @param RoleService $roleService
      * @return mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function sortAction(Request $request, RoleService $roleService)
+    public function sortAction(RoleService $roleService)
     {
-        if ($request->isPost() && $request->isAjax()) {
-            return $this->asJson($roleService->sort($request));
+        if ($this->request->isPost() && $this->request->isAjax()) {
+            return $this->asJson($roleService->sort($this->request));
         }
         return $this->renderJson('error', 500);
     }
 
     /**
      * 删除角色
-     * @param Request $request
      * @param RoleService $roleService
      * @return mixed
      * @throws \think\Exception
@@ -159,15 +154,15 @@ class RoleController extends BaseController
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    public function deleteAction(Request $request, RoleService $roleService)
+    public function deleteAction(RoleService $roleService)
     {
-        if ($request->isPost() && $request->isAjax()) {
+        if ($this->request->isPost() && $this->request->isAjax()) {
             // 检查编辑者的角色权限是否有权编辑该角色
-            $has_edit_auth = $roleService->checkRoleEditorAuth($request->post('id'), $this->UserInfo['role_id']);
+            $has_edit_auth = $roleService->checkRoleEditorAuth($this->request->post('id'), $this->UserInfo['role_id']);
             if (!$has_edit_auth) {
                 return $this->renderJson('您的权限级无法删除该角色，请联系上级删除', 400);
             }
-            return $this->asJson($roleService->delete($request));
+            return $this->asJson($roleService->delete($this->request));
         }
         return $this->renderJson('error', 500);
     }
