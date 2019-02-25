@@ -167,7 +167,7 @@ return [
     [
         'id'             => '9',
         'tag'            => 'Async_Task_Detail',
-        'name'           => '查看异步状态详情',
+        'name'           => '查看异步任务详情',
         'icon'           => '',
         'url'            => 'manage/async_task/detail',
         'parent_id'      => '8',

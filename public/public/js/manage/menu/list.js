@@ -52,7 +52,7 @@ $(function () {
     $("#reorganize").on("click",function () {
         var url = $(this).attr("href");
         utils.ajaxConfirm('确认按层级和排序重新整理菜单并生成seed数据么？重排整理后角色数据可能会失效',url,{"reorganize":"reorganize"},function () {
-            // location.reload();
+            location.reload();
         });
         return false;
     });
