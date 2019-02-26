@@ -246,8 +246,9 @@ tr.selected>td {}
     position: relative;
     margin-right: 0 !important;
     margin-left: 0 !important;
+    background-color: #fafaf4;
 }
-.columns_group .col-xs-6 {
+.columns_group .col-xs-4 {
     padding-right:0;
     padding-left:0;
 }
@@ -257,13 +258,13 @@ tr.selected>td {}
 /*菜单字段操作按钮*/
 .columns_manage {
     position: absolute;
-    right:-50px;
+    right:10px;
     top:7px;
 }
 .columns_manage .fa-trash {
     display: inline-block;
     cursor: pointer;
-    margin-right:2px;
+    margin-right:5px;
     color:#e26969;
 }
 .columns_manage .fa-arrows-alt {
@@ -277,7 +278,7 @@ tr.selected>td {}
     margin-left: 5px !important;
 }
 /*菜单拖动样式*/
-.columns_sortable input,.columns_sortable .input-group-addon {
+.columns_sortable,.columns_sortable input,.columns_sortable .input-group-addon {
     background-color: #fef5ba;
 }
 /**
