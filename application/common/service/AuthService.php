@@ -77,8 +77,10 @@ class AuthService
 
     /**
      * 获取用户管理菜单列表
-     * @throws
-     * @return []
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function getUserAuthMenu()
     {

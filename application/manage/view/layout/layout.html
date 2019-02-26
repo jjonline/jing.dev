@@ -1,14 +1,3 @@
-<%{php}%>
-/* 固定6个模板变量 */
-$_app             = container();
-$_controller      = $_app->get('app\manage\controller\\'.request()->controller().'Controller');
-$load_layout_css  = !isset($load_layout_css) ? !!$_controller->load_layout_css : !!$load_layout_css;
-$load_layout_js   = !isset($load_layout_js) ? !!$_controller->load_layout_js : !!$load_layout_js;
-$title            = !isset($title) ? $_controller->title : $title;
-$content_title    = !isset($content_title) ? $_controller->content_title : $content_title;
-$content_subtitle = !isset($content_subtitle) ? $_controller->content_subtitle : $content_subtitle;
-$breadcrumb       = !isset($breadcrumb) ? $_controller->breadcrumb : $breadcrumb;
-<%{/php}%>
 <!--Header Begin-->
 <%{include file='layout/header' /}%><%{/*  包含模板布局头 */}%>
 <!--Header End-->

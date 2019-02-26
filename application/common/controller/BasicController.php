@@ -31,13 +31,17 @@ class BasicController extends Controller
     {
         parent::initialize();
         // 初始化操作日志服务，封装控制器下直接可使用的日志记录方法
-        $this->LogService = $LogService = Container::get('app\common\service\LogService');
+        /**
+         * @var LogService $LogService
+         */
+        $LogService = $this->LogService = Container::get('app\common\service\LogService');
 
         // 闭包传参执行钩子行为的最终写入Db或其他永久存储
         Hook::add('response_end', function () use ($LogService) {
             $except_controller = Config::get('local.log_except_controller', []);
             $except_action     = Config::get('local.log_except_action', []);
-            if (!in_array($this->request->controller(), $except_controller) && !in_array($this->request->action(), $except_action)) {
+            if (!in_array($this->request->controller(), $except_controller)
+                && !in_array($this->request->action(), $except_action)) {
                 $LogService->save('normal');
             }
         });
