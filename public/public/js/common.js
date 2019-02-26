@@ -9,15 +9,32 @@ $(function () {
     /**
      * 绑定button模拟的radio
      */
-    $('.js-select-container').on('click','button',function () {
-        $(this).parents('.js-select-container').find('button').removeClass('btn-primary');
+    $(".js-select-container").on("click","button",function () {
+        $(this).parents(".js-select-container").find("button").removeClass("btn-primary");
         //$('.js-select-container button').removeClass('btn-primary');
-        $(this).addClass('btn-primary');
+        $(this).addClass("btn-primary");
     });
     /**
      * 绑定bootstrapSwitch事件
      */
-    $('.js-switch-container input').bootstrapSwitch();
+    $(".js-switch-container input").bootstrapSwitch();
+    /**
+     * tooltip
+     */
+    $("[data-toggle='tooltip']").tooltip();
+
+    /**
+     * 隐藏侧边栏
+     */
+    utils.hideNav = function () {
+        $("body").addClass('sidebar-collapse');
+    };
+    /**
+     * 显示侧边栏
+     */
+    utils.showNav = function () {
+        $("body").removeClass('sidebar-collapse');
+    };
 
     /**
      * 绑定datatable字段筛选器
@@ -28,8 +45,8 @@ $(function () {
     utils.bindColumnSelector = function (node_id,dataTableHandler,columns) {
         // 所有字段
         var column           = columns || getColumns();
-        var local_all_key    = app_info.module +'_'+ app_info.controller +'_'+ app_info.action;
-        var local_select_key = local_all_key+ '_selected';
+        var local_all_key    = app_info.module +"_"+ app_info.controller +"_"+ app_info.action;
+        var local_select_key = local_all_key+ "_selected";
         // 将所有字段列表塞入本地
         utils.localData(local_all_key,JSON.stringify(column));
         // 已勾选字段init
@@ -48,7 +65,7 @@ $(function () {
             // 生成选择字段的html
             var message   = '<div class="row">';
             $.each(column,function (i,n) {
-                var checked = '';
+                var checked = "";
                 $.each(selected_columns,function (ii,nn) {
                     if(n == nn)
                     {
@@ -431,24 +448,6 @@ $(function () {
             $('#_UserSearchModal_').modal('hide');
         });
 
-    };
-
-    /**
-     * tooltip
-     */
-    $("[data-toggle='tooltip']").tooltip();
-
-    /**
-     * 隐藏侧边栏
-     */
-    utils.hideNav = function () {
-        $('body').addClass('sidebar-collapse');
-    };
-    /**
-     * 显示侧边栏
-     */
-    utils.showNav = function () {
-        $('body').removeClass('sidebar-collapse');
     };
 
     /**

@@ -64,7 +64,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">是否必选：</label>
                         <div class="col-sm-5">
-                            <div class="js-switch-container">
+                            <div class="js-switch-container" data-toggle="tooltip" title="必选的公用菜单选是">
                                 <input type="checkbox" id="is_required" name="Menu[is_required]" title="是" data-on-text="是" data-off-text="否">
                             </div>
                         </div>
@@ -72,7 +72,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">是否badge：</label>
                         <div class="col-sm-5">
-                            <div class="js-switch-container">
+                            <div class="js-switch-container" data-toggle="tooltip" title="该菜单是否需要badge小红点统计功能">
                                 <input type="checkbox" id="is_badge" name="Menu[is_badge]" title="是" data-on-text="是" data-off-text="否">
                             </div>
                         </div>
@@ -80,31 +80,62 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">是否系统菜单：</label>
                         <div class="col-sm-5">
-                            <div class="js-switch-container">
+                            <div class="js-switch-container" data-toggle="tooltip" title="选是菜单列表不显示删除按钮，即不可直接删除">
                                 <input type="checkbox" id="is_system" name="Menu[is_system]" title="是" data-on-text="是" data-off-text="否">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">是否控制字段显示：</label>
-                        <div class="col-sm-5">
-                            <div class="js-switch-container">
-                                <input type="checkbox" id="is_column" name="Menu[is_column]" title="是" data-on-text="是" data-off-text="否">
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">是否数据权限控制：</label>
                         <div class="col-sm-5">
-                            <div class="js-switch-container">
+                            <div class="js-switch-container" data-toggle="tooltip" title="该菜单是否需要依据部门层级显示全部、部门或个人的数据，选是则在定制角色时需要选择角色的数据范围">
                                 <input type="checkbox" id="is_permissions" name="Menu[is_permissions]" title="是" data-on-text="是" data-off-text="否">
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">菜单额外数据：</label>
+                        <label class="col-sm-2 control-label">是否控制字段显示：</label>
                         <div class="col-sm-5">
-                            <textarea id="extra_param" rows=3 class="form-control" name="Menu[extra_param]" placeholder="菜单额外所可使用的数据，填入json字符串，使用时自动转换为数组，可选"></textarea>
+                            <div class="js-switch-container" data-toggle="tooltip" title="该菜单是否需要定制不同角色显示不同字段，选是则要完善该菜单下的所有待选字段">
+                                <input type="checkbox" id="is_column" name="Menu[is_column]" title="是" data-on-text="是" data-off-text="否">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="columns_container">
+                        <label class="col-sm-2 control-label">待选字段列表：</label>
+                        <div class="col-sm-5 columns_item">
+                            <ul id="columns_item_container" data-toggle="tooltip" title="请成对输入带别名的字符串形式的字段标记和字段中文名称；从上往下依次排序，后方拖动按钮可以拖动排序，删除按钮可以删除该字段">
+                                <li class="form-group columns_group">
+                                    <div class="columns_manage">
+                                        <i class="fa fa-trash"></i>
+                                        <i class="fa fa-arrows-alt"></i>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">字段</div>
+                                            <input type="text" class="form-control columns" name="Columns[columns][]" placeholder="order.order_sn">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">名称</div>
+                                            <input type="text" class="form-control name" name="Columns[name][]" placeholder="字段名称">
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="form-group columns_group_btn">
+                                <div class="col-xs-6">
+                                    <button type="button" class="btn btn-block btn-default" id="insert_five_columns">
+                                        <i class="fa fa-plus"></i> 点此新增5个字段
+                                    </button>
+                                </div>
+                                <div class="col-xs-6">
+                                    <button type="button" class="btn btn-block btn-default"  id="insert_ten_columns">
+                                        <i class="fa fa-plus"></i> 点此新增10个字段
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -123,6 +154,7 @@
         </div>
     </div>
 </div>
+<script src="__PUBLIC__/plugin/sortable/Sortable.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 var menu = <%{:json_encode($list)}%>;
 </script>

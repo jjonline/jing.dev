@@ -1,5 +1,29 @@
 $(function () {
 
+    // 初始化自定义字段拖动事件
+    var sortAble = $("#columns_item_container");
+    new Sortable(sortAble.get(0), {
+        animation: 150,
+        ghostClass: "columns_sortable"
+    });
+    // 删除字段确认提醒
+    $(sortAble).on("click", ".fa-trash", function () {
+        var item = $(this).parents('li');
+        utils.confirm("确认删除该字段么？", function () {
+            $(item).remove();
+            utils.toast("已删除");
+        });
+    });
+
+    // 需要自定义字段打开输入框
+    $("#is_column").on("switchChange.bootstrapSwitch",function (e,isCheck) {
+        if (isCheck) {
+            $("#columns_container").show();
+        } else {
+            $("#columns_container").hide();
+        }
+    });
+
     // 菜单选择事件
     $('#level1').change(function () {
         var option = '<option value="">--新建二级菜单--</option>';
@@ -15,7 +39,7 @@ $(function () {
                 option += '<option value="'+n.id+'">'+n.name+'</option>';
             }
         });
-        $('#level2').html(option);
+        $("#level2").html(option);
     });
 
     // 新增菜单提交
