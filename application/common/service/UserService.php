@@ -482,7 +482,8 @@ class UserService
                 $user_update['gender'] = $profile['gender'];
             }
             // 密码
-            if (FilterValidHelper::is_password_valid($profile['re_password']) && $profile['re_password'] != $profile['password']) {
+            if (FilterValidHelper::is_password_valid($profile['re_password'])
+                && $profile['re_password'] != $profile['password']) {
                 $user_update['password'] = $this->generateUserPassword($profile['re_password']);
             }
             // 座机号码

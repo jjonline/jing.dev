@@ -11,7 +11,6 @@ namespace app\manage\controller;
 use app\common\controller\BaseController;
 use app\common\service\UserLogService;
 use app\common\service\UserOpenService;
-use think\Request;
 
 class MineController extends BaseController
 {

@@ -399,7 +399,13 @@ class DatetimeHelper
      */
     public static function intersectDays($beginDate1, $endDate1, $beginDate2, $endDate2)
     {
-        if (empty($beginDate1) || empty($endDate1)  || empty($beginDate2)  || empty($endDate2) || $beginDate1 >= $endDate1 || $beginDate2 >= $endDate2) {
+        if (empty($beginDate1)
+            || empty($endDate1)
+            || empty($beginDate2)
+            || empty($endDate2)
+            || $beginDate1 >= $endDate1
+            || $beginDate2 >= $endDate2
+        ) {
             return false;
         }
 

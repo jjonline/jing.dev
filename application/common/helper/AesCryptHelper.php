@@ -8,7 +8,7 @@
 
 namespace app\common\helper;
 
-use app\common\model\SiteConfig;
+use think\facade\Config;
 
 class AesCryptHelper
 {
@@ -24,7 +24,7 @@ class AesCryptHelper
     public static function getCryptKey()
     {
         if (empty(self::$key)) {
-            self::$key = (new SiteConfig())->getSitConfigValueByKey('crypt_key');
+            self::$key = Config::get('local.aes_crypt_key', '123456');
             self::$key = trim(self::$key);
         }
         return self::$key;

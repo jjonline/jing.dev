@@ -19,4 +19,8 @@ return [
     'log_except_controller'  => [],
     // 系统默认每个请求都写日志进log表，可通过该配置忽略某个操作名的请求不记录[仅匹配操作名，可能多个控制器下具有相同操作名]
     'log_except_action'      => ['polling'],
+    // AES加解密key
+    'aes_crypt_key'          => '',
+    // AES加解密iv
+    'aes_crypt_iv'           => '1234567890123456',
 ];

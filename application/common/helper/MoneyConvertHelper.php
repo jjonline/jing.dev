@@ -170,8 +170,8 @@ class MoneyConvertHelper
     /**
      * 对小数点后三位部分进行转换
      * ------------------------------------------------------------------
-     * @param	$integer float 将要转换的小数点后三位部分
-     * @return 	$this
+     * @param  $integer float 将要转换的小数点后三位部分
+     * @return $this
      */
     private function convertDecimal($decimal)
     {
@@ -187,11 +187,21 @@ class MoneyConvertHelper
     /**
      * 去掉多余的"零X"
      * ------------------------------------------------------------------
-     * @return 	$this
+     * @return $this
      */
     private function removeZero()
     {
-        while (strpos($this->resultString, "零拾") || strpos($this->resultString, "零佰") || strpos($this->resultString, "零仟") || strpos($this->resultString, "零万") || strpos($this->resultString, "零亿") || strpos($this->resultString, "零角") || strpos($this->resultString, "零分") || strpos($this->resultString, "零厘") || strpos($this->resultString, "零零") || strpos($this->resultString, "亿万") || strpos($this->resultString, "零元")) {
+        while (strpos($this->resultString, "零拾")
+            || strpos($this->resultString, "零佰")
+            || strpos($this->resultString, "零仟")
+            || strpos($this->resultString, "零万")
+            || strpos($this->resultString, "零亿")
+            || strpos($this->resultString, "零角")
+            || strpos($this->resultString, "零分")
+            || strpos($this->resultString, "零厘")
+            || strpos($this->resultString, "零零")
+            || strpos($this->resultString, "亿万")
+            || strpos($this->resultString, "零元")) {
             $this->resultString = str_replace("零拾", "零", $this->resultString);
             $this->resultString = str_replace("零佰", "零", $this->resultString);
             $this->resultString = str_replace("零仟", "零", $this->resultString);

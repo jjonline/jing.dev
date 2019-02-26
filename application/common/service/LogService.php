@@ -98,9 +98,15 @@ class LogService
         $logData['ip']                  = Container::get('request')->ip();
         $logData['method']              = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'NONE';
         // 内存使用情况，单位kb
-        $logData['memory_usage']        = NumberHelper::round((memory_get_usage() - Container::get('app')->getBeginMem()) / 1024, 2);
+        $logData['memory_usage']        = NumberHelper::round(
+            (memory_get_usage() - Container::get('app')->getBeginMem()) / 1024,
+            2
+        );
         // 耗时，单位：毫秒
-        $logData['execute_millisecond'] = NumberHelper::round((microtime(true) - Container::get('app')->getBeginTime()) * 1000);
+        $logData['execute_millisecond'] = NumberHelper::round(
+            (microtime(true) - Container::get('app')->getBeginTime()) * 1000,
+            0
+        );
         // 避免负数的情况
         $logData['execute_millisecond'] = $logData['execute_millisecond'] > 0 ? $logData['execute_millisecond'] : 0;
         // PHP序列化成字符串后存储，保留参数类型等精确信息
@@ -111,7 +117,8 @@ class LogService
         ));
         $logData['user_agent']          = $request->header('user-agent', '');
         // 操作的模块、控制器、操作
-        $logData['action']              = strtolower($request->module().'/'.$request->controller().'/'.$request->action());
+        $logData['action']              = strtolower($request->module()
+            .'/'.$request->controller().'/'.$request->action());
         // 操作用户ID，解决输出后钩子执行时session已销毁的问题
         if (session_status() === PHP_SESSION_ACTIVE) {
             $logData['user_id']         = $request->session('user_id') ? $request->session('user_id') : 0;

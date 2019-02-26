@@ -36,7 +36,7 @@ class HttpHelper
                 'allow_redirects'  => false, // http重定向不执行
                 'decode_content'   => false, // 是否解码结果集
                 'headers'          => [
-                    'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+                    'user-agent' => isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '',
                     'Referer'    => 'https://www.google.com/',
                 ],
             ]);

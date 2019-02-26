@@ -51,7 +51,8 @@ class UploadController extends BaseController
                 "url"      => empty($result['data']['file_path']) ? '' : $result['data']['file_path'],
                 "title"    => empty($result['data']['file_origin_name']) ? '' : $result['data']['file_origin_name'],
                 "original" => empty($result['data']['file_origin_name']) ? '' : $result['data']['file_origin_name'],
-                "type"     => empty($result['data']['file_origin_name']) ? '' : strtolower(strrchr($result['data']['file_origin_name'], '.')),
+                "type"     => empty($result['data']['file_origin_name'])
+                    ? '' : strtolower(strrchr($result['data']['file_origin_name'], '.')),
                 "size"     => empty($result['data']['file_size']) ? '' : $result['data']['file_size'],
             ];
             return $this->asJson($ue_result);

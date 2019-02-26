@@ -19,31 +19,6 @@ use think\Response;
 class BaseController extends BaseAuthController
 {
     /**
-     * @var bool 是否载入自定义css
-     */
-    public $load_layout_css;
-    /**
-     * @var bool 是否载入自定义js
-     */
-    public $load_layout_js;
-    /**
-     * @var string 网页标题
-     */
-    public $title;
-    /**
-     * @var string 主体内容标题
-     */
-    public $content_title;
-    /**
-     * @var string 主体内容副标题，主体内容的描述语句
-     */
-    public $content_subtitle;
-    /**
-     * @var [] 主体内容右侧导航面包屑数组 结构:[['label' => '','url' => ''],['label' => '','url' => '']]
-     */
-    public $breadcrumb;
-
-    /**
      * 初始化执行
      */
     protected function initialize()

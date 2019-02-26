@@ -195,7 +195,10 @@ class RoleService
                         $v_value3['parent_id'] = $value['id'];
                         // 如果有数据权限范围
                         if ($value['is_permissions'] == 1) {
-                            $v_value3['children']  = $this->getPermissionTreeData($value['permissions'], $v_value3['id']);
+                            $v_value3['children']  = $this->getPermissionTreeData(
+                                $value['permissions'],
+                                $v_value3['id']
+                            );
                         }
                         $menu3[]               = $v_value3;
                     } else {
@@ -205,7 +208,10 @@ class RoleService
                 case 3:
                     if ($value['is_required'] == 0) {
                         if ($value['is_permissions'] == 1) {
-                            $value['children'] = $this->getPermissionTreeData($value['permissions'], $value['id']);
+                            $value['children'] = $this->getPermissionTreeData(
+                                $value['permissions'],
+                                $value['id']
+                            );
                         }
                     }
                     $menu3[]            = $value;
