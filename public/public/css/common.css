@@ -237,8 +237,8 @@ tr.selected>td {}
 .menu_deal_intro {
     display: none;
     position: absolute;
-    background-color: #fafafa;
-    border:1px dashed #EEFFBB;
+    background-color: #EEFFBB;
+    border:1px dashed #eee;
     border-radius: 5px;
     right:15px;
     top:390px;
