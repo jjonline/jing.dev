@@ -14,15 +14,36 @@ use think\Model;
 class UserOpen extends Model
 {
     /**
-     * 开放平台类型，添加类型后注意同步修改user_open表的枚举类型字段type的待选值
+     * @var int qq开放平台登录
+     */
+    const OPEN_QQ = 1;
+    /**
+     * @var int 微信pc扫码登录
+     */
+    const OPEN_WX_PC = 2;
+    /**
+     * @var int 微信公众号登录
+     */
+    const OPEN_WX_MP = 3;
+    /**
+     * @var int 微信小程序登录
+     */
+    const OPEN_WX_APPLET = 4;
+    /**
+     * @var int 微博开放平台登录
+     */
+    const OPEN_WB = 5;
+
+    /**
+     * 开放平台类型map
      * @var array
      */
     public $OpenType = [
-        'qq'          => 'QQ',
-        'pc_weixin'   => '微信扫码',
-        'mp_weixin'   => '微信公众号',
-        'xiaochengxu' => '小程序',
-        'weibo'       => '微博',
+        self::OPEN_QQ        => 'QQ',
+        self::OPEN_WX_PC     => '微信扫码',
+        self::OPEN_WX_MP     => '微信公众号',
+        self::OPEN_WX_APPLET => '微信小程序',
+        self::OPEN_WB        => '微博',
     ];
 
     /**

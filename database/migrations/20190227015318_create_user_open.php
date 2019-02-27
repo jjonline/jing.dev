@@ -57,7 +57,7 @@ class CreateUserOpen extends Migrator
                 ])
                 ->addColumn('name', 'string', [
                     'limit'   => 64,
-                    'default' => '0',
+                    'default' => '',
                     'null'    => false,
                     'comment' => '开放平台账号的名称',
                 ])
