@@ -118,7 +118,7 @@ class MenuService
                 || empty($Columns['sorted'])) {
                 return ['error_code' => 400, 'error_msg' => '待选字段列表不完善'];
             }
-            $columns = array_filter($Columns['columns']);
+            $columns = array_unique(array_filter($Columns['columns'])); // 去重
             $name    = array_filter($Columns['name']);
             $sorted  = $Columns['sorted'];
             if (count($sorted) != count($name) || count($sorted) != count($columns)) {
