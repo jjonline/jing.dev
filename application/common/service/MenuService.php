@@ -122,7 +122,7 @@ class MenuService
             $name    = array_filter($Columns['name']);
             $sorted  = $Columns['sorted'];
             if (count($sorted) != count($name) || count($sorted) != count($columns)) {
-                return ['error_code' => 400, 'error_msg' => '请完善每一个待选字段的信息'];
+                return ['error_code' => 400, 'error_msg' => '待选字段的信息不完整或存在重复字段'];
             }
             // 处理成json
             $columns_list = [];
