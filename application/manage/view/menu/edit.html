@@ -104,6 +104,12 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="col-sm-2 control-label">备注信息：</label>
+                        <div class="col-sm-5">
+                            <textarea id="remark" rows=3 class="form-control" name="Menu[remark]" placeholder="菜单备注信息，便于管理员识别，可选"><%{$menu_edit.remark}%></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="col-sm-2 control-label">是否控制字段显示：</label>
                         <div class="col-sm-5">
                             <div class="js-switch-container" data-toggle="tooltip" title="该菜单是否需要定制不同角色显示不同字段，选是则要完善该菜单下的所有待选字段">
@@ -111,16 +117,48 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">菜单额外数据：</label>
-                        <div class="col-sm-5">
-                            <textarea id="extra_param" rows=3 class="form-control" name="Menu[extra_param]" placeholder="菜单额外所可使用的数据，填入json字符串，使用时自动转换为数组，可选"><%{:json_encode($menu_edit.extra_param,JSON_UNESCAPED_UNICODE)}%></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">备注信息：</label>
-                        <div class="col-sm-5">
-                            <textarea id="remark" rows=3 class="form-control" name="Menu[remark]" placeholder="菜单备注信息，便于管理员识别，可选"><%{$menu_edit.remark}%></textarea>
+                    <div class="form-group" id="columns_container">
+                        <label class="col-sm-2 control-label">待选字段列表：</label>
+                        <div class="col-sm-8 columns_item">
+                            <ul id="columns_item_container">
+                                <li class="form-group columns_group">
+                                    <div class="columns_manage">
+                                        <i class="fa fa-trash"></i>
+                                        <i class="fa fa-arrows-alt"></i>
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">字段</div>
+                                            <input type="text" class="form-control columns" name="Columns[columns][]" placeholder="order.order_sn">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">名称</div>
+                                            <input type="text" class="form-control name" name="Columns[name][]" placeholder="字段名称">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" class="sorted" name="Columns[sorted][]"> 可排序
+                                            </label>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="form-group columns_group_btn">
+                                <div class="col-xs-6">
+                                    <button type="button" class="btn btn-block btn-default" id="insert_five_columns">
+                                        <i class="fa fa-plus"></i> 点此新增5个字段
+                                    </button>
+                                </div>
+                                <div class="col-xs-6">
+                                    <button type="button" class="btn btn-block btn-default"  id="insert_ten_columns">
+                                        <i class="fa fa-plus"></i> 点此新增10个字段
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -133,6 +171,7 @@
         </div>
     </div>
 </div>
+<script src="__PUBLIC__/plugin/sortable/Sortable.min.js" type="text/javascript"></script>
 <script type="text/javascript">
     var level = <%{$menu_edit.level}%>;
     var item  = <%{:json_encode($menu_edit)}%>;

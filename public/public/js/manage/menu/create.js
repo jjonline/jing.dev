@@ -117,11 +117,28 @@ $(function () {
             }
         }
         var data = $('#menuAdd').serializeArray();
+        var fix_data = data.concat();
+        // 将checkbox值重设成选中true不选false
+        var index = 0;
+        $.each(data,function (i,n) {
+            // 清理掉可排序已选数组元素
+            if (n.name == 'Columns[sorted][]') {
+                fix_data.remove(i - index);
+                index ++;
+            }
+        });
+        // 添加自定义按顺序的可排序checkbox数组元素
+        fix_data = fix_data.concat(
+            $(".sorted").map(
+                function() {
+                    return {"name": this.name, "value": $(this).prop('checked') ? 1 : 0}
+                }).get()
+        );
         $('.btn-submit').prop('disabled',true).text('提交中...');
         $.ajax({
             url: $('#menuAdd').attr('action'),
             type: 'POST',
-            data: data,
+            data: fix_data,
             success: function (data) {
                 if(data.error_code == 0){
                     utils.alert(data.error_msg,function () {
