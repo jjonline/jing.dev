@@ -66,7 +66,7 @@ class UserOpen extends Model
         if (!$data->isEmpty()) {
             $data = $data->toArray();
             foreach ($data as $key => $val) {
-                $data[$key] = $this->parseUserOpenInfo($val);
+                $data[$key] = $this->parseUserOpenTypeInfo($val);
             }
             return $data;
         }
@@ -108,7 +108,7 @@ class UserOpen extends Model
      * @return array
      * @throws Exception
      */
-    protected function parseUserOpenInfo($user_open_item = array())
+    protected function parseUserOpenTypeInfo($user_open_item = array())
     {
         if (empty($user_open_item) || empty($user_open_item['open_type'])) {
             throw new Exception('解析用户开放平台类型参数错误：必须有open_type标识');
