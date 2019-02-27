@@ -87,7 +87,7 @@ class CreateUserOpen extends Migrator
                 ->addColumn('enable', 'integer', [
                     'limit'   => MysqlAdapter::INT_TINY, // tinyint类型
                     'default' => '1',
-                    'null'    => true,
+                    'null'    => false,
                     'comment' => '标记是否有效1-有效0-禁用',
                 ])
                 ->addColumn('create_time', 'datetime', [
