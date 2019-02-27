@@ -5,6 +5,14 @@ $(function () {
         animation: 150,
         ghostClass: "columns_sortable"
     });
+
+    // init有字段列表时自动打开
+    if ($("#is_column").attr("checked")) {
+        $("#columns_container").show();
+        // 操作说明宽度fix + show
+        $(".menu_deal_intro").css("width",$(".box-body").width() * 5 / 13).show();
+    }
+
     // 删除字段确认提醒
     $(sortAble).on("click", ".fa-trash", function () {
         var item = $(this).parents('li');

@@ -30,6 +30,10 @@ class Menu extends Model
     public function getMenuById($id)
     {
         $data = $this->find($id);
+        // 额外json转化为数组
+        if ($data) {
+            $data['extra_param'] = json_decode(json_encode($data['extra_param']), true);
+        }
         return $data ? $data->toArray() : [];
     }
 

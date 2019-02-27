@@ -121,31 +121,35 @@
                         <label class="col-sm-2 control-label">待选字段列表：</label>
                         <div class="col-sm-8 columns_item">
                             <ul id="columns_item_container">
-                                <li class="form-group columns_group">
-                                    <div class="columns_manage">
-                                        <i class="fa fa-trash"></i>
-                                        <i class="fa fa-arrows-alt"></i>
-                                    </div>
-                                    <div class="col-xs-4">
-                                        <div class="input-group">
-                                            <div class="input-group-addon">字段</div>
-                                            <input type="text" class="form-control columns" name="Columns[columns][]" placeholder="order.order_sn">
+                                <%{if condition="isset($menu_edit.extra_param.columns)"}%>
+                                <%{volist name="menu_edit.extra_param.columns" id="columns"}%>
+                                    <li class="form-group columns_group">
+                                        <div class="columns_manage">
+                                            <i class="fa fa-trash"></i>
+                                            <i class="fa fa-arrows-alt"></i>
                                         </div>
-                                    </div>
-                                    <div class="col-xs-4">
-                                        <div class="input-group">
-                                            <div class="input-group-addon">名称</div>
-                                            <input type="text" class="form-control name" name="Columns[name][]" placeholder="字段名称">
+                                        <div class="col-xs-4">
+                                            <div class="input-group">
+                                                <div class="input-group-addon">字段</div>
+                                                <input type="text" class="form-control columns" name="Columns[columns][]" placeholder="order.order_sn" value="<%{$columns.columns}%>">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-xs-2">
-                                        <div class="checkbox">
-                                            <label>
-                                                <input type="checkbox" class="sorted" name="Columns[sorted][]"> 可排序
-                                            </label>
+                                        <div class="col-xs-4">
+                                            <div class="input-group">
+                                                <div class="input-group-addon">名称</div>
+                                                <input type="text" class="form-control name" name="Columns[name][]" placeholder="字段名称" value="<%{$columns.name}%>">
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>
+                                        <div class="col-xs-2">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" class="sorted" name="Columns[sorted][]"<%{if condition="$columns.sorted"}%> checked="checked"<%{/if}%>> 可排序
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </li>
+                                <%{/volist}%>
+                                <%{/if}%>
                             </ul>
                             <div class="form-group columns_group_btn">
                                 <div class="col-xs-6">
