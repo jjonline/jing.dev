@@ -234,6 +234,29 @@ tr.selected>td {}
 }
 
 /*menu菜单新增编辑*/
+.menu_deal_intro {
+    display: none;
+    position: absolute;
+    background-color: #fafafa;
+    border:1px dashed #EEFFBB;
+    border-radius: 5px;
+    right:15px;
+    top:390px;
+}
+.menu_deal_intro h3 {
+    padding:15px 15px 10px 15px;
+    font-size:15px;
+    margin:0;
+}
+.menu_deal_intro ul {
+    list-style: none;
+    padding:0 25px 10px 25px;
+    margin:0;
+    font-size:13px;
+}
+.menu_deal_intro ul li {
+    padding:5px 0;
+}
 #columns_container {
     display: none;
 }

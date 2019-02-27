@@ -8,6 +8,17 @@
             </div>
             <form action="<%{:url('menu/create')}%>" class="form-horizontal" id="menuAdd">
                 <div class="box-body">
+                    <div class="menu_deal_intro">
+                        <h3>待选字段列表填写说明：</h3>
+                        <ul>
+                            <li>1、`字段`填写带别名的数据表字段，程序中会使用到，例如：order.sn、order_detail.buy_num</li>
+                            <li>2、`名称`填写字段对应的中文名称，前端显示上会用到，例如：订单号、购买数量</li>
+                            <li>3、`可排序`选项指定该字段在列表中是否可以作为排序的字段</li>
+                            <li>4、后方删除按钮可以删除该字段</li>
+                            <li>5、后方移动按钮，可以调整字段显示顺序，从上往下依次对应自左到右</li>
+                            <li>6、可点击下方添加字段按钮添加多个字段</li>
+                        </ul>
+                    </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">一级菜单：</label>
                         <div class="col-sm-5">
@@ -94,6 +105,12 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="col-sm-2 control-label">备注信息：</label>
+                        <div class="col-sm-5">
+                            <textarea id="remark" rows=3 class="form-control" name="Menu[remark]" placeholder="菜单备注信息，便于管理员识别，可选"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="col-sm-2 control-label">是否控制字段显示：</label>
                         <div class="col-sm-5">
                             <div class="js-switch-container" data-toggle="tooltip" title="该菜单是否需要定制不同角色显示不同字段，选是则要完善该菜单下的所有待选字段">
@@ -104,32 +121,7 @@
                     <div class="form-group" id="columns_container">
                         <label class="col-sm-2 control-label">待选字段列表：</label>
                         <div class="col-sm-8 columns_item">
-                            <ul id="columns_item_container" data-toggle="tooltip" title="请成对输入带别名的字符串形式的字段标记和字段中文名称，可排序选中表示该字段在列表中可以执行排序逻辑，字段名称包括别名会用在程序代码中，字段中文名称会用在前端显示上；字段本身的顺序从上往下排列，后方拖动按钮点击并拖动可以设置字段本身的顺序，删除按钮可以删除该字段">
-                                <li class="form-group columns_group">
-                                    <div class="columns_manage">
-                                        <i class="fa fa-trash"></i>
-                                        <i class="fa fa-arrows-alt"></i>
-                                    </div>
-                                    <div class="col-xs-4">
-                                        <div class="input-group">
-                                            <div class="input-group-addon">字段</div>
-                                            <input type="text" class="form-control columns" name="Columns[columns][]" placeholder="order.order_sn">
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-4">
-                                        <div class="input-group">
-                                            <div class="input-group-addon">名称</div>
-                                            <input type="text" class="form-control name" name="Columns[name][]" placeholder="字段名称">
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-2">
-                                        <div class="checkbox">
-                                            <label>
-                                                <input type="checkbox" class="sorted" name="Columns[sorted][]"> 可排序
-                                            </label>
-                                        </div>
-                                    </div>
-                                </li>
+                            <ul id="columns_item_container">
                                 <li class="form-group columns_group">
                                     <div class="columns_manage">
                                         <i class="fa fa-trash"></i>
@@ -168,12 +160,6 @@
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">备注信息：</label>
-                        <div class="col-sm-5">
-                            <textarea id="remark" rows=3 class="form-control" name="Menu[remark]" placeholder="菜单备注信息，便于管理员识别，可选"></textarea>
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,4 @@
 $(function () {
-
     // 初始化自定义字段拖动事件
     var sortAble = $("#columns_item_container");
     new Sortable(sortAble.get(0), {
@@ -15,13 +14,64 @@ $(function () {
         });
     });
 
-    // 需要自定义字段打开输入框
+    // 需要自定义字段打开输入框和提示说明
     $("#is_column").on("switchChange.bootstrapSwitch",function (e,isCheck) {
         if (isCheck) {
             $("#columns_container").show();
+            // 操作说明宽度fix + show
+            $(".menu_deal_intro").css("width",$(".box-body").width() * 5 / 13).show();
         } else {
             $("#columns_container").hide();
+            $(".menu_deal_intro").hide();
         }
+    });
+
+    /**
+     * 新增字段列表方法封装
+     * @param repeat
+     */
+    function insertColumns(repeat)
+    {
+        var li = '<li class="form-group columns_group">' +
+            '           <div class="columns_manage">' +
+            '               <i class="fa fa-trash"></i>' +
+            '               <i class="fa fa-arrows-alt"></i>' +
+            '               </div>' +
+            '           <div class="col-xs-4">' +
+            '               <div class="input-group">' +
+            '                   <div class="input-group-addon">字段</div>' +
+            '                       <input type="text" class="form-control columns" name="Columns[columns][]" placeholder="order.order_sn">' +
+            '                   </div>' +
+            '           </div>' +
+            '           <div class="col-xs-4">' +
+            '               <div class="input-group">' +
+            '                   <div class="input-group-addon">名称</div>' +
+            '                       <input type="text" class="form-control name" name="Columns[name][]" placeholder="字段名称">' +
+            '               </div>' +
+            '           </div>' +
+            '           <div class="col-xs-2">' +
+            '               <div class="checkbox">' +
+            '                   <label>' +
+            '                       <input type="checkbox" class="sorted" name="Columns[sorted][]"> 可排序' +
+            '                   </label>' +
+            '               </div>' +
+            '           </div>' +
+            '</li>';
+        var _li = '';
+        while (repeat) {
+            _li = _li + li;
+            repeat--;
+        }
+        $("#columns_item_container").append(_li);
+    }
+
+    // 新增5字段列表
+    $("#insert_five_columns").on("click", function () {
+        insertColumns(5);
+    });
+    // 新增10字段列表
+    $("#insert_ten_columns").on("click", function () {
+        insertColumns(10);
     });
 
     // 菜单选择事件
