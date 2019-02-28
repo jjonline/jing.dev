@@ -1,9 +1,9 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2018/4/28
- * Time: 11:05
+ * 异步任务列表
+ * @user Jea杨 (JJonline@JJonline.Cn)
+ * @date 2018-03-09 11:16
+ * @file AsyncTaskSearch.php
  */
 
 namespace app\manage\model\search;
@@ -12,7 +12,7 @@ use think\Db;
 
 class AsyncTaskSearch extends BaseSearch
 {
-    public function list($act_user_info)
+    public function lists($act_user_info)
     {
         try {
             return $this->search($act_user_info);

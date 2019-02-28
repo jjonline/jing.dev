@@ -8,7 +8,10 @@
 
 namespace app\manage\model\search;
 
+use app\common\model\Department;
+use app\common\model\Menu;
 use think\db\Query;
+use think\Exception;
 use think\Request;
 
 class BaseSearch
@@ -50,21 +53,30 @@ class BaseSearch
      */
     public $pageError;
     /**
-     * @var string 检索关键词
+     * @var string 处理添加百分号后的[若有]检索关键词
      */
     public $keyword;
+    /**
+     * @var string 原始检索关键词
+     */
+    public $keyword_origin;
+    /**
+     * @var int 可能的按部门查看数据的部门参数
+     */
+    public $dept_id;
 
     public function __construct()
     {
-        $this->request = app('request');
+        $this->request        = app('request');
         // 初始化dataTable传递过来的相关Get变量参数[post亦可]
-        $this->draw    = $this->request->param('draw/i');
-        $this->columns = $this->request->param('columns/a');
-        $this->order   = $this->request->param('order/a');
-        $this->start   = $this->request->param('start/i');
-        $this->length  = $this->request->param('length/i');
-        $this->keyword = $this->request->param('keyword', null);
-        $this->keyword = $this->keyword ? '%'.$this->keyword.'%' : null;
+        $this->draw           = $this->request->param('draw/i');
+        $this->columns        = $this->request->param('columns/a');
+        $this->order          = $this->request->param('order/a');
+        $this->start          = $this->request->param('start/i');
+        $this->length         = $this->request->param('length/i');
+        $this->dept_id        = $this->request->param('dept_id/i', 0);
+        $this->keyword_origin = $this->request->param('keyword', null);
+        $this->keyword        = $this->keyword_origin ? '%' . $this->keyword_origin . '%' : null;
     }
 
     /**
@@ -102,8 +114,11 @@ class BaseSearch
             $like = [];
             $bind = [];
             foreach ($columns as $key => $value) {
-                $like[]            = $value.' LIKE :key'.$key;
-                $bind['key'.$key]  = $keyword;
+                // 超过10个字符时使用数字索引导致bug
+                // 最多支持52个字段同时检索，绰绰有余，超过10个检索字段性能就已经很低下了
+                $_key                = chr($key + 65);
+                $like[]              = $value . ' LIKE :key' . $_key;
+                $bind['key' . $_key] = $keyword;
             }
             $query->where(implode(' OR ', $like), $bind);
         }
@@ -160,6 +175,106 @@ class BaseSearch
             $query->where($column, '>=', $begin_range);
             $query->where($column, '<=', $end_range);
         }
+    }
+
+    /**
+     * 数据范围限制和部门检索融合方法
+     * ----
+     * 1、有数据范围限定的执行范围限定逻辑
+     * 2、有部门检索需求的执行部门及子部门数据检索
+     * ----
+     * @param Query  $query
+     * @param string $dept_column  当前被检索的表的部门字段名称，一般是dept_id，可能会有别名
+     * @param string $user_column  当前数据表的用户ID字段，可能会有别名
+     * @param array  $user_info    当前登录用户信息，由控制器传递过来
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    protected function permissionLimitOrDeptSearch(Query &$query, $dept_column, $user_column, $user_info = [])
+    {
+        $search_dept_id = $this->dept_id; // 可能的本次检索的部门参数
+        // 有数据范围限制 + 部门检索条件的处理
+        if ($user_info['menu_auth']['is_permissions']) {
+            // 全部数据--部门及子部门检索
+            if (Menu::PERMISSION_SUPER == $user_info['menu_auth']) {
+                // 全部数据且没有部门检索要求返回
+                if (empty($search_dept_id)) {
+                    return;
+                }
+                // 获取拟查找部门的所有子部门
+                $departModel   = new Department();
+                $child_dept    = $departModel->getChildDeptByParentId($search_dept_id);
+                // 检索的部门id索引数组
+                $search_dept   = $child_dept ?: [];
+                $search_dept[] = $search_dept_id;
+                // 去重+重排数字索引后按部门检索
+                $query->where($dept_column, 'IN', array_merge(array_unique($search_dept)));
+            }
+            // 部门及子部门数据范围--部门及子部门限定条件下的检索指定部门数据
+            if (Menu::PERMISSION_LEADER == $user_info['menu_auth']) {
+                // 部门及子部门数据范围，没有检索部门条件，将用户所属部门设置成部门检索条件
+                if (empty($search_dept_id)) {
+                    $search_dept_id = $user_info['dept_id'];
+                }
+                // 没有该部门查看权限，抛异常终止
+                if (!in_array($search_dept_id, $user_info['dept_auth']['dept_id_vector'])) {
+                    throw new Exception('您的权限不能查看该部门数据');
+                }
+                // 获取拟查找部门的所有子部门
+                $departModel   = new Department();
+                $child_dept    = $departModel->getChildDeptByParentId($search_dept_id);
+                // 检索的部门id索引数组
+                $search_dept   = $child_dept ?: [];
+                $search_dept[] = $search_dept_id;
+                // 去重+重排数字索引后按部门检索
+                $query->where($dept_column, 'IN', array_merge(array_unique($search_dept)));
+            }
+            // 个人数据--只能查看个人数据，用户ID条件必选
+            if (Menu::PERMISSION_STAFF == $user_info['menu_auth']) {
+                if (empty($search_dept_id)) {
+                    /**
+                     * 没有部门检索
+                     */
+                    $query->where($user_column, $user_info['id']);
+                } else {
+                    /**
+                     * 子部门可能存在个人数据，按部门筛选个人数据的需求
+                     */
+                    $query->where(function (Query $subQuery) use (
+                        $search_dept_id,
+                        $dept_column,
+                        $user_column,
+                        $user_info
+                    ) {
+                        $subQuery->where($user_column, $user_info['id'])
+                                 ->where($dept_column, $search_dept_id);
+                    });
+                }
+            }
+            // 访客权限，不允许查看任何数据
+            if (Menu::PERMISSION_GUEST == $user_info['menu_auth']) {
+                throw new Exception('您没有查看数据的权限');
+            }
+            return;
+        }
+
+        /**
+         * 菜单中没有数据范围限制，但可能需要按部门来筛选数据
+         */
+        // 没有部门检索条件 返回
+        if (empty($search_dept_id)) {
+            return;
+        }
+        // 获取拟查找部门的所有子部门
+        $departModel   = new Department();
+        $child_dept    = $departModel->getChildDeptByParentId($search_dept_id);
+        // 检索的部门id索引数组并检索检索部门
+        $search_dept   = $child_dept ?: [];
+        $search_dept[] = $search_dept_id;
+        // 去重+重排数字索引后按部门检索
+        $query->where($dept_column, 'IN', array_merge(array_unique($search_dept)));
     }
 
     /**

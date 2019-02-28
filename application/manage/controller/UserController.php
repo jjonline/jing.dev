@@ -26,7 +26,7 @@ class UserController extends BaseController
     {
         if ($this->request->isAjax()) {
             // 将当前登录用户信息传递过去
-            $result = $userSearch->list($this->UserInfo);
+            $result = $userSearch->lists($this->UserInfo);
             return $this->asJson($result);
         }
         $common = [

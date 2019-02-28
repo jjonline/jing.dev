@@ -18,6 +18,23 @@ class Menu extends Model
     protected $json = ['extra_param'];
 
     /**
+     * @var string 超管权限，不受部门限制的查看数据
+     */
+    const PERMISSION_SUPER  = 'super';
+    /**
+     * @var string 部门领导的权限，能查看部门及子部门数据
+     */
+    const PERMISSION_LEADER = 'leader';
+    /**
+     * @var string 职员权限，仅能查看个人数据
+     */
+    const PERMISSION_STAFF  = 'staff';
+    /**
+     * @var string 访客权限，不能查看任何数据
+     */
+    const PERMISSION_GUEST  = 'guest';
+
+    /**
      * 菜单ID获取菜单详情
      *
      * @param int $id 菜单ID

@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * 后台用户列表
  * @user Jea杨 (JJonline@JJonline.Cn)
  * @date 2018-03-09 11:16
  * @file UserSearch.php
@@ -12,6 +12,15 @@ use think\Db;
 
 class UserSearch extends BaseSearch
 {
+    public function lists($act_user_info)
+    {
+        try {
+            return $this->search($act_user_info);
+        } catch (\Throwable $e) {
+            $this->pageError = '出现异常：'.$e->getMessage();
+            return $this->handleResult();
+        }
+    }
 
     /**
      * 后台管理员列表
@@ -26,7 +35,7 @@ class UserSearch extends BaseSearch
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function list($user_info)
+    protected function search($user_info)
     {
         // 1、超级管理员菜单权限可看全部
         // 2、leader菜单权限且属于部门领导可看所属部门以及子部门下成员

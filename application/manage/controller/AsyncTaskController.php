@@ -1,9 +1,9 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Zwb
- * Date: 2018/4/28
- * Time: 10:52
+ * 异步任务
+ * @user Jea杨 (JJonline@JJonline.Cn)
+ * @date 2018-03-09 11:16
+ * @file AsyncTaskController.php
  */
 
 namespace app\manage\controller;
@@ -23,8 +23,9 @@ class AsyncTaskController extends BaseController
     {
         if ($this->request->isAjax()) {
             // 将当前登录用户信息传递过去
-            return $this->asJson($asyncTaskSearch->list($this->UserInfo));
+            return $this->asJson($asyncTaskSearch->lists($this->UserInfo));
         }
+        dump($this->UserInfo);
         $common = [
             'title'            => '异步任务状态 - ' . config('local.site_name'),
             'content_title'    => '异步任务状态',
