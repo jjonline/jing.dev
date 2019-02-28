@@ -1,18 +1,22 @@
-image: tetraweb/php
-before_script:
-    - apt-get update
-    - apt-get install zip unzip
-    - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-    - php composer-setup.php
-    - php -r "unlink('composer-setup.php');"
+# 定义 stages
 stages:
-    - build
     - test
-build:
-    stage: build
-    script:
-        composer update -no-dev
+    - build
+
+# 定义 job
 test:
     stage: test
     script:
-        php think unit
+        - echo "I am job1"
+        - echo "I am in test stage"
+    tags:
+        - php
+
+# 定义 job
+build:
+    stage: build
+    script:
+        - echo "I am job2 x"
+        - echo "I am in build stage"
+    tags:
+        - php
