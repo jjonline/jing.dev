@@ -10,6 +10,36 @@ namespace app\common\helper;
 
 class ArrayHelper
 {
+    /**
+     * 字符串或stdClass转换为纯数组
+     * ---
+     * 1、字符串形式的
+     * 2、stdClass形式的
+     * 3、数组的stdClass形式的
+     * ---
+     * @param $origin
+     * @return array
+     */
+    public static function toArray($origin)
+    {
+        if (empty($origin)) {
+            return null;
+        }
+        if (is_string($origin)) {
+            return json_decode($origin, true);
+        }
+        if ($origin instanceof \stdClass) {
+            return json_decode(json_encode($origin), true);
+        }
+        if (is_array($origin)) {
+            foreach ($origin as $key => $value) {
+                if ($value instanceof \stdClass) {
+                    $origin[$key] =  json_decode(json_encode($value), true);
+                }
+            }
+        }
+        return $origin;
+    }
 
     /**
      * 将二维数组转化为字典

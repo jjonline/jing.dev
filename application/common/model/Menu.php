@@ -15,7 +15,7 @@ use think\Model;
 
 class Menu extends Model
 {
-    protected $json = ['extra_param'];
+    protected $json = ['all_columns'];
 
     /**
      * @var string 超管权限，不受部门限制的查看数据
@@ -49,7 +49,7 @@ class Menu extends Model
         $data = $this->find($id);
         // 额外json转化为数组
         if ($data) {
-            $data['extra_param'] = json_decode(json_encode($data['extra_param']), true);
+            $data['all_columns'] = json_decode(json_encode($data['all_columns']), true);
         }
         return $data ? $data->toArray() : [];
     }

@@ -25,7 +25,6 @@ class AsyncTaskController extends BaseController
             // 将当前登录用户信息传递过去
             return $this->asJson($asyncTaskSearch->lists($this->UserInfo));
         }
-        dump($this->UserInfo);
         $common = [
             'title'            => '异步任务状态 - ' . config('local.site_name'),
             'content_title'    => '异步任务状态',

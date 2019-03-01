@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * 角色菜单
  * @user Jea杨 (JJonline@JJonline.Cn)
  * @date 2018-02-11 22:18
  * @file RoeMenu.php
@@ -28,7 +28,11 @@ class RoleMenu extends Model
         $data = Db::name('menu menu')
               ->join('role_menu role_menu', 'menu.id = role_menu.menu_id')
               ->where('role_menu.role_id', $role_id)
-              ->field(['menu.*','role_menu.permissions as permissions'])
+              ->field([
+                  'menu.*',
+                  'role_menu.permissions as permissions',
+                  'role_menu.show_columns as show_columns',
+              ])
               ->order(['menu.sort' => 'ASC','menu.level' => 'ASC'])
               ->select();
         return $data->isEmpty() ? [] : $data->toArray();
@@ -48,7 +52,11 @@ class RoleMenu extends Model
               ->join('role_menu role_menu', 'menu.id = role_menu.menu_id')
               ->join('user user', 'user.role_id = role_menu.role_id')
               ->where('user.id', $user_id)
-              ->field(['menu.*','role_menu.permissions as permissions'])
+              ->field([
+                  'menu.*',
+                  'role_menu.permissions as permissions',
+                  'role_menu.show_columns as show_columns',
+              ])
               ->order(['menu.sort' => 'ASC','menu.level' => 'ASC'])
               ->select();
         return $data->isEmpty() ? [] : $data->toArray();

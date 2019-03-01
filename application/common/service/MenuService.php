@@ -98,14 +98,9 @@ class MenuService
             $Menu['is_permissions'] = 1;
         }
         /**
-         * ++++++++++++++++++
-         * 菜单额外数据处理，先收集最后统一赋值
-         * $extra_param = [
-         *     'columns' => [],
-         * ];
-         * ++++++++++++++++++
+         * 穷举菜单列表
          */
-        $extra_param = [];
+        $Menu['all_columns'] = [];
 
         // 是否控制字段显示
         $Menu['is_column'] = 0;
@@ -133,7 +128,7 @@ class MenuService
                 $item['sorted']  = empty($value) ? 0 : 1;
                 $columns_list[]  = $item;
             }
-            $extra_param['columns'] = $columns_list;
+            $Menu['all_columns'] = $columns_list;
         }
 
         // 菜单级别处理
@@ -158,13 +153,6 @@ class MenuService
             $Menu['level']     = 3;
             $Menu['parent_id'] = $level2['id'];
         }
-
-        /**
-         * ++++++++++
-         * 统一赋值额外参数json字段值
-         * ++++++++++
-         */
-        $Menu['extra_param'] = $extra_param;
 
         // 新增或编辑区分写入
         if ($is_edit) {
@@ -232,8 +220,8 @@ class MenuService
                 // 仅处理三级菜单
                 $value['old_id'] = $value['id'];
                 // 额外参数为空的统一成null值
-                if (empty($value['extra_param'])) {
-                    $value['extra_param'] = null;
+                if (empty($value['all_columns'])) {
+                    $value['all_columns'] = null;
                 }
                 switch ($value['level']) {
                     case 1:

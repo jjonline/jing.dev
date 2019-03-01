@@ -121,8 +121,8 @@
                         <label class="col-sm-2 control-label">待选字段列表：</label>
                         <div class="col-sm-8 columns_item">
                             <ul id="columns_item_container">
-                                <%{if condition="isset($menu_edit.extra_param.columns)"}%>
-                                <%{volist name="menu_edit.extra_param.columns" id="columns"}%>
+                                <%{if condition="isset($menu_edit.all_columns)"}%>
+                                <%{volist name="menu_edit.all_columns" id="columns"}%>
                                     <li class="form-group columns_group">
                                         <div class="columns_manage">
                                             <i class="fa fa-trash"></i>

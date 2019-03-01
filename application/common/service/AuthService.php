@@ -242,9 +242,8 @@ class AuthService
         // 前方菜单权限已检查通过，此处值绝对存在
         // 前方按权限标记[url或tag]分组后是二维数组，key为$auth_tag
         $info = $user_menu_map[$auth_tag][0];
-        if (!empty($info['extra_param'])) {
-            // 还原额外参数的数组格式
-            $info['extra_param'] = (array)$info['extra_param'];
+        if (!empty($info['all_columns'])) {
+            $info['all_columns'] = ArrayHelper::toArray($info['all_columns']);
         }
         return $info;
     }
@@ -265,21 +264,6 @@ class AuthService
     }
 
     /**
-     * 获取指定Url中的额外数组数据，无则为空字符串
-     * @param null $url
-     * @return null|array
-     * @throws Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     */
-    public function getMenuExtraParam($url = null)
-    {
-        $menu = $this->getUserSingleMenuInfo($url);
-        return $menu['extra_param'];
-    }
-
-    /**
      * 获取用户的权限菜单列表
      * @param string $user_id 可选的用户id，留空则获取当前登录用户
      * @return array|mixed
@@ -297,7 +281,9 @@ class AuthService
         if ($user_id === 1) {
             $data = $this->Menu->getMenuList();
             foreach ($data as $key => $value) {
-                $data[$key]['permissions'] = 'super';
+                $data[$key]['permissions']  = 'super';
+                $data[$key]['all_columns']  = ArrayHelper::toArray($value['all_columns']);
+                $data[$key]['show_columns'] = $data[$key]['all_columns'];
             }
             return $data;
         }
@@ -310,6 +296,10 @@ class AuthService
             }
         }
         $user_menu = $this->RoleMenu->getRoleMenuListByUserId($user_id);
+        foreach ($user_menu as $key => $value) {
+            $user_menu[$key]['all_columns']  = ArrayHelper::toArray($value['all_columns']);
+            $user_menu[$key]['show_columns'] = ArrayHelper::toArray($value['show_columns']);
+        }
         // 将结果集缓存
         if (!Config::get('app.app_debug')) {
             Cache::tag($this->cache_tag)->set($user_menu_cache_key, $user_menu, 3600 * 12);//缓存12小时

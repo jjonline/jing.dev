@@ -89,7 +89,7 @@ class CreateMenu extends Migrator
                     'null'    => true,
                     'comment' => '标记是否需要控制字段显示-1则有显示字段控制',
                 ])
-                ->addColumn('extra_param', 'json', [
+                ->addColumn('all_columns', 'json', [
                     'default' => null,
                     'null'    => true,
                     'comment' => '菜单额外配置的选项数据，譬如需控制字段时则预置字段列表选项',
