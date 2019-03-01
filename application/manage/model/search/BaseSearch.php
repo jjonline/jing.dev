@@ -218,24 +218,52 @@ class BaseSearch
                 if (empty($search_dept_id)) {
                     $search_dept_id = $user_info['dept_id'];
                 }
-                // 没有该部门查看权限，抛异常终止
+                // 没有该部门查看权限，只显示该部门下可能的属于个人的数据
                 if (!in_array($search_dept_id, $user_info['dept_auth']['dept_id_vector'])) {
-                    throw new Exception('您的权限不能查看该部门数据');
+                    $query->where(function (Query $subQuery) use (
+                        $search_dept_id,
+                        $dept_column,
+                        $user_column,
+                        $user_info
+                    ) {
+                        $subQuery->where($user_column, $user_info['id'])
+                                 ->where($dept_column, $search_dept_id);
+                    });
+                    return;
                 }
+
                 // 获取拟查找部门的所有子部门
                 $departModel   = new Department();
                 $child_dept    = $departModel->getChildDeptByParentId($search_dept_id);
                 // 检索的部门id索引数组
                 $search_dept   = $child_dept ?: [];
                 $search_dept[] = $search_dept_id;
-                // 去重+重排数字索引后按部门检索
-                $query->where($dept_column, 'IN', array_merge(array_unique($search_dept)));
+                $search_dept   = array_merge(array_unique($search_dept));
+
+                /**
+                 * leader数据范围的内涵条件：
+                 * 1、如果有部门检索条件则仅检索指定部门[及其子部门]的数据
+                 * 2、如果没有部门检索条件，则检索部门及子部门数据 ++ 个人数据
+                 */
+                $query->where(function (Query $subQuery) use (
+                    $dept_column,
+                    $user_column,
+                    $search_dept,
+                    $user_info
+                ) {
+                    if ($this->dept_id) {
+                        $subQuery->where($dept_column, 'IN', $search_dept);
+                    } else {
+                        $subQuery->where($dept_column, 'IN', $search_dept)
+                                 ->whereOr($user_column, $user_info['id']);
+                    }
+                });
             }
             // 个人数据--只能查看个人数据，用户ID条件必选
             if (Menu::PERMISSION_STAFF == $user_info['menu_auth']) {
                 if (empty($search_dept_id)) {
                     /**
-                     * 没有部门检索
+                     * 没有部门检索，仅检索个人数据，这样任意部门存在的个人数据都会显示
                      */
                     $query->where($user_column, $user_info['id']);
                 } else {
@@ -289,7 +317,7 @@ class BaseSearch
             'recordsFiltered' => $this->totalCount,
             'data'            => $this->results,
         ];
-        if ($this->pageError) {
+        if (!empty($this->pageError)) {
             $result['error'] = $this->pageError;
         }
         return $result;
