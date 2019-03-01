@@ -92,8 +92,9 @@ class BaseAuthController extends BasicController
         // 当前菜单权限的一些信息
         $this->UserInfo['menu_auth'] = $this->AuthService->getUserSingleMenuInfo();
         // 会员可操作的部门列表信息
-        $this->UserInfo['dept_auth'] = $this->DepartmentService
-            ->getAuthDeptInfoByDeptId($this->UserInfo['dept_id'], $this->UserInfo['is_leader']);
+        $this->UserInfo['dept_auth'] = $this->DepartmentService->getAuthDeptInfoByDeptId(
+            $this->UserInfo['dept_id']
+        );
         // 获取管理菜单
         $UserAuthMenu                = $this->AuthService->getUserAuthMenu();
         //dump($UserAuthMenu);

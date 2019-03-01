@@ -205,22 +205,22 @@ class AuthService
      * --
      * 大部分时候无参数调用
      * --
-     * @param null $url
+     * @param string $auth_tag
      * @return bool
      * @throws Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getUserSingleMenuInfo($url = null)
+    public function getUserSingleMenuInfo($auth_tag = null)
     {
-        if (!$this->userHasPermission($url)) {
+        if (!$this->userHasPermission($auth_tag)) {
             throw new Exception('用户无该菜单权限，获取菜单权限信息失败', 500);
         }
         $user_id = Session::get('user_id');
         $request = request();
-        if (empty($url)) {
-            $url = $this->generateRequestMenuUrl($request);
+        if (empty($auth_tag)) {
+            $auth_tag = $this->generateRequestMenuUrl($request);
         }
         $user_menu_cache_Map_key = 'User_menu_cache_Map_key'.$user_id;
         if (!Config::get('app.app_debug')) {
@@ -239,8 +239,9 @@ class AuthService
                 Cache::tag($this->cache_tag)->set($user_menu_cache_Map_key, $user_menu_map, 3600 * 12);
             }
         }
-        // 前方菜单权限已检查通过，此处值绝对存在，前方按url排序后是一个只有一个元素的二维数组，还原
-        $info = $user_menu_map[$url][0];
+        // 前方菜单权限已检查通过，此处值绝对存在
+        // 前方按权限标记[url或tag]分组后是二维数组，key为$auth_tag
+        $info = $user_menu_map[$auth_tag][0];
         if (!empty($info['extra_param'])) {
             // 还原额外参数的数组格式
             $info['extra_param'] = (array)$info['extra_param'];
@@ -266,7 +267,7 @@ class AuthService
     /**
      * 获取指定Url中的额外数组数据，无则为空字符串
      * @param null $url
-     * @return []|''
+     * @return null|array
      * @throws Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException

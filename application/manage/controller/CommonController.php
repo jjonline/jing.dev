@@ -58,8 +58,7 @@ class CommonController extends BasicController
             $this->UserInfo              = Session::get('user_info');
             // 会员可操作的部门列表信息
             $this->UserInfo['dept_auth'] = $this->DepartmentService->getAuthDeptInfoByDeptId(
-                $this->UserInfo['dept_id'],
-                $this->UserInfo['is_leader']
+                $this->UserInfo['dept_id']
             );
 
             return $this->UserInfo;

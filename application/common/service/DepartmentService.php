@@ -186,25 +186,20 @@ class DepartmentService
     }
 
     /**
-     * 获取父部门ID指定的子部门信息 == 获取用户所辖部门信息
-     * ---
-     * 1、登录用户所属部门下的子部门
-     * 2、若登录用户是部门领导，则包含本部门
-     * ---
+     * 获取用户所辖部门信息，即所在部门和子部门信息
      * @param $dept_id
-     * @param int $user_is_leader
      * @return array|mixed
      * [
-     *     'dept_id_vector' => 包含能管理的部门ID的索引数组,
-     *     'dept_list' => 包含能管理的部门的多维数组,
-     *     'dept_list_tree' => 按纵向树排序的部门数据
+     *     'dept_id_vector' => 所在部门及子部门ID构成的索引数组,
+     *     'dept_list'      => 所在部门及子部门多维数组,
+     *     'dept_list_tree' => 所在部门及子部门纵向树排序的部门数据
      * ]
      * @throws Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getAuthDeptInfoByDeptId($dept_id, $user_is_leader = 0)
+    public function getAuthDeptInfoByDeptId($dept_id)
     {
         $user_id = Session::get('user_id');
         if (empty($user_id)) {
@@ -217,7 +212,7 @@ class DepartmentService
                 return $vector;
             }
         }
-        $vector = $this->getChildDeptInfoByParentDeptId($dept_id, $user_is_leader);
+        $vector = $this->getChildDeptInfoByParentDeptId($dept_id);
         $vector && Cache::tag($this->cache_tag)->set('User_Auth_Dept'.$user_id, $vector, 3600*12);
         return $vector;
     }
@@ -225,7 +220,6 @@ class DepartmentService
     /**
      * 获取指定部门ID下辖的所有子部门信息
      * @param $parent_id
-     * @param int $user_is_leader
      * @return array
      * [
      *    'dept_id_vector' => 包含能管理的部门ID的索引数组,
@@ -236,22 +230,20 @@ class DepartmentService
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getChildDeptInfoByParentDeptId($parent_id, $user_is_leader = 0)
+    public function getChildDeptInfoByParentDeptId($parent_id)
     {
         $dept_list   = $this->getDeptList();
         $vector_list = TreeHelper::child($dept_list, $parent_id);
         $vector      = [];
         $begin_level = 0;//所辖部门开始层级
-        // 若$user_is_leader为1表示为$dept_id指定部门的领导--将本部门信息也附加进去
+        // 将本部门信息也附加进去放在第一个元素
         foreach ($dept_list as $key => $value) {
             if ($parent_id == $value['id']) {
-                $begin_level = $value['level'];
-                if ($user_is_leader) {
-                    $value['name_format1']      = $value['name'];
-                    $value['name_format2']      = $value['name'];
-                    $vector['dept_id_vector'][] = $value['id'];
-                    $vector['dept_list'][]      = $value;
-                }
+                $begin_level                = $value['level'];
+                $value['name_format1']      = $value['name'];
+                $value['name_format2']      = $value['name'];
+                $vector['dept_id_vector'][] = $value['id'];
+                $vector['dept_list'][]      = $value;
                 break;
             }
         }

@@ -13,6 +13,7 @@ use think\Model;
 
 class RoleMenu extends Model
 {
+    protected $json = ['show_columns'];
 
     /**
      * 依据角色ID查询该角色所拥有的菜单列表和菜单权限
