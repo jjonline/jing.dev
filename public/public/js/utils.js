@@ -975,7 +975,7 @@ var utils = {
                 }
 
                 //获取裁剪完后的base64图片url,转换为blob
-                var data_blob = document.getElementById("image_cut_canvas").toDataURL(utils.field_type);
+                var data_blob = document.getElementById("image_cut_canvas").toDataURL(utils.field_type,1);
                 var formData  = new FormData();
 
                 formData.append("File",dataURLtoBlob(data_blob) , utils.field_name || "default.png" );

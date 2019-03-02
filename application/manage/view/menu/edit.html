@@ -14,9 +14,9 @@
                             <li>1、`字段`填写带别名的数据表字段，程序中会使用到，例如：order.sn、order_detail.buy_num</li>
                             <li>2、`名称`填写字段对应的中文名称，前端显示上会用到，例如：订单号、购买数量</li>
                             <li>3、`可排序`选项指定该字段在列表中是否可以作为排序的字段</li>
-                            <li>4、后方删除按钮可以删除该字段</li>
-                            <li>5、后方移动按钮，可以调整字段显示顺序，从上往下依次对应自左到右</li>
-                            <li>6、可点击下方添加字段按钮添加多个字段</li>
+                            <li>4、`必选`选项指定该字段在列表中是必须显示的</li>
+                            <li>5、删除按钮可删除该字段</li>
+                            <li>6、移动按钮可调整字段顺序，从上往下依次对应自左到右</li>
                         </ul>
                     </div>
                     <div class="form-group">
@@ -143,7 +143,14 @@
                                         <div class="col-xs-2">
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" class="sorted" name="Columns[sorted][]"<%{if condition="$columns.sorted"}%> checked="checked"<%{/if}%>> 可排序
+                                                    <input type="checkbox" class="sorted" name="Columns[sorted][]"<%{if condition="!empty($columns.sorted)"}%> checked="checked"<%{/if}%>> 可排序
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-2">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" class="default" name="Columns[default][]"<%{if condition="!empty($columns.default)"}%> checked="checked"<%{/if}%>> 必选
                                                 </label>
                                             </div>
                                         </div>

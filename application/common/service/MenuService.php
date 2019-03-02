@@ -115,8 +115,12 @@ class MenuService
             }
             $columns = array_unique(array_filter($Columns['columns'])); // 去重
             $name    = array_filter($Columns['name']);
-            $sorted  = $Columns['sorted'];
-            if (count($sorted) != count($name) || count($sorted) != count($columns)) {
+            $sorted  = $Columns['sorted']; // 可排序
+            $default = $Columns['default']; // 必选
+            if (count($sorted) != count($name)
+                || count($sorted) != count($columns)
+                || count($sorted) != count($default)
+            ) {
                 return ['error_code' => 400, 'error_msg' => '待选字段的信息不完整或存在重复字段'];
             }
             // 处理成json
@@ -126,6 +130,7 @@ class MenuService
                 $item['columns'] = $columns[$key];
                 $item['name']    = $name[$key];
                 $item['sorted']  = empty($value) ? 0 : 1;
+                $item['default'] = empty($default[$key]) ? 0 : 1;
                 $columns_list[]  = $item;
             }
             $Menu['all_columns'] = $columns_list;

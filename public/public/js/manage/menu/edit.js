@@ -64,6 +64,13 @@ $(function () {
             '                   </label>' +
             '               </div>' +
             '           </div>' +
+            '           <div class="col-xs-2">' +
+            '               <div class="checkbox">' +
+            '                   <label>' +
+            '                       <input type="checkbox" class="default" name="Columns[default][]"> 必选' +
+            '                   </label>' +
+            '               </div>' +
+            '           </div>' +
             '</li>';
         var _li = '';
         while (repeat) {
@@ -141,6 +148,8 @@ $(function () {
             return false;
         }
         var data = $('#menuEdit').serializeArray();
+
+        // 修改可排序checkbox
         var fix_data = data.concat();
         // 将checkbox值重设成选中true不选false
         var index = 0;
@@ -158,11 +167,31 @@ $(function () {
                     return {"name": this.name, "value": $(this).prop('checked') ? 1 : 0}
                 }).get()
         );
+
+        // 修改必选checkbox
+        var fix_data1 = fix_data.concat();
+        // 将checkbox值重设成选中true不选false
+        var index1 = 0;
+        $.each(fix_data,function (i,n) {
+            // 清理掉可排序已选数组元素
+            if (n.name == 'Columns[default][]') {
+                fix_data1.remove(i - index1);
+                index1 ++;
+            }
+        });
+        // 添加自定义按顺序的可排序checkbox数组元素
+        fix_data1 = fix_data1.concat(
+            $(".default").map(
+                function() {
+                    return {"name": this.name, "value": $(this).prop('checked') ? 1 : 0}
+                }).get()
+        );
+
         $('.btn-submit').prop('disabled',true).text('提交中...');
         $.ajax({
             url: $('#menuAdd').attr('action'),
             type: 'POST',
-            data: fix_data,
+            data: fix_data1,
             success: function (data) {
                 if(data.error_code == 0){
                     utils.alert(data.error_msg,function () {

@@ -280,6 +280,7 @@ tr.selected>td {}
 }
 /*菜单字段操作按钮*/
 .columns_manage {
+    z-index: 9999;
     position: absolute;
     right:10px;
     top:7px;
