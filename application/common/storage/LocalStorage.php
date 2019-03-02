@@ -9,7 +9,6 @@
 namespace app\common\storage;
 
 use app\common\helper\AttachmentHelper;
-use think\facade\Config;
 
 class LocalStorage extends BaseStorage
 {

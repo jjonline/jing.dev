@@ -685,10 +685,9 @@ var utils = {
             onNewFile:function (id,file_info) {},
             onUploadProgress:function (id, percent) {},
             onUploadSuccess:function (id, data) {
-                if(data.error_code == 0)
-                {
+                if (data.error_code == 0) {
                     success && success(data);
-                }else {
+                } else {
                     error && error();
                 }
             },
@@ -934,20 +933,20 @@ var utils = {
             changeEvent:function () {
                 // 浮层上的input触发change事件后的动作和方法
                 var checked_file_info = $(this).get(0).files[0];
-                if(utils.isEmpty(checked_file_info))
-                {
+                if (utils.isEmpty(checked_file_info)) {
                     return false;
                 }
                 var fileName = checked_file_info.name;
-                var fileType=fileName.substring(fileName.lastIndexOf('.'),fileName.length).toLowerCase();
+                var fileType = fileName.substring(fileName.lastIndexOf('.'),fileName.length).toLowerCase();
                 if(fileType!='.gif' && fileType!='.jpeg' && fileType!='.png' && fileType!='.jpg')
                 {
                     utils.toast('请选择gif、jpeg、jpg或png格式的图片');
                     return false;
                 }
-                utils.field_name = fileName;
+                utils.field_name = fileName;// 从input文件框读取到的原始文件名
+                utils.field_type = checked_file_info.type; // 从input文件框读取到的文件mime类型
                 // 将选择的图片文件本地渲染装载
-                var file_reader = new FileReader();
+                var file_reader  = new FileReader();
                 file_reader.readAsDataURL(checked_file_info);
                 file_reader.onload =function (e) {
                     var img_preview = '<img id="corp_box" src="'+e.target.result+'">';
@@ -976,7 +975,7 @@ var utils = {
                 }
 
                 //获取裁剪完后的base64图片url,转换为blob
-                var data_blob = document.getElementById("image_cut_canvas").toDataURL();
+                var data_blob = document.getElementById("image_cut_canvas").toDataURL(utils.field_type);
                 var formData  = new FormData();
 
                 formData.append("File",dataURLtoBlob(data_blob) , utils.field_name || "default.png" );
