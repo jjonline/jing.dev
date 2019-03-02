@@ -9,28 +9,49 @@
 namespace app\common\helper;
 
 use app\common\service\AttachmentService;
+use think\facade\Config;
 
 class AttachmentHelper
 {
-
     /**
      * 通过附件ID获取附件资源网址
      * @param string $attachment_id attachment表主键ID
-     * @return mixed
+     * @return string
      */
     public static function getAttachmentPathById($attachment_id)
     {
-        return app(AttachmentService::class)->getAttachmentPathById($attachment_id);
+        $attachment = app(AttachmentService::class)->getAttachmentById($attachment_id);
+        return empty($attachment['file_path']) ? '' : $attachment['file_path'];
     }
 
     /**
      * 通过附件ID数组获取资源外网数组
      * @param string $attachment_id attachment表主键ID
-     * @return mixed
+     * @return []
      */
     public static function getAttachmentByIds($attachment_ids)
     {
         return app(AttachmentService::class)->getAttachmentByIds($attachment_ids);
+    }
+
+    /**
+     * 资源ID生成本地私有访问Url
+     * @param string $attachment_id
+     * @return string
+     */
+    public static function generateLocalSafeUrl($attachment_id)
+    {
+        $expire_time        = Config::get('attachment.attachment_expire_time', 1800);
+        $auth_key           = Config::get('local.auth_key');
+        $param              = [];
+        $param['expire_in'] = time() + $expire_time;
+        // 生成ID的加密字符串 半小时有效
+        $param['access_key'] = self::transferEncrypt(
+            $attachment_id,
+            $auth_key,
+            $expire_time
+        );
+        return '/manage/common/attachment?'.http_build_query($param);
     }
 
     /**

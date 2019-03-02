@@ -30,17 +30,8 @@ class LocalStorage extends BaseStorage
      */
     public function get($attachment)
     {
-        $expire_time = Config::get('attachment.attachment_expire_time', 1800);
         if ($attachment['is_safe']) {
-            $param               = [];
-            $param['expire_in']  = time() + $expire_time;
-            // 生成ID的加密字符串 半小时有效
-            $param['access_key'] = AttachmentHelper::transferEncrypt(
-                $attachment['id'],
-                Config::get('local.auth_key'),
-                $expire_time
-            );
-            return '/manage/common/attachment?'.http_build_query($param);
+            return AttachmentHelper::generateLocalSafeUrl($attachment['id']);
         }
         return app('request')->domain().$attachment['file_path'];
     }

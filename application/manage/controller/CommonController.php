@@ -121,7 +121,7 @@ class CommonController extends BasicController
     public function attachAction(AttachmentService $attachmentService)
     {
         $attachment_id = $this->request->get('id');
-        $file_path     = $attachmentService->getAttachmentPathById($attachment_id);
+        $file_path     = $attachmentService->getAttachmentById($attachment_id);
         if (empty($file_path)) {
             $this->redirect('/public/images/no.png');
         }

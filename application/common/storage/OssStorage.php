@@ -93,15 +93,7 @@ class OssStorage extends BaseStorage
                 /**
                  * oss安全资源链接获取失败，则降级成本地加密资源
                  */
-                $param               = [];
-                $param['expire_in']  = time() + $expire_time;
-                // 生成ID的加密字符串 半小时有效
-                $param['access_key'] = AttachmentHelper::transferEncrypt(
-                    $attachment['id'],
-                    Config::get('local.auth_key'),
-                    $expire_time
-                );
-                return '/manage/common/attachment?'.http_build_query($param);
+                return AttachmentHelper::generateLocalSafeUrl($attachment['id']);
             }
         }
         // 非安全资源，直接构造

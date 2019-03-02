@@ -184,7 +184,7 @@ class AttachmentService
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getAttachmentPathById($attachment_id)
+    public function getAttachmentById($attachment_id)
     {
         $attachment = $this->Attachment->getAttachmentById($attachment_id);
         if (empty($attachment)) {
