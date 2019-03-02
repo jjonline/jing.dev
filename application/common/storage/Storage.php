@@ -39,14 +39,12 @@ class Storage
 
     /**
      * 往存储引擎推送单一文件
-     * @param string $local_dir  反斜杠开头的本地资源url
-     * @param string $remote_dir 远程存储的url|路径设置参数，默认与$local_dir一一对应
-     * @param array  $param      额外的底层存储引擎需要的参数数组
+     * @param array $attachment 单个资源的信息数组
      * @return bool 推送成功true，推送失败false
      */
-    public function put($local_dir, $remote_dir, $param = [])
+    public function put($attachment)
     {
-        return $this->instance->put($local_dir, $remote_dir, $param);
+        return $this->instance->put($attachment);
     }
 
     /**

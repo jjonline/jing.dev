@@ -15,12 +15,10 @@ class LocalStorage extends BaseStorage
 {
     /**
      * 本地推送不执行方法直接返回true
-     * @param string $local_dir
-     * @param string $remote_dir
-     * @param array $param
+     * @param array $attachment 单个资源的信息数组
      * @return bool
      */
-    public function put($local_dir, $remote_dir = '', $param = [])
+    public function put($attachment)
     {
         return true;
     }
@@ -32,14 +30,15 @@ class LocalStorage extends BaseStorage
      */
     public function get($attachment)
     {
+        $expire_time = Config::get('attachment.attachment_expire_time', 1800);
         if ($attachment['is_safe']) {
             $param               = [];
-            $param['expire_in']  = time() + 1800;
+            $param['expire_in']  = time() + $expire_time;
             // 生成ID的加密字符串 半小时有效
             $param['access_key'] = AttachmentHelper::transferEncrypt(
                 $attachment['id'],
                 Config::get('local.auth_key'),
-                1800
+                $expire_time
             );
             return '/manage/common/attachment?'.http_build_query($param);
         }

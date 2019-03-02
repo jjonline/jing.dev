@@ -307,8 +307,9 @@ class AttachmentService
     protected function storageAttachment($attachment)
     {
         try {
-            return $this->Storage->put($attachment['file_path'], '', $attachment);
+            return $this->Storage->put($attachment);
         } catch (\Throwable $e) {
+            trace('File '.$attachment['file_path'].' Upload Error. Info = '.$e->getMessage(), 'error');
             return false;
         }
     }
