@@ -16,7 +16,7 @@ test:
 build:
     stage: build
     script:
-        - echo "I am job2 x"
+        - echo "I am job2"
         - echo "I am in build stage"
     tags:
         - php
