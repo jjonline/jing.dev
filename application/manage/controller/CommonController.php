@@ -90,7 +90,7 @@ class CommonController extends BasicController
             return xml([
                 'Code'    => '500',
                 'Key'     => 'NoSuchKey',
-                'Message' => 'The specified key does not exist.',
+                'Message' => 'Link has expired.',
             ], 200, [], ['root_node' => 'Error']);
         }
         $attachment  = $attachmentService->Attachment->getAttachmentById($attachment_id);
@@ -98,14 +98,17 @@ class CommonController extends BasicController
             return xml([
                 'Code'    => '404',
                 'Key'     => 'Expired',
-                'Message' => 'Link has expired or File Not Found.',
+                'Message' => 'Link has expired.',
             ], 200, [], ['root_node' => 'Error']);
         }
         $filename = realpath('.'.$attachment['file_path']);
         ob_start();
         readfile($filename);
-        return response(ob_get_clean(), 200, ['Content-Length' => $attachment['file_size']])
-            ->contentType($attachment['file_mime']);
+        return response(
+            ob_get_clean(),
+            200,
+            ['Content-Length' => $attachment['file_size']]
+        )->contentType($attachment['file_mime']);
     }
 
     /**
@@ -122,7 +125,7 @@ class CommonController extends BasicController
         if (empty($file_path)) {
             $this->redirect('/public/images/no.png');
         }
-        $this->redirect($file_path);
+        $this->redirect($file_path['file_path']);
     }
 
     /**

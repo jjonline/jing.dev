@@ -8,6 +8,8 @@
 
 namespace app\common\helper;
 
+use app\common\service\AttachmentService;
+
 class AttachmentHelper
 {
 
@@ -18,31 +20,17 @@ class AttachmentHelper
      */
     public static function getAttachmentPathById($attachment_id)
     {
-        return app('app\common\service\AttachmentService')->getAttachmentPathById($attachment_id);
+        return app(AttachmentService::class)->getAttachmentPathById($attachment_id);
     }
 
     /**
-     * 通过附件ID数组获取
+     * 通过附件ID数组获取资源外网数组
      * @param string $attachment_id attachment表主键ID
      * @return mixed
      */
     public static function getAttachmentByIds($attachment_ids)
     {
-        return app('app\common\service\AttachmentService')->getAttachmentByIds($attachment_ids);
-    }
-
-    /**
-     * 生成安全资源访问Url
-     * @param  string $attachment_id 资源ID
-     * @return string
-     */
-    public static function generateSafeAttachmentPath($attachment_id)
-    {
-        $param              = [];
-        $param['expire_in'] = time() + 1800;
-        //生成ID的加密字符串 半小时有效
-        $param['access_key']= self::transferEncrypt($attachment_id, config('local.auth_key'), 1800);
-        return '/manage/common/attachment?'.http_build_query($param);
+        return app(AttachmentService::class)->getAttachmentByIds($attachment_ids);
     }
 
     /**
