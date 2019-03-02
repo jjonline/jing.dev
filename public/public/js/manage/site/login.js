@@ -59,4 +59,29 @@ $(function () {
         $('#login-tips').addClass('hide');
         return false;
     });
+
+    /**
+     * 检查http下的https是否有效
+     */
+    function isHttpsEffect() {
+        try {
+            // 非https请求自动检查是否支持https
+            if(!utils.isHttps()) {
+                var https = "https://" + document.domain;
+                $.ajax({
+                    url: https + "/manage/common/chineseToPinyin",
+                    dataType:"jsonp",
+                    data: {chinese:"颜如玉"},
+                    success: function (data) {
+                        if (data.error_code == 0) {
+                            // https检查通过，跳转到https协议
+                            window.location.href = location.href.replace("http", "https");
+                        }
+                    },
+                    error:function () {}
+                });
+            }
+        }catch (e) {}
+    }
+    isHttpsEffect();
 });

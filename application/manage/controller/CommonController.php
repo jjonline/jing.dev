@@ -139,6 +139,10 @@ class CommonController extends BasicController
             return $this->renderJson('待转换中文不得为空', 404);
         }
         $pinyin = StringHelper::convertToPinyin($chinese);
+        // 支持jsonp
+        if ($this->request->has('callback', 'get')) {
+            return jsonp(['error_code' => 0, 'error_msg'  => 'success', 'data'  => $pinyin]);
+        }
         return $this->renderJson('success', 0, $pinyin);
     }
 
