@@ -37,6 +37,8 @@ class Storage
         $ret = [];
         foreach ($this->instance as $engine => $instance) {
             /**
+             * 当有多个存储引擎推送时，只要某一个推送出现异常，整个推送就会被终止
+             * 若需要继续推送，修改此方法，将异常catch住
              * @var BaseStorage $instance
              */
             $ret[$engine] = $instance->put($attachment);

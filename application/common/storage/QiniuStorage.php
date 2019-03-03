@@ -71,7 +71,7 @@ class QiniuStorage extends BaseStorage
                 $this->generateObject($attachment['file_path']),
                 $this->generateFileDir($attachment['file_path'])
             );
-            if (!empty($result)) {
+            if (!empty($result['key'])) {
                 return true;
             }
             /**
@@ -86,7 +86,7 @@ class QiniuStorage extends BaseStorage
                 $this->generateObject($attachment['file_path']),
                 $this->generateFileDir($attachment['file_path'])
             );
-            if (!empty($result)) {
+            if (!empty($result['key'])) {
                 return true;
             }
             /**
@@ -177,7 +177,11 @@ class QiniuStorage extends BaseStorage
             $this->access_key_frontend,
             $this->access_secret_frontend
         );
-        $this->client_frontend_token = $this->auth_frontend->uploadToken($this->bucket_safe, null, 3600);
+        $this->client_frontend_token = $this->auth_frontend->uploadToken(
+            $this->bucket_frontend,
+            null,
+            3600
+        );
 
         // 上传句柄
         $this->client_frontend = new UploadManager();
@@ -196,7 +200,11 @@ class QiniuStorage extends BaseStorage
             $this->access_key_safe,
             $this->access_secret_safe
         );
-        $this->client_safe_token = $this->auth_safe->uploadToken($this->bucket_safe, null, 3600);
+        $this->client_safe_token = $this->auth_safe->uploadToken(
+            $this->bucket_safe,
+            null,
+            3600
+        );
 
         // 上传句柄
         $this->client_safe = new UploadManager();

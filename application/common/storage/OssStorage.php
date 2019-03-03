@@ -50,7 +50,7 @@ class OssStorage extends BaseStorage
     /**
      * OSS推送单个文件
      * @param array $attachment Db表键单条数据构成的数组
-     * @return bool|void
+     * @return bool
      * @throws \OSS\Core\OssException
      */
     public function put($attachment)
@@ -70,6 +70,7 @@ class OssStorage extends BaseStorage
                 $this->generateFileDir($attachment['file_path'])
             );
         }
+        return true;
     }
 
     /**
