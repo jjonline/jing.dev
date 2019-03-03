@@ -104,7 +104,7 @@ class QiniuStorage extends BaseStorage
      */
     public function get($attachment)
     {
-        $file_path = $this->getQiniuDomain($attachment['is_safe']).$attachment['file_path'];
+        $file_path = $this->getDomain($attachment['is_safe']).$attachment['file_path'];
         if ($attachment['is_safe']) {
             $expire_time = Config::get('attachment.attachment_expire_time', 1800);
             try {
@@ -133,7 +133,7 @@ class QiniuStorage extends BaseStorage
      * @param bool $is_safe
      * @return string
      */
-    protected function getQiniuDomain($is_safe)
+    protected function getDomain($is_safe)
     {
         if ($is_safe) {
             $is_ssl = Config::get('attachment.qiniu.safe.is_ssl', false);
@@ -145,7 +145,7 @@ class QiniuStorage extends BaseStorage
     }
 
     /**
-     * 资源本地路径生成oss的object规则
+     * 资源本地路径生成object规则，即远程存储路径规则
      * @param $file_path
      * @return string
      */

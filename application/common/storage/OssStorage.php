@@ -98,7 +98,7 @@ class OssStorage extends BaseStorage
             }
         }
         // 非安全资源，直接构造
-        return $this->getOssDomain($attachment['is_safe']).$attachment['file_path'];
+        return $this->getDomain($attachment['is_safe']).$attachment['file_path'];
     }
 
     public function all()
@@ -111,7 +111,7 @@ class OssStorage extends BaseStorage
      * @param bool $is_safe
      * @return string
      */
-    private function getOssDomain($is_safe = false)
+    private function getDomain($is_safe = false)
     {
         if ($is_safe) {
             $is_ssl = Config::get('attachment.oss.safe.is_ssl', false);
@@ -129,7 +129,7 @@ class OssStorage extends BaseStorage
     }
 
     /**
-     * 资源本地路径生成oss的object规则
+     * 资源本地路径生成oss的object规则，即远程存储路径规则
      * @param $file_path
      * @return string
      */
