@@ -30,7 +30,8 @@
         "jjonline/aliyun-dysms-php-sdk": "2.0",
         "topthink/think-migration": "2.0.*",
         "aliyuncs/oss-sdk-php": "^2.3",
-        "qiniu/php-sdk": "^7.2"
+        "qiniu/php-sdk": "^7.2",
+        "upyun/sdk": "^3.3"
     },
     "require-dev": {
         "topthink/think-testing": "^2.0"

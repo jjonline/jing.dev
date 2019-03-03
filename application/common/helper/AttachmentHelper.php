@@ -51,7 +51,7 @@ class AttachmentHelper
             $auth_key,
             $expire_time
         );
-        return '/manage/common/attachment?'.http_build_query($param);
+        return app('request')->domain().'/manage/common/attachment?'.http_build_query($param);
     }
 
     /**
