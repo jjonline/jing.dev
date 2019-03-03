@@ -100,9 +100,6 @@ class Storage
         // 1个或多个存储引擎实例化
         $engines = $this->parseStorageEngine();
         foreach ($engines as $engine) {
-            if (self::LOCAL == $engine) {
-                continue;
-            }
             $this->instance[$engine] = $this->initOneEngine($engine);
         }
     }
@@ -116,9 +113,10 @@ class Storage
         if (!empty($this->instance_frontend)) {
             return;
         }
-        // 分析前台引擎配置，若无则使用存储引擎的第一个值
-        // 若存储引擎依然为空则使用local
-        $_engine = Config::get('attachment.attachment_frontend_use', null);
+        // 分析前台引擎配置
+        $_engine = Config::get('attachment.attachment_frontend_use');
+
+        // 前台引擎配置为空，使用第一个存储引擎，若存储引擎依然为空则使用local
         if (empty($_engine)) {
             $engines = $this->parseStorageEngine();
             $_engine = $engines[0];
@@ -140,6 +138,11 @@ class Storage
     {
         // 获取配置参数中的存储引擎，1个或多个
         $_engines = Config::get('attachment.attachment_engine', self::LOCAL);
+
+        // Config::get获取默认值的情况是不存在这个配置项(is_set)，而不是empty或等价于false就返回默认值
+        if (empty($_engines)) {
+            $_engines = self::LOCAL;
+        }
 
         // 半角逗号分隔字符串解析成数组
         if (is_string($_engines)) {
