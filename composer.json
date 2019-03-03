@@ -29,7 +29,8 @@
         "guzzlehttp/guzzle": "6.3.*",
         "jjonline/aliyun-dysms-php-sdk": "2.0",
         "topthink/think-migration": "2.0.*",
-        "aliyuncs/oss-sdk-php": "^2.3"
+        "aliyuncs/oss-sdk-php": "^2.3",
+        "qiniu/php-sdk": "^7.2"
     },
     "require-dev": {
         "topthink/think-testing": "^2.0"

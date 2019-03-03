@@ -47,13 +47,15 @@ abstract class BaseStorage
      * 往存储引擎推送单一文件
      * @param array $attachment 单个资源的信息数组
      * @return bool 推送成功true，推送失败false
+     * @throws \Exception
      */
     abstract public function put($attachment);
 
     /**
      * 从存储引擎获取单一文件前台可访问完整资源url
      * @param array $attachment 单个资源的信息数组
-     * @return string|false 获取成功字符串，获取失败false
+     * @return string 获取成功字符串，获取失败抛出异常
+     * @throws \Exception
      */
     abstract public function get($attachment);
 

@@ -25,11 +25,11 @@ class OssStorage extends BaseStorage
     /**
      * @var OssClient
      */
-    protected $oss_client_frontend;
+    protected $client_frontend;
     /**
      * @var OssClient
      */
-    protected $oss_client_safe;
+    protected $client_safe;
 
     public function __construct()
     {
@@ -57,14 +57,14 @@ class OssStorage extends BaseStorage
     {
         if ($attachment['is_safe']) {
             $this->initSafe();
-            $this->oss_client_safe->uploadFile(
+            $this->client_safe->uploadFile(
                 $this->bucket_safe,
                 $this->generateObject($attachment['file_path']),
                 $this->generateFileDir($attachment['file_path'])
             );
         } else {
             $this->initFrontend();
-            $this->oss_client_frontend->uploadFile(
+            $this->client_frontend->uploadFile(
                 $this->bucket_frontend,
                 $this->generateObject($attachment['file_path']),
                 $this->generateFileDir($attachment['file_path'])
@@ -84,7 +84,7 @@ class OssStorage extends BaseStorage
             $expire_time = Config::get('attachment.attachment_expire_time', 1800);
             try {
                 $this->initSafe();
-                return $this->oss_client_safe->signUrl(
+                return $this->client_safe->signUrl(
                     $this->bucket_safe,
                     $this->generateObject($attachment['file_path']),
                     $expire_time
@@ -132,7 +132,7 @@ class OssStorage extends BaseStorage
      * @param $file_path
      * @return string
      */
-    private function generateObject($file_path)
+    protected function generateObject($file_path)
     {
         return ltrim($file_path, '/');
     }
@@ -142,7 +142,7 @@ class OssStorage extends BaseStorage
      * @param $file_path
      * @return string
      */
-    private function generateFileDir($file_path)
+    protected function generateFileDir($file_path)
     {
         return '.'.$file_path;
     }
@@ -153,17 +153,17 @@ class OssStorage extends BaseStorage
      * @return $this
      * @throws \OSS\Core\OssException
      */
-    private function initFrontend()
+    protected function initFrontend()
     {
-        if (is_null($this->oss_client_frontend)) {
-            $this->oss_client_frontend = new OssClient(
+        if (is_null($this->client_frontend)) {
+            $this->client_frontend = new OssClient(
                 $this->access_key_frontend,
                 $this->access_secret_frontend,
                 $this->domain_frontend ?: $this->endpoint_frontend,
                 !empty($this->domain_frontend) // isCname -- 自定义域名情况下属于cname
             );
             $is_ssl = Config::get('attachment.oss.frontend.is_ssl', false);
-            $this->oss_client_frontend->setUseSSL($is_ssl);
+            $this->client_frontend->setUseSSL($is_ssl);
         }
         return $this;
     }
@@ -174,17 +174,17 @@ class OssStorage extends BaseStorage
      * @return $this
      * @throws \OSS\Core\OssException
      */
-    private function initSafe()
+    protected function initSafe()
     {
-        if (is_null($this->oss_client_safe)) {
-            $this->oss_client_safe = new OssClient(
+        if (is_null($this->client_safe)) {
+            $this->client_safe = new OssClient(
                 $this->access_key_safe,
                 $this->access_secret_safe,
                 $this->domain_safe ?: $this->endpoint_safe,
                 !empty($this->domain_safe) // isCname -- 自定义域名情况下属于cname
             );
             $is_ssl = Config::get('attachment.oss.safe.is_ssl', false);
-            $this->oss_client_safe->setUseSSL($is_ssl);
+            $this->client_safe->setUseSSL($is_ssl);
         }
         return $this;
     }
