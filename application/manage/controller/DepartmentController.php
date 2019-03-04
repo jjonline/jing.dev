@@ -46,7 +46,7 @@ class DepartmentController extends BaseController
     /**
      * 创建部门
      * @param DepartmentService $departmentService
-     * @return array|mixed
+     * @return array|\think\Response
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
@@ -56,29 +56,13 @@ class DepartmentController extends BaseController
         if ($this->request->isPost() && $this->request->isAjax()) {
             return $departmentService->save($this->request);
         }
-        $common = [
-            'title'            => '新增部门 - ' . config('local.site_name'),
-            'content_title'    => '新增部门',
-            'content_subtitle' => '新增部门--即新增公司、公司下部门（系统的部门是一个抽象的概念）',
-            'breadcrumb'       => [
-                ['label' => '系统管理', 'url' => url('department/list')],
-                ['label' => '新增部门', 'url' => ''],
-            ],
-            'load_layout_css'  => false,
-            'load_layout_js'   => true,
-        ];
-        $this->assign($common);
-
-        $dept_list = $departmentService->getDeptTreeList();
-        $this->assign('dept_list', $dept_list);
-
-        return $this->fetch();
+        return $this->renderJson('error', 500);
     }
 
     /**
      * 编辑部门
      * @param DepartmentService $departmentService
-     * @return array|mixed
+     * @return array|\think\Response
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
@@ -88,27 +72,7 @@ class DepartmentController extends BaseController
         if ($this->request->isPost() && $this->request->isAjax()) {
             return $departmentService->save($this->request);
         }
-        $common = [
-            'title'            => '编辑部门 - ' . config('local.site_name'),
-            'content_title'    => '编辑部门',
-            'content_subtitle' => '编辑公司、公司下信息',
-            'breadcrumb'       => [
-                ['label' => '系统管理', 'url' => url('department/list')],
-                ['label' => '编辑部门', 'url' => ''],
-            ],
-            'load_layout_css'  => false,
-            'load_layout_js'   => true,
-        ];
-        $this->assign($common);
-
-        $Dept = $departmentService->Department->getDeptInfoById($this->request->param('id'));
-        if (empty($Dept)) {
-            $this->redirect(url('department/list'));
-        }
-        $dept_list = $departmentService->getDeptTreeList();
-        $this->assign('dept_list', $dept_list);
-        $this->assign('dept', $Dept);
-        return $this->fetch();
+        return $this->renderJson('error', 500);
     }
 
     /**
