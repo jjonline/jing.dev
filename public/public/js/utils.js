@@ -5,10 +5,6 @@
  * @version $Id$
  */
 
-/**
- * utits帮助对象函数
- * @type {Object}
- */
 var utils = {
     /**
      * 检查参数是否为空，是空返回true
@@ -21,12 +17,14 @@ var utils = {
         var reg = /\S+/ig;
         return !reg.test(input);
     },
+
     /**
      * 检查是否数组
      */
     isNumber : function (input) {
         return !utils.isEmpty(input) && !isNaN(input);
     },
+
     /**
      * 获取表单验证令牌值，同名函数getToken
      */
@@ -36,6 +34,7 @@ var utils = {
     getToken: function () {
         return utils.getCsrf();
     },
+
     /**
      * bootbox提示方法封装的提示层
      * @param  message  提示消息文字
@@ -60,6 +59,7 @@ var utils = {
             }
         });
     },
+
     /**
      * layer封装的toast提示层方法，定时自动消失
      * @param message
@@ -75,6 +75,7 @@ var utils = {
             callback && callback();
         },time);
     },
+
     /**
      * 操作确认
      * @param message 提示语
@@ -152,6 +153,7 @@ var utils = {
             }
         });
     },
+
     /**
      * 显示自动消失的提示框
      * @param  str  提示文字
@@ -163,6 +165,7 @@ var utils = {
             utils.hideLoading();
         },time || 3000);
     },
+
     /**
      * 生成随机数字
      * @param min 随机数字最小值
@@ -177,6 +180,7 @@ var utils = {
         var Rand  = Math.random();
         return (params.min + Math.round(Rand * Range));
     },
+
     /**
      * 生成随机字符串
      * @param length 随机字符串的长度
@@ -192,6 +196,7 @@ var utils = {
         }
         return strings;
     },
+
     /**
      * 去除字符串中的所有空白
      * @param strings
@@ -203,6 +208,7 @@ var utils = {
         strings.replace(/(^\s+)|(\s+$)/g,"");
         return strings.replace(/\s/g,"");
     },
+
     /**
      * 检查是否合法邮箱格式
      * @param match
@@ -223,6 +229,7 @@ var utils = {
         }
         return false;
     },
+
     /**
      * 检查是否合法手机号
      * @param match
@@ -238,6 +245,7 @@ var utils = {
         }
         return false;
     },
+
     /**
      * 检查是否为utf8格式的中文
      * @param match
@@ -250,6 +258,7 @@ var utils = {
         }
         return true;
     },
+
     /**
      * 检查是否http或https打头的url
      * @param match
@@ -262,6 +271,12 @@ var utils = {
         }
         return false;
     },
+
+    /**
+     * 检查是否字母和数字构成的密码
+     * @param match
+     * @returns {boolean}
+     */
     isPassWord:function(match) {
         var pcre = /[A-Za-z]+/,num = /\d+/;
         if (pcre.test(match)) {
@@ -272,6 +287,7 @@ var utils = {
         }
         return false;
     },
+
     /**
      * 检查是否全部为字母构成
      * @param match
@@ -284,7 +300,9 @@ var utils = {
         }
         return false;
     },
-    isOpera:typeof opera !== 'undefined' && opera.toString() === '[object Opera]',
+
+    isOpera:typeof opera !== "undefined" && opera.toString() === "[object Opera]",
+
     /**
      * 页面载入Js文件
      * @param src      js文件url
@@ -292,33 +310,33 @@ var utils = {
      * @returns {*}
      */
     loadJs:function (src,callback) {
-        var scripts = document.getElementsByTagName('script');
+        var scripts = document.getElementsByTagName("script");
         for(i in scripts)
         {
             if(scripts[i].src == src)
             {
-                if(typeof callback != 'function')
+                if(typeof callback != "function")
                 {
                     return false;
                 }
                 return callback();
             }
         }
-        var head     = document.getElementsByTagName('head').item(0);
-        var node     = document.createElement('script');
-        node.type    = 'text/javascript';
+        var head     = document.getElementsByTagName("head").item(0);
+        var node     = document.createElement("script");
+        node.type    = "text/javascript";
         node.src     = src;
-        node.charset = 'utf-8';
+        node.charset = "utf-8";
         node.async   = true;
         //addEventListener
-        if(typeof callback == 'function')
+        if(typeof callback == "function")
         {
-            if (node.attachEvent && !(node.attachEvent.toString && node.attachEvent.toString().indexOf('[native code') < 0) && !this.isOpera)
+            if (node.attachEvent && !(node.attachEvent.toString && node.attachEvent.toString().indexOf("[native code") < 0) && !this.isOpera)
             {
-                node.attachEvent('onreadystatechange', callback);
+                node.attachEvent("onreadystatechange", callback);
             }else{
-                node.addEventListener('load', callback, false);
-                node.addEventListener('error', callback, false);
+                node.addEventListener("load", callback, false);
+                node.addEventListener("error", callback, false);
             }
         }
         head.appendChild(node);
@@ -330,35 +348,36 @@ var utils = {
      * @returns {*}
      */
     loadCss:function (href,callback) {
-        var links = document.getElementsByTagName('link');
+        var links = document.getElementsByTagName("link");
         for(i in links)
         {
             if(links[i].href == href)
             {
-                if(typeof callback != 'function')
+                if(typeof callback != "function")
                 {
                     return false;
                 }
                 return callback();
             }
         }
-        var head  = document.getElementsByTagName('head').item(0);
-        var link  = document.createElement('link');
-        link.type = 'text/css';
-        link.rel  = 'stylesheet';
+        var head  = document.getElementsByTagName("head").item(0);
+        var link  = document.createElement("link");
+        link.type = "text/css";
+        link.rel  = "stylesheet";
         link.href = href;
-        if(typeof callback == 'function')
+        if(typeof callback == "function")
         {
             if (link.attachEvent && !(link.attachEvent.toString && link.attachEvent.toString().indexOf('[native code') < 0) && !this.isOpera)
             {
-                link.attachEvent('onreadystatechange', callback);
+                link.attachEvent("onreadystatechange", callback);
             }else{
-                link.addEventListener('load', callback, false);
-                link.addEventListener('error', callback, false);
+                link.addEventListener("load", callback, false);
+                link.addEventListener("error", callback, false);
             }
         }
         head.appendChild(link);
     },
+
     /**
      * 获取窗体尺寸信息
      * @returns {{width: *, w: *, height: *, h: *}}
@@ -380,12 +399,13 @@ var utils = {
             winWidth = document.documentElement.clientWidth;
         }
         return {
-            'width': winWidth,
-            'w': winWidth,
-            'height': winHeight,
-            'h': winHeight
+            "width": winWidth,
+            "w": winWidth,
+            "height": winHeight,
+            "h": winHeight
         };
     },
+
     /**
      * 读取|设置|清理cookie
      * -----
@@ -406,10 +426,11 @@ var utils = {
         /*内部方法--cookie是否存在*/
         function hasCookie(key) {
             var cookieArray=document.cookie.split("; ");
-            var cookie=new Object();
             for (var i=0;i<cookieArray.length;i++){
                 var arr=cookieArray[i].split("=");
-                if(arr[0]==key) return true;
+                if(arr[0]==key) {
+                    return true;
+                }
             }
             return false;
         }
@@ -539,7 +560,6 @@ var utils = {
     /**
      * 检查是否合符天朝规范的身份证号，不是返回false，是返回身份证读取出的信息
      * @param match
-     * @return false|[]
      */
     isID:function(match) {
         var id = match.toUpperCase();//18位身份证中的x为大写
@@ -668,6 +688,30 @@ var utils = {
         });
     },
     /**
+     * 页面顶部显示进度条
+     * @param process_rate 0~100进度条
+     */
+    showProcess:function (process_rate) {
+        var process = $("#utils_process");
+        if (!process.html()) {
+            $("body").prepend("<div id='utils_process' style='position: fixed;width: 100%;top:0;left:0;z-index: 9999;height:3px;'><div id='utils_process_percent' style='height:3px;position:relative;background-color: #0fe848;width:1%;'></div></div>");
+        }
+        $("#utils_process_percent").css("width",process_rate + "%");
+    },
+
+    /**
+     * 隐藏顶部进度条
+     */
+    hideProcess:function () {
+        var process = $("#utils_process");
+        if (process.html()) {
+            setTimeout(function () {
+                $("#utils_process_percent").css("width",0);
+            }, 100);
+        }
+    },
+
+    /**
      * 精简的没有进度条的单个文件ajax上传
      * @param id
      * @param success
@@ -697,6 +741,7 @@ var utils = {
         });
         return false;
     },
+
     /**
      * 绑定带进度条的单个或多个文件上传控件
      * @param id string 待绑定上传input文件框的ID
@@ -722,7 +767,7 @@ var utils = {
          *    </span>
          * </div>
          * -----
-         * Js中调用：utils.bindUploader('input元素的ID',{
+         * Js中调用：utils.bindAjaxUploader('input元素的ID',{
          *      'data':'需在上传时额外附带的key-value对象，一般留空即可',
          *      'success':'文件上传成功后的回调函数，参数为上传后端控制器返回的json',
          *      'error':'文件上传失败后的回调函数，大部分时候不用传，页面会有toast提示',
@@ -731,7 +776,7 @@ var utils = {
          * -----
          */
         var that = $("#" + id);
-        // 提示
+        // tooltip提示
         if(!utils.isEmpty($(that).parent('.upload').html()))
         {
             if(!utils.isEmpty(that.attr('title')))
@@ -741,34 +786,7 @@ var utils = {
                 });
             }
         }
-        /**
-         * 初始化上传进度条内部方法
-         * @param file_name 文件名
-         */
-        var initProcess = function (file_name) {
-            var process_dom = [
-                '<div id="dm-uploader-process">',
-                    '<div class="row">',
-                        '<div class="col-md-12">',
-                            '<div id="dm-uploader-filename">正在上传：'+ file_name || '文件名未知' +'</div>',
-                            '<div id="dm-uploader-percent-container">',
-                                '<div id="dm-uploader-percent-bar" class="bg-primary dm-uploader-percent">',
 
-                                '</div>',
-                            '</div>',
-                        '</div>',
-                    '</div>',
-                '</div>'
-            ].join('');
-            bootbox.dialog({
-                message: process_dom,
-                closeButton:false,
-                //title: '文件上传进度',
-                onEscape: true,
-                //backdrop: true,
-                buttons: {}
-            });
-        };
         // 图片（若是图片）预览，上传进度
         that.dmUploader({
             method:'POST',
@@ -784,23 +802,18 @@ var utils = {
                 // initProcess();
             },
             onUploadProgress:function (id, percent) {
-                if(utils.isEmpty($('#dm-uploader-process').html()))
-                {
-                    initProcess(param.file_name[id]);
-                }
-                $('#dm-uploader-percent-bar').css('width',percent + '%').text(percent+'%');
-                // console.log(percent);
+                utils.showProcess(percent); // 顶部显示进度条
             },
             onUploadSuccess:function (id, data) {
-                $('.bootbox').modal('hide');
+                utils.hideProcess(); // 隐藏进度条
                 param.success && param.success(data);
             },
             onFileExtError:function(file) {
-                $('.bootbox').modal('hide');
+                utils.hideProcess(); // 隐藏进度条
                 param.error && param.error('所选文件后缀有误，允许后缀：' + param.allow_extension.join('、'));
             },
             onUploadError:function (id, xhr, status, errorThrown) {
-                $('.bootbox').modal('hide');
+                utils.hideProcess(); // 隐藏进度条
                 param.error && param.error('上传文件出错');
             }
         });
@@ -814,13 +827,27 @@ var utils = {
 
         // 默认参数和额外参数进行合并
         var param = $.extend({
+            url:'',
             rate:'4/3',//裁剪图的比例
+            title:'图片剪裁',//指定裁剪框的名称
             width:800,//指定裁剪后图片宽度
             height:600,//指定裁剪后图片高度
             extraData:{},//额外塞入上传的post数据体重的filed-value对象数组
             success:function (data) {},//裁剪并上传成功后的回调函数，data参数为服务器返回的json对象
             error:function () {}//裁剪或上传失败的回调函数
         },params);
+
+        var that = $("#" + node_id);
+        // tooltip提示
+        if(!utils.isEmpty($(that).parent('.upload').html()))
+        {
+            if(!utils.isEmpty(that.attr('title')))
+            {
+                $(that).parent('.upload').tooltip({
+                    title:that.attr('title')
+                });
+            }
+        }
 
         // 渲染生成裁剪框
         var dialog_content = [
@@ -847,7 +874,7 @@ var utils = {
                 bootbox.dialog({
                     message: dialog_content,
                     //size:'large',
-                    title: '图片剪裁',
+                    title: param.title || '图片剪裁',
                     onEscape: true,
                     //backdrop: true,
                     buttons: {
@@ -959,7 +986,7 @@ var utils = {
                 },50);
             },
             uploadBlob:function () {
-                url  = '/manage/upload/upload?action=image';
+                url  = param.url || '/manage/upload/upload?action=image';
                 data = param.extraData || {};
                 if(!$('#cut').html())
                 {
