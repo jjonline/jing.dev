@@ -17,9 +17,6 @@ class UploadController extends BaseController
      * 上传文件
      * @param AttachmentService $attachmentService
      * @return mixed
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     public function uploadAction(AttachmentService $attachmentService)
     {
