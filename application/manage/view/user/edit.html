@@ -1,0 +1,138 @@
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-danger">
+            <div class="box-header with-border">
+                <h4 class="box-title">用户信息</h4>
+            </div>
+            <form action="<%{:url('user/edit')}%>" class="form-horizontal" id="userEdit">
+                <div class="box-body">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">真实姓名：</label>
+                        <div class="col-sm-5">
+                            <input type="text" id="real_name" class="form-control" name="User[real_name]" placeholder="账号使用者的真实姓名，不会对外泄露，请务必填写真实姓名" value="<%{$user.real_name}%>">
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="id" name="User[id]" value="<%{$user.id}%>">
+
+                    <div class="form-group" id="gender_container">
+                        <label class="col-sm-2 control-label">性别：</label>
+                        <div class="col-sm-5">
+                            <select name="User[gender]" id="gender" class="form-control select2">
+                                <option value="1"<%{if condition="$user.gender EQ 1"}%> selected="selected"<%{/if}%>>男</option>
+                                <option value="0"<%{if condition="$user.gender EQ 0"}%> selected="selected"<%{/if}%>>女</option>
+                                <option value="-1"<%{if condition="$user.gender EQ -1"}%> selected="selected"<%{/if}%>>未知</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">用户名：</label>
+                        <div class="col-sm-5"><input type="text" id="user_name" class="form-control" name="User[user_name]" placeholder="用户名，用于登录后台的账号，字母和数字构成" value="<%{$user.user_name}%>">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">新登录密码：</label>
+                        <div class="col-sm-5">
+                            <input type="password" id="password" class="form-control" name="User[password]" placeholder="登录密码，6只18位字母和数字构成，不修改请留空">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">手机号：</label>
+                        <div class="col-sm-5">
+                            <input type="text" id="mobile" class="form-control" name="User[mobile]" placeholder="账号使用者的手机号，填写则可作为登录账号，可留空" value="<%{$user.mobile}%>">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">邮箱地址：</label>
+                        <div class="col-sm-5">
+                            <input type="text" id="email" class="form-control" name="User[email]" placeholder="账号使用者的邮箱，填写则可作为登录账号，可留空" value="<%{$user.email}%>">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">座机号码：</label>
+                        <div class="col-sm-5">
+                            <input type="text" id="telephone" class="form-control" name="User[telephone]" placeholder="账号使用者的办公电话等固定电话号码，可留空" value="<%{$user.telephone}%>">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">所属角色：</label>
+                        <div class="col-sm-5">
+                            <select name="User[role_id]" id="role_id" class="form-control select2">
+                                <option value="">--请选择角色--</option>
+                                <%{volist name="role_list" id="_role"}%>
+                                    <option value="<%{$_role.id}%>"<%{if condition="$user.role_id EQ $_role.id"}%> selected="selected"<%{/if}%>><%{$_role.name}%></option>
+                                <%{/volist}%>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="level2_container">
+                        <label class="col-sm-2 control-label">所属部门：</label>
+                        <div class="col-sm-5">
+                            <select name="User[dept_id]" id="dept_id" class="form-control select2">
+                                <option value="">--请选择部门--</option>
+                                <%{volist name="dept_list" id="_dept"}%>
+                                    <option value="<%{$_dept.id}%>"<%{if condition="$user.dept_id EQ $_dept.id"}%> selected="selected"<%{/if}%>><%{$_dept.name_format1|raw}%></option>
+                                <%{/volist}%>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">是否根用户：</label>
+                        <div class="col-sm-5">
+                            <div class="js-switch-container">
+                                <input type="checkbox" id="is_root" name="User[is_root]" data-on-text="是" data-off-text="否"<%{if condition="$user.is_root EQ 1"}%> checked="checked"<%{/if}%><%{if condition="empty(session('user_info.is_root'))"}%> disabled="disabled"<%{/if}%>>
+                                <div class="js-switch-context">根用户永远具备所有菜单权限，仅根用户可选择</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">是否部门领导：</label>
+                        <div class="col-sm-5">
+                            <div class="js-switch-container">
+                                <input type="checkbox" id="is_leader" name="User[is_leader]" title="是" data-on-text="是" data-off-text="否"<%{if condition="$user.is_leader EQ 1"}%> checked="checked"<%{/if}%>>
+                                <div class="js-switch-context">仅仅是一个是否领导标记不标明任何权限</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">是否启用：</label>
+                        <div class="col-sm-5">
+                            <div class="js-switch-container">
+                                <input type="checkbox" id="enable" name="User[enable]" title="是" data-on-text="是" data-off-text="否"<%{if condition="$user.enable EQ 1"}%> checked="checked"<%{/if}%>>
+                                <div class="js-switch-context">选否则禁用用户无法登陆</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">备注信息：</label>
+                        <div class="col-sm-5">
+                            <textarea id="remark" rows=3 class="form-control" name="User[remark]" placeholder="菜单备注信息，便于管理员识别，可留空"><%{$user.remark}%></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <div class="row">
+                        <div class="col-sm-offset-2 col-sm-5"><button type="submit" class="btn btn-success pull-right btn-submit">提交</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var role_list = <%{:json_encode($role_list)}%>;
+    var dept_list = <%{:json_encode($dept_list)}%>;
+</script>

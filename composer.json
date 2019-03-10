@@ -1,0 +1,56 @@
+{
+    "name": "topthink/think",
+    "description": "the new thinkphp framework",
+    "type": "project",
+    "keywords": [
+        "framework",
+        "thinkphp",
+        "ORM"
+    ],
+    "homepage": "http://thinkphp.cn/",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "liu21st",
+            "email": "liu21st@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.0",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "ext-mbstring": "*",
+        "ext-redis": "*",
+        "ext-bcmath": "*",
+        "topthink/framework": "5.1.*",
+        "topthink/think-image": "1.*",
+        "endroid/qr-code": "2.5.0",
+        "zoujingli/wechat-php-sdk": "1.3.*",
+        "guzzlehttp/guzzle": "6.3.*",
+        "jjonline/aliyun-dysms-php-sdk": "2.0",
+        "topthink/think-migration": "2.0.*",
+        "aliyuncs/oss-sdk-php": "^2.3",
+        "qiniu/php-sdk": "^7.2",
+        "upyun/sdk": "^3.3"
+    },
+    "require-dev": {
+        "topthink/think-testing": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "application"
+        }
+    },
+    "extra": {
+        "think-path": "thinkphp"
+    },
+    "config": {
+        "preferred-install": "dist"
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.laravel-china.org"
+        }
+    }
+}

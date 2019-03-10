@@ -1,0 +1,438 @@
+<?php
+/**
+ * 授权Service服务
+ * ---
+ * 1、登录效验
+ * 2、权限菜单效验
+ * ---
+ * @user Jea杨 (JJonline@JJonline.Cn)
+ * @date 2018-02-10 22:34
+ * @file AuthService.php
+ */
+
+namespace app\common\service;
+
+use app\common\helper\ArrayHelper;
+use app\common\model\User;
+use app\common\model\Menu;
+use app\common\model\RoleMenu;
+use app\common\model\Role;
+use think\Exception;
+use think\facade\Cache;
+use think\facade\Config;
+use think\facade\Session;
+use think\facade\Url;
+use think\Request;
+
+class AuthService
+{
+    /**
+     * @var Menu
+     */
+    public $Menu;
+    /**
+     * @var User
+     */
+    public $User;
+    /**
+     * @var Role
+     */
+    public $Role;
+    /**
+     * @var RoleMenu
+     */
+    public $RoleMenu;
+    /**
+     * @var LogService
+     */
+    public $LogService;
+    /**
+     * @var DepartmentService
+     */
+    public $DepartmentService;
+    /**
+     * @var [] 高亮使用的key-value数组
+     */
+    protected $MenuMap = [];
+    /**
+     * @var string 缓存所有部门列表数据的tag标识，可实现按tag标识清理缓存
+     */
+    public $cache_tag = 'auth';
+
+    public function __construct(
+        LogService $logService,
+        User $User,
+        Role $Role,
+        Menu $Menu,
+        RoleMenu $roleMenu,
+        DepartmentService $departmentService
+    ) {
+        $this->User              = $User;
+        $this->DepartmentService = $departmentService;
+        $this->Role              = $Role;
+        $this->Menu              = $Menu;
+        $this->RoleMenu          = $roleMenu;
+        $this->LogService        = $logService;
+    }
+
+    /**
+     * 获取用户管理菜单列表
+     * @return array
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getUserAuthMenu()
+    {
+        $data    = $this->getUserMenuList();
+        $menu    = [];
+        $menu1   = [];
+        $menu2   = [];
+        $menu3   = [];
+        // 导航栏高亮、一级导航默认展开标记处理
+        $highLight = false;//当前高亮的层级
+        $request   = request();
+        $now_url   = $this->generateRequestMenuUrl($request);
+        foreach ($data as $key => $value) {
+            $value['active']    = false;//高亮
+            if ($value['url'] == $now_url) {
+                $value['active'] = true;
+                $highLight       = $value;//当前高亮的菜单
+            }
+            if ($value['level'] == 1) {
+                $value['menu_open'] = false;//仅一级导航栏需要标记是否展开，默认不展开后方设置高亮再处理
+            }
+            // 仅处理三级菜单
+            switch ($value['level']) {
+                case 1:
+                    $menu1[] = $value;
+                    break;
+                case 2:
+                    $menu2[] = $value;
+                    break;
+                case 3:
+                    $menu3[] = $value;
+                    break;
+            }
+            if (empty($value['url'])) {
+                $this->MenuMap[$value['url']] = $value;//以url为键名的数组
+            }
+        }
+        // 按层级处理菜单数组--仅到3级
+        foreach ($menu1 as $key1 => $value1) {
+            // 二级菜单
+            $_menu2 = [];
+            foreach ($menu2 as $key2 => $value2) {
+                // 三级菜单
+                $_menu3 = [];
+                foreach ($menu3 as $key3 => $value3) {
+                    if ($value2['id'] == $value3['parent_id']) {
+                        $_menu3[] = $value3;
+                    }
+                }
+                $value2['children'] = $_menu3;
+
+                if ($value1['id'] == $value2['parent_id']) {
+                    $_menu2[] = $value2;
+                }
+            }
+            $menu[$key1] = $value1;
+            $menu[$key1]['children'] = $_menu2;
+        }
+
+        //dump($menu);exit;
+
+        //dump($this->userHasPermission());
+
+        // 设置高亮
+        $menu = $this->setHighLight($menu, $highLight);
+
+        return $menu;
+    }
+
+    /**
+     * 检查当前用户访问的url或指定url是否有权限
+     * @param string $auth_tag 检查权限的Url或该菜单对应为全局唯一的字符串即菜单的tag字符串，为null则检查当前Url
+     * @return bool
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function userHasPermission($auth_tag = null)
+    {
+        // 未登录直接抛异常终止执行
+        $user_id = Session::get('user_id');
+        if (empty($user_id)) {
+            throw new Exception('未初始化用户登录状态不可调用userHasPermission方法', 500);
+        }
+
+        // 如果未传参则拼接当前url
+        if (empty($auth_tag)) {
+            $request  = request();
+            $auth_tag = $this->generateRequestMenuUrl($request);
+        }
+
+        // 缓存数据的Key
+        $user_menu_cache_Map_key = 'User_menu_cache_Map_key'.$user_id;
+        if (!Config::get('app.app_debug')) {
+            $user_menu_map = Cache::get($user_menu_cache_Map_key);
+            if (!empty($user_menu_map)) {
+                // 查找到缓存 直接从缓存中判断
+                return isset($user_menu_map[$auth_tag]);
+                // return array_key_exists($auth_tag,$user_menu_map);
+            }
+        }
+
+        // 处理菜单数据
+        $user_menu_map = $this->getUserMenuList();
+        if (empty($user_menu_map)) {
+            return false;
+        }
+
+        // 按url和tag分组，url和tag成为数组的键名
+        $user_menu_map1 = ArrayHelper::group($user_menu_map, 'url');
+        $user_menu_map2 = ArrayHelper::group($user_menu_map, 'tag');
+        $user_menu_map  = array_merge($user_menu_map1, $user_menu_map2);
+
+        // 依据开发模式与否将全新Map数组缓存
+        if (!Config::get('app.app_debug')) {
+            Cache::tag($this->cache_tag)->set($user_menu_cache_Map_key, $user_menu_map, 3600 * 12);
+        }
+        return isset($user_menu_map[$auth_tag]);
+        // return array_key_exists($auth_tag,$user_menu_map);
+    }
+
+    /**
+     * 获取指定Url的当前用户的单个菜单的权限信息
+     * --
+     * 大部分时候无参数调用
+     * --
+     * @param string $auth_tag
+     * @return bool
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getUserSingleMenuInfo($auth_tag = null)
+    {
+        if (!$this->userHasPermission($auth_tag)) {
+            throw new Exception('用户无该菜单权限，获取菜单权限信息失败', 500);
+        }
+        $user_id = Session::get('user_id');
+        $request = request();
+        if (empty($auth_tag)) {
+            $auth_tag = $this->generateRequestMenuUrl($request);
+        }
+        $user_menu_cache_Map_key = 'User_menu_cache_Map_key'.$user_id;
+        if (!Config::get('app.app_debug')) {
+            $user_menu_map = Cache::get($user_menu_cache_Map_key);
+        } else {
+            $user_menu_map = $this->getUserMenuList();
+            if (empty($user_menu_map)) {
+                throw new Exception('用户无该菜单权限，获取菜单权限信息失败', 500);
+            }
+            // 按url和tag分组，url和tag成为数组的键名
+            $user_menu_map1 = ArrayHelper::group($user_menu_map, 'url');
+            $user_menu_map2 = ArrayHelper::group($user_menu_map, 'tag');
+            $user_menu_map  = array_merge($user_menu_map1, $user_menu_map2);
+            //依据开发模式与否将全新Map数组缓存
+            if (!Config::get('app.app_debug')) {
+                Cache::tag($this->cache_tag)->set($user_menu_cache_Map_key, $user_menu_map, 3600 * 12);
+            }
+        }
+        // 前方菜单权限已检查通过，此处值绝对存在
+        // 前方按权限标记[url或tag]分组后是二维数组，key为$auth_tag
+        $info = $user_menu_map[$auth_tag][0];
+        if (!empty($info['all_columns'])) {
+            $info['all_columns'] = ArrayHelper::toArray($info['all_columns']);
+        }
+        return $info;
+    }
+
+    /**
+     * 获取用户指定Url的权限标记，即返回：['super','leader','staff','guest']中的一者
+     * @param null $url
+     * @return mixed
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getUserPermissionsTag($url = null)
+    {
+        $menu = $this->getUserSingleMenuInfo($url);
+        return $menu['permissions'];
+    }
+
+    /**
+     * 获取用户的权限菜单列表
+     * ----
+     * 方法体自动判断是否为根用户，若为根用户则获取所有权限
+     * ----
+     * @param int $user_id
+     * @return array
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    protected function getUserMenuList($user_id = null)
+    {
+        // 参数检查过滤
+        $user_id = !empty($user_id) ? $user_id : Session::get('user_id');
+        if (empty($user_id)) {
+            return [];
+        }
+
+        // 依据开发模式自动选择是否启用户菜单缓存
+        $user_menu_cache_key = 'User_Menu_Cache_Origin_key'.$user_id;
+        if (!Config::get('app.app_debug')) {
+            $user_menu = Cache::get($user_menu_cache_key);
+            if (!empty($user_menu)) {
+                return $user_menu;
+            }
+        }
+
+        // 没有缓存或开发模式，智能读取菜单数据并处理
+        $is_root   = $this->User->isRootUser($user_id); // 是否根权限用户
+        $user_menu = $is_root ? $this->getRootUserMenuList($user_id) : $this->getNormalUserMenuList($user_id);
+
+        // 依据是否开发模式将结果集缓存
+        if (!Config::get('app.app_debug')) {
+            Cache::tag($this->cache_tag)->set($user_menu_cache_key, $user_menu, 3600 * 12);//缓存12小时
+        }
+
+        return $user_menu;
+    }
+
+    /**
+     * 设置导航栏高亮属性
+     * @param array $UserAuthMenu 用户所具有的菜单权限数组
+     * @param array $highLight 检测到的当前高亮菜单数组
+     * @return array
+     */
+    protected function setHighLight($UserAuthMenu, $highLight)
+    {
+        if (empty($highLight)) {
+            return $UserAuthMenu;
+        }
+        // 1级高亮
+        if ($highLight['level'] == 1) {
+            foreach ($UserAuthMenu as $key => $value) {
+                if ($value['id'] == $highLight['id']) {
+                    $UserAuthMenu[$key]['menu_open'] = true;
+                    $UserAuthMenu[$key]['active']    = true;
+                }
+            }
+            return $UserAuthMenu;
+        }
+        // 2级高亮
+        if ($highLight['level'] == 2) {
+            foreach ($UserAuthMenu as $key => $value) {
+                if ($value['id'] == $highLight['parent_id']) {
+                    $UserAuthMenu[$key]['menu_open'] = true;
+                    $UserAuthMenu[$key]['active']    = true;
+                }
+            }
+            return $UserAuthMenu;
+        }
+        // 3级高亮
+        if ($highLight['level'] == 3) {
+            foreach ($UserAuthMenu as $key1 => $value1) {
+                // 遍历二级
+                if (!empty($value1['children'])) {
+                    foreach ($value1['children'] as $key2 => $value2) {
+                        // 遍历三级
+                        if (!empty($value2['children'])) {
+                            foreach ($value2['children'] as $key3 => $value3) {
+                                if ($highLight['id'] == $value3['id']) {
+                                    // 1级
+                                    $UserAuthMenu[$key1]['menu_open'] = true;
+                                    $UserAuthMenu[$key1]['active']    = true;
+                                    // 2级
+                                    $UserAuthMenu[$key1]['children'][$key2]['active'] = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return $UserAuthMenu;
+        }
+        // 菜单数据异常，原样返回
+        return $UserAuthMenu;
+    }
+
+    /**
+     * 依据当前模块、控制器、操作生成与菜单权限对应的无斜杠前缀、无文件后缀的Url组成部分
+     * @param Request $request
+     * @return string
+     */
+    protected function generateRequestMenuUrl(Request $request)
+    {
+        $component = $request->module().'/'.$request->controller().'/'.$request->action();
+        return trim(Url::build($component, '', ''), '/');
+    }
+
+    /**
+     * 检查并获取根用户菜单权限列表
+     * @param int $user_id
+     * @return array
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private function getRootUserMenuList($user_id)
+    {
+        // 检查是否根用户，不是的话抛出异常
+        if (!$this->User->isRootUser($user_id)) {
+            throw new Exception('非根用户，不允许获取根菜单权限');
+        }
+        /**
+         * 根用户，从菜单表获取所有菜单并拼接所有菜单权限
+         * ---
+         * 1、读取所有菜单数据
+         * 2、赋予所有菜单super权限
+         * 3、智能转换待选字段为数组
+         * 4、赋予所有待选字段为可显示字段
+         * ---
+         */
+        $menu = $this->Menu->getMenuList();
+        foreach ($menu as $key => $value) {
+            $value['all_columns']       = ArrayHelper::toArray($value['all_columns']); // 待选字段信息
+            $menu[$key]['permissions']  = 'super';
+            $menu[$key]['all_columns']  = $value['all_columns'];
+            $menu[$key]['show_columns'] = $value['all_columns'];
+        }
+        return $menu;
+    }
+
+    /**
+     * 读取非根用户权限列表
+     * @param int $user_id
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private function getNormalUserMenuList($user_id)
+    {
+        $user_menu = $this->RoleMenu->getRoleMenuListByUserId($user_id);
+        /**
+         * 从角色读取角色的菜单权限列表并处理数据
+         * ---
+         * 1、从角色所属菜单读取出角色所拥有的菜单列表
+         * 2、智能转换所有待选字段为数组
+         * 3、智能转所有可显示字段为数组
+         */
+        foreach ($user_menu as $key => $value) {
+            $user_menu[$key]['all_columns']  = ArrayHelper::toArray($value['all_columns']); // 智能转换为数组
+            $user_menu[$key]['show_columns'] = ArrayHelper::toArray($value['show_columns']);// 智能转换为数组
+        }
+        return $user_menu;
+    }
+}

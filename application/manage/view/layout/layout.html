@@ -1,0 +1,46 @@
+<!--Header Begin-->
+<%{include file='layout/header' /}%><%{/*  包含模板布局头 */}%>
+<!--Header End-->
+
+<!--Left Begin-->
+<%{include file='layout/left' /}%><%{/*  包含侧边栏 */}%>
+<!--Left End-->
+
+<!--Content Begin-->
+<div class="content-wrapper">
+    <section class="content-header">
+        <h1>
+            <%{$content_title|default="未命名"}%>
+            <%{if condition="!empty($content_subtitle)"}%><small><%{$content_subtitle}%></small><%{/if}%>
+        </h1>
+        <ol class="breadcrumb">
+            <%{volist name="breadcrumb" id="_breadcrumb"}%>
+                <%{if condition="$key EQ 0"}%>
+                    <li<%{if condition="count($breadcrumb) EQ ($key+1)"}%> class="active"<%{/if}%>>
+                        <%{if condition="!empty($_breadcrumb.url)"}%>
+                            <i class="fa fa-home"></i> <a href="<%{$_breadcrumb.url}%>"><%{$_breadcrumb.label}%></a>
+                        <%{else/}%>
+                            <%{$_breadcrumb.label}%>
+                        <%{/if}%>
+                    </li>
+                <%{else/}%>
+                    <li<%{if condition="count($breadcrumb) EQ ($key+1)"}%> class="active"<%{/if}%>>
+                        <%{if condition="!empty($_breadcrumb.url)"}%>
+                            <a href="<%{$_breadcrumb.url}%>"><%{$_breadcrumb.label}%></a>
+                        <%{else/}%>
+                            <%{$_breadcrumb.label}%>
+                        <%{/if}%>
+                    </li>
+                <%{/if}%>
+            <%{/volist}%>
+        </ol>
+    </section>
+    <section class="content">
+        {__CONTENT__}
+    </section>
+</div>
+<!--Content End-->
+
+<!--Footer Begin-->
+<%{include file='layout/footer' /}%><%{/*  包含侧边栏 */}%>
+<!--Footer End-->

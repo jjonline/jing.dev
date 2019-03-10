@@ -1,0 +1,22 @@
+# 定义 stages
+stages:
+    - test
+    - build
+
+# 定义 job
+test:
+    stage: test
+    script:
+        - echo "I am job1"
+        - echo "I am in test stage"
+    tags:
+        - php
+
+# 定义 job
+build:
+    stage: build
+    script:
+        - echo "I am job2"
+        - echo "I am in build stage"
+    tags:
+        - php

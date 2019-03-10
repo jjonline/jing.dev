@@ -1,0 +1,255 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-solid">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-3">
+                                <div class="has-feedback">
+                                    <input id="txt_search" type="text" class="form-control" placeholder="搜索操作用户、任务标题等">
+                                    <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-3 pull-right">
+                                <div class="btn-group pull-right">
+                                    <button class="btn btn-default search-btn"><i class="fa fa-cog"></i> 高级查询</button>
+                                    <button class="btn btn-default" id="table-refresh" data-toggle="tooltip" title="点击刷新当前列表">
+                                        <i class="fa fa-refresh"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-default" id="table-columns" data-toggle="tooltip" title="点击筛选字段">
+                                        <i class="glyphicon glyphicon-th icon-th"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary">
+            <div class="box-body">
+                <table class="table table-bordered table-striped table-hover display responsive nowrap" cellspacing="0" width="100%" id="table" data-order='[[5,"desc"]]'>
+                    <thead>
+                    <tr>
+                        <th data-priority="1" data-orderable="false">操作用户</th>
+                        <th data-priority="1" data-orderable="false">任务标题</th>
+                        <th data-priority="1" data-orderable="true">任务执行状态</th>
+                        <th data-priority="1" data-orderable="true">任务开始时间</th>
+                        <th data-priority="1" data-orderable="true">任务结束时间</th>
+                        <th data-priority="1" data-orderable="true">任务创建时间</th>
+                        <th data-priority="1" data-orderable="false">部门</th>
+                        <th data-priority="1" style="text-align: center;width:10px" data-orderable="false">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!--查看详情modal Begin-->
+<div class="modal fade" id="DetailModal" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="DetailModalLabel">详情</h4>
+            </div>
+            <div>
+                <div class="nav-tabs-custom">
+                    <div class="tab-content">
+                        <div class="tab-pane active form-horizontal" id="detail-basic">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">操作用户</label>
+                                <div class="col-sm-8">
+                                    <div class="detail_real_name div-detail-row"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">任务标题</label>
+                                <div class="col-sm-8">
+                                    <div class="detail_title div-detail-row"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">任务状态</label>
+                                <div class="col-sm-8">
+                                    <div class="detail_task_status div-detail-row"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">任务开始时间</label>
+                                <div class="col-sm-8">
+                                    <div class="detail_delivery_time div-detail-row"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">任务结束时间</label>
+                                <div class="col-sm-8">
+                                    <div class="detail_finish_time div-detail-row"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">任务创建时间</label>
+                                <div class="col-sm-8">
+                                    <div class="detail_create_time div-detail-row"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">所属部门</label>
+                                <div class="col-sm-8">
+                                    <div class="detail_dept_name div-detail-row"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">执行结果描述</label>
+                                <div class="col-sm-8">
+                                    <div class="detail_result div-detail-row" style="font-size:13px;color:#777"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/.tab-content -->
+                    <div class="box-footer">
+                        <div class="row">
+                            <div class="col-sm-12 text-center">
+                                <button type="button" class="btn btn-info" data-dismiss="modal">关闭</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--查看详情modal End-->
+
+<!--高级查询modal Begin-->
+<div class="modal fade" id="SearchModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="SearchModelLabel">高级查询</h4>
+            </div>
+            <div class="modal-body">
+                <form action="" class="form-horizontal" id="SearchForm">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">归属部门</label>
+                        <div class="col-sm-8">
+                            <select name="dept_id" id="select_dept" class="form-control select2" style="width: 100%;">
+                                <option value="0">--选择归属部门--</option>
+                                <%{volist name="dept_list" id="_dept"}%>
+                                <option value="<%{$_dept.id}%>"><%{$_dept.name_format1|raw}%></option>
+                                <%{/volist}%>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">任务状态</label>
+                        <div class="col-sm-8">
+                            <select name="task_status" id="task_status" class="form-control select2" style="width: 100%;">
+                                <option value="">--选择任务状态--</option>
+                                <option value="0">未执行</option>
+                                <option value="1">正在执行</option>
+                                <option value="2">执行成功</option>
+                                <option value="3">执行失败</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">任务开始时间</label>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="delivery_time_begin"  type="text" class="form-control pull-right advanced_search_date" placeholder="选择起始日期">
+                                <div class="input-group-addon clear-delivery-time-begin-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="delivery_time_end" type="text" class="form-control pull-right advanced_search_date" placeholder="选择结束日期">
+                                <div class="input-group-addon clear-delivery-time-end-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">任务结束时间</label>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="finish_time_begin"  type="text" class="form-control pull-right advanced_search_date" placeholder="选择起始日期">
+                                <div class="input-group-addon clear-finish-time-begin-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="finish_time_end"  type="text" class="form-control pull-right advanced_search_date" placeholder="选择结束日期">
+                                <div class="input-group-addon clear-finish-time-end-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">创建时间</label>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="create_time_begin"  type="text" class="form-control pull-right advanced_search_date" placeholder="选择起始日期">
+                                <div class="input-group-addon clear-create-time-begin-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="create_time_end" type="text" class="form-control pull-right advanced_search_date" placeholder="选择结束日期">
+                                <div class="input-group-addon clear-create-time-end-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="box-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <div class="col-xs-6 text-right">
+                            <button type="button" class="btn btn-default btn-reset">重置</button>
+                        </div>
+                        <div class="col-xs-6 text-left">
+                            <button type="button" class="btn btn-info btn-search">查询</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--高级查询结束-->
