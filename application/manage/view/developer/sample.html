@@ -146,6 +146,9 @@ utils.bindAjaxUploader("file_upload",{
         utils.alert("网络或服务器异常，文件上传失败！");
     }//上传失败的回调函数
 });</pre>
+                <h3>注意事项</h3>
+                    <p>1、php配置文件<code>php.ini</code>中设置项<code>post_max_size</code>、<code>upload_max_filesize</code>共同影响大文件上传，请留意</p>
+                    <p>2、nginx作为服务器时，配置项<code>client_max_body_size</code>也将影响文件上传，请留意</p>
                 </div>
             </div>
             <div class="box-footer clearfix"></div>
