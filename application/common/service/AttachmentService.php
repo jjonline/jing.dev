@@ -11,6 +11,7 @@ namespace app\common\service;
 use app\common\helper\GenerateHelper;
 use app\common\model\Attachment;
 use app\common\storage\Storage;
+use think\Exception;
 use think\File;
 use think\Image;
 use think\Request;
@@ -68,7 +69,7 @@ class AttachmentService
             if (empty($origin_file)) {
                 $file_obj_arr = $request->file();
                 if (empty($file_obj_arr)) {
-                    return ['error_code' => 500,'error_msg' => '未检测到上传的文件，本系统指定的上传文件域为：File'];
+                    throw new Exception('未检测到上传的文件，本系统指定的上传文件域为：File', 500);
                 }
                 // 文件域不为File，自主读取第一个进行处理
                 $origin_file  = array_shift($file_obj_arr);
@@ -92,7 +93,7 @@ class AttachmentService
              */
             if (!isset($allowedExt[$paramDir])) {
                 //上传的类型或参数错误
-                return ['error_code' => 500,'error_msg' => '不允许上传的文件类型：'.$file_ext];
+                throw new Exception('不允许上传的文件类型：'.$file_ext, 500);
             }
 
             /**
@@ -106,7 +107,7 @@ class AttachmentService
                 //限定了文件类型
                 $extension = strtolower(pathinfo($exist_attachment['file_path'], PATHINFO_EXTENSION));
                 if (!in_array($extension, $allowedExt[$paramDir])) {
-                    return ['error_code' => 500,'error_msg' => '不允许上传的文件后缀：'.$extension];
+                    throw new Exception('不允许上传的文件后缀：'.$extension, 500);
                 }
 
                 // 处理资源信息成前端可直接使用的信息数组
@@ -120,8 +121,8 @@ class AttachmentService
              */
             $saveDir = './uploads/'.$paramDir.'/'.date('Y').'/';
             $file    = $origin_file->validate(['ext' => $allowedExt[$paramDir]])
-                ->rule('sha1')
-                ->move($saveDir);
+                     ->rule('sha1')
+                     ->move($saveDir);
             if (!$file) {
                 return ['error_code' => 500, 'error_msg' => $origin_file->getError()];
             }
