@@ -297,7 +297,7 @@ class AuthService
         }
 
         // 没有缓存或开发模式，智能读取菜单数据并处理
-        $is_root   = $this->User->isRootUser($user_id); // 是否根权限用户
+        $is_root   = $this->isRootUser(); // 是否根权限用户
         $user_menu = $is_root ? $this->getRootUserMenuList($user_id) : $this->getNormalUserMenuList($user_id);
 
         // 依据是否开发模式将结果集缓存
@@ -389,7 +389,7 @@ class AuthService
     private function getRootUserMenuList($user_id)
     {
         // 检查是否根用户，不是的话抛出异常
-        if (!$this->User->isRootUser($user_id)) {
+        if (!$this->isRootUser($user_id)) {
             throw new Exception('非根用户，不允许获取根菜单权限');
         }
         /**
@@ -434,5 +434,22 @@ class AuthService
             $user_menu[$key]['show_columns'] = ArrayHelper::toArray($value['show_columns']);// 智能转换为数组
         }
         return $user_menu;
+    }
+
+    /**
+     * 当前登录用户是否为根用户
+     * ---
+     * 如果未传user_id参数则直接读取session返回
+     * 如果传了则从数据库读取
+     * ---
+     * @param int $user_id
+     * @return bool
+     */
+    private function isRootUser($user_id = null)
+    {
+        if (empty($user_id)) {
+            return !!Session::get('user_info.is_root');
+        }
+        return $this->User->isRootUser($user_id);
     }
 }
