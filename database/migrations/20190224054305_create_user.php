@@ -3,7 +3,6 @@
  * 创建用户表
  */
 use think\migration\Migrator;
-use think\migration\db\Column;
 use Phinx\Db\Adapter\MysqlAdapter;
 
 class CreateUser extends Migrator
@@ -72,12 +71,6 @@ class CreateUser extends Migrator
                     'null'    => false,
                     'comment' => '授权code，用于cookie加密(可变)',
                 ])
-                ->addColumn('is_leader', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY,
-                    'default' => '0',
-                    'null'    => false,
-                    'comment' => '是否本部门的领导：1是0不是 用于直属部门内部审批、数据权限等识别',
-                ])
                 ->addColumn('dept_id', 'integer', [
                     'default' => '0',
                     'null'    => false,
@@ -87,6 +80,18 @@ class CreateUser extends Migrator
                     'default' => '0',
                     'null'    => false,
                     'comment' => '所属角色ID',
+                ])
+                ->addColumn('is_leader', 'integer', [
+                    'limit'   => MysqlAdapter::INT_TINY,
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => '是否本部门的领导：1是0不是',
+                ])
+                ->addColumn('is_root', 'integer', [
+                    'limit'   => MysqlAdapter::INT_TINY,
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => '是否为根用户：1是0不是[根用户不受角色限制永远具备所有菜单的所有权限，只有根用户才能创建根用户]',
                 ])
                 ->addColumn('enable', 'integer', [
                     'limit'   => MysqlAdapter::INT_TINY,
