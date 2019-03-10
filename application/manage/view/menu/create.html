@@ -75,32 +75,36 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">是否必选：</label>
                         <div class="col-sm-5">
-                            <div class="js-switch-container" data-toggle="tooltip" title="必选的公用菜单选是">
-                                <input type="checkbox" id="is_required" name="Menu[is_required]" title="是" data-on-text="是" data-off-text="否">
+                            <div class="js-switch-container">
+                                <input type="checkbox" id="is_required" name="Menu[is_required]" data-on-text="是" data-off-text="否">
+                                <div class="js-switch-context">是否为必选的公用菜单</div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">是否badge：</label>
                         <div class="col-sm-5">
-                            <div class="js-switch-container" data-toggle="tooltip" title="该菜单是否需要badge小红点统计功能">
-                                <input type="checkbox" id="is_badge" name="Menu[is_badge]" title="是" data-on-text="是" data-off-text="否">
+                            <div class="js-switch-container">
+                                <input type="checkbox" id="is_badge" name="Menu[is_badge]" data-on-text="是" data-off-text="否">
+                                <div class="js-switch-context">是否需要在菜单导航上显示badge小红点统计</div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">是否系统菜单：</label>
                         <div class="col-sm-5">
-                            <div class="js-switch-container" data-toggle="tooltip" title="选是菜单列表不显示删除按钮，即不可直接删除">
-                                <input type="checkbox" id="is_system" name="Menu[is_system]" title="是" data-on-text="是" data-off-text="否">
+                            <div class="js-switch-container">
+                                <input type="checkbox" id="is_system" name="Menu[is_system]" data-on-text="是" data-off-text="否">
+                                <div class="js-switch-context">选是菜单列表不显示删除按钮即不可删除</div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">是否数据权限控制：</label>
                         <div class="col-sm-5">
-                            <div class="js-switch-container" data-toggle="tooltip" title="该菜单是否需要依据部门层级显示全部、部门或个人的数据，选是则在定制角色时需要选择角色的数据范围">
-                                <input type="checkbox" id="is_permissions" name="Menu[is_permissions]" title="是" data-on-text="是" data-off-text="否">
+                            <div class="js-switch-container">
+                                <input type="checkbox" id="is_permissions" name="Menu[is_permissions]" data-on-text="是" data-off-text="否">
+                                <div class="js-switch-context">是否在角色中限定查看数据的范围：全部、部门和个人、仅个人、游客</div>
                             </div>
                         </div>
                     </div>
@@ -113,8 +117,9 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">是否控制字段显示：</label>
                         <div class="col-sm-5">
-                            <div class="js-switch-container" data-toggle="tooltip" title="该菜单是否需要定制不同角色显示不同字段，选是则要完善该菜单下的所有待选字段">
-                                <input type="checkbox" id="is_column" name="Menu[is_column]" title="是" data-on-text="是" data-off-text="否">
+                            <div class="js-switch-container">
+                                <input type="checkbox" id="is_column" name="Menu[is_column]" data-on-text="是" data-off-text="否">
+                                <div class="js-switch-context">是否需要定制不同角色菜单页面里的列表中显示不同字段</div>
                             </div>
                         </div>
                     </div>

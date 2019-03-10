@@ -125,4 +125,17 @@ class User extends Model
         $_user['auth_code'] = GenerateHelper::makeNonceStr(8);
         return $this->update($_user, ['id' => $user_id]);
     }
+
+    /**
+     * 指定用户是否为根用户
+     * @param $user_id
+     * @return bool
+     */
+    public function isRootUser($user_id)
+    {
+        if (empty($user_id)) {
+            return false;
+        }
+        return !!$this->where('id', $user_id)->value('is_root');
+    }
 }

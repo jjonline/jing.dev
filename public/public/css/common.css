@@ -368,6 +368,16 @@ tr.selected>td {}
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+/*js-switch-container*/
+.js-switch-container {
+    position: relative;
+}
+.js-switch-context {
+    display: inline-block;
+    line-height: 34px;
+    font-size:12px;
+    color:#999;
+}
 
 /*notification*/
 .notification {

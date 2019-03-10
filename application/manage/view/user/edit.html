@@ -87,10 +87,21 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="col-sm-2 control-label">是否根用户：</label>
+                        <div class="col-sm-5">
+                            <div class="js-switch-container">
+                                <input type="checkbox" id="is_root" name="User[is_root]" data-on-text="是" data-off-text="否"<%{if condition="$user.is_root EQ 1"}%> checked="checked"<%{/if}%><%{if condition="empty(session('user_info.is_root'))"}%> disabled="disabled"<%{/if}%>>
+                                <div class="js-switch-context">根用户永远具备所有菜单权限，仅根用户可选择</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label class="col-sm-2 control-label">是否部门领导：</label>
                         <div class="col-sm-5">
                             <div class="js-switch-container">
                                 <input type="checkbox" id="is_leader" name="User[is_leader]" title="是" data-on-text="是" data-off-text="否"<%{if condition="$user.is_leader EQ 1"}%> checked="checked"<%{/if}%>>
+                                <div class="js-switch-context">仅仅是一个是否领导标记不标明任何权限</div>
                             </div>
                         </div>
                     </div>
@@ -100,6 +111,7 @@
                         <div class="col-sm-5">
                             <div class="js-switch-container">
                                 <input type="checkbox" id="enable" name="User[enable]" title="是" data-on-text="是" data-off-text="否"<%{if condition="$user.enable EQ 1"}%> checked="checked"<%{/if}%>>
+                                <div class="js-switch-context">选否则禁用用户无法登陆</div>
                             </div>
                         </div>
                     </div>

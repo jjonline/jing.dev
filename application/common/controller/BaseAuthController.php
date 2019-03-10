@@ -17,6 +17,7 @@ use think\Container;
 use app\common\service\AuthService;
 use app\common\service\UserService;
 use app\common\service\DepartmentService;
+use think\Exception;
 use think\exception\HttpResponseException;
 use think\Response;
 use think\facade\Session;
@@ -42,64 +43,100 @@ class BaseAuthController extends BasicController
 
     /**
      * 初始化认证、鉴权
-     * @throws
+     * @return void
      */
     protected function initialize()
     {
         parent::initialize();
-        //初始化用户服务、权限效验服务、操作日志服务
-        $this->UserService       = Container::get('app\common\service\UserService');
-        $this->AuthService       = Container::get('app\common\service\AuthService');
-        $this->DepartmentService = Container::get('app\common\service\DepartmentService');
-        /**
-         * @var [] 不需要登录状态即可渲染的控制器和不需要验证权限的公共ajax控制器，所有模块下的site、common两个控制器不做菜单权限检查和登录效验
-         */
-        $except_controller = ['site','common'];
-        if (in_array(strtolower($this->request->controller()), $except_controller)) {
-            return true;
-        }
-        // 检查是否登录
-        if (!$this->isUserLogin()) {
-            // ajax请求返回json 非ajax跳转至登录页面
-            if ($this->request->isAjax()) {
-                $response = Response::create(['error_code' => -1,'error_msg' => '您尚未登录，请保留好编辑的内容后刷新页面~'], 'json');
-                //抛出异常并输出，终止后续业务代码执行
-                throw new HttpResponseException($response);
-            } else {
-                //跳转隐式抛出异常，终止后续业务代码执行
-                $this->redirect('site/login');
+        try {
+            //初始化用户服务、权限效验服务、操作日志服务
+            $this->UserService       = Container::get('app\common\service\UserService');
+            $this->AuthService       = Container::get('app\common\service\AuthService');
+            $this->DepartmentService = Container::get('app\common\service\DepartmentService');
+
+            /**
+             * @var [] 不需要登录状态即可渲染的控制器和不需要验证权限的公共ajax控制器
+             * ---
+             * 所有模块下的site|common两个控制器不做菜单权限检查和登录效验 直接跳过
+             * ---
+             */
+            $except_controller = ['site','common'];
+            if (in_array(strtolower($this->request->controller()), $except_controller)) {
+                return;
             }
-        }
-        // 检查权限
-        if (!$this->AuthService->userHasPermission()) {
-            $response = app('response');//读取单例
-            $response->code(404);
-            $this->view->engine->layout(false);//关闭layout 防止死循环
+
+            // 检查是否登录
+            if (!$this->isUserLogin()) {
+                throw new Exception('您尚未登录，请保留好编辑的内容后刷新页面', -1);
+            }
+
+            // 检查权限
+            if (!$this->AuthService->userHasPermission()) {
+                throw new Exception('抱歉，您没有操作该页面的权限！', 404);
+            }
+
+            // 初始化User属性
+            $this->UserInfo              = Session::get('user_info');
+            // 当前菜单权限的一些信息
+            $this->UserInfo['menu_auth'] = $this->AuthService->getUserSingleMenuInfo();
+            // 会员可操作的部门列表信息
+            $this->UserInfo['dept_auth'] = $this->DepartmentService->getAuthDeptInfoByDeptId(
+                $this->UserInfo['dept_id']
+            );
+
+            // 获取管理菜单
+            $UserAuthMenu                = $this->AuthService->getUserAuthMenu();
+            // dump($UserAuthMenu);
+            // 输出管理菜单
+            $this->assign('UserAuthMenu', $UserAuthMenu);
+        } catch (\Throwable $e) {
+            /**
+             * 未登录ajax则ajax返回-1，其他则redirect跳转
+             * ---
+             * 1、依据是否ajax，ajax响应code为-1的相应
+             * 2、非ajax则直接重定向到登录页面
+             * ---
+             */
+            if ($e->getCode() == -1) {
+                if ($this->request->isAjax()) {
+                    $response = Response::create([
+                        'error_code' => -1,
+                        'error_msg'  => $e->getMessage()
+                    ], 'json');
+
+                    // 抛出HttpResponseException异常并输出，终止后续业务代码执行
+                    throw new HttpResponseException($response);
+                } else {
+                    // 跳转隐式抛出HttpResponseException异常，终止后续业务代码执行
+                    $this->redirect('site/login');
+                }
+            }
+
+            /**
+             * 没有权限等其他异常
+             * ----
+             * 1、关闭模板布局
+             * 2、依据是否ajax请求做出不同的响应
+             * ----
+             */
+            $this->view->engine->layout(false); // 关闭layout 防止死循环
             if ($this->request->isAjax()) {
-                $response = Response::create(['error_code' => -1,'error_msg' => '没有操作权限'], 'json');
+                $response = Response::create([
+                    'error_code' => -1,
+                    'error_msg'  => '没有操作权限'
+                ], 'json');
             } else {
-                $error = $this->fetch('../application/common/view/error.html', [
+                $response = app('response'); // 读取单例构造html响应内容
+                $error    = $this->fetch('../application/common/view/error.html', [
                     'title' => '没有操作权限',
-                    'msg'   => '抱歉，您没有操作该页面的权限！'
+                    'msg'   => $e->getMessage()
                 ]);
+                $response->code(404);
                 $response->data($error);
             }
-            //抛出异常并输出，终止后续业务代码执行
+            // 抛出HttpResponseException异常并输出，终止后续业务代码执行
             throw new HttpResponseException($response);
         }
-        // 初始化User属性
-        $this->UserInfo              = Session::get('user_info');
-        // 当前菜单权限的一些信息
-        $this->UserInfo['menu_auth'] = $this->AuthService->getUserSingleMenuInfo();
-        // 会员可操作的部门列表信息
-        $this->UserInfo['dept_auth'] = $this->DepartmentService->getAuthDeptInfoByDeptId(
-            $this->UserInfo['dept_id']
-        );
-        // 获取管理菜单
-        $UserAuthMenu                = $this->AuthService->getUserAuthMenu();
-        //dump($UserAuthMenu);
-        // 输出管理菜单
-        $this->assign('UserAuthMenu', $UserAuthMenu);
     }
 
     /**

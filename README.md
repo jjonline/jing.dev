@@ -10,7 +10,7 @@
 > 
 > Redis缓存
 
-本地开发地址：https://component.jing.dev/
+本地开发地址：https://component.jing.dev/manage
 
 ### 开发说明
 

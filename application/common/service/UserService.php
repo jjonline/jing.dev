@@ -207,9 +207,23 @@ class UserService
         if (!in_array($exist_user['dept_id'], $act_user_info['dept_auth']['dept_id_vector'])) {
             return ['error_code' => 400,'error_msg' => '您无权限编辑该用户的信息'];
         }
+        // 被编辑的是根用户，当前用户非根用户
+        $is_root = !!Session::get('user_info.is_root');
+        if ($exist_user['is_root'] && !$is_root) {
+            return ['error_code' => 400,'error_msg' => '您不是根用户，不能编辑根用户'];
+        }
 
         // 收集修改编辑过的item
         $update_user = [];
+
+        // 是否创建为根用户判断处理
+        if (!empty($_user['is_root'])) {
+            if (!$is_root) {
+                return ['error_code' => 400,'error_msg' => '您不是根用户，不能创建根用户'];
+            }
+            $update_user['is_root'] = 1;
+        }
+
         // 修改用户名
         if ($_user['user_name'] != $exist_user['user_name']) {
             $repeat = $this->User->getUserInfoByUserName(trim($_user['user_name']));
@@ -335,11 +349,21 @@ class UserService
         try {
             // 自动检测生成新用户信息
             $user              = $this->generateNewUserInfo($_user);
+
             // 补充座机和是否领导以及是否启用
             $user['telephone'] = !empty($_user['telephone']) ? $_user['telephone'] : '';
             $user['is_leader'] = !empty($_user['is_leader']) ? 1 : 0;
             $user['enable']    = !empty($_user['enable']) ? 1 : 0;
             $user['auth_code'] = GenerateHelper::makeNonceStr(8);
+
+            // 是否创建为根用户判断处理
+            if (!empty($_user['is_root'])) {
+                if (!Session::get('user_info.is_root')) {
+                    throw new Exception('您不是根用户，不能创建根用户');
+                }
+                $user['is_root'] = 1;
+            }
+
             $result = $this->User->isUpdate(false)->save($user);
             if (false !== $result) {
                 $this->LogService->logRecorder([$_user,$user], '单独新增后台用户');

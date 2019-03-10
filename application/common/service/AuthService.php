@@ -78,6 +78,7 @@ class AuthService
     /**
      * 获取用户管理菜单列表
      * @return array
+     * @throws Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
@@ -153,8 +154,11 @@ class AuthService
     /**
      * 检查当前用户访问的url或指定url是否有权限
      * @param string $auth_tag 检查权限的Url或该菜单对应为全局唯一的字符串即菜单的tag字符串，为null则检查当前Url
-     * @throws
      * @return bool
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function userHasPermission($auth_tag = null)
     {
@@ -265,28 +269,24 @@ class AuthService
 
     /**
      * 获取用户的权限菜单列表
-     * @param string $user_id 可选的用户id，留空则获取当前登录用户
-     * @return array|mixed
+     * ----
+     * 方法体自动判断是否为根用户，若为根用户则获取所有权限
+     * ----
+     * @param int $user_id
+     * @return array
+     * @throws Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getUserMenuList($user_id = null)
+    protected function getUserMenuList($user_id = null)
     {
-        $user_id   = !empty($user_id) ? $user_id : Session::get('user_id');
+        // 参数检查过滤
+        $user_id = !empty($user_id) ? $user_id : Session::get('user_id');
         if (empty($user_id)) {
             return [];
         }
-        // 开发者账号，显示所有菜单具有所有超级权限
-        if ($user_id === 1) {
-            $data = $this->Menu->getMenuList();
-            foreach ($data as $key => $value) {
-                $data[$key]['permissions']  = 'super';
-                $data[$key]['all_columns']  = ArrayHelper::toArray($value['all_columns']);
-                $data[$key]['show_columns'] = $data[$key]['all_columns'];
-            }
-            return $data;
-        }
+
         // 依据开发模式自动选择是否启用户菜单缓存
         $user_menu_cache_key = 'User_Menu_Cache_Origin_key'.$user_id;
         if (!Config::get('app.app_debug')) {
@@ -295,15 +295,16 @@ class AuthService
                 return $user_menu;
             }
         }
-        $user_menu = $this->RoleMenu->getRoleMenuListByUserId($user_id);
-        foreach ($user_menu as $key => $value) {
-            $user_menu[$key]['all_columns']  = ArrayHelper::toArray($value['all_columns']);
-            $user_menu[$key]['show_columns'] = ArrayHelper::toArray($value['show_columns']);
-        }
-        // 将结果集缓存
+
+        // 没有缓存或开发模式，智能读取菜单数据并处理
+        $is_root   = $this->User->isRootUser($user_id); // 是否根权限用户
+        $user_menu = $is_root ? $this->getRootUserMenuList($user_id) : $this->getNormalUserMenuList($user_id);
+
+        // 依据是否开发模式将结果集缓存
         if (!Config::get('app.app_debug')) {
             Cache::tag($this->cache_tag)->set($user_menu_cache_key, $user_menu, 3600 * 12);//缓存12小时
         }
+
         return $user_menu;
     }
 
@@ -374,5 +375,64 @@ class AuthService
     {
         $component = $request->module().'/'.$request->controller().'/'.$request->action();
         return trim(Url::build($component, '', ''), '/');
+    }
+
+    /**
+     * 检查并获取根用户菜单权限列表
+     * @param int $user_id
+     * @return array
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private function getRootUserMenuList($user_id)
+    {
+        // 检查是否根用户，不是的话抛出异常
+        if (!$this->User->isRootUser($user_id)) {
+            throw new Exception('非根用户，不允许获取根菜单权限');
+        }
+        /**
+         * 根用户，从菜单表获取所有菜单并拼接所有菜单权限
+         * ---
+         * 1、读取所有菜单数据
+         * 2、赋予所有菜单super权限
+         * 3、智能转换待选字段为数组
+         * 4、赋予所有待选字段为可显示字段
+         * ---
+         */
+        $menu = $this->Menu->getMenuList();
+        foreach ($menu as $key => $value) {
+            $value['all_columns']       = ArrayHelper::toArray($value['all_columns']); // 待选字段信息
+            $menu[$key]['permissions']  = 'super';
+            $menu[$key]['all_columns']  = $value['all_columns'];
+            $menu[$key]['show_columns'] = $value['all_columns'];
+        }
+        return $menu;
+    }
+
+    /**
+     * 读取非根用户权限列表
+     * @param int $user_id
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private function getNormalUserMenuList($user_id)
+    {
+        $user_menu = $this->RoleMenu->getRoleMenuListByUserId($user_id);
+        /**
+         * 从角色读取角色的菜单权限列表并处理数据
+         * ---
+         * 1、从角色所属菜单读取出角色所拥有的菜单列表
+         * 2、智能转换所有待选字段为数组
+         * 3、智能转所有可显示字段为数组
+         */
+        foreach ($user_menu as $key => $value) {
+            $user_menu[$key]['all_columns']  = ArrayHelper::toArray($value['all_columns']); // 智能转换为数组
+            $user_menu[$key]['show_columns'] = ArrayHelper::toArray($value['show_columns']);// 智能转换为数组
+        }
+        return $user_menu;
     }
 }
