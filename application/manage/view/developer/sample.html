@@ -36,6 +36,8 @@
             // 取消选中被触发
         }
 });</pre>
+            <h3>后端说明：</h3>
+                <p>开关组件按钮被选中，<code>serializeArray</code>方法提交后，后端获取到的数据是以checkbox的<code>name</code>为键，值为<code>on</code>，若是数组形式的name则是数组；若未选中则没有该键名的参数。</p>
             </div>
         </div>
         <div class="box-footer clearfix"></div>
