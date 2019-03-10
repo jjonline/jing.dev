@@ -1,0 +1,44 @@
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="box box-danger">
+        <div class="box-header with-border">
+            <h3 class="box-title"><b>js-switch开关组件</b></h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <p>需要使用开关按钮组件，使用Html结构即可：</p>
+            <h3>效果示例：</h3>
+            <div class="col-sm-12 sample-container">
+                <div class="js-switch-container">
+                    <input type="checkbox" id="is_root" name="User[is_root]" data-on-text="是" data-off-text="否">
+                    <div class="js-switch-context">开关功能简要说明，不宜过长</div>
+                </div>
+            </div>
+            <h3>html代码：</h3>
+            <pre class="prettyprint lang-html linenums">&lt;div class="js-switch-container"&gt;
+    &lt;input type="checkbox" id="is_root" name="User[is_root]" data-on-text="是" data-off-text="否"&gt;
+    &lt;div class="js-switch-context"&gt;开关功能简要说明，不宜过长&lt;/div&gt;
+&lt;/div&gt;</pre>
+            <h3>使用说明：</h3>
+            <p>1、默认选中<code>checkbox</code>标签添加<code>checked="checked"</code></p>
+            <p>2、禁用<code>checkbox</code>标签添加<code>disabled="disabled"</code></p>
+            <p>3、获取选中状态js代码<code>$("#is_root").prop("checked")</code>，返回bool值</p>
+            <p>4、绑定事件js代码</p>
+            <div class="col-sm-12">
+                <pre class="prettyprint lang-js linenums">$("#is_root").on("switchChange.bootstrapSwitch",function (e,isCheck) {
+        if (isCheck) {
+            // 选中被触发
+        } else {
+            // 取消选中被触发
+        }
+});</pre>
+            </div>
+        </div>
+        <div class="box-footer clearfix"></div>
+    </div>
+</div>
+<script src="__PUBLIC__/plugin/code/prettify.js" type="text/javascript"></script>
