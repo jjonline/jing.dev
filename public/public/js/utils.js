@@ -752,9 +752,9 @@ var utils = {
             url:'',//上传文件后端Url，留空则为/manage/upload/upload?origin=ajax
             allow_extension: null,//null不限制、需限制时使用数组 ['jpg','jpeg']
             multiple:true,//是否允许选择多张图，默认允许多张
-            error:function () {},//上传成功的回调函数
-            success:function () {},//上传失败的回调函数
-            data: {} //上传控制器额外附带的key-value
+            error:function () {},//上传失败的回调函数
+            success:function () {},//上传成功的回调函数
+            extraData: {} //上传控制器额外附带的key-value
         },_param);
         param.file_name = [];//初始化内部变量
         /**
@@ -791,7 +791,7 @@ var utils = {
         that.dmUploader({
             method:'POST',
             fieldName:'File',
-            extraData:param.data,
+            extraData:param.extraData,
             extFilter:param.allow_extension ? param.allow_extension : null,
             multiple:!!param.multiple,
             url:param.url ?  param.url : '/manage/upload/upload?origin=ajax',

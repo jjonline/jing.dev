@@ -50,130 +50,134 @@ class AttachmentService
      */
     public function uploadFile(Request $request)
     {
-        /**
-         * 上传文件的允许类型
-         */
-        $paramDir       =   $request->param('file_type');
-        $allowedExt     =   array(
-            'image' =>  array('gif', 'jpg', 'jpeg', 'png', 'bmp'),
-            'flash' =>  array('swf', 'flv'),
-            'media' =>  array('swf', 'flv', 'mp4'),//媒体类型 仅允许该三种
-            'file'  =>  array('csv','doc', 'docx', 'xls', 'xlsx', 'ppt', 'pdf', 'txt', 'zip', 'rar', 'gz', 'bz2','7z'),
-            'music' =>  array('mp3','mp4','m4a','amr'),// 媒体语音音乐类型
-        );
+        try {
+            /**
+             * 上传文件的允许类型
+             */
+            $paramDir       =   $request->param('file_type');
+            $allowedExt     =   array(
+                'image' =>  ['gif', 'jpg', 'jpeg', 'png', 'bmp'],
+                'flash' =>  ['swf', 'flv'],
+                'media' =>  ['swf', 'flv', 'mp4'],//媒体类型 仅允许该三种
+                'file'  =>  ['csv','doc', 'docx', 'xls', 'xlsx', 'ppt', 'pdf', 'txt', 'zip', 'rar', 'gz', 'bz2','7z'],
+                'music' =>  ['mp3','mp4','m4a','amr'],// 媒体语音音乐类型
+            );
 
-        /**
-         * 处理文件上传域，系统默认为单个File
-         * 文件域不为File，自主读取第一个文件域进行处理
-         */
-        $origin_file = $request->file('File');
-        if (empty($origin_file)) {
-            $file_obj_arr = $request->file();
-            if (empty($file_obj_arr)) {
-                return ['error_code' => 500,'error_msg' => '未检测到上传的文件，本系统指定的上传文件域为：File'];
+            /**
+             * 处理文件上传域，系统默认为单个File
+             * 文件域不为File，自主读取第一个文件域进行处理
+             */
+            $origin_file = $request->file('File');
+            if (empty($origin_file)) {
+                $file_obj_arr = $request->file();
+                if (empty($file_obj_arr)) {
+                    return ['error_code' => 500,'error_msg' => '未检测到上传的文件，本系统指定的上传文件域为：File'];
+                }
+                // 文件域不为File，自主读取第一个进行处理
+                $origin_file  = array_shift($file_obj_arr);
             }
-            // 文件域不为File，自主读取第一个进行处理
-            $origin_file  = array_shift($file_obj_arr);
-        }
 
-        /**
-         * 获取上传文件的后缀
-         */
-        $file_ext = strtolower(pathinfo($origin_file->getInfo('name'), PATHINFO_EXTENSION));
-        if (empty($paramDir)) {
-            foreach ($allowedExt as $key => $value) {
-                if (in_array($file_ext, $value)) {
-                    $paramDir = $key;
-                    break;
+            /**
+             * 获取上传文件的后缀
+             */
+            $file_ext = strtolower(pathinfo($origin_file->getInfo('name'), PATHINFO_EXTENSION));
+            if (empty($paramDir)) {
+                foreach ($allowedExt as $key => $value) {
+                    if (in_array($file_ext, $value)) {
+                        $paramDir = $key;
+                        break;
+                    }
                 }
             }
-        }
 
-        /**
-         * 初步检查文件后缀要求是否通过
-         */
-        if (!isset($allowedExt[$paramDir])) {
-            //上传的类型或参数错误
-            return ['error_code' => 500,'error_msg' => '不允许上传的文件类型：'.$file_ext];
-        }
-
-        /**
-         * 检查用户级别的资源重复
-         * ---
-         * 若已上传过则直接返回
-         * ---
-         */
-        $exist_attachment = $this->Attachment->getAttachmentByUserFileSha1($origin_file->hash('sha1'));
-        if (!empty($exist_attachment)) {
-            //限定了文件类型
-            $extension = strtolower(pathinfo($exist_attachment['file_path'], PATHINFO_EXTENSION));
-            if (!in_array($extension, $allowedExt[$paramDir])) {
-                return ['error_code' => 500,'error_msg' => '不允许上传的文件后缀：'.$extension];
+            /**
+             * 初步检查文件后缀要求是否通过
+             */
+            if (!isset($allowedExt[$paramDir])) {
+                //上传的类型或参数错误
+                return ['error_code' => 500,'error_msg' => '不允许上传的文件类型：'.$file_ext];
             }
+
+            /**
+             * 检查用户级别的资源重复
+             * ---
+             * 若已上传过则直接返回
+             * ---
+             */
+            $exist_attachment = $this->Attachment->getAttachmentByUserFileSha1($origin_file->hash('sha1'));
+            if (!empty($exist_attachment)) {
+                //限定了文件类型
+                $extension = strtolower(pathinfo($exist_attachment['file_path'], PATHINFO_EXTENSION));
+                if (!in_array($extension, $allowedExt[$paramDir])) {
+                    return ['error_code' => 500,'error_msg' => '不允许上传的文件后缀：'.$extension];
+                }
+
+                // 处理资源信息成前端可直接使用的信息数组
+                $this->dealAttachmentToFrontend($exist_attachment);
+
+                return ['error_code' => 0,'error_msg' => '上传成功：文件曾上传过','data' => $exist_attachment];
+            }
+
+            /**
+             * 不同类型文件存储的根目录 如图片则是./Uploads/Image/
+             */
+            $saveDir = './uploads/'.$paramDir.'/'.date('Y').'/';
+            $file    = $origin_file->validate(['ext' => $allowedExt[$paramDir]])
+                ->rule('sha1')
+                ->move($saveDir);
+            if (!$file) {
+                return ['error_code' => 500, 'error_msg' => $origin_file->getError()];
+            }
+
+            /**
+             * 记录attachment信息至数据库
+             */
+            $attachment                     = [];
+            $attachment['id']               = GenerateHelper::uuid();
+            $attachment['user_id']          = $request->session('user_id') ? $request->session('user_id') : 0;
+            $attachment['file_origin_name'] = $origin_file->getInfo('name');
+            $attachment['file_name']        = $file->getFilename();
+            $attachment['file_path']        = trim($saveDir.$file->getSaveName(), '.');
+            $attachment['file_mime']        = $file->getMime();
+            $attachment['file_size']        = $file->getSize();
+            $attachment['file_sha1']        = $file->hash('sha1');
+
+            // 是否安全资源
+            $is_safe                        = !empty($request->param('is_safe'));
+            $attachment['is_safe']          = $is_safe ? 1 : 0;
+
+            /**
+             * 如果图片增加图片高宽尺寸信息
+             */
+            if ($paramDir == 'image') {
+                try {
+                    $Image                      = Image::open($file);
+                    $attachment['image_width']  = $Image->width();
+                    $attachment['image_height'] = $Image->height();
+                } catch (\Throwable $e) {
+                    // 图片读取出错，将该文件删除然后返回错误信息
+                    $exception_file = $saveDir.$file->getSaveName();
+                    is_file($exception_file) && unlink($exception_file);
+                    return ['error_code' => 500, 'error_msg' => '上传失败：'.$e->getMessage()];
+                }
+            }
+            $result = $this->Attachment->isUpdate(false)->data($attachment)->save();
+            if (false !== $result) {
+                // 存储上传记录ok，记录日志
+                $this->LogService->logRecorder($attachment['file_path'], '上传文件');
+            }
+
+            // 同步资源到外部存储系统
+            $this->storageAttachment($attachment);
 
             // 处理资源信息成前端可直接使用的信息数组
-            $this->dealAttachmentToFrontend($exist_attachment);
+            $this->dealAttachmentToFrontend($attachment);
 
-            return ['error_code' => 0,'error_msg' => '上传成功：文件曾上传过','data' => $exist_attachment];
+            // 无论attachment存储至Db是否成功 文件上传完成均返回文件信息数组
+            return ['error_code' => 0, 'error_msg' => '上传成功：新增文件', 'data' => $attachment];
+        } catch (\Throwable $e) {
+            return ['error_code' => 500, 'error_msg' => $e->getMessage()];
         }
-
-        /**
-         * 不同类型文件存储的根目录 如图片则是./Uploads/Image/
-         */
-        $saveDir = './uploads/'.$paramDir.'/'.date('Y').'/';
-        $file    = $origin_file->validate(['ext' => $allowedExt[$paramDir]])
-            ->rule('sha1')
-            ->move($saveDir);
-        if (!$file) {
-            return ['error_code' => 500, 'error_msg' => $origin_file->getError()];
-        }
-
-        /**
-         * 记录attachment信息至数据库
-         */
-        $attachment                     = [];
-        $attachment['id']               = GenerateHelper::uuid();
-        $attachment['user_id']          = $request->session('user_id') ? $request->session('user_id') : 0;
-        $attachment['file_origin_name'] = $origin_file->getInfo('name');
-        $attachment['file_name']        = $file->getFilename();
-        $attachment['file_path']        = trim($saveDir.$file->getSaveName(), '.');
-        $attachment['file_mime']        = $file->getMime();
-        $attachment['file_size']        = $file->getSize();
-        $attachment['file_sha1']        = $file->hash('sha1');
-
-        // 是否安全资源
-        $is_safe                        = $request->has('is_safe', 'post');
-        $attachment['is_safe']          = $is_safe ? 1 : 0;
-
-        /**
-         * 如果图片增加图片高宽尺寸信息
-         */
-        if ($paramDir == 'image') {
-            try {
-                $Image                      = Image::open($file);
-                $attachment['image_width']  = $Image->width();
-                $attachment['image_height'] = $Image->height();
-            } catch (\Throwable $e) {
-                // 图片读取出错，将该文件删除然后返回错误信息
-                $exception_file = $saveDir.$file->getSaveName();
-                is_file($exception_file) && unlink($exception_file);
-                return ['error_code' => 500, 'error_msg' => '上传失败：'.$e->getMessage()];
-            }
-        }
-        $result = $this->Attachment->isUpdate(false)->data($attachment)->save();
-        if (false !== $result) {
-            // 存储上传记录ok，记录日志
-            $this->LogService->logRecorder($attachment['file_path'], '上传文件');
-        }
-
-        // 同步资源到外部存储系统
-        $this->storageAttachment($attachment);
-
-        // 处理资源信息成前端可直接使用的信息数组
-        $this->dealAttachmentToFrontend($attachment);
-
-        // 无论attachment存储至Db是否成功 文件上传完成均返回文件信息数组
-        return ['error_code' => 0, 'error_msg' => '上传成功：新增文件', 'data' => $attachment];
     }
 
     /**
