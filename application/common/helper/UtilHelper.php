@@ -15,6 +15,47 @@ use think\facade\Log;
 class UtilHelper
 {
     /**
+     * 删除runtime运行时文件
+     * @return array
+     */
+    public static function rmRuntimeFile($del_path)
+    {
+        if (empty($del_path) || false === strpos($del_path, 'runtime/temp')) {
+            return ['error_code'=> 500, 'error_msg' => '路径不能为空或不是运行时目录'];
+        }
+        $delete_file_number = 0;
+        $delete_dir_number  = 0;
+        $del_path = rtrim($del_path, '/').'/';
+        try {
+            $iterator = new \DirectoryIterator($del_path);
+            while ($iterator->valid()) {
+                if ($iterator->isFile()) {
+                    if ($iterator->getFilename() != '.gitignore') {
+                        unlink($del_path.$iterator->getFilename());
+                        $delete_file_number++;
+                    }
+                } elseif ($iterator->isDir() && !$iterator->isDot()) {
+                    $res = self::rmRuntimeFile($del_path.$iterator->getFilename());
+                    if ($res['error_code'] == 0) {
+                        $delete_file_number += $res['data']['del_file_total'];
+                        $delete_dir_number  += $res['data']['del_dir_total'];
+                    }
+                    $file_number = count(scandir($del_path.$iterator->getFilename()));
+                    if ($file_number == 2) {
+                        rmdir($del_path.$iterator->getFilename());
+                        $delete_dir_number++;
+                    }
+                }
+                $iterator->next();
+            }
+            $data = ['del_file_total' => $delete_file_number,'del_dir_total' => $delete_dir_number];
+            return ['error_code'=>0, 'error_msg'=>'runtime/temp下所有运行时文件已删除','data'=>$data];
+        } catch (\Throwable $e) {
+            return ['error_code'=>500, 'error_msg'=> '清理失败:'.$e->getMessage()];
+        }
+    }
+
+    /**
      * 检查用户是否处于被防御状态
      * @param int $user_id
      * @return bool
