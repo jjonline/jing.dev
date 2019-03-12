@@ -40,6 +40,63 @@ class ArrayHelper
         }
         return $origin;
     }
+    
+    /**
+     * 二维数组按照二维中某个键指向的值进行制定排序规则的排序
+     * @param array $multi_array 二维数组
+     * @param mixed $level_2_key 二维数组中用于排序依据的排序
+     * @param int $sort_order    排序规则升序或降序，常量：SORT_DESC、SORT_ASC
+     * @param int $sort_flags    算法常量：
+     * SORT_REGULAR、SORT_NUMERIC、SORT_STRING、SORT_LOCALE_STRING、SORT_NATURAL、SORT_FLAG_CASE
+     * @return mixed
+     */
+    public static function multiSortByKey(
+        $multi_array,
+        $level_2_key,
+        $sort_order = SORT_DESC,
+        $sort_flags = SORT_REGULAR
+    ) {
+        $sort_array = [];
+        foreach ($multi_array as $key => $value) {
+            if (isset($value[$level_2_key])) {
+                $sort_array[] = $value[$level_2_key];
+            }
+        }
+        if (empty($sort_array)) {
+            return $multi_array;
+        }
+        // 引用形式排序处理
+        array_multisort($sort_array, $sort_order, $sort_flags, $multi_array);
+        return $multi_array;
+    }
+
+    /**
+     * 一维数组多元素切成成对的二维数组，仅供swoole中redis队列参数转换使用
+     * ---
+     * 例如：['a','b','c']
+     * 调用后切成：
+     * [
+     *    [a,b],
+     *    [a,c]
+     * ]
+     * ---
+     * 传入参数数组务必事先检查元素个数
+     * @param array $array
+     * @return array
+     */
+    public static function segmentToPairArray(array $array)
+    {
+        $result = [];
+        foreach ($array as $key => $value) {
+            $_item    = [];
+            $_item[0] = $array[0];
+            if ($key > 0) {
+                $_item[1] = $value;
+                $result[] = $_item;
+            }
+        }
+        return $result;
+    }
 
     /**
      * 将二维数组转化为字典
