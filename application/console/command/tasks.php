@@ -87,7 +87,7 @@ class tasks extends Command
         $server->on('connect', [$swooleService,'onConnect']);
 
         // lpush往队列推任务的handler--redis的lpush命令处理函数
-        $server->setHandler('LPUSH', function ($fd, $data) use ($server,$output) {
+        $server->setHandler('LPUSH', function ($fd, $data) use ($server, $output) {
             try {
                 /**
                  * 确保传递给task异步执行的参数是pair形式的数组
