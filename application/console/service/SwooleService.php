@@ -9,11 +9,13 @@
 namespace app\console\service;
 
 use app\common\model\AsyncTask;
+use Cron\CronExpression;
 use Swoole\Server;
 use think\console\Output;
 use think\Container;
 use think\Exception;
 use think\facade\Log;
+use app\console\task;
 
 class SwooleService
 {
@@ -53,8 +55,11 @@ class SwooleService
                 }
 
                 // 手动清理模型对象
-                $AsyncTaskModel = null;
+                $AsyncTaskModel->getConnection()->free();
                 unset($AsyncTaskModel);
+
+                // 在worker进程中每10秒执行一次指定回调函数
+                $server->tick(60000, [$this,'tickTaskHandler'], $server); // Worker进程每10s自动执行一次
             } catch (\Throwable $e) {
                 $this->log('初始化启动服务器时读取上次未执行完的任务出错：'.$e->getMessage());
             }
@@ -87,10 +92,10 @@ class SwooleService
         /**
          * 参数的结构
         $data = [
-            0 => '任务类名，对redis来说就是List列表的表名',
-            1 => '任务参数，是一个json字符串，对redis来说就是LIst列表中的值'
+        0 => '任务类名，对redis来说就是List列表的表名',
+        1 => '任务参数，是一个json字符串，对redis来说就是LIst列表中的值'
         ]
-        */
+         */
         try {
             // 处理任务参数
             $task_data = json_decode($data[1], true);
@@ -111,12 +116,65 @@ class SwooleService
             $this->log('任务['.$worker_id.'_'.$task_id.']执行完毕，耗时:'.$use_time.'秒');
 
             // 清理实例化对象
-            $task = null;
             Container::remove($task_class);
         } catch (\Throwable $e) {
             $this->log('任务执行抛出异常：'.$e->getMessage());
         }
         return 'ok';
+    }
+
+    /**
+     * 定时循环执行的回调函数
+     * ----
+     * worker进程只能是1个，否则会导致同时有两个定时任务执行
+     * ----
+     * @param int $tick_id
+     * @param Server $server
+     */
+    public function tickTaskHandler($tick_id, Server $server)
+    {
+        try {
+            $cron_task_list = [];
+            $cron_task_path = app()->getModulePath().'console/task/cron/';
+            $iterator       = new \DirectoryIterator($cron_task_path);
+            while ($iterator->valid()) {
+                // 读取该目录下的所有定时任务文件名[亦既无命名空间的类名]
+                if ($iterator->isFile() && $iterator->getExtension() == 'php') {
+                    $cron_task_list[] = $iterator->getBasename('.php');
+                    $ClassName        = $this->NameSpacePrefix.'cron\\'.$iterator->getBasename('.php');
+                    $this->executeTickTask($ClassName, $server);
+                }
+                $iterator->next();
+            }
+        } catch (\Throwable $e) {
+            $this->log('定时任务触发异步执行出错：'.$e->getMessage());
+        }
+    }
+
+    /**
+     * 生成并投递定时执行的异步任务
+     * @param $className
+     * @param Server $server
+     * @return bool
+     */
+    protected function executeTickTask($className, Server $server)
+    {
+        try {
+            $cron = CronExpression::factory($className::$CronExpression);
+            if ($cron->isDue()) {
+                $tick   = Container::get($className);
+                $result = $tick->execute();
+                if (!empty($result)) {
+                    $server->task($result);
+                }
+                // 清理实例化对象
+                Container::remove($className);
+            }
+            return true;
+        } catch (\Throwable $e) {
+            $this->log('生成定时触发的异步任务数据失败：'.$e->getMessage());
+            return false;
+        }
     }
 
     /**
