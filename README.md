@@ -4,9 +4,9 @@
 
 环境要求：
 
-> PHP7.1+ (启用PHP-Redis、OpenSSL、Curl以及MbString扩展)
+> PHP7.2+ (启用PHP-Redis、OpenSSL、Curl以及MbString扩展)
 > 
-> MySQL5.6
+> MySQL5.7+
 > 
 > Redis缓存
 
