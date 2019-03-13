@@ -26,6 +26,74 @@
 * 4、执行配置文件初始化，根目录下执行：`php think init --env=dev`命令初始化开发环境的配置。
 * 5、执行数据表迁移命令，根目录下执行：`php think migrate:run`命令，生成各种数据表。
 * 6、初始化各种表的基本数据，根目录下执行：`php think seed:run`命令，为各种数据表填充必要的数据。
+* 7、web根目录指向`public`目录，做好必要的rewrite，登录入口为`manage`模块，seed的唯一默认管理员`jing`初始密码`12345`
+
+### 参考nginx配置
+
+* `*.jing.dev`域名已经做了泛解析，均解析至:`127.0.0.1`，各位开发者可以使用
+
+```
+server {
+    listen                 80;
+    listen                 443 ssl http2;
+    server_name            *.jing.dev;
+    charset                utf-8;
+    client_max_body_size   50M;
+    #autoindex             on;
+    #autoindex_exact_size  off;
+    #autoindex_localtime   off;
+
+    # if ($server_port !~ 443)
+    # {
+    #    rewrite ^(/.*)$ https://$host$1 permanent;
+    # }
+
+    ssl_certificate           /Users/jingjing/.acme.sh/*.jing.dev/fullchain.cer;
+    ssl_certificate_key       /Users/jingjing/.acme.sh/*.jing.dev/*.jing.dev.key;
+    ssl_protocols             TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers               ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache         shared:SSL:10m;
+    ssl_session_timeout       10m;
+
+    # preg domain name and set web root dir
+    if ($host ~* ^([^\.]+)\.jing.dev$)
+    {
+        set $domain_name $1;
+    }
+    root    /Users/jingjing/Developer/$domain_name/public;
+    index   index.html index.htm default.html default.htm index.php default.php;
+
+    # default rewrite
+    location / {
+        if (!-e $request_filename)
+        {
+            rewrite ^/(.*)$ /index.php?s=$1 last;
+            break;
+        }
+    }
+
+    # handle php
+    location ~ ^(.+\.php)(.*)$ {
+        root                     /Users/jingjing/Developer/$domain_name/public;
+        fastcgi_pass             127.0.0.1:9000;
+        fastcgi_read_timeout     36000;
+        fastcgi_index            index.php;
+        fastcgi_split_path_info  ^(.+\.php)(.*)$;
+        fastcgi_param            PATH_INFO $fastcgi_path_info;
+        fastcgi_param            SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include                  fastcgi_params;
+    }
+
+    # deny hide file
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+}
+```
+
 
 ### Git分支说明
 
