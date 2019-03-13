@@ -84,8 +84,7 @@ class CreateUserOpen extends Migrator
                     'null'    => true,
                     'comment' => '获取到的用户全部字段信息-{"province":"xx","following":1122...}',
                 ])
-                ->addColumn('enable', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY, // tinyint类型
+                ->addColumn('enable', 'boolean', [ // tinyint(1)类型
                     'default' => '1',
                     'null'    => false,
                     'comment' => '标记是否有效1-有效0-禁用',

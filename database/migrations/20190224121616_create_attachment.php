@@ -75,8 +75,7 @@ class CreateAttachment extends Migrator
                     'null'    => false,
                     'comment' => '图片类型资源的高度',
                 ])
-                ->addColumn('is_safe', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY, // tinyint类型
+                ->addColumn('is_safe', 'boolean', [ // tinyint(1)类型
                     'default' => '0',
                     'null'    => false,
                     'comment' => '资源文件是否需要安全存储不暴露公网url，1是0否',

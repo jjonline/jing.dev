@@ -59,32 +59,27 @@ class CreateMenu extends Migrator
                     'null'    => false,
                     'comment' => '当前层级 1为一级导航 2为二级导航 3为二级导航页面中的功能按钮',
                 ])
-                ->addColumn('is_required', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY, // tinyint类型
+                ->addColumn('is_required', 'boolean', [ // tinyint(1)类型
                     'default' => '0',
                     'null'    => false,
                     'comment' => '标记是否必选-1必选0权限控制，为1时选择角色菜单权限的时候默认勾选且不可取消',
                 ])
-                ->addColumn('is_badge', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY, // tinyint类型
+                ->addColumn('is_badge', 'boolean', [ // tinyint(1)类型
                     'default' => '0',
                     'null'    => false,
                     'comment' => '菜单中是否需要显示待办事项badge',
                 ])
-                ->addColumn('is_system', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY, // tinyint类型
+                ->addColumn('is_system', 'boolean', [ // tinyint(1)类型
                     'default' => '0',
                     'null'    => true,
                     'comment' => '标记是否系统菜单-1不允许删除 0允许删除',
                 ])
-                ->addColumn('is_permissions', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY, // tinyint类型
+                ->addColumn('is_permissions', 'boolean', [ // tinyint(1)类型
                     'default' => '0',
                     'null'    => true,
                     'comment' => '标记是否有数据范围控制-1则会按部门划分数据范围进行控制',
                 ])
-                ->addColumn('is_column', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY, // tinyint类型
+                ->addColumn('is_column', 'boolean', [ // tinyint(1)类型
                     'default' => '0',
                     'null'    => true,
                     'comment' => '标记是否需要控制字段显示-1则有显示字段控制',

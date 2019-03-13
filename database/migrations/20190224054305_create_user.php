@@ -81,20 +81,17 @@ class CreateUser extends Migrator
                     'null'    => false,
                     'comment' => '所属角色ID',
                 ])
-                ->addColumn('is_leader', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY,
+                ->addColumn('is_leader', 'boolean', [ // tinyint(1)类型
                     'default' => '0',
                     'null'    => false,
                     'comment' => '是否本部门的领导：1是0不是',
                 ])
-                ->addColumn('is_root', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY,
+                ->addColumn('is_root', 'boolean', [ // tinyint(1)类型
                     'default' => '0',
                     'null'    => false,
                     'comment' => '是否为根用户：1是0不是[根用户不受角色限制永远具备所有菜单的所有权限，只有根用户才能创建根用户]',
                 ])
-                ->addColumn('enable', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY,
+                ->addColumn('enable', 'boolean', [ // tinyint(1)类型
                     'default' => '0',
                     'null'    => false,
                     'comment' => '启用禁用标记：1启用0禁用',
