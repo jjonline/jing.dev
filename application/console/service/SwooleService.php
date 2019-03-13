@@ -15,7 +15,6 @@ use think\console\Output;
 use think\Container;
 use think\Exception;
 use think\facade\Log;
-use app\console\task;
 
 class SwooleService
 {
@@ -91,10 +90,10 @@ class SwooleService
     {
         /**
          * 参数的结构
-        $data = [
-        0 => '任务类名，对redis来说就是List列表的表名',
-        1 => '任务参数，是一个json字符串，对redis来说就是LIst列表中的值'
-        ]
+         * $data = [
+         *    0 => '任务类名，对redis来说就是List列表的表名',
+         *    1 => '任务参数，是一个json字符串，对redis来说就是LIst列表中的值'
+         * ]
          */
         try {
             // 处理任务参数
@@ -134,13 +133,11 @@ class SwooleService
     public function tickTaskHandler($tick_id, Server $server)
     {
         try {
-            $cron_task_list = [];
             $cron_task_path = app()->getModulePath().'console/task/cron/';
             $iterator       = new \DirectoryIterator($cron_task_path);
             while ($iterator->valid()) {
                 // 读取该目录下的所有定时任务文件名[亦既无命名空间的类名]
                 if ($iterator->isFile() && $iterator->getExtension() == 'php') {
-                    $cron_task_list[] = $iterator->getBasename('.php');
                     $ClassName        = $this->NameSpacePrefix.'cron\\'.$iterator->getBasename('.php');
                     $this->executeTickTask($ClassName, $server);
                 }
