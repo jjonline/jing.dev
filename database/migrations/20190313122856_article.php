@@ -24,12 +24,12 @@ class Article extends Migrator
                 //'primary_key' => 'id',
                 'engine'      => 'InnoDB',
                 'collation'   => 'utf8mb4_general_ci',
-                'comment'     => '图文文章表(包含可用于落地页的系统文章)',
+                'comment'     => '图文文章表',
             ]);
             $table->addColumn('cat_id', 'integer', [
                     'default' => '0',
                     'null'    => false,
-                    'comment' => '文章分类ID 0表示属于系统文章',
+                    'comment' => '文章分类ID',
                 ])
                 ->addColumn('cover_id', 'char', [
                     'limit'   => 36,

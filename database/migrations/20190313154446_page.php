@@ -1,14 +1,14 @@
 <?php
 /**
- * 文章分类表
+ * 系统落地页page表
  */
 use think\migration\Migrator;
 use think\migration\db\Column;
 use Phinx\Db\Adapter\MysqlAdapter;
 
-class ArticleCat extends Migrator
+class Page extends Migrator
 {
-    static private $table='article_cat';
+    static private $table='page';
 
     /**
      * 执行迁移被运行的方法
@@ -24,42 +24,59 @@ class ArticleCat extends Migrator
                 //'primary_key' => 'id',
                 'engine'      => 'InnoDB',
                 'collation'   => 'utf8mb4_general_ci',
-                'comment'     => '文章分类',
+                'comment'     => '落地单页配置和参数表--依赖前台落地页的代码实现',
             ]);
-            $table->addColumn('name', 'string', [
+            $table->addColumn('flag', 'string', [
+                    'limit'   => 32,
+                    'null'    => false,
+                    'comment' => '落地页唯一flag标记',
+                ])
+                ->addColumn('cover_id', 'string', [
+                    'limit'   => 36,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '落地页单独的可选的大封面图id',
+                ])->addColumn('keywords', 'string', [
+                    'limit'   => 128,
+                    'null'    => false,
+                    'comment' => '页面关键词，用于落地页面的keywords标签，半角逗号分隔不宜过多',
+                ])
+                ->addColumn('description', 'string', [
+                    'limit'   => 256,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '页面描述，用于落地页面的description标签，最多140字',
+                ])
+                ->addColumn('config', 'json', [
+                    'null'    => true,
+                    'comment' => 'json格式的落地页配置参数',
+                ])
+                ->addColumn('setting', 'json', [
+                    'null'    => true,
+                    'comment' => 'json格式的落地页配置项对应的具体参数内容',
+                ])
+                ->addColumn('enable', 'boolean', [ // tinyint(1)类型
+                    'default' => '1',
+                    'null'    => false,
+                    'comment' => '标记是否有效1-有效0-禁用',
+                ])
+                ->addColumn('template', 'string', [
                     'limit'   => 32,
                     'default' => '',
                     'null'    => false,
-                    'comment' => '分类名称',
-                ])
-                ->addColumn('icon', 'string', [
-                    'limit'   => 64,
-                    'default' => '',
-                    'null'    => false,
-                    'comment' => '预留的分类icon图标',
-                ])
-                ->addColumn('parent_id', 'integer', [
-                    'default' => '0',
-                    'null'    => false,
-                    'comment' => '父分类ID，0为顶级无父分类',
-                ])
-                ->addColumn('level', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY, // tinyint类型
-                    // 'default' => '1', // 不得为空，必须赋值，不给默认值
-                    'null'    => false,
-                    'comment' => '层级 1一级 2二级 3三级',
-                ])
-                ->addColumn('sort', 'integer', [
-                    'limit'   => MysqlAdapter::INT_BIG, // bigint类型
-                    'default' => '0',
-                    'null'    => false,
-                    'comment' => '排序，数字越小越靠前',
+                    'comment' => '可选的落地页使用的模板名称',
                 ])
                 ->addColumn('remark', 'string', [
                     'limit'   => 255,
                     'default' => '',
                     'null'    => false,
                     'comment' => '备注信息',
+                ])
+                ->addColumn('sort', 'integer', [
+                    'limit'   => MysqlAdapter::INT_BIG,
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => '排序，数字越小越靠前',
                 ])
                 ->addColumn('create_time', 'datetime', [
                     'default' => 'CURRENT_TIMESTAMP',
@@ -70,8 +87,8 @@ class ArticleCat extends Migrator
                     'update'  => 'CURRENT_TIMESTAMP',
                     'comment' => '最后修改时间',
                 ])
-                ->addIndex('parent_id', [
-                    'unique' => false
+                ->addIndex('flag', [
+                    'unique' => true
                 ])
                 ->create();
         }
