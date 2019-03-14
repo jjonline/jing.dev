@@ -1,0 +1,236 @@
+<div class="row">
+    <div class="col-md-12">
+
+        <%{if condition = "user_has_permission('manage/article/create')"}%>
+            <div class="box box-solid">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-2">
+                            <a href="<%{:url('manage/article/create')}%>"  class="btn btn-primary" id="create"><i class="fa fa-plus"></i> 新增文章</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <%{/if}%>
+
+        <div class="box box-solid">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-3">
+                                <div class="has-feedback">
+                                    <input id="txt_search" type="text" class="form-control" placeholder="搜索标题、来源、作者、备注">
+                                    <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-3">
+
+                            </div>
+                            <div class="col-xs-12 col-sm-3">
+
+                            </div>
+                            <div class="col-xs-12 col-sm-3 pull-right">
+                                <div class="btn-group pull-right">
+                                    <button class="btn btn-default" id="adv_search_btn"><i class="fa fa-cog"></i> 高级查询</button>
+                                    <button class="btn btn-default" id="refresh_table_btn" data-toggle="tooltip" title="点击刷新当前列表">
+                                        <i class="fa fa-refresh"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-default" id="table-columns" data-toggle="tooltip" title="点击筛选字段">
+                                        <i class="glyphicon glyphicon-th icon-th"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary">
+            <div class="box-body">
+                <table class="table table-bordered table-striped table-hover display responsive nowrap" cellspacing="0" width="100%" id="table" data-order='[[ 9, "desc" ]]'>
+                    <thead>
+                    <tr>
+                        <th data-priority="false" data-orderable="false">
+                            <input type="checkbox" class="check_all" title="选中/反选全部">
+                        </th>
+                        <th data-priority="1">ID</th>
+                        <th data-priority="2" data-orderable="false">分类</th>
+                        <th data-priority="3" data-orderable="false">标题</th>
+                        <th data-priority="4" data-orderable="false">作者</th>
+                        <th data-priority="5">阅读</th>
+                        <th data-priority="6">首页</th>
+                        <th data-priority="7">置顶</th>
+                        <th data-priority="8">状态</th>
+                        <th data-priority="9">排序</th>
+                        <th data-priority="10" data-orderable="false">模板</th>
+                        <th data-priority="11">显示时间</th>
+                        <th data-priority="12" data-orderable="false">用户</th>
+                        <th data-priority="13" data-orderable="false">部门</th>
+                        <th data-priority="14">创建时间</th>
+                        <th data-priority="15">最后更新时间</th>
+                        <th data-priority="16" data-orderable="false">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--高级查询modal Begin-->
+<div class="modal fade" id="SearchModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="SearchModelLabel">高级查询</h4>
+            </div>
+            <div class="modal-body">
+                <form action="" class="form-horizontal" id="SearchForm">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">状态</label>
+                        <div class="col-sm-8">
+                            <select name="adv_enable" id="adv_enable" class="form-control select2" style="width: 100%;">
+                                <option value="">--选择状态--</option>
+                                <option value="0">禁用</option>
+                                <option value="1">启用</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">置顶</label>
+                        <div class="col-sm-8">
+                            <select name="adv_enable" id="adv_top" class="form-control select2" style="width: 100%;">
+                                <option value="">--选择置顶状态--</option>
+                                <option value="0">未置顶</option>
+                                <option value="1">置顶</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">首页</label>
+                        <div class="col-sm-8">
+                            <select name="adv_enable" id="adv_home" class="form-control select2" style="width: 100%;">
+                                <option value="">--选择首页状态--</option>
+                                <option value="0">首页不显示</option>
+                                <option value="1">首页显示</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">显示时间</label>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="show_time_begin" type="text" class="form-control search_date" placeholder="显示时间开始">
+                                <div class="input-group-addon clear-begin-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="show_time_end" type="text" class="form-control search_date" placeholder="显示时间结束">
+                                <div class="input-group-addon clear-end-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">创建时间</label>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="search_begin_date" data-key="search_begin_date" type="text" class="form-control pull-right search_date" placeholder="创建时间开始">
+                                <div class="input-group-addon clear-begin-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="search_end_date" data-key="search_end_date" type="text" class="form-control pull-right search_date" placeholder="创建时间结束">
+                                <div class="input-group-addon clear-end-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">最后更新时间</label>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="update_time_begin" data-key="search_begin_date" type="text" class="form-control pull-right search_date" placeholder="最后更新时间开始">
+                                <div class="input-group-addon clear-begin-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input readonly id="update_time_end" data-key="search_end_date" type="text" class="form-control pull-right search_date" placeholder="最后更新时间结束">
+                                <div class="input-group-addon clear-end-data" style="cursor: pointer;">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">text</label>
+                        <div class="col-sm-8">
+                            <input id="text" type="text" class="form-control" placeholder="text">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="box-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <div class="col-xs-6 text-right">
+                            <button type="button" class="btn btn-default" id="exec_reset">重置</button>
+                        </div>
+                        <div class="col-xs-6 text-left">
+                            <button type="button" class="btn btn-info" id="exec_search">查询</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--高级查询结束-->
+
+<script>
+    var has_edit_permission = <%{:user_has_permission('manage/article/edit') ? 'true' : 'false'}%>;
+    var has_delete_permission = <%{:user_has_permission('manage/article/delete') ? 'true' : 'false'}%>;
+</script>
