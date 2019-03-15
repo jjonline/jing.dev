@@ -113,12 +113,9 @@ class ArticleService
             if (empty($article)) {
                 throw new Exception('拟删除的文章数据不存在');
             }
-
-            // todo 删除的其他检查
-
             $effect_rows = $this->Article->db()->where('id', $id)->delete();
             if (false == $effect_rows) {
-                throw new Exception('排序调整失败：系统异常');
+                throw new Exception('删除操作失败：系统异常');
             }
             // 记录日志
             $this->LogService->logRecorder(

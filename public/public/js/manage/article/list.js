@@ -153,15 +153,23 @@ $(function () {
             $(".check_item").prop("checked",false).trigger("change");
         }
     }).on("click",".enable",function () {
+        // 启用禁用
         var data = $(this).parents("tr").data("json");
         var text = data.enable ? "确认禁用该文章图文么？" : "确认启用该文章图文么？";
         utils.ajaxConfirm(text,"/manage/article/enable",{"id":data.id},function () {
             refreshTable();
         });
     }).on("change",".list-sort-input",function () {
+        // 快速设置排序
         var id   = $(this).data("id");
         var sort = $(this).val();
         utils.ajaxConfirm("确认修改排序么？",'/manage/article/sort',{"id":id,"sort":sort},function () {
+            refreshTable();
+        });
+    }).on("click",".delete",function () {
+        // 删除
+        var id   = $(this).data("id");
+        utils.ajaxConfirm("确认删除该文章么？删除后将无法找回，若无需前台显示建议选禁用功能",'/manage/article/delete',{"id":id},function () {
             refreshTable();
         });
     });
@@ -274,7 +282,7 @@ $(function () {
                              * 拥有删除权限，则显示删除按钮
                              */
                             if (has_delete_permission) {
-                                items[n].operate += " <a data-href=\"/manage/article/delete?id="+data.id+"\" class=\"btn btn-xs btn-danger delete\" data-id=\""+data.id+"\"><i class=\"fa fa-trash\"></i> 编辑</a>";
+                                items[n].operate += " <a data-href=\"/manage/article/delete?id="+data.id+"\" class=\"btn btn-xs btn-danger delete\" data-id=\""+data.id+"\"><i class=\"fa fa-trash\"></i> 删除</a>";
                             }
 
                             // 首页、置顶、状态
