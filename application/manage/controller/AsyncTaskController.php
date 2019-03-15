@@ -18,6 +18,9 @@ class AsyncTaskController extends BaseController
      * 任务状态列表
      * @param AsyncTaskSearch $asyncTaskSearch
      * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function listAction(AsyncTaskSearch $asyncTaskSearch)
     {
@@ -38,9 +41,12 @@ class AsyncTaskController extends BaseController
         ];
         $this->assign($common);
 
-        // 仅能分配当前账号所下辖的部门
-        $dept_list  = $this->UserInfo['dept_auth']['dept_list_tree'];
-        $this->assign('dept_list', $dept_list);
+        // 所有部门筛选
+        $this->assign('dept_list', $this->UserInfo['dept_all']);
+
+        // 所有用户筛选
+        $this->assign('user', $this->UserService->User->getUserList());
+
         return $this->fetch();
     }
 

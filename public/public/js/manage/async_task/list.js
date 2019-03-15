@@ -1,6 +1,7 @@
 $(function () {
     var txtSearch           = $('#txt_search');
     var dept_id             = $('#select_dept');
+    var user_id             = $("#user_id");
     var task_status         = $('#task_status');
     var create_time_begin   = $('#create_time_begin');
     var create_time_end     = $('#create_time_end');
@@ -105,6 +106,7 @@ $(function () {
                 data: function (d) {
                     return $.extend({}, d, {
                         dept_id: dept_id.val(),
+                        user_id: user_id.val(),
                         keyword: txtSearch.val(),
                         task_status:task_status.val(),
                         create_time_begin: create_time_begin.val(),
@@ -243,6 +245,7 @@ $(function () {
     $('.btn-reset').click(function () {
         $('#select_dept').val('0').trigger('change');
         $('#task_status').val('').trigger('change');
+        $('#user_id').val('').trigger('change');
         create_time_begin.val('');
         create_time_end.val('');
         delivery_time_begin.val('');

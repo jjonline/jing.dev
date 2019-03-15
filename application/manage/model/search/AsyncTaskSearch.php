@@ -52,6 +52,12 @@ class AsyncTaskSearch extends BaseSearch
         $user_columns = 'async_task.user_id';
         $this->permissionLimitOrDeptSearch($Query, $dept_columns, $user_columns, $user_info);
 
+        // 指定用户检索
+        $user_id = $this->request->param('user_id');
+        if (!empty($user_id) && is_numeric($user_id)) {
+            $Query->where('async_task.user_id', $user_id);
+        }
+
         // 关键词搜索
         $search_columns = [
             'user.real_name',
