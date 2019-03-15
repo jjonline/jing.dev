@@ -118,7 +118,7 @@ class __CONTROLLER__Service
 
             $effect_rows = $this->__CONTROLLER__->db()->where('id', $id)->delete();
             if (false == $effect_rows) {
-                throw new Exception('排序调整失败：系统异常');
+                throw new Exception('删除操作失败：系统异常');
             }
             // 记录日志
             $this->LogService->logRecorder(
