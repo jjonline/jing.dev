@@ -50,7 +50,7 @@ class CreateAttachment extends Migrator
                     'comment' => '相对于网站根目录的带文件名的文件路径，斜杠开头，方便切换CDN',
                 ])
                 ->addColumn('file_mime', 'string', [
-                    'limit'   => 64,
+                    'limit'   => 128,
                     // 'null'    => false,
                     'comment' => '文件mime类型',
                 ])
