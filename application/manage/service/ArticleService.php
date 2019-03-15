@@ -45,7 +45,7 @@ class ArticleService
                 // 编辑模式
                 $exist_data = $this->Article->getDataById($_article['id']);
                 if (empty($exist_data)) {
-                    throw new Exception('拟编辑的图文文章数据不存在');
+                    throw new Exception('拟编辑的文章数据不存在');
                 }
 
             } else {
@@ -83,7 +83,7 @@ class ArticleService
             }
             $article = $this->Article->getDataById($id);
             if (empty($article)) {
-                throw new Exception('拟编辑排序的图文文章数据不存在');
+                throw new Exception('拟编辑排序的文章数据不存在');
             }
             $effect_rows = $this->Article->isUpdate(true)->save(['sort' => intval($sort)], ['id' => $id]);
             if (false == $effect_rows) {
@@ -111,7 +111,7 @@ class ArticleService
             $id = $request->post('id/i');
             $article = $this->Article->getDataById($id);
             if (empty($article)) {
-                throw new Exception('拟删除的图文文章数据不存在');
+                throw new Exception('拟删除的文章数据不存在');
             }
 
             // todo 删除的其他检查
@@ -123,9 +123,40 @@ class ArticleService
             // 记录日志
             $this->LogService->logRecorder(
                 $article,
-                "删除图文文章"
+                "删除文章"
             );
             return ['error_code' => 0, 'error_msg' => '已删除', 'data' => null];
+        } catch (\Throwable $e) {
+            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage(), 'data' => null];
+        }
+    }
+
+    /**
+     * 启用|禁用文章
+     * @param Request $request
+     * @return array
+     */
+    public function enable(Request $request)
+    {
+        try {
+            $id = $request->post('id/i');
+            $article = $this->Article->getDataById($id);
+            if (empty($article)) {
+                throw new Exception('拟启用或禁用的文章数据不存在');
+            }
+
+            $effect_rows = $this->Article->db()->where('id', $id)->update([
+                'enable' => $article['enable'] ? 0 : 1
+            ]);
+            if (false == $effect_rows) {
+                throw new Exception($article['enable'] ? '禁用失败：系统异常' : '启用失败：系统异常');
+            }
+            // 记录日志
+            $this->LogService->logRecorder(
+                $article,
+                $article['enable'] ? '禁用文章' : '启用文章'
+            );
+            return ['error_code' => 0, 'error_msg' => $article['enable'] ? '已禁用文章' : '已启用文章', 'data' => null];
         } catch (\Throwable $e) {
             return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage(), 'data' => null];
         }

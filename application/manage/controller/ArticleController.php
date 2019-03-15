@@ -103,4 +103,17 @@ class ArticleController extends BaseController
         }
         return $this->renderJson('error', 500);
     }
+
+    /**
+     * 快速启用|禁用文章
+     * @param ArticleService $articleService
+     * @return array|\think\Response
+     */
+    public function enableAction(ArticleService $articleService)
+    {
+        if ($this->request->isAjax()) {
+            return $articleService->enable($this->request);
+        }
+        return $this->renderJson('error', 500);
+    }
 }
