@@ -433,6 +433,11 @@ class RoleService
      */
     public function checkRoleEditorAuth($edit_role_id, $editor_role_id)
     {
+        // 跟用户则拥有所有权限
+        $user_id = Session::get('user_info.id');
+        if ($this->User->isRootUser($user_id)) {
+            return true;
+        }
         $edit_role_menu_list   = $this->RoleMenu->getRoleMenuListByRoleId($edit_role_id);
         $editor_role_menu_list = $this->RoleMenu->getRoleMenuListByRoleId($editor_role_id);
         // 循环对比和检查
@@ -525,12 +530,14 @@ class RoleService
             $role_menu[]               = $_role_menu;
         }
 
-        // 检查当前用户所具备的菜单权限级别是否超限，开发者角色具有所有权限
-        if (Session::get('user_info.role_id') != 1) {
-            // 开发者角色仅允许拥有开发者角色的账号进行编辑
-            if ($is_edit == 1) {
-                return ['error_code' => 400, 'error_msg' => '开发者角色不允许非开发者编辑'];
-            }
+        /**
+         * 检查当前用户所具备的菜单权限级别是否超限
+         * ---
+         * 根用户不受限制
+         * ---
+         */
+        $user_id = Session::get('user_info.id');
+        if (!$this->User->isRootUser($user_id)) {
             $user_role_menu = $this->RoleMenu->getRoleMenuListByRoleId(Session::get('user_info.role_id'));
             $checked_menu   = $role_menu;
             foreach ($role_menu as $key => $value) {

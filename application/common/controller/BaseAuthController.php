@@ -83,6 +83,7 @@ class BaseAuthController extends BasicController
             $this->UserInfo['dept_auth'] = $this->DepartmentService->getAuthDeptInfoByDeptId(
                 $this->UserInfo['dept_id']
             );
+            $this->UserInfo['dept_all']  = $this->DepartmentService->getDeptTreeList();
 
             // 获取管理菜单
             $UserAuthMenu                = $this->AuthService->getUserAuthMenu();

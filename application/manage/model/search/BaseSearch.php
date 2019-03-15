@@ -198,7 +198,7 @@ class BaseSearch
         // 有数据范围限制 + 部门检索条件的处理
         if ($user_info['menu_auth']['is_permissions']) {
             // 全部数据--部门及子部门检索
-            if (Menu::PERMISSION_SUPER == $user_info['menu_auth']) {
+            if (Menu::PERMISSION_SUPER == $user_info['menu_auth']['permissions']) {
                 // 全部数据且没有部门检索要求返回
                 if (empty($search_dept_id)) {
                     return;
@@ -213,7 +213,7 @@ class BaseSearch
                 $query->where($dept_column, 'IN', array_merge(array_unique($search_dept)));
             }
             // 部门及子部门数据范围--部门及子部门限定条件下的检索指定部门数据
-            if (Menu::PERMISSION_LEADER == $user_info['menu_auth']) {
+            if (Menu::PERMISSION_LEADER == $user_info['menu_auth']['permissions']) {
                 // 部门及子部门数据范围，没有检索部门条件，将用户所属部门设置成部门检索条件
                 if (empty($search_dept_id)) {
                     $search_dept_id = $user_info['dept_id'];
@@ -260,7 +260,7 @@ class BaseSearch
                 });
             }
             // 个人数据--只能查看个人数据，用户ID条件必选
-            if (Menu::PERMISSION_STAFF == $user_info['menu_auth']) {
+            if (Menu::PERMISSION_STAFF == $user_info['menu_auth']['permissions']) {
                 if (empty($search_dept_id)) {
                     /**
                      * 没有部门检索，仅检索个人数据，这样任意部门存在的个人数据都会显示
@@ -282,7 +282,7 @@ class BaseSearch
                 }
             }
             // 访客权限，不允许查看任何数据
-            if (Menu::PERMISSION_GUEST == $user_info['menu_auth']) {
+            if (Menu::PERMISSION_GUEST == $user_info['menu_auth']['permissions']) {
                 throw new Exception('您没有查看数据的权限');
             }
             return;
