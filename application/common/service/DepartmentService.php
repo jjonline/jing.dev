@@ -165,24 +165,26 @@ class DepartmentService
      * --
      * 按层级显示竖向数、通过部门名称前加标识符来区分
      * --
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @return array
      */
     public function getDeptTreeList()
     {
-        $dept = $this->getDeptList();
-        foreach ($dept as $key => $value) {
-            $dept[$key]['name_format1'] = $value['name'];
-            $dept[$key]['name_format2'] = $value['name'];
-            if ($value['level'] > 1) {
-                $dept[$key]['name_format1']   = str_repeat('&nbsp;&nbsp;├&nbsp;&nbsp;', $value['level'])
-                    .$value['name'];
-                $dept[$key]['name_format2']   = str_repeat('&nbsp;', floor(pow(($value['level'] - 1), 1.8) * 2))
-                    .'└─'.$value['name'];
+        try {
+            $dept = $this->getDeptList();
+            foreach ($dept as $key => $value) {
+                $dept[$key]['name_format1'] = $value['name'];
+                $dept[$key]['name_format2'] = $value['name'];
+                if ($value['level'] > 1) {
+                    $dept[$key]['name_format1']   = str_repeat('&nbsp;&nbsp;├&nbsp;&nbsp;', $value['level'])
+                        .$value['name'];
+                    $dept[$key]['name_format2']   = str_repeat('&nbsp;', floor(pow(($value['level'] - 1), 1.8) * 2))
+                        .'└─'.$value['name'];
+                }
             }
+            return TreeHelper::vTree($dept);
+        } catch (\Throwable $e) {
+            return [];
         }
-        return TreeHelper::vTree($dept);
     }
 
     /**

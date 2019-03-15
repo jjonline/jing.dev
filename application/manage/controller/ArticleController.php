@@ -19,9 +19,6 @@ class ArticleController extends BaseController
      * @param ArticleSearch $articleSearch
      * @param ArticleCatService $articleCatService
      * @return mixed
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     public function listAction(ArticleSearch $articleSearch, ArticleCatService $articleCatService)
     {
@@ -43,14 +40,14 @@ class ArticleController extends BaseController
         $this->assign($common);
 
         // 文章分类
-        $article_cat = $articleCatService->getArticleCatListTree();
+        $article_cat = $articleCatService->getArticleCatTreeList();
         $this->assign('article_cat', $article_cat);
 
         // 所有部门
-        $this->assign('dept', $this->UserInfo['dept_all']);
+        $this->assign('dept', $this->DepartmentService->getDeptTreeList());
 
         // 所有用户筛选
-        $this->assign('user', $this->UserService->User->getUserList());
+        $this->assign('user', $this->UserService->getUserTreeList());
 
         return $this->fetch();
     }

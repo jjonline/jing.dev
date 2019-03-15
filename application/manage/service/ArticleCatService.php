@@ -40,7 +40,7 @@ class ArticleCatService
      * 依据开发模式与否的带缓存的获取菜单列表tree
      * @return array
      */
-    public function getArticleCatListTree()
+    public function getArticleCatTreeList()
     {
         try {
             if (!Config::get('app.app_debug')) {
