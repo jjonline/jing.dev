@@ -249,12 +249,16 @@ class DepartmentService
         }
         foreach ($vector_list as $key => $value) {
             // 附加部门名称的层级标识
-            $value['name_format1']      = str_repeat('&nbsp;&nbsp;├&nbsp;&nbsp;', $value['level'] - $begin_level)
-                .$value['name'];
+            $value['name_format1']      = str_repeat(
+                '&nbsp;&nbsp;├&nbsp;&nbsp;',
+                $value['level'] - $begin_level
+            ) . $value['name'];
+
             $value['name_format2']      = str_repeat(
                 '&nbsp;',
                 floor(pow(($value['level'] - $begin_level - 1), 1.8) * 2)
             ).'└─'.$value['name'];
+
             $vector['dept_id_vector'][] = $value['id'];
             $vector['dept_list'][]      = $value;
         }

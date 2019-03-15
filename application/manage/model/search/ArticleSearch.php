@@ -8,6 +8,7 @@
 
 namespace app\manage\model\search;
 
+use app\manage\model\ArticleCat;
 use think\Db;
 
 class ArticleSearch extends BaseSearch
@@ -65,10 +66,35 @@ class ArticleSearch extends BaseSearch
                ->leftJoin('department dept', 'dept.id = article.dept_id');
 
         // 部门检索 + 权限限制
-        $this->permissionLimitOrDeptSearch($Query, 'article.dept_id', 'article.user_id', $act_member_info);
+        $this->permissionLimitOrDeptSearch(
+            $Query,
+            'article.dept_id',
+            'article.user_id',
+            $act_member_info
+        );
 
         /**
-         * 检索条件
+         * 文章分类检索
+         * ---
+         * 即检索该自定的分类也检索该分类下的所有子分类
+         */
+        $article_cat = $this->request->param('article_cat');
+        if (!empty($article_cat) && is_numeric($article_cat)) {
+            $article_cats  = (new ArticleCat())->getChildArticleCatByParentId($article_cat);
+            // 补充检索的分类ID本身
+            $search_cats   = $article_cats ?: [];
+            $search_cats[] = $article_cat;
+            $Query->where('article.cat_id', 'IN', $search_cats);
+        }
+
+        // 指定用户检索
+        $user_id = $this->request->param('user_id');
+        if (!empty($user_id) && is_numeric($user_id)) {
+            $Query->where('article.user_id', $user_id);
+        }
+
+        /**
+         * 关键词搜索检索条件
          */
         // 关键词搜索--方法体内部自动判断$this->keyword是否有值并执行sql构造
         $search_columns = [
@@ -80,16 +106,41 @@ class ArticleSearch extends BaseSearch
         $this->keywordSearch($Query, $search_columns, $this->keyword);
 
         // 禁用|启用状态
-        // $enable = $this->request->param('enable');
-        // if (in_array($enable, ['0','1'])) {
-        //    $Query->where('article.enable', $enable);
-        //}
+        $enable = $this->request->param('adv_enable');
+        if (in_array($enable, ['0','1'])) {
+            $Query->where('article.enable', $enable);
+        }
 
-        // 时间范围检索
+        // is_home状态
+        $is_home = $this->request->param('adv_home');
+        if (in_array($is_home, ['0','1'])) {
+            $Query->where('article.is_home', $is_home);
+        }
+
+        // adv_top状态
+        $is_top = $this->request->param('adv_top');
+        if (in_array($is_top, ['0','1'])) {
+            $Query->where('article.is_top', $is_top);
+        }
+
+        // 时间范围检索--创建时间
         $this->dateTimeSearch($Query, 'article.create_time');
 
-        // 数字范围检索
-        // $this->rangeSearch($Query, 'article.xxx', $begin_range, $end_range);
+        // 时间范围检索--更新时间
+        $this->dateTimeSearch(
+            $Query,
+            'article.show_time',
+            $this->request->param('update_time_begin'),
+            $this->request->param('update_time_end')
+        );
+
+        // 时间范围检索--显示时间
+        $this->dateTimeSearch(
+            $Query,
+            'article.show_time',
+            $this->request->param('show_time_begin'),
+            $this->request->param('show_time_end')
+        );
 
         // 克隆Query对象读取总记录数
         $countQuery       = clone $Query;

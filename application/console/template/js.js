@@ -1,7 +1,6 @@
 $(function () {
     var keyUpHandle; // 文本检索handler句柄
     var pageDataSearch; // dataTable的检索句柄
-    var table           = $(".table"); // dataTable的表格容器
     var txtSearch       = $("#txt_search"); // 文本检索的输入框
     var searchBeginDate = $("#search_begin_date"); // 时间范围检索开始
     var searchEndDate   = $("#search_end_date");// 时间范围检索结束

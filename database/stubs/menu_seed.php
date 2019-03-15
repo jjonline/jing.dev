@@ -56,7 +56,7 @@ return [
         'is_required' => '0',
         'is_badge' => '0',
         'is_system' => '1',
-        'is_permissions' => '0',
+        'is_permissions' => '1',
         'is_column' => '0',
         'all_columns' => null,
         'sort' => '1',

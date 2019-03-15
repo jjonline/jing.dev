@@ -127,6 +127,23 @@ class User extends Model
     }
 
     /**
+     * 获取所有用户id+真实姓名列表
+     * @return array
+     * @throws DbException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    public function getUserList()
+    {
+        $result = $this->field(['id', 'real_name'])
+            ->order([
+                'update_time' => 'DESC', // 最近登录过的靠前
+                'id'          => 'ASC'
+            ])->select();
+        return $result->isEmpty() ? [] : $result->toArray();
+    }
+
+    /**
      * 指定用户是否为根用户
      * @param $user_id
      * @return bool

@@ -5,23 +5,12 @@ $(function () {
     var searchBeginDate = $("#search_begin_date"); // 时间范围检索开始
     var searchEndDate   = $("#search_end_date");// 时间范围检索结束
 
-    // 检索
-    var article_cat = $("#article_cat");
-    var dept_id = $("#dept_id");
-    var user_id = $("#user_id");
-    var adv_enable = $("#adv_enable");
-    var adv_top = $("#adv_top");
-    var adv_home = $("#adv_home");
-    var show_time_begin = $("#show_time_begin");
-    var show_time_end = $("#show_time_end");
-    var update_time_begin = $("#update_time_begin");
-    var update_time_end = $("#update_time_end");
 
     /**
      * 文本检索和cookie记录检索值
      * 以及绑定检索输入框的自动提交事件
      */
-    var targetSearch = utils.cookie("txtArticleSearch");
+    var targetSearch = utils.cookie("txtArticleCatSearch");
     if (!utils.isEmpty(targetSearch)) {
         txtSearch.val(targetSearch);
         txtSearch.select();
@@ -29,7 +18,7 @@ $(function () {
     txtSearch.on("keyup", function () {
         keyUpHandle && clearTimeout(keyUpHandle);
         keyUpHandle = setTimeout(function () {
-            utils.cookie('txtArticleSearch', txtSearch.val());
+            utils.cookie('txtArticleCatSearch', txtSearch.val());
             refreshTable();
         }, 600);
     });
@@ -86,16 +75,7 @@ $(function () {
         searchBeginDate.val("");
         searchEndDate.val("");
 
-        article_cat.val("").trigger("change");
-        dept_id.val("").trigger("change");
-        user_id.val("").trigger("change");
-        adv_enable.val("").trigger("change");
-        adv_top.val("").trigger("change");
-        adv_home.val("").trigger("change");
-        show_time_begin.val("");
-        show_time_end.val("");
-        update_time_begin.val("");
-        update_time_end.val("");
+        // todo 清除高级查询modal上的输入框值等内容，一般先在顶部定义各个输入框的对象，此处直接用
 
         refreshTable();
         return false;
@@ -152,19 +132,144 @@ $(function () {
         }else {
             $(".check_item").prop("checked",false).trigger("change");
         }
-    }).on("click",".enable",function () {
-        var data = $(this).parents("tr").data("json");
-        var text = data.enable ? "确认禁用该文章图文么？" : "确认启用该文章图文么？";
-        utils.ajaxConfirm(text,"/manage/article/enable",{"id":data.id},function () {
-            refreshTable();
-        });
-    }).on("change",".list-sort-input",function () {
-        var id   = $(this).data("id");
-        var sort = $(this).val();
-        utils.ajaxConfirm("确认修改排序么？",'/manage/article/sort',{"id":id,"sort":sort},function () {
-            refreshTable();
-        });
+    }).on("click",'.edit',function () {
+        // 编辑按钮打开编辑modal
+        $("#id").val($(this).data("id")).prop("disabled",false);
+        var editData = $(this).data("json"); // 从tr中读取出的待编辑的数据
+
+        $("#SaveModalLabel").text("编辑前台图文");
+        $(".btn-edit-submit").show();
+        $(".btn-create-submit").hide();
+
+        // todo 编辑模式需处理的逻辑
+        // sample
+        $("#real_name").val(editData.real_name);
+
+        $("#SaveModal").modal("show");
+        return false;
     });
+
+    // 新增
+    $("#create").on('click',function () {
+        $("#id").val($(this).data("id")).prop("disabled",false);
+        $("#SaveModalForm").get(0).reset();
+        $("#SaveModalLabel").text("新增前台图文");
+
+        $(".btn-edit-submit").hide();
+        $(".btn-create-submit").show();
+
+        // todo 新增模式需处理的逻辑
+
+        $("#SaveModal").modal("show");
+        return false;
+    });
+
+    /**
+     * ++++编辑记录++++
+     * ——————————
+     * 提交编辑ajax动作
+     * ——————————
+     */
+    $(".btn-edit-submit").on("click",function () {
+        var that = this;
+        var form = $("#SaveModalForm");
+
+        /**
+         * sample
+         */
+        var real_time = $("#real_name");
+        if (utils.isEmpty(real_time.val())) {
+            real_time.focus();
+            utils.toast("输入真实姓名");
+            return false;
+        }
+
+        // todo 边界效验逻辑
+
+        var data = form.serializeArray();
+        $(that).prop("disabled",true).text("提交中...");
+        utils.showLoading("提交中，请稍后...");
+        $.ajax({
+            url: form.data("edit"),
+            type: "POST",
+            data: data,
+            success: function (data) {
+                utils.hideLoading();
+                if (data.error_code === 0) {
+                    utils.toast(data.error_msg, 3000,function () {
+                        $("#SaveModal").modal("hide");
+                        refreshTable();
+                    });
+                } else {
+                    utils.alert(data.error_msg ? data.error_msg : "未知错误");
+                }
+                $(that).prop("disabled",false).text("提交");
+            },
+            error:function () {
+                utils.hideLoading();
+                $(that).prop("disabled",false).text("提交");
+                utils.alert("网络或服务器异常，请稍后再试");
+            }
+        });
+        return false;
+    });
+
+    /**
+     * ++++新增记录++++
+     * ——————————
+     * 提交新增ajax动作
+     * ——————————
+     */
+    $(".btn-create-submit").on("click",function () {
+        var that = this;
+        var form = $("#SaveModalForm");
+
+        /**
+         * sample
+         */
+        var real_time = $("#real_name");
+        if (utils.isEmpty(real_time.val())) {
+            real_time.focus();
+            utils.toast("输入真实姓名");
+            return false;
+        }
+
+        // todo 边界效验逻辑
+
+        var data = form.serializeArray();
+        $(that).prop("disabled",true).text("提交中...");
+        utils.showLoading("提交中，请稍后...");
+        $.ajax({
+            url: form.data("create"),
+            type: "POST",
+            data: data,
+            success: function (data) {
+                utils.hideLoading();
+                if (data.error_code === 0) {
+                    utils.toast(data.error_msg, 3000,function () {
+                        $("#SaveModal").modal("hide");
+                        refreshTable();
+                    });
+                } else {
+                    utils.alert(data.error_msg ? data.error_msg : "未知错误");
+                }
+                $(that).prop("disabled",false).text("提交");
+            },
+            error:function () {
+                utils.hideLoading();
+                $(that).prop("disabled",false).text("提交");
+                utils.alert("网络或服务器异常，请稍后再试");
+            }
+        });
+        return false;
+    });
+
+
+
+
+
+
+
 
     /**
      * +++++++++++++++++++++++++++++++
@@ -200,7 +305,7 @@ $(function () {
                 rightColumns: 1
             },
             ajax: {
-                url: "/manage/article/list.html",
+                url: "/manage/article_cat/list.html",
                 type: "POST",
                 /**
                  * +++++++++++++++++++++++++++++++++++++++++++
@@ -211,19 +316,7 @@ $(function () {
                  */
                 data: function (data) {
                     return $.extend({}, data, {
-                        keyword:txtSearch.val(),
-                        begin_date:searchBeginDate.val(),
-                        end_date:searchEndDate.val(),
-                        article_cat:article_cat.val(),
-                        dept_id:dept_id.val(),
-                        user_id:user_id.val(),
-                        adv_enable:adv_enable.val(),
-                        adv_top:adv_top.val(),
-                        adv_home:adv_home.val(),
-                        show_time_begin:show_time_begin.val(),
-                        show_time_end:show_time_end.val(),
-                        update_time_begin:update_time_begin.val(),
-                        update_time_end:update_time_end.val()
+                        // todo 额外塞入请求体的数据获取方法
                     });
                 },
                 /**
@@ -268,35 +361,8 @@ $(function () {
                              * 拥有编辑权限，则显示编辑按钮
                              */
                             if (has_edit_permission) {
-                                items[n].operate += " <a href=\"/manage/article/edit?id="+data.id+"\" class=\"btn btn-xs btn-primary edit\" data-id=\""+data.id+"\"><i class=\"fa fa-pencil-square-o\"></i> 编辑</a>";
+                                items[n].operate += " <a data-href=\"/manage/article_cat/edit?id="+data.id+"\" class=\"btn btn-xs btn-primary edit\" data-id=\""+data.id+"\"><i class=\"fa fa-pencil-square-o\"></i> 编辑</a>";
                             }
-                            /**
-                             * 拥有删除权限，则显示删除按钮
-                             */
-                            if (has_delete_permission) {
-                                items[n].operate += " <a data-href=\"/manage/article/delete?id="+data.id+"\" class=\"btn btn-xs btn-danger delete\" data-id=\""+data.id+"\"><i class=\"fa fa-trash\"></i> 编辑</a>";
-                            }
-
-                            // 首页、置顶、状态
-                            if (data.is_home) {
-                                items[n].is_home = "<label class=\"label bg-olive\">是</label>";
-                            } else {
-                                items[n].is_home = "<label class=\"label bg-teal\">否</label>";
-                            }
-                            if (data.is_top) {
-                                items[n].is_top = "<label class=\"label bg-olive\">是</label>";
-                            } else {
-                                items[n].is_top = "<label class=\"label bg-teal\">否</label>";
-                            }
-                            if (data.enable) {
-                                items[n].enable = "<button class=\"btn btn-xs bg-olive enable\">启用</button>";
-                            } else {
-                                items[n].enable = "<button class=\"btn btn-xs bg-teal enable\">禁用</button>";
-                            }
-                            items[n].sort ="<div class=\"layui-input-inline\">" +
-                                                "<input type=\"text\" class=\"list-sort-input\" data-id=\""+data.id+"\" value=\""+data.sort+"\">" +
-                                          "</div>";
-
                         }
                         return items;
                     }
@@ -320,20 +386,20 @@ $(function () {
                     }
                 },
                 {data:"id"},
-                {data:"article_cat",className:"text-center"},
                 {data:"title"},
-                {data:"author",className:"text-center"},
+                {data:"article_cat_name",className:"text-center"},
+                {data:"article_author_name",className:"text-center"},
+                {data:"content_type",className:"text-center"},
+                {data:"sort",className:"text-center"},
+                {data:"awesome",className:"text-center"},
                 {data:"click",className:"text-center"},
                 {data:"is_home",className:"text-center"},
                 {data:"is_top",className:"text-center"},
-                {data:"enable",className:"text-center"},
-                {data:"sort",className:"text-center"},
-                {data:"template",className:"text-center"},
-                {data:"show_time",className:"text-center"},
-                {data:"real_name",className:"text-center"},
-                {data:"dept_name",className:"text-center"},
+                {data:"allow_comment",className:"text-center"},
+                {data:"display_time",className:"text-center"},
                 {data:"create_time",className:"text-center"},
                 {data:"update_time",className:"text-center"},
+                {data:"enable",className:"text-center"},
                 {data:"operate",className:"text-center"}
             ],
             /**
