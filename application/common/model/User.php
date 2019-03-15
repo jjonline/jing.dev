@@ -133,7 +133,7 @@ class User extends Model
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    public function getUserList()
+    public function getUserTreeList()
     {
         $result = $this->field(['id', 'real_name'])
             ->order([

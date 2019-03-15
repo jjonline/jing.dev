@@ -610,6 +610,19 @@ class UserService
     }
 
     /**
+     * 获取所有用户ID和姓名列表
+     * @return array
+     */
+    public function getUserTreeList()
+    {
+        try {
+            return $this->User->getUserTreeList();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
      * 生成客户端加密cookie
      * @param $User []|UserModel 用户模型
      * @return string
