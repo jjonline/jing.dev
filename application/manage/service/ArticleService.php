@@ -11,6 +11,7 @@ namespace app\manage\service;
 use app\manage\model\Article;
 use app\common\service\LogService;
 use think\Exception;
+use think\facade\Session;
 use think\Request;
 
 class ArticleService
@@ -157,5 +158,35 @@ class ArticleService
         } catch (\Throwable $e) {
             return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage(), 'data' => null];
         }
+    }
+
+    /**
+     * 有权限的读取文章
+     * @param int $id
+     * @param array $act_user_info
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getAuthArticleById($id, $act_user_info)
+    {
+        $article = $this->Article->getDataById($id);
+        if (empty($article)) {
+            return [];
+        }
+        /**
+         * 所属用户对应或根用户直接返回
+         */
+        if ($act_user_info['id'] == $article['user_id'] || $act_user_info['is_root']) {
+            return $article;
+        }
+        /**
+         * 属于下辖部门
+         */
+        if (in_array($article['dept_id'], $act_user_info['dept_auth']['dept_id_vector'])) {
+            return $article;
+        }
+        return [];
     }
 }

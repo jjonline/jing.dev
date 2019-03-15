@@ -25,7 +25,7 @@ class Article extends Model
         if (empty($id)) {
             return [];
         }
-        $result = $this->where('id', $id)->find();
+        $result = $this->field(true)->where('id', $id)->find();
         return empty($result) ? [] : $result->toArray();
     }
 }
