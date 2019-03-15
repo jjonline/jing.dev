@@ -53,29 +53,72 @@ class ArticleController extends BaseController
     }
 
     /**
-     * 新增图文文章
+     * 新增文章
      * @param ArticleService $articleService
-     * @return mixed
+     * @return array|mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function createAction(ArticleService $articleService)
     {
         if ($this->request->isPost() && $this->request->isAjax()) {
             return $articleService->save($this->request);
         }
-        return $this->renderJson('error', 500);
+        $common = [
+            'title'            => '新增文章 - ' . config('local.site_name'),
+            'content_title'    => '新增文章',
+            'content_subtitle' => '新增网站前台文章',
+            'breadcrumb'       => [
+                ['label' => '文章列表和管理', 'url' => url('article/list')],
+                ['label' => '新增文章', 'url' => ''],
+            ],
+            'load_layout_css'  => true,
+            'load_layout_js'   => true,
+        ];
+        $this->assign($common);
+
+//        dump($this->UserInfo);
+
+        return $this->fetch();
     }
 
     /**
-     * 编辑图文文章
+     * 编辑文章
      * @param ArticleService $articleService
-     * @return mixed
+     * @return array|mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function editAction(ArticleService $articleService)
     {
         if ($this->request->isPost() && $this->request->isAjax()) {
             return $articleService->save($this->request);
         }
-        return $this->renderJson('error', 500);
+
+        // 检查编辑权限
+        $article = $articleService->getAuthArticleById($this->request->get('id'), $this->UserInfo);
+        if (empty($article)) {
+            $this->error("文章不存在或您无权限编辑该文章");
+        }
+
+        $common = [
+            'title'            => '编辑文章 - ' . config('local.site_name'),
+            'content_title'    => '编辑文章',
+            'content_subtitle' => '编辑网站前台文章',
+            'breadcrumb'       => [
+                ['label' => '文章列表和管理', 'url' => url('article/list')],
+                ['label' => '编辑文章', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
+        ];
+        $this->assign($common);
+
+        // dump($this->UserInfo);
+
+        return $this->fetch();
     }
 
     /**
