@@ -8,6 +8,7 @@
 
 namespace app\manage\service;
 
+use app\manage\model\Article;
 use app\manage\model\ArticleCat;
 use app\common\service\LogService;
 use think\facade\Config;
@@ -22,6 +23,10 @@ class ArticleCatService
      */
     public $ArticleCat;
     /**
+     * @var Article
+     */
+    public $Article;
+    /**
      * @var LogService
      */
     public $LogService;
@@ -30,8 +35,9 @@ class ArticleCatService
      */
     public $CacheTag = 'Article.Cat.Tag';
 
-    public function __construct(ArticleCat $articleCat, LogService $logService)
+    public function __construct(Article $article, ArticleCat $articleCat, LogService $logService)
     {
+        $this->Article    = $article;
         $this->ArticleCat = $articleCat;
         $this->LogService = $logService;
     }
@@ -67,33 +73,50 @@ class ArticleCatService
     public function save(Request $request)
     {
         try {
-            $_articleCat = $request->post('articleCat/a');
+            $_articleCat = $request->post('ArticleCat/a');
+            if (empty($_articleCat['name']) || $_articleCat['parent_id'] == -1) {
+                throw new Exception('上级分类或分类名称缺失');
+            }
             $is_edit = !empty($_articleCat['id']);
-            $articleCat = [];
             if ($is_edit) {
-                // 编辑模式
-                $exist_data = $this->ArticleCat->getDataById($_articleCat['id']);
-                if (empty($exist_data)) {
-                    throw new Exception('拟编辑的文章分类数据不存在');
+                $exist_cat = $this->ArticleCat->getDataById($_articleCat['id']);
+                if (empty($exist_cat)) {
+                    throw new Exception('拟编辑分类不存在');
                 }
-
+            }
+            // 构造数据
+            $ArticleCat           = [];
+            $ArticleCat['name']   = trim($_articleCat['name']);
+            $ArticleCat['sort']   = intval($_articleCat['sort']) < 0 ? 1 : intval($_articleCat['sort']);
+            $ArticleCat['icon']   = trim($_articleCat['icon']);
+            $ArticleCat['remark'] = trim($_articleCat['remark']);
+            $ArticleCat['level']  = 1;
+            // 处理上级分类和层级
+            if ($_articleCat['parent_id'] != 0) {
+                $parent_articleCat= $this->ArticleCat->getDataById($_articleCat['parent_id']);
+                if (empty($parent_articleCat)) {
+                    throw new Exception('所选上级分类不存在');
+                }
+                if ($parent_articleCat['level'] >= 3) {
+                    throw new Exception('分类最大允许3级');
+                }
+                $ArticleCat['level']     = $parent_articleCat['level'] + 1;
+                $ArticleCat['parent_id'] = $parent_articleCat['id'];
+            }
+            if ($is_edit) {
+                $ArticleCat['id'] = $_articleCat['id'];
+                $result = $this->ArticleCat->isUpdate(true)->data($ArticleCat)->save();
             } else {
-                // 新增模式
-
+                $result = $this->ArticleCat->isUpdate(false)->data($ArticleCat)->save();
             }
-
-            $effect_rows = $this->ArticleCat->isUpdate($is_edit)->save($articleCat);
-            if (false === $effect_rows) {
-                throw new Exception('系统异常：保存数据失败');
+            if (false !== $result) {
+                Cache::clear($this->CacheTag);// 按标签清理分类缓存
+                $this->LogService->logRecorder($ArticleCat, $is_edit ? '编辑文章分类' :'新增文章分类');
+                return ['error_code' => 0,'error_msg'   => '分类保存成功'];
             }
-            // 记录日志
-            $this->LogService->logRecorder(
-                [$_articleCat,$articleCat],
-                ($is_edit ? "编辑" : "新增")."文章分类"
-            );
-            return ['error_code' => 0, 'error_msg' => '保存成功', 'data' => null];
+            return ['error_code' => 500,'error_msg' => '分类保存失败：系统异常'];
         } catch (\Throwable $e) {
-            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage(), 'data' => null];
+            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
         }
     }
 
@@ -110,10 +133,12 @@ class ArticleCatService
             if ($sort <= 0) {
                 throw new Exception('排序数字有误');
             }
+
             $articleCat = $this->ArticleCat->getDataById($id);
             if (empty($articleCat)) {
                 throw new Exception('拟编辑排序的文章分类数据不存在');
             }
+
             $effect_rows = $this->ArticleCat->isUpdate(true)->save(['sort' => intval($sort)], ['id' => $id]);
             if (false == $effect_rows) {
                 throw new Exception('排序调整失败：系统异常');
@@ -123,9 +148,10 @@ class ArticleCatService
                 $articleCat,
                 "文章分类快速排序"
             );
-            return ['error_code' => 0, 'error_msg' => '排序调整成功', 'data' => null];
+            Cache::clear($this->CacheTag);// 按标签清理分类缓存
+            return ['error_code' => 0, 'error_msg' => '排序调整成功'];
         } catch (\Throwable $e) {
-            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage(), 'data' => null];
+            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
         }
     }
 
@@ -143,20 +169,25 @@ class ArticleCatService
                 throw new Exception('拟删除的文章分类数据不存在');
             }
 
-            // todo 删除的其他检查
+            // 检查该分类是否有文章
+            if ($this->Article->isArticleCatExistData($id)) {
+                throw new Exception('拟删除的文章分类已有文章数据，确需删除本分类请先删除该分类下的所有文章');
+            }
 
             $effect_rows = $this->ArticleCat->db()->where('id', $id)->delete();
-            if (false == $effect_rows) {
-                throw new Exception('排序调整失败：系统异常');
+            if (false === $effect_rows) {
+                throw new Exception('删除文章分类失败：系统异常');
             }
+
             // 记录日志
             $this->LogService->logRecorder(
                 $articleCat,
                 "删除文章分类"
             );
-            return ['error_code' => 0, 'error_msg' => '已删除', 'data' => null];
+            Cache::clear($this->CacheTag);// 按标签清理分类缓存
+            return ['error_code' => 0, 'error_msg' => '已删除'];
         } catch (\Throwable $e) {
-            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage(), 'data' => null];
+            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
         }
     }
 }
