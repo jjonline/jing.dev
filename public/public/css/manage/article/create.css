@@ -1,0 +1,7 @@
+.article-attr-container {}
+.article-attr-container .article-attr {
+    padding-left:0;
+}
+.article-attr-container .article-attr:last-child {
+    padding-right: 0;
+}

@@ -341,6 +341,12 @@ tr.selected>td {}
     font-size:12px;
     padding-left: 2px;
 }
+/*不是必须与背景色一致占位*/
+.control-label .not-required,.not-required {
+    color: #fff;
+    font-size:12px;
+    padding-left: 2px;
+}
 .div-detail-row{
     padding-top:7px;
 }

@@ -14879,7 +14879,7 @@ UE.plugins['pasteplain'] = function(){
     };
 };
 
-// plugins/list.js
+// plugins/list1.js
 /**
  * 有序列表,无序列表插件
  * @file
