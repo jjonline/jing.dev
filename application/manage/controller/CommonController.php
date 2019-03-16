@@ -18,6 +18,7 @@ use app\common\helper\StringHelper;
 use app\common\service\AttachmentService;
 use app\common\service\DepartmentService;
 use app\common\service\UtilService;
+use app\manage\service\TagService;
 use app\manage\service\UserService;
 use think\Container;
 use think\facade\Config;
@@ -165,6 +166,29 @@ class CommonController extends BasicController
             }
             return $this->renderJson('未登录，请先登录', -1);
         }
+        return $this->renderJson('error');
+    }
+
+    /**
+     * 检索关键词
+     * @param TagService $tagService
+     * @return mixed|\think\Response
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getTagListAction(TagService $tagService)
+    {
+        if ($this->request->isAjax()) {
+            if ($this->getUserInfo()) {
+                $keyword = $this->request->param('query');
+                $result  = $tagService->searchTagList($keyword, $this->UserInfo);
+                return $this->asJson($result);
+            }
+            return $this->renderJson('未登录，请先登录', -1);
+        }
+        return $this->renderJson('error');
     }
 
     /**

@@ -40,8 +40,54 @@ $(function () {
     });
 
     // 添加关键词
+    var has_tag = [];
     $(".add-tag-btn").on("click",function () {
+        utils.bindSearchTag({
+            select:function (data) {
+                if ($.inArray(data.tag, has_tag) >= 0) {
+                    utils.toast("该关键词已添加");
+                    return false;
+                }
 
+                if (has_tag.length >= 5) {
+                    utils.toast("一篇文章最多5个关键词");
+                    return false;
+                }
+
+                // 添加关键词
+                has_tag.push(data.tag);
+                var _html = '';
+                $.each(has_tag,function (i,n) {
+                    _html += '<span class="tag_item">'+n+' <i class="fa fa-trash"></i></span>';
+                });
+                $("#tag_container").html(_html);
+                $("#tags").val(has_tag.join('|'));
+                utils.toast("已添加：" + data.tag);
+            }
+        });
+    });
+    // 删除关键词
+    $("#tag_container").on("click", '.fa-trash', function () {
+       var tag  = utils.trimAllSpace($(this).parent().text());
+       var tags = $("#tags");
+       utils.confirm("确认删除关键词："+tag+" 么？", function () {
+           var exist_tag = tags.val().split('|');
+           var new_tag   = [];
+           $.each(exist_tag,function (i,n) {
+                if (n != tag) {
+                    new_tag.push(n);
+                }
+           });
+           // 重新赋值添加关键词
+           has_tag = new_tag;
+           var _html = '';
+           $.each(has_tag,function (i,n) {
+               _html += '<span class="tag_item">'+n+' <i class="fa fa-trash"></i></span>';
+           });
+           $("#tag_container").html(_html);
+           tags.val(has_tag.join('|'));
+           utils.toast("已删除：" + tag);
+       });
     });
 
 });

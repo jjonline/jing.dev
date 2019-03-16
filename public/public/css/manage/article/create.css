@@ -5,3 +5,38 @@
 .article-attr-container .article-attr:last-child {
     padding-right: 0;
 }
+#tag_container {
+    display: inline-block;
+}
+.tag_item {
+    position: relative;
+    display: inline-block;
+    background-color: #39cccc;
+    color:#fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.18);
+    padding: 6px 22px 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    margin-right:10px;
+}
+.tag_item .fa {
+    position: absolute;
+    right:4px;
+    top:9px;
+    cursor: pointer;
+    color:#e26969;
+}
