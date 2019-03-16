@@ -11,6 +11,22 @@ namespace app\common\helper;
 class ArrayHelper
 {
     /**
+     * 一维数组去除等价false值 + 去重 + 每个元素去除两端空白
+     * @param array $origin 一维数组
+     * @return array
+     */
+    public static function uniqueAndTrimOneDimissionArray($origin)
+    {
+        // 去除等价false值 去除空值
+        $origin = array_unique(array_filter($origin));
+        // 去除元素两边空白
+        foreach ($origin as $key => $value) {
+            $origin[$key] = trim($value);
+        }
+        return $origin;
+    }
+
+    /**
      * 字符串或stdClass转换为纯数组
      * ---
      * 1、字符串形式的

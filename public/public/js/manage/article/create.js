@@ -90,4 +90,54 @@ $(function () {
        });
     });
 
+    // 提交新增
+    $("#ArticleForm").submit(function () {
+        if(utils.isEmpty($("#title").val()))
+        {
+            $("#title").focus();
+            utils.toast('输入文章标题');
+            return false;
+        }
+        if(utils.isEmpty($("#cat_id").val()))
+        {
+            $("#cat_id").focus();
+            utils.toast('请选择文章分类');
+            return false;
+        }
+        if(utils.isEmpty($("#excerpt").val()))
+        {
+            $("#excerpt").focus();
+            utils.toast('请输入文章摘要');
+            return false;
+        }
+        if(utils.isEmpty(editor.getContent()))
+        {
+            editor.focus();
+            utils.toast('请输入文章内容');
+            return false;
+        }
+        $('.btn-submit').prop('disabled',true).text('提交中...');
+        $.ajax({
+            url: $('#ArticleForm').attr('action'),
+            type: 'POST',
+            data: $('#ArticleForm').serializeArray(),
+            success: function (data) {
+                if(data.error_code == 0){
+                    utils.alert(data.error_msg,function () {
+                        location.href = '/manage/article/list';
+                    });
+                }else{
+                    utils.alert(data.error_msg ? data.error_msg : '未知错误');
+                }
+                $('.btn-submit').prop('disabled',false).text('提交保存');
+            },
+            error:function () {
+                $('.btn-submit').prop('disabled',false).text('提交保存');
+                utils.alert('网络或服务器异常，请稍后再试');
+            }
+        });
+
+        return false;
+    });
+
 });
