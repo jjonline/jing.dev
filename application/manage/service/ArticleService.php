@@ -10,6 +10,8 @@ namespace app\manage\service;
 
 use app\manage\model\Article;
 use app\common\service\LogService;
+use app\manage\model\ArticleCat;
+use app\manage\model\Tag;
 use think\Exception;
 use think\facade\Session;
 use think\Request;
@@ -21,13 +23,27 @@ class ArticleService
      */
     public $Article;
     /**
+     * @var ArticleCat
+     */
+    public $ArticleCat;
+    /**
+     * @var Tag
+     */
+    public $Tag;
+    /**
      * @var LogService
      */
     public $LogService;
 
-    public function __construct(Article $article, LogService $logService)
-    {
-        $this->Article = $article;
+    public function __construct(
+        Article $article,
+        ArticleCat $articleCat,
+        Tag $tag,
+        LogService $logService
+    ) {
+        $this->Article    = $article;
+        $this->ArticleCat = $articleCat;
+        $this->Tag        = $tag;
         $this->LogService = $logService;
     }
 
@@ -39,7 +55,34 @@ class ArticleService
     public function save(Request $request)
     {
         try {
-            $_article = $request->post('article/a');
+            $_article = $request->post('Article/a');
+            if (empty($_article['title']) || mb_strlen($_article['title']) > 128) {
+                throw new Exception('标题不得为空或大于128字符');
+            }
+            if (empty($_article['excerpt']) || mb_strlen($_article['excerpt']) > 140) {
+                throw new Exception('摘要不得为空或大于140字符');
+            }
+            if (empty($_article['content']) || mb_strlen($_article['content']) > 65535) {
+                throw new Exception('内容不得为空或大于6万个字符');
+            }
+            if (!empty($_article['remark']) && mb_strlen($_article['remark']) > 255) {
+                throw new Exception('备注不得大于255字符');
+            }
+            if (!empty($_article['author']) && mb_strlen($_article['author']) > 32) {
+                throw new Exception('作者不得大于32字符');
+            }
+            if (!empty($_article['source']) && mb_strlen($_article['source']) > 128) {
+                throw new Exception('来源不得大于128字符');
+            }
+            if (!empty($_article['template']) && mb_strlen($_article['template']) > 32) {
+                throw new Exception('自定义模板不得大于32字符');
+            }
+            // 检查文章分类
+            $exist_cat = $this->ArticleCat->getDataById($_article['cat_id']);
+            if (empty($exist_cat)) {
+                throw new Exception('所选文章分类不存在');
+            }
+
             $is_edit = !empty($_article['id']);
             $article = [];
             if ($is_edit) {
@@ -48,10 +91,34 @@ class ArticleService
                 if (empty($exist_data)) {
                     throw new Exception('拟编辑的文章数据不存在');
                 }
-
+                $article['id'] = $_article['id'];
             } else {
-                // 新增模式
+                // 新增模式 补充创建者和部门
+                $article['user_id'] = Session::get('user_info.id');
+                $article['dept_id'] = Session::get('user_info.dept_id');
+            }
 
+            // 构造文章数据
+            $article['title']    = $_article['title'];
+            $article['cat_id']   = $_article['cat_id'];
+            $article['cover_id'] = $_article['cover_id'] ?: '';
+            $article['excerpt']  = $_article['excerpt'];
+            $article['content']  = $_article['content'];
+            $article['author']   = $_article['author'];
+            $article['source']   = $_article['source'];
+            $article['template'] = $_article['template'];
+            $article['remark']   = $_article['remark'];
+            $article['click']    = $_article['click'] ? intval($_article['click']) : 0;
+            $article['enable']   = empty($_article['enable']) ? 1 : 0;
+            $article['is_home']  = empty($_article['is_home']) ? 0 : 1;
+            $article['is_top']   = empty($_article['is_top']) ? 0 : 1;
+
+            // 处理tags关键词
+            if (empty($_article['tags'])) {
+                $article['tags'] = '';
+            } else {
+                // 智能读取或新增tag并返回半角逗号分隔的文章tag字段值
+                $article['tags'] = $this->Tag->autoSaveTags($_article['tags']);
             }
 
             $effect_rows = $this->Article->isUpdate($is_edit)->save($article);

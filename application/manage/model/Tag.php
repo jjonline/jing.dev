@@ -8,6 +8,8 @@
 
 namespace app\manage\model;
 
+use app\common\helper\ArrayHelper;
+use think\facade\Session;
 use think\Model;
 
 class Tag extends Model
@@ -27,5 +29,43 @@ class Tag extends Model
         }
         $result = $this->where('id', $id)->find();
         return empty($result) ? [] : $result->toArray();
+    }
+
+    /**
+     * 关键词自动存储读取
+     * @param string $tag tag1|tag2 形式的多个关键词
+     * @return string 1,3,5 形式的字符串
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function autoSaveTags($tag = '')
+    {
+        if (empty($tag)) {
+            return '';
+        }
+        $tags = ArrayHelper::uniqueAndTrimOneDimissionArray(explode('|', $tag));
+        if (empty($tags)) {
+            return '';
+        }
+
+        $result = [];
+        foreach ($tags as $tag) {
+            $exist_tag = $this->db()->field(true)->where('tag', $tag)->find();
+            if (empty($exist_tag)) {
+                $result[] = $this->db()->insertGetId([
+                    'tag'     => $tag,
+                    'quota'   => 1,
+                    'user_id' => Session::get('user_info.id'),
+                    'dept_id' => Session::get('user_info.dept_id'),
+                ]);
+            } else {
+                $this->db()->where('id', $exist_tag['id'])->setInc('quota'); // 引用+1
+                $result[] = $exist_tag['id'];
+            }
+        }
+
+        return implode(',', $result);
     }
 }
