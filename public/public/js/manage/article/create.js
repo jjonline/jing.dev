@@ -30,4 +30,18 @@ $(function () {
         }//裁剪或上传失败的回调函数
     });
 
+    // 自定义文章显示时间
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        laydate.render({
+            elem: '#show_time',
+            type: 'datetime'
+        });
+    });
+
+    // 添加关键词
+    $(".add-tag-btn").on("click",function () {
+
+    });
+
 });

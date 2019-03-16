@@ -72,7 +72,7 @@ class MenuController extends BaseController
 
         $MenuModel = new Menu();
         $list      = $MenuModel->getMenuList();
-        $this->assign('list', $list);
+        $this->assign('list', array_merge($list)); // 重排数字索引
         return $this->fetch();
     }
 
@@ -110,7 +110,7 @@ class MenuController extends BaseController
             $this->redirect(url('menu/list'));
         }
         $this->assign('menu_edit', $menu);
-        $this->assign('list', $list);
+        $this->assign('list', array_merge($list)); // 重排数字索引
         return $this->fetch();
     }
 
