@@ -307,6 +307,7 @@ $(function () {
      *  placeholder:搜素框的提示语
      *  is_large:boolean,//大浮层还是小浮层，默认大
      *  url:检索url，默认/manage/common/getUserList即可
+     *  select:function (data) {}
      * }
      */
     utils.bindSearchUser = function (option) {
@@ -421,11 +422,11 @@ $(function () {
                                 });
                             }
                         }else {
-                            $("#ProductModalContainer").html('<div class="search-context">'+(data.error_msg ? data.error_msg : '未知错误')+'</div>');
+                            $("#_UserSearchContainer_").html('<div class="search-context">'+(data.error_msg ? data.error_msg : '未知错误')+'</div>');
                         }
                     },
                     error: function () {
-                        $("#ProductModalContainer").html('<div class="search-context">服务器异常，请稍后再试</div>');
+                        $("#_UserSearchContainer_").html('<div class="search-context">服务器异常，请稍后再试</div>');
                     }
                 });
             }, 200);
@@ -446,6 +447,170 @@ $(function () {
             var data = $(this).parents('tr').data('json');
             options.select(data);
             $('#_UserSearchModal_').modal('hide');
+        });
+
+    };
+
+    /**
+     * 通用检索tag关键词方法浮层
+     * @param option object
+     * {
+     *  title:搜索框的标题
+     *  placeholder:搜素框的提示语
+     *  is_large:boolean,//大浮层还是小浮层，默认大
+     *  url:检索url，默认/manage/common/getTagList即可
+     *  select:function (data) {} // 选中1个之后的回调函数
+     * }
+     */
+    utils.bindSearchTag = function (option) {
+        var options = $.extend({
+            title:'检索Tag关键词',//模型层标题
+            is_large:true,//模型层标题
+            placeholder:'输入tag关键词或关键词ID后检索，或直接输入关键词添加',//输入框placeholder
+            url:'/manage/common/getTagList',//检索请求的url
+            select:function (data) {} //勾选用户后的回调函数，参数为所选用户的object
+        },option);
+        var search_table = '<script type="text/html" id="_Tag_Search_Container_">' +
+            '    <table class="table table-bordered table-hover" id="_Tag_Search_Table_" style="width:100%;">' +
+            '        <thead>' +
+            '        <tr>' +
+            '            <th data-priority="1">ID</th>' +
+            '            <th data-priority="2">Tag</th>' +
+            '            <th data-priority="4">引用次数</th>' +
+            '            <th data-priority="3">创建者</th>' +
+            '            <th data-priority="5">创建时间</th>' +
+            '            <th style="text-align: center;padding-right: 0;">操作</th>' +
+            '        </tr>' +
+            '        </thead>' +
+            '        <tbody>' +
+            '        <% for(var n = 0; n< tags.length; n++) {' +
+            '        var tag = tags[n];' +
+            '        %>' +
+            '        <tr data-json=\'<%=JSON.stringify(tag)%>\'>' +
+            '            <td><%=tag.id%></td>' +
+            '            <td><%=tag.tag%></td>' +
+            '            <td><%=tag.quota%></td>' +
+            '            <td><%=tag.real_name%></td>' +
+            '            <td><%=tag.create_time%></td>' +
+            '            <td style="text-align: center;"><button class="btn btn-xs btn-info select"><i class="fa fa-plus" title="点击选择"></i></button></td>' +
+            '        </tr>' +
+            '        <% } %>' +
+            '        </tbody>' +
+            '    </table>' +
+            '</script>';
+        var search_modal = '<div class="modal fade" id="_TagSearchModal_" role="dialog" data-backdrop="static" aria-hidden="true">' +
+            '    <div class="modal-dialog modal-lg">' +
+            '        <div class="modal-content">' +
+            '            <div class="modal-header">' +
+            '                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '                <h4 class="modal-title" id="_TagSearchModalLabel_">检索客户</h4>' +
+            '            </div>' +
+            '            <div class="modal-body">' +
+            '                <div class="row">' +
+            '                    <div class="col-md-12">' +
+            '                        <div class="row">' +
+            '                            <div class="col-sm-12">' +
+            '                                <div class="input-group search-control">' +
+            '                                    <input type="text" class="form-control" id="_TagSearchInput_" placeholder="" value="" autocomplete="off" />' +
+            '                                    <span class="input-group-addon _tag_search_" style="cursor: pointer;">' +
+            '                                        <i class="fa fa-search"></i> 检索' +
+            '                                    </span>' +
+            '                                    <span class="input-group-addon bg-aqua _tag_add_" style="cursor: pointer;">' +
+            '                                        <i class="fa fa-plus"></i> 直接添加' +
+            '                                    </span>' +
+            '                                </div>' +
+            '                            </div>' +
+            '                        </div>' +
+            '                    </div>' +
+            '                    <div class="col-md-12" id="_TagSearchContainer_"></div>' +
+            '                </div>' +
+            '            </div>' +
+            '        </div>' +
+            '    </div>' +
+            '</div>';
+        if(!$('#_TagSearchModal_').html())
+        {
+            $('body').append(search_modal).append(search_table);
+        }
+        var keyUpHandle;
+        var MessageTable;
+        if(!options.is_large)
+        {
+            $('#_TagSearchModal_').find('.modal-dialog').removeClass('modal-lg');
+        } else {
+            $('#_TagSearchModal_').find('.modal-dialog').addClass('modal-lg');
+        }
+        // 设置模型层标题
+        $('#_TagSearchModalLabel_').text(options.title);
+        $('#_TagSearchInput_').attr('placeholder',options.placeholder);
+        // 绑定事件
+        function searchTag()
+        {
+            var key  = $("#_TagSearchInput_").val();
+            keyUpHandle && clearTimeout(keyUpHandle);
+            keyUpHandle = setTimeout(function () {
+                $('#_TagSearchContainer_').html('<div class="search-context">加载中...</div>');
+                $.ajax({
+                    type: "GET",
+                    url: options.url,
+                    data: {query: key},
+                    success: function (data) {
+                        if(data.error_code == 0)
+                        {
+                            $('#_TagSearchContainer_').html('');
+                            MessageTable && MessageTable.destroy();
+                            if(data.data)
+                            {
+                                var dataHTML = tmpl("_Tag_Search_Container_", {
+                                    tags: data.data
+                                });
+
+                                $("#_TagSearchContainer_").html(dataHTML);
+                                MessageTable = $('#_Tag_Search_Table_').DataTable({
+                                    paging: false,
+                                    searching: false,
+                                    ordering: false,
+                                    info: false,
+                                    language: {
+                                        emptyTable: '<div class="search-context">没有查询到数据，在上方修改关键字后再试或直接添加</div>'
+                                    }
+                                });
+                            }
+                        }else {
+                            $("#_TagSearchContainer_").html('<div class="search-context">'+(data.error_msg ? data.error_msg : '未知错误')+'</div>');
+                        }
+                    },
+                    error: function () {
+                        $("#_TagSearchContainer_").html('<div class="search-context">服务器异常，请稍后再试</div>');
+                    }
+                });
+            }, 200);
+        }
+        // 延迟执行
+        setTimeout(function () {
+            $('#_TagSearchModal_').modal('show');
+            searchTag();
+            $('#_TagSearchInput_').select();
+        },200);
+        // 绑定搜索客户键盘事件
+        $("#_TagSearchModal_").on("keyup", "#_TagSearchInput_", function () {
+            searchTag();
+        }).on("click", "._tag_search_", function () {
+            // 从库里搜索
+            searchTag();
+        }).on('click','.select',function () {
+            // 选择某个tag动作
+            var data = $(this).parents('tr').data('json');
+            options.select(data);
+            // $('#_TagSearchModal_').modal('hide');
+        }).on("click","._tag_add_",function () {
+            // 直接添加输入值
+            var input = $("#_TagSearchInput_");
+            var data = {"tag":input.val(), 'id':0,'quota':0,'create_time':null,'real_name':''};
+            if (!utils.isEmpty(data.tag)) {
+                options.select(data);
+                input.val("").focus(); // 清空输入项并获得焦点
+            }
         });
 
     };

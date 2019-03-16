@@ -56,7 +56,7 @@ class UserService
         }
         $data = $this->User->db()->alias('user')
             ->leftJoin('department department', 'department.id = user.dept_id')
-            ->where(function (Query $query) use ($keyword,$dept_auth) {
+            ->where(function (Query $query) use ($keyword, $dept_auth) {
                 $query->where('user.dept_id', 'IN', $dept_auth['dept_id_vector'])
                   ->where('user.user_name|user.real_name|user.mobile', 'LIKE', '%'.$keyword.'%');
             })
