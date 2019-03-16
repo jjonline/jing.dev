@@ -73,7 +73,7 @@
             <div class="modal-body">
                 <form action="<%{:url('department/edit')}%>" data-edit="<%{:url('department/edit')}%>" data-create="<%{:url('department/create')}%>" class="form-horizontal" id="DeptForm">
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">上级部门<span class="required">*</span></label>
+                        <label class="col-sm-3 control-label">上级部门 <span class="required">*</span></label>
                         <div class="col-sm-8">
                             <select name="Dept[parent_id]" id="parent_id" class="form-control select2" style="width: 100%;">
                                 <option value="-1">--请选择上级部门--</option>
@@ -90,20 +90,20 @@
                     <input type="hidden" id="id" name="Dept[id]" value="" disabled="disabled">
 
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">部门名称<span class="required">*</span></label>
+                        <label class="col-sm-3 control-label">部门名称 <span class="required">*</span></label>
                         <div class="col-sm-8">
                             <input type="text" id="name" class="form-control" name="Dept[name]" placeholder="公司名、业务部门名、团队名等">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">部门排序</label>
+                        <label class="col-sm-3 control-label">部门排序 <span class="not-required">*</span></label>
                         <div class="col-sm-8">
-                            <input type="number" id="sort" class="form-control" name="Dept[sort]" placeholder="自定部门层级内的排序，大于0的整数，数字越小越靠前">
+                            <input type="number" id="sort" class="form-control" name="Dept[sort]" placeholder="大于0的整数，数字越小本层级内越靠前">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">备注信息</label>
+                        <label class="col-sm-3 control-label">备注信息 <span class="not-required">*</span></label>
                         <div class="col-sm-8">
                             <textarea id="remark" rows=3 class="form-control" name="Dept[remark]" placeholder="对该部门的备注信息"></textarea>
                         </div>

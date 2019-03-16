@@ -30,10 +30,10 @@
                         <th data-priority="1">名称</th>
                         <th data-priority="5">标签</th>
                         <th data-priority="6">Url</th>
-                        <th data-priority="7" style="text-align: center;">图标</th>
+                        <th data-priority="7" class="text-center">图标</th>
                         <th data-priority="8">备注</th>
                         <th data-priority="3">排序</th>
-                        <th data-priority="2" style="text-align: center;">操作</th>
+                        <th data-priority="2" class="text-center">操作</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -43,7 +43,7 @@
                         <td><%{$item.name|raw}%></td>
                         <td><%{$item.tag}%></td>
                         <td><%{$item.url}%></td>
-                        <td style="text-align: center;">
+                        <td class="text-center">
                             <%{if condition="empty($item.icon)"}%>
                                 无
                             <%{else/}%>
@@ -56,7 +56,7 @@
                                 <input type="text" class="list-sort-input" data-id="<%{$item.id}%>" value="<%{$item.sort}%>">
                             </div>
                         </td>
-                        <td style="text-align: center;">
+                        <td class="text-center">
                             <a href="<%{:url('menu/edit',['id' => $item.id])}%>" class="btn btn-xs btn-success"><i class="fa fa-pencil-square-o"></i> 编辑</a>
                             <%{if condition="empty($item.is_system)"}%>
                                 <a href="javascript:;" data-href="<%{:url('menu/delete',['id' => $item.id])}%>" class="btn btn-xs btn-danger delete" data-id="<%{$item.id}%>"><i class="fa fa-trash-o"></i> 删除</a>

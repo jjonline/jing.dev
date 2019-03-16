@@ -28,4 +28,17 @@ class Article extends Model
         $result = $this->field(true)->where('id', $id)->find();
         return empty($result) ? [] : $result->toArray();
     }
+
+    /**
+     * 检查某文章分类下是否有文章
+     * @param int $cat_id
+     * @return bool
+     */
+    public function isArticleCatExistData($cat_id)
+    {
+        if (empty($cat_id)) {
+            return false;
+        }
+        return !!$this->where('cat_id', $cat_id)->count();
+    }
 }

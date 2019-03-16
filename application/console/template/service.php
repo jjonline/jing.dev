@@ -62,9 +62,9 @@ class __CONTROLLER__Service
                 [$___CONTROLLER_LOWER__,$__CONTROLLER_LOWER__],
                 ($is_edit ? "编辑" : "新增")."__LIST_NAME__"
             );
-            return ['error_code' => 0, 'error_msg' => '保存成功', 'data' => null];
+            return ['error_code' => 0, 'error_msg' => '保存成功'];
         } catch (\Throwable $e) {
-            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage(), 'data' => null];
+            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
         }
     }
 
@@ -94,9 +94,9 @@ class __CONTROLLER__Service
                 $__CONTROLLER_LOWER__,
                 "__LIST_NAME__快速排序"
             );
-            return ['error_code' => 0, 'error_msg' => '排序调整成功', 'data' => null];
+            return ['error_code' => 0, 'error_msg' => '排序调整成功'];
         } catch (\Throwable $e) {
-            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage(), 'data' => null];
+            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
         }
     }
 
@@ -117,7 +117,7 @@ class __CONTROLLER__Service
             // todo 删除的其他检查
 
             $effect_rows = $this->__CONTROLLER__->db()->where('id', $id)->delete();
-            if (false == $effect_rows) {
+            if (false === $effect_rows) {
                 throw new Exception('删除操作失败：系统异常');
             }
             // 记录日志
@@ -125,9 +125,9 @@ class __CONTROLLER__Service
                 $__CONTROLLER_LOWER__,
                 "删除__LIST_NAME__"
             );
-            return ['error_code' => 0, 'error_msg' => '已删除', 'data' => null];
+            return ['error_code' => 0, 'error_msg' => '已删除'];
         } catch (\Throwable $e) {
-            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage(), 'data' => null];
+            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
         }
     }
 }

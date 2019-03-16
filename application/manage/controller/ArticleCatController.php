@@ -14,9 +14,10 @@ class ArticleCatController extends BaseController
 {
     /**
      * 文章分类管理
+     * @param ArticleCatService $articleCatService
      * @return mixed
      */
-    public function listAction()
+    public function listAction(ArticleCatService $articleCatService)
     {
         $common = [
             'title'            => '文章分类管理 - ' . config('local.site_name'),
@@ -30,6 +31,13 @@ class ArticleCatController extends BaseController
             'load_layout_js'   => true,
         ];
         $this->assign($common);
+
+        $list = $articleCatService->getArticleCatTreeList();
+        $this->assign('list', $list);
+        $this->assign('can_create', user_has_permission('manage/article_cat/create'));
+        $this->assign('can_edit', user_has_permission('manage/article_cat/edit'));
+        $this->assign('can_delete', user_has_permission('manage/article_cat/delete'));
+        $this->assign('can_sort', user_has_permission('manage/article_cat/sort'));
 
         return $this->fetch();
     }
