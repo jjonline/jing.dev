@@ -141,10 +141,6 @@ class AuthService
             $menu[$key1]['children'] = $_menu2;
         }
 
-        //dump($menu);exit;
-
-        //dump($this->userHasPermission());
-
         // 设置高亮
         $menu = $this->setHighLight($menu, $highLight);
 
@@ -156,9 +152,6 @@ class AuthService
      * @param string $auth_tag 检查权限的Url或该菜单对应为全局唯一的字符串即菜单的tag字符串，为null则检查当前Url
      * @return bool
      * @throws Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     public function userHasPermission($auth_tag = null)
     {
@@ -168,40 +161,44 @@ class AuthService
             throw new Exception('未初始化用户登录状态不可调用userHasPermission方法', 500);
         }
 
-        // 如果未传参则拼接当前url
-        if (empty($auth_tag)) {
-            $request  = request();
-            $auth_tag = $this->generateRequestMenuUrl($request);
-        }
-
-        // 缓存数据的Key
-        $user_menu_cache_Map_key = 'User_menu_cache_Map_key'.$user_id;
-        if (!Config::get('app.app_debug')) {
-            $user_menu_map = Cache::get($user_menu_cache_Map_key);
-            if (!empty($user_menu_map)) {
-                // 查找到缓存 直接从缓存中判断
-                return isset($user_menu_map[$auth_tag]);
-                // return array_key_exists($auth_tag,$user_menu_map);
+        try {
+            // 如果未传参则拼接当前url
+            if (empty($auth_tag)) {
+                $request  = request();
+                $auth_tag = $this->generateRequestMenuUrl($request);
             }
-        }
 
-        // 处理菜单数据
-        $user_menu_map = $this->getUserMenuList();
-        if (empty($user_menu_map)) {
+            // 缓存数据的Key
+            $user_menu_cache_Map_key = 'User_menu_cache_Map_key'.$user_id;
+            if (!Config::get('app.app_debug')) {
+                $user_menu_map = Cache::get($user_menu_cache_Map_key);
+                if (!empty($user_menu_map)) {
+                    // 查找到缓存 直接从缓存中判断
+                    return isset($user_menu_map[$auth_tag]);
+                    // return array_key_exists($auth_tag,$user_menu_map);
+                }
+            }
+
+            // 处理菜单数据
+            $user_menu_map = $this->getUserMenuList();
+            if (empty($user_menu_map)) {
+                return false;
+            }
+
+            // 按url和tag分组，url和tag成为数组的键名
+            $user_menu_map1 = ArrayHelper::group($user_menu_map, 'url');
+            $user_menu_map2 = ArrayHelper::group($user_menu_map, 'tag');
+            $user_menu_map  = array_merge($user_menu_map1, $user_menu_map2);
+
+            // 依据开发模式与否将全新Map数组缓存
+            if (!Config::get('app.app_debug')) {
+                Cache::tag($this->cache_tag)->set($user_menu_cache_Map_key, $user_menu_map, 3600 * 12);
+            }
+            // return array_key_exists($auth_tag,$user_menu_map);
+            return isset($user_menu_map[$auth_tag]);
+        } catch (\Throwable $e) {
             return false;
         }
-
-        // 按url和tag分组，url和tag成为数组的键名
-        $user_menu_map1 = ArrayHelper::group($user_menu_map, 'url');
-        $user_menu_map2 = ArrayHelper::group($user_menu_map, 'tag');
-        $user_menu_map  = array_merge($user_menu_map1, $user_menu_map2);
-
-        // 依据开发模式与否将全新Map数组缓存
-        if (!Config::get('app.app_debug')) {
-            Cache::tag($this->cache_tag)->set($user_menu_cache_Map_key, $user_menu_map, 3600 * 12);
-        }
-        return isset($user_menu_map[$auth_tag]);
-        // return array_key_exists($auth_tag,$user_menu_map);
     }
 
     /**
@@ -254,17 +251,17 @@ class AuthService
 
     /**
      * 获取用户指定Url的权限标记，即返回：['super','leader','staff','guest']中的一者
-     * @param null $url
-     * @return mixed
-     * @throws Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @param mixed $tag 待检查的菜单标签名称或菜单无前缀url
+     * @return string 一下4个中的1个-super|leader|staff|guest
      */
-    public function getUserPermissionsTag($url = null)
+    public function getUserPermissionsTag($tag = null)
     {
-        $menu = $this->getUserSingleMenuInfo($url);
-        return $menu['permissions'];
+        try {
+            $menu = $this->getUserSingleMenuInfo($tag);
+            return $menu['permissions'];
+        } catch (\Throwable $e) {
+            return Menu::PERMISSION_GUEST;
+        }
     }
 
     /**

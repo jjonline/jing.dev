@@ -316,6 +316,7 @@ $(function () {
             is_large:true,//模型层标题
             placeholder:'输入用户名、姓名、手机号搜索用户',//输入框placeholder
             url:'/manage/common/getUserList',//检索请求的url
+            dept_id:'', // 指定检索摸个部门及子部门，不指定则检索所有
             select:function (data) {} //勾选用户后的回调函数，参数为所选用户的object
         },option);
         var search_table = '<script type="text/html" id="_User_Search_Container_">' +
@@ -398,7 +399,7 @@ $(function () {
                 $.ajax({
                     type: "GET",
                     url: options.url,
-                    data: {query: key},
+                    data: {query: key, dept_id:option.dept_id},
                     success: function (data) {
                         if(data.error_code == 0)
                         {

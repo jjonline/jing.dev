@@ -12,6 +12,7 @@ use app\manage\model\Article;
 use app\common\service\LogService;
 use app\manage\model\ArticleCat;
 use app\manage\model\Tag;
+use app\manage\model\User;
 use think\Exception;
 use think\facade\Session;
 use think\Request;
@@ -31,6 +32,10 @@ class ArticleService
      */
     public $Tag;
     /**
+     * @var User
+     */
+    public $User;
+    /**
      * @var LogService
      */
     public $LogService;
@@ -39,11 +44,13 @@ class ArticleService
         Article $article,
         ArticleCat $articleCat,
         Tag $tag,
+        User $user,
         LogService $logService
     ) {
         $this->Article    = $article;
         $this->ArticleCat = $articleCat;
         $this->Tag        = $tag;
+        $this->User       = $user;
         $this->LogService = $logService;
     }
 
@@ -93,9 +100,22 @@ class ArticleService
                 }
                 $article['id'] = $_article['id'];
             } else {
-                // 新增模式 补充创建者和部门
+                // 新增模式 补充默认的创建者和所属部门
                 $article['user_id'] = Session::get('user_info.id');
                 $article['dept_id'] = Session::get('user_info.dept_id');
+            }
+
+            // 依据是否设置创建人变更文章创建者和所属部门
+            if (!empty($_article['create_user_id'])) {
+                /**
+                 * 这里暂时不检查当前处理用户是否有权限指定创建人，记录下日志
+                 */
+                $assign_user = $this->User->getUserById($_article['create_user_id']);
+                if (!empty($assign_user)) {
+                    $article['user_id'] = $assign_user['id'];
+                    $article['dept_id'] = $assign_user['dept_id'];
+                    $this->LogService->logRecorder($assign_user, ($is_edit ? "编辑" : "新增")."文章指定创建人");
+                }
             }
 
             // 构造文章数据
@@ -128,7 +148,7 @@ class ArticleService
             // 记录日志
             $this->LogService->logRecorder(
                 [$_article,$article],
-                ($is_edit ? "编辑" : "新增")."图文文章"
+                ($is_edit ? "编辑" : "新增")."文章"
             );
             return ['error_code' => 0, 'error_msg' => '保存成功', 'data' => null];
         } catch (\Throwable $e) {

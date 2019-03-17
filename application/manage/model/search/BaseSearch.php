@@ -205,10 +205,8 @@ class BaseSearch
                 }
                 // 获取拟查找部门的所有子部门
                 $departModel   = new Department();
-                $child_dept    = $departModel->getChildDeptByParentId($search_dept_id);
-                // 检索的部门id索引数组
-                $search_dept   = $child_dept ?: [];
-                $search_dept[] = $search_dept_id;
+                $search_dept   = $departModel->getDeptChildAndSelfIdArrayById($search_dept_id);
+
                 // 去重+重排数字索引后按部门检索
                 $query->where($dept_column, 'IN', array_merge(array_unique($search_dept)));
             }
@@ -234,10 +232,8 @@ class BaseSearch
 
                 // 获取拟查找部门的所有子部门
                 $departModel   = new Department();
-                $child_dept    = $departModel->getChildDeptByParentId($search_dept_id);
-                // 检索的部门id索引数组
-                $search_dept   = $child_dept ?: [];
-                $search_dept[] = $search_dept_id;
+                $search_dept   = $departModel->getDeptChildAndSelfIdArrayById($search_dept_id);
+
                 $search_dept   = array_merge(array_unique($search_dept));
 
                 /**

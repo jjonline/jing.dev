@@ -81,12 +81,20 @@ class ArticleController extends BaseController
         $article_cat = $articleCatService->getArticleCatTreeList();
         $this->assign('article_cat', $article_cat);
 
-        // super + leader可指定创建人
-        $can_assign_create_user = in_array($this->UserInfo['menu_auth']['permissions'], [
+        // 检查列表权限 super+leader可指定创建人
+        $user_list_permission = $this->getUserPermissionsTag('Article_List'); // 读取当前用户的文章列表权限
+        $can_assign_create_user = in_array($user_list_permission, [
             Menu::PERMISSION_SUPER,
             Menu::PERMISSION_LEADER
         ]);
         $this->assign('can_assign_create_user', $can_assign_create_user);
+
+        // 指定创建人是否需要按部门
+        $search_user_with_dept_id = 0;
+        if ($user_list_permission == Menu::PERMISSION_LEADER) {
+            $search_user_with_dept_id = $this->UserInfo['dept_id'];
+        }
+        $this->assign('search_user_with_dept_id', $search_user_with_dept_id);
 
         return $this->fetch();
     }
@@ -132,12 +140,20 @@ class ArticleController extends BaseController
         $article_cat = $articleCatService->getArticleCatTreeList();
         $this->assign('article_cat', $article_cat);
 
-        // super + leader可指定创建人
-        $can_assign_create_user = in_array($this->UserInfo['menu_auth']['permissions'], [
+        // 检查列表权限 super+leader可指定创建人
+        $user_list_permission   = $this->getUserPermissionsTag('Article_List'); // 读取当前用户的文章列表权限
+        $can_assign_create_user = in_array($user_list_permission, [
             Menu::PERMISSION_SUPER,
             Menu::PERMISSION_LEADER
         ]);
         $this->assign('can_assign_create_user', $can_assign_create_user);
+
+        // 指定创建人是否需要按部门
+        $search_user_with_dept_id = 0;
+        if ($user_list_permission == Menu::PERMISSION_LEADER) {
+            $search_user_with_dept_id = $this->UserInfo['dept_id'];
+        }
+        $this->assign('search_user_with_dept_id', $search_user_with_dept_id);
 
         return $this->fetch();
     }

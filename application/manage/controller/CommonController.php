@@ -160,8 +160,7 @@ class CommonController extends BasicController
     {
         if ($this->request->isAjax()) {
             if ($this->getUserInfo()) {
-                $keyword = $this->request->param('query');
-                $result  = $userService->searchUserList($keyword, $this->UserInfo);
+                $result  = $userService->searchUserList($this->request, $this->UserInfo);
                 return $this->asJson($result);
             }
             return $this->renderJson('未登录，请先登录', -1);
