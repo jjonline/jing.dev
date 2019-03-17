@@ -51,14 +51,14 @@ class Tag extends Model
     /**
      * 关键词自动存储读取
      * @param string $tag tag1|tag2 形式的多个关键词
-     * @param bool $is_update 使用tag的文章、单独页等是否处于更新模式
+     * @param string $origin_tag_ids 原来的关键词ID半角逗号分隔的字符串，没有留空
      * @return string 1,3,5 形式的字符串
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function autoSaveTags($tag = '', $is_update = false)
+    public function autoSaveTags($tag = '', $origin_tag_ids = '')
     {
         if (empty($tag)) {
             return '';
@@ -68,25 +68,100 @@ class Tag extends Model
             return '';
         }
 
+        // 原始tag_id情况
+        $origin_tags = ArrayHelper::uniqueAndTrimOneDimissionArray(explode(',', $origin_tag_ids));
+
         $result = [];
         foreach ($tags as $tag) {
             $exist_tag = $this->db()->field(true)->where('tag', $tag)->find();
             if (empty($exist_tag)) {
                 $result[] = $this->db()->insertGetId([
                     'tag'     => $tag,
-                    'quota'   => 1,
                     'user_id' => Session::get('user_info.id'),
                     'dept_id' => Session::get('user_info.dept_id'),
                 ]);
             } else {
-                // 新增文章等引用关键词时tag的引用次数+1 编辑情况不需要
-                if (!$is_update) {
-                    $this->db()->where('id', $exist_tag['id'])->setInc('quota'); // 引用+1
-                }
                 $result[] = $exist_tag['id'];
             }
         }
 
+        // tag引用次数修改
+        $added_ids  = array_diff($result, $origin_tags); // 新增的tag
+        $delete_ids = array_diff($origin_tags, $result); // 编辑模式时被删除的tag
+
+        // 新添加的引用全部+1
+        $this->setIncTagsQuota($added_ids);
+
+        // 被清理掉的引用全部-1
+        $this->setDecTagsQuota($delete_ids);
+
         return implode(',', $result);
+    }
+
+    /**
+     * 设置多个关键词的引用减1
+     * @param mixed $tag_ids 1,2,34形式的半角逗号分隔的关键词或一维数组形式的[1,2,34]
+     * @return bool
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function setDecTagsQuota($tag_ids)
+    {
+        if (empty($tag_ids)) {
+            return false;
+        }
+        if (is_string($tag_ids)) {
+            $tags = ArrayHelper::uniqueAndTrimOneDimissionArray(explode(',', $tag_ids));
+        } else {
+            $tags = $tag_ids;
+        }
+        if (empty($tags)) {
+            return false;
+        }
+        $result = $this->where('id', 'IN', $tags)->select();
+        if ($result->isEmpty()) {
+            return false;
+        }
+        foreach ($result as $tag) {
+            // 未减到0的情况下减去1个引用
+            if ($tag['quota'] >= 1) {
+                $this->db()->where('id', $tag['id'])->setDec('quota', 1);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 设置多个关键词的引用加1
+     * @param mixed $tag_ids 1,2,34形式的半角逗号分隔的关键词或一维数组形式的[1,2,34]
+     * @return bool
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function setIncTagsQuota($tag_ids)
+    {
+        if (empty($tag_ids)) {
+            return false;
+        }
+        if (is_string($tag_ids)) {
+            $tags = ArrayHelper::uniqueAndTrimOneDimissionArray(explode(',', $tag_ids));
+        } else {
+            $tags = $tag_ids;
+        }
+        if (empty($tags)) {
+            return false;
+        }
+        $result = $this->where('id', 'IN', $tags)->select();
+        if ($result->isEmpty()) {
+            return false;
+        }
+        foreach ($result as $tag) {
+            $this->db()->where('id', $tag['id'])->setInc('quota', 1);
+        }
+        return true;
     }
 }

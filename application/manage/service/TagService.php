@@ -133,7 +133,9 @@ class TagService
                 throw new Exception('拟删除的关键词数据不存在');
             }
 
-            // todo 删除的其他检查
+            if ($tag['quota' > 0]) {
+                throw new Exception('关键词已被引用不允许删除');
+            }
 
             $effect_rows = $this->Tag->db()->where('id', $id)->delete();
             if (false === $effect_rows) {
@@ -153,16 +155,16 @@ class TagService
     /**
      * 关键词自动存储读取
      * @param string $tag tag1|tag2 形式的多个关键词
-     * @param bool $is_update 使用tag的文章、单独页等是否处于更新模式
+     * @param string $origin_tag_ids 原来的关键词ID半角逗号分隔的字符串，没有留空
      * @return string 1,3,5 形式的字符串
      * @throws Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function autoSaveTags($tags_str, $is_update = false)
+    public function autoSaveTags($tags_str, $origin_tag_ids = '')
     {
-        return $this->Tag->autoSaveTags($tags_str, $is_update);
+        return $this->Tag->autoSaveTags($tags_str, $origin_tag_ids);
     }
 
     /**
