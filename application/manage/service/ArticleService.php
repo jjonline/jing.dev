@@ -118,7 +118,7 @@ class ArticleService
                 $article['tags'] = '';
             } else {
                 // 智能读取或新增tag并返回半角逗号分隔的文章tag字段值
-                $article['tags'] = $this->Tag->autoSaveTags($_article['tags']);
+                $article['tags'] = $this->Tag->autoSaveTags($_article['tags'], $is_edit);
             }
 
             $effect_rows = $this->Article->isUpdate($is_edit)->save($article);

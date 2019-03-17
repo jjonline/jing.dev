@@ -474,10 +474,10 @@ $(function () {
             '    <table class="table table-bordered table-hover" id="_Tag_Search_Table_" style="width:100%;">' +
             '        <thead>' +
             '        <tr>' +
-            '            <th data-priority="1">ID</th>' +
+            '            <th data-priority="1" class="text-center">ID</th>' +
             '            <th data-priority="2">Tag</th>' +
-            '            <th data-priority="4">引用次数</th>' +
-            '            <th data-priority="3">创建者</th>' +
+            '            <th data-priority="4" class="text-center">引用</th>' +
+            '            <th data-priority="3">创建人</th>' +
             '            <th data-priority="5">创建时间</th>' +
             '            <th style="text-align: center;padding-right: 0;">操作</th>' +
             '        </tr>' +
@@ -487,9 +487,9 @@ $(function () {
             '        var tag = tags[n];' +
             '        %>' +
             '        <tr data-json=\'<%=JSON.stringify(tag)%>\'>' +
-            '            <td><%=tag.id%></td>' +
+            '            <td class="text-center"><%=tag.id%></td>' +
             '            <td><%=tag.tag%></td>' +
-            '            <td><%=tag.quota%></td>' +
+            '            <td class="text-center"><%=tag.quota%></td>' +
             '            <td><%=tag.real_name%></td>' +
             '            <td><%=tag.create_time%></td>' +
             '            <td style="text-align: center;"><button class="btn btn-xs btn-info select"><i class="fa fa-plus" title="点击选择"></i></button></td>' +

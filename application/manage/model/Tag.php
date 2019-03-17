@@ -34,13 +34,14 @@ class Tag extends Model
     /**
      * 关键词自动存储读取
      * @param string $tag tag1|tag2 形式的多个关键词
+     * @param bool $is_update 使用tag的文章、单独页等是否处于更新模式
      * @return string 1,3,5 形式的字符串
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function autoSaveTags($tag = '')
+    public function autoSaveTags($tag = '', $is_update = false)
     {
         if (empty($tag)) {
             return '';
@@ -61,7 +62,10 @@ class Tag extends Model
                     'dept_id' => Session::get('user_info.dept_id'),
                 ]);
             } else {
-                $this->db()->where('id', $exist_tag['id'])->setInc('quota'); // 引用+1
+                // 新增文章等引用关键词时tag的引用次数+1 编辑情况不需要
+                if (!$is_update) {
+                    $this->db()->where('id', $exist_tag['id'])->setInc('quota'); // 引用+1
+                }
                 $result[] = $exist_tag['id'];
             }
         }

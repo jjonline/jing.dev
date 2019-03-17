@@ -10,7 +10,6 @@ namespace app\manage\service;
 
 use app\manage\model\Tag;
 use app\common\service\LogService;
-use think\db\Query;
 use think\Exception;
 use think\Request;
 
@@ -130,6 +129,21 @@ class TagService
         } catch (\Throwable $e) {
             return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
         }
+    }
+
+    /**
+     * 关键词自动存储读取
+     * @param string $tag tag1|tag2 形式的多个关键词
+     * @param bool $is_update 使用tag的文章、单独页等是否处于更新模式
+     * @return string 1,3,5 形式的字符串
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function autoSaveTags($tags_str, $is_update = false)
+    {
+        return $this->Tag->autoSaveTags($tags_str, $is_update);
     }
 
     /**
