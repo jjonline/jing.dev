@@ -13,6 +13,7 @@ use app\common\service\LogService;
 use app\manage\model\ArticleCat;
 use app\manage\model\Tag;
 use app\manage\model\User;
+use think\Db;
 use think\Exception;
 use think\facade\Session;
 use think\Request;
@@ -138,7 +139,10 @@ class ArticleService
                 $article['tags'] = '';
             } else {
                 // 智能读取或新增tag并返回半角逗号分隔的文章tag字段值
-                $article['tags'] = $this->Tag->autoSaveTags($_article['tags'], $is_edit);
+                $article['tags'] = $this->Tag->autoSaveTags(
+                    $_article['tags'],
+                    $is_edit ? $exist_data['tags'] : ''
+                );
             }
 
             $effect_rows = $this->Article->isUpdate($is_edit)->save($article);
@@ -195,6 +199,7 @@ class ArticleService
      */
     public function delete(Request $request)
     {
+        Db::startTrans();
         try {
             $id = $request->post('id/i');
             $article = $this->Article->getDataById($id);
@@ -205,13 +210,17 @@ class ArticleService
             if (false == $effect_rows) {
                 throw new Exception('删除操作失败：系统异常');
             }
+            // 同步对关键词引用减1
+            $this->Tag->setDecTagsQuota($article['tags']);
             // 记录日志
             $this->LogService->logRecorder(
                 $article,
                 "删除文章"
             );
+            Db::commit();
             return ['error_code' => 0, 'error_msg' => '已删除', 'data' => null];
         } catch (\Throwable $e) {
+            Db::rollback();
             return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage(), 'data' => null];
         }
     }
