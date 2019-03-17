@@ -3,16 +3,12 @@ $(function () {
 
     // 初始化
     editor = UE.getEditor("content");
-    editor.ready(function () {
-        editor.setHeight(450);
-        editor.execCommand('fontfamily','微软雅黑'); //字体
-        editor.execCommand('fontsize', '14px'); //字号
-    });
 
     // 初始化编辑模式
     function init()
     {
         editor.ready(function () {
+            editor.setHeight(450);
             editor.setContent(article.content || "");
         });
         has_tag = article.tags;

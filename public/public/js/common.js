@@ -610,6 +610,9 @@ $(function () {
             if (!utils.isEmpty(data.tag)) {
                 options.select(data);
                 input.val("").focus(); // 清空输入项并获得焦点
+            } else {
+                utils.toast("请输入tag关键词");
+                input.focus(); // 获得焦点
             }
         });
 
