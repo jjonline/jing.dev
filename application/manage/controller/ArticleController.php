@@ -92,12 +92,13 @@ class ArticleController extends BaseController
     /**
      * 编辑文章
      * @param ArticleService $articleService
+     * @param ArticleCatService $articleCatService
      * @return array|mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function editAction(ArticleService $articleService)
+    public function editAction(ArticleService $articleService, ArticleCatService $articleCatService)
     {
         if ($this->request->isPost() && $this->request->isAjax()) {
             return $articleService->save($this->request);
@@ -117,12 +118,23 @@ class ArticleController extends BaseController
                 ['label' => '文章列表和管理', 'url' => url('article/list')],
                 ['label' => '编辑文章', 'url' => ''],
             ],
-            'load_layout_css'  => false,
+            'load_layout_css'  => true,
             'load_layout_js'   => true,
         ];
         $this->assign($common);
 
-        // dump($this->UserInfo);
+        // 拟编辑文章
+        $this->assign('article', $article);
+
+        // 文章分类
+        $article_cat = $articleCatService->getArticleCatTreeList();
+        $this->assign('article_cat', $article_cat);
+
+        // 所有部门
+        $this->assign('dept', $this->DepartmentService->getDeptTreeList());
+
+        // 所有用户筛选
+        $this->assign('user', $this->UserService->getUserTreeList());
 
         return $this->fetch();
     }

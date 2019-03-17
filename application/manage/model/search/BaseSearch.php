@@ -197,8 +197,8 @@ class BaseSearch
         $search_dept_id = $this->dept_id; // 可能的本次检索的部门参数
         // 有数据范围限制 + 部门检索条件的处理
         if ($user_info['menu_auth']['is_permissions']) {
-            // 根用户|全部数据--部门及子部门检索
-            if ($user_info['is_root'] || Menu::PERMISSION_SUPER == $user_info['menu_auth']['permissions']) {
+            // 全部数据--部门及子部门检索[根用户在菜单权限处理时已处理为super]
+            if (Menu::PERMISSION_SUPER == $user_info['menu_auth']['permissions']) {
                 // 全部数据且没有部门检索要求返回
                 if (empty($search_dept_id)) {
                     return;

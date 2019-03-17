@@ -238,9 +238,16 @@ class ArticleService
      */
     public function getAuthArticleById($id, $act_user_info)
     {
-        $article = $this->Article->getDataById($id);
+        $article = $this->Article->getArticle4EditById($id);
         if (empty($article)) {
             return [];
+        }
+        // 补充关键词信息--统一转换为数组
+        if (!empty($article['tags'])) {
+            $tags = $this->Tag->db()->where('id', 'IN', $article['tags'])->column('tag');
+            $article['tags'] = $tags;
+        } else {
+            $article['tags'] = [];
         }
         /**
          * 所属用户对应或根用户直接返回
