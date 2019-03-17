@@ -8,6 +8,7 @@
 
 namespace app\manage\model;
 
+use app\common\helper\AttachmentHelper;
 use think\Model;
 
 class Article extends Model
@@ -27,6 +28,44 @@ class Article extends Model
         }
         $result = $this->field(true)->where('id', $id)->find();
         return empty($result) ? [] : $result->toArray();
+    }
+
+    /**
+     * 为编辑文章读取单条文章所有编辑需要的信息
+     * @param int $id
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getArticle4EditById($id)
+    {
+        if (empty($id)) {
+            return [];
+        }
+        $result = $this->db()->alias('article')
+            ->leftJoin('department dept', 'article.dept_id=dept.id')
+            ->leftJoin('user user', 'article.user_id=user.id')
+            ->leftJoin('article_cat article_cat', 'article.cat_id=article_cat.id')
+            ->field([
+                'article.*',
+                'article_cat.name as article_cat_name',
+                'dept.name as dept_name',
+                'user.real_name',
+            ])
+            ->where('article.id', $id)
+            ->find();
+        if (empty($result)) {
+            return [];
+        }
+
+        // 补充封面图
+        $result['cover_path'] = '';
+        if (!empty($result['cover_id'])) {
+            $result['cover_path'] = AttachmentHelper::getAttachmentPathById($result['cover_id']);
+        }
+
+        return $result->toArray();
     }
 
     /**

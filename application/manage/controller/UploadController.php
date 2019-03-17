@@ -49,7 +49,8 @@ class UploadController extends BaseController
                     ? '' : strtolower(strrchr($result['data']['file_origin_name'], '.')),
                 "size"     => empty($result['data']['file_size']) ? '' : $result['data']['file_size'],
             ];
-            return $this->asJson($ue_result);
+            config('app.app_trace', false); // 使用html的mime类型输出json字符串，关闭trace消息输出
+            return json_encode($ue_result, JSON_UNESCAPED_UNICODE);
         }
         return $this->renderJson('error');
     }
