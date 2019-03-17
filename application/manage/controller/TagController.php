@@ -37,6 +37,12 @@ class TagController extends BaseController
         ];
         $this->assign($common);
 
+        // 所有部门
+        $this->assign('dept', $this->DepartmentService->getDeptTreeList());
+
+        // 所有用户筛选
+        $this->assign('user', $this->UserService->getUserTreeList());
+
         return $this->fetch();
     }
 

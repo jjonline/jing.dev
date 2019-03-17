@@ -135,9 +135,9 @@ $(function () {
     }).on("click",'.edit',function () {
         // 编辑按钮打开编辑modal
         $("#id").val($(this).data("id")).prop("disabled",false);
-        var editData = $(this).data("json"); // 从tr中读取出的待编辑的数据
+        var editData = $(this).parents("tr").data("json"); // 从tr中读取出的待编辑的数据
 
-        $("#SaveModalLabel").text("编辑前台图文");
+        $("#SaveModalLabel").text("编辑__LIST_NAME__");
         $(".btn-edit-submit").show();
         $(".btn-create-submit").hide();
 
@@ -153,7 +153,7 @@ $(function () {
     $("#create").on('click',function () {
         $("#id").val($(this).data("id")).prop("disabled",false);
         $("#SaveModalForm").get(0).reset();
-        $("#SaveModalLabel").text("新增前台图文");
+        $("#SaveModalLabel").text("新增__LIST_NAME__");
 
         $(".btn-edit-submit").hide();
         $(".btn-create-submit").show();
