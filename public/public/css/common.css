@@ -59,51 +59,15 @@ tr.selected>td {}
     box-shadow: 0 -1px 8px rgba(0,0,0,.08);
 }
 .DTFC_RightWrapper {
-    right: -1px;
+    height: auto !important;
+    right: -1px !important;
     box-shadow: -1px 0 8px rgba(0,0,0,.08);
 }
 .DTFC_RightBodyLiner {
     overflow-y: visible !important;
     text-align: center;
 }
-/*.DTFC_LeftBodyLiner {*/
-    /*overflow-y: visible !important;*/
-/*}*/
 
-/*产品检索*/
-.lower_inventory {
-    background-color: #fbe3f9;
-}
-.high_inventory{
-    background-color: #2fc55633;
-}
-.none_inventory {
-    background-color: #fdb8ab;
-}
-.lower_inventory:hover {
-    background-color: #fbe3f9 !important;
-}.high_inventory:hover {
-    background-color: #2fc55633 !important;
-}
-.none_inventory:hover {
-    background-color: #fdb8ab !important;
-}
-.product_tips {
-    padding-top:10px;
-}
-.product_tips p {
-    margin-bottom: 5px;
-    line-height: 20px;
-    font-size:13px;
-    color: #666;
-}
-.product_tips .inventory_tips {
-    display: inline-block;
-    width: 45px;
-    height: 20px;
-    float:left;
-    margin-right: 5px;
-}
 
 /*ueditor*/
 .edui-default .edui-colorpicker-nocolor {
@@ -168,7 +132,8 @@ tr.selected>td {}
     color: #e73d4a !important;
 }
 
-.btn-green {color: #FFF;
+.btn-green {
+    color: #FFF;
     background-color: #32c5d2;
     border-color: #32c5d2;
 }
@@ -209,7 +174,6 @@ tr.selected>td {}
     cursor:default;
     -webkit-touch-callout:none;
     -webkit-user-select:none;
-    -khtml-user-select:none;
     -moz-user-select:none;
     -ms-user-select:none;
     user-select:none;
@@ -224,7 +188,17 @@ tr.selected>td {}
     cursor: pointer;
     position: relative;
 }
-.upload-container input[type=file] {position:absolute;top:0;right:0;margin:0;border:solid transparent;width:100%;height:100%;opacity:0;cursor:pointer}
+.upload-container input[type=file] {
+    position:absolute;
+    top:0;
+    right:0;
+    margin:0;
+    border:solid transparent;
+    width:100%;
+    height:100%;
+    opacity:0;
+    cursor:pointer
+}
 
 .jcrop-holder {
     text-align: center;
