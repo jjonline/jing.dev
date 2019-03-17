@@ -133,6 +133,21 @@
                                 <textarea id="remark" rows=3 class="form-control" name="Article[remark]" placeholder="备注信息，便于管理员自己识别的备注"></textarea>
                             </div>
                         </div>
+
+                        <!--super|leader用户变更文章创建人-->
+                        <%{if condition="$can_assign_create_user"}%>
+                        <div class="form-group">
+                            <input type="hidden" id="create_user_id" name="Article[create_user_id]" value="">
+                            <label class="col-sm-2 control-label">指定创建人 <span class="not-required">*</span></label>
+                            <div class="col-sm-10">
+                                <div id="create_user_container">
+                                    <div class="create_user"><%{:session('user_info.real_name')}%> <i class="fa fa-trash"></i></div>
+                                    <div class="create_user_context">指定文章创建人，点击按钮编辑，不编辑或留空则不指定[变更创建人后所属部门自动跟随创建人变更]</div>
+                                </div>
+                            </div>
+                        </div>
+                        <%{/if}%>
+
                     </div>
                 </div>
                 <div class="box-footer">

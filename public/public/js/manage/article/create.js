@@ -4,8 +4,8 @@ $(function () {
     editor = UE.getEditor("content");
     editor.ready(function () {
         editor.setHeight(450);
-        editor.execCommand('fontfamily','微软雅黑'); //字体
-        editor.execCommand('fontsize', '14px'); //字号
+        // editor.execCommand('fontfamily','微软雅黑'); //字体
+        // editor.execCommand('fontsize', '14px'); //字号
     });
 
     //上传封面裁剪插件

@@ -8,6 +8,7 @@
 namespace app\manage\controller;
 
 use app\common\controller\BaseController;
+use app\common\model\Menu;
 use app\manage\service\ArticleCatService;
 use app\manage\service\ArticleService;
 use app\manage\model\search\ArticleSearch;
@@ -80,11 +81,12 @@ class ArticleController extends BaseController
         $article_cat = $articleCatService->getArticleCatTreeList();
         $this->assign('article_cat', $article_cat);
 
-        // 所有部门
-        $this->assign('dept', $this->DepartmentService->getDeptTreeList());
-
-        // 所有用户筛选
-        $this->assign('user', $this->UserService->getUserTreeList());
+        // super + leader可指定创建人
+        $can_assign_create_user = in_array($this->UserInfo['menu_auth']['permissions'], [
+            Menu::PERMISSION_SUPER,
+            Menu::PERMISSION_LEADER
+        ]);
+        $this->assign('can_assign_create_user', $can_assign_create_user);
 
         return $this->fetch();
     }
@@ -130,11 +132,12 @@ class ArticleController extends BaseController
         $article_cat = $articleCatService->getArticleCatTreeList();
         $this->assign('article_cat', $article_cat);
 
-        // 所有部门
-        $this->assign('dept', $this->DepartmentService->getDeptTreeList());
-
-        // 所有用户筛选
-        $this->assign('user', $this->UserService->getUserTreeList());
+        // super + leader可指定创建人
+        $can_assign_create_user = in_array($this->UserInfo['menu_auth']['permissions'], [
+            Menu::PERMISSION_SUPER,
+            Menu::PERMISSION_LEADER
+        ]);
+        $this->assign('can_assign_create_user', $can_assign_create_user);
 
         return $this->fetch();
     }
