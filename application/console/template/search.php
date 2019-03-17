@@ -37,16 +37,6 @@ class __CONTROLLER__Search extends BaseSearch
      */
     protected function search($act_member_info)
     {
-        // 1、超级管理员菜单权限可看全部
-        // 2、leader菜单权限且属于部门领导可看所属部门以及子部门下成员
-        // 3、leader菜单权限但不是领导只能看本部门下的子部门的会员数据
-        $menu_auth = $act_member_info['menu_auth'];
-        $dept_auth = $act_member_info['dept_auth'];
-        if (!in_array($menu_auth['permissions'], ['super','leader','staff'])) {
-            $this->pageError = '抱歉，您没有操作权限';
-            return $this->handleResult();
-        }
-
         // 构造Query对象
         $Query = Db::name('__CONTROLLER_UNDER_SCORE__ __CONTROLLER_UNDER_SCORE__')
                ->field([
@@ -57,6 +47,14 @@ class __CONTROLLER__Search extends BaseSearch
                    '__CONTROLLER_UNDER_SCORE__.remark'
                ]);
                // ->leftJoin('member_level member_level', 'member_level.id = member.member_level_id');
+
+        // 部门检索 + 权限限制
+        $this->permissionLimitOrDeptSearch(
+            $Query,
+            '__CONTROLLER_UNDER_SCORE__.dept_id',
+            '__CONTROLLER_UNDER_SCORE__.user_id',
+            $act_member_info
+        );
 
         /**
          * 检索条件

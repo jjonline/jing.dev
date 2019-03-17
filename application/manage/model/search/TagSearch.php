@@ -28,54 +28,61 @@ class TagSearch extends BaseSearch
     }
 
     /**
-     * 前台关键词搜索
+     * 关键词搜索
      * @param $act_member_info
      * @return array
+     * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
     protected function search($act_member_info)
     {
-        // 1、超级管理员菜单权限可看全部
-        // 2、leader菜单权限且属于部门领导可看所属部门以及子部门下成员
-        // 3、leader菜单权限但不是领导只能看本部门下的子部门的会员数据
-        $menu_auth = $act_member_info['menu_auth'];
-        $dept_auth = $act_member_info['dept_auth'];
-        if (!in_array($menu_auth['permissions'], ['super','leader','staff'])) {
-            $this->pageError = '抱歉，您没有操作权限';
-            return $this->handleResult();
-        }
-
         // 构造Query对象
         $Query = Db::name('tag tag')
-               ->field([
-                   //'CONCAT("DT_Member_",member.id) as DT_RowId',
-                   'tag.id',
+           ->field([
+               //'CONCAT("DT_Member_",member.id) as DT_RowId',
+               'tag.id',
+               'tag.tag',
+               'tag.cover_id',
+               'tag.excerpt',
+               'tag.quota',
+               'tag.sort',
+               'tag.user_id',
+               'tag.dept_id',
+               'user.real_name',
+               'dept.name as dept_name',
+               'tag.create_time',
+               'tag.update_time',
+           ])
+           ->leftJoin('user user', 'user.id = tag.user_id')
+           ->leftJoin('department dept', 'dept.id = tag.dept_id');
 
-                   'tag.create_time',
-                   'tag.remark'
-               ]);
-               // ->leftJoin('member_level member_level', 'member_level.id = member.member_level_id');
+        // 部门检索 + 权限限制
+        $this->permissionLimitOrDeptSearch(
+            $Query,
+            'tag.dept_id',
+            'tag.user_id',
+            $act_member_info
+        );
 
-        /**
-         * 检索条件
-         */
         // 关键词搜索--方法体内部自动判断$this->keyword是否有值并执行sql构造
-        $search_columns = ['tag.remark'];
+        $search_columns = ['tag.tag','tag.excerpt','tag.id'];
         $this->keywordSearch($Query, $search_columns, $this->keyword);
 
-        // 禁用|启用状态
-        // $enable = $this->request->param('enable');
-        // if (in_array($enable, ['0','1'])) {
-        //    $Query->where('tag.enable', $enable);
-        //}
+        // 指定用户检索
+        $user_id = $this->request->param('user_id');
+        if (!empty($user_id) && is_numeric($user_id)) {
+            $Query->where('tag.user_id', $user_id);
+        }
 
         // 时间范围检索
         $this->dateTimeSearch($Query, 'tag.create_time');
 
-        // 数字范围检索
-        // $this->rangeSearch($Query, 'tag.xxx', $begin_range, $end_range);
+        // 引用范围检索
+        $begin_quota = $this->request->param('quota_begin');
+        $end_quota = $this->request->param('quota_end');
+        $this->rangeSearch($Query, 'tag.quota', $begin_quota, $end_quota);
 
         // 克隆Query对象读取总记录数
         $countQuery       = clone $Query;

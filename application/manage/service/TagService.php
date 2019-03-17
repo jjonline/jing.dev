@@ -38,20 +38,39 @@ class TagService
     public function save(Request $request)
     {
         try {
-            $_tag = $request->post('tag/a');
-            $is_edit = !empty($_tag['id']);
-            $tag = [];
+            $_tag    = $request->post('Tag/a');
+            if (empty($_tag['tag']) || mb_strlen($_tag['tag']) > 12) {
+                throw new Exception('Tag关键词最大12个字符');
+            }
+            if (!empty($_tag['excerpt']) && mb_strlen($_tag['excerpt']) > 255) {
+                throw new Exception('Tag关键词说明最大255个字符');
+            }
+
+            $repeat_tag = $this->Tag->getDataByTag($_tag['tag']);
+            $is_edit    = !empty($_tag['id']);
+            $tag        = [];
             if ($is_edit) {
                 // 编辑模式
                 $exist_data = $this->Tag->getDataById($_tag['id']);
                 if (empty($exist_data)) {
                     throw new Exception('拟编辑的关键词数据不存在');
                 }
-
+                if ($exist_data['tag'] != $_tag['tag']) {
+                    if (!empty($repeat_tag)) {
+                        throw new Exception('修改后的关键词已存在');
+                    }
+                }
+                $tag['id'] = $_tag['id'];
             } else {
                 // 新增模式
-
+                if (!empty($repeat_tag)) {
+                    throw new Exception('拟新增的关键词已存在');
+                }
             }
+
+            $tag['tag']      = $_tag['tag'];
+            $tag['excerpt']  = empty($_tag['excerpt']) ? '' : trim($_tag['excerpt']);
+            $tag['cover_id'] = empty($_tag['cover_id']) ? '' : trim($_tag['cover_id']);
 
             $effect_rows = $this->Tag->isUpdate($is_edit)->save($tag);
             if (false === $effect_rows) {

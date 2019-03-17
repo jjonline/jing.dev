@@ -5,7 +5,11 @@ $(function () {
     var searchBeginDate = $("#search_begin_date"); // 时间范围检索开始
     var searchEndDate   = $("#search_end_date");// 时间范围检索结束
 
-
+    // 检索
+    var dept_id = $("#dept_id");
+    var user_id = $("#user_id");
+    var quota_begin = $("#quota_begin");
+    var quota_end = $("#quota_end");
     /**
      * 文本检索和cookie记录检索值
      * 以及绑定检索输入框的自动提交事件
@@ -75,7 +79,10 @@ $(function () {
         searchBeginDate.val("");
         searchEndDate.val("");
 
-        // todo 清除高级查询modal上的输入框值等内容，一般先在顶部定义各个输入框的对象，此处直接用
+        dept_id.val("").trigger("change");
+        user_id.val("").trigger("change");
+        quota_begin.val("");
+        quota_end.val("");
 
         refreshTable();
         return false;
@@ -135,30 +142,74 @@ $(function () {
     }).on("click",'.edit',function () {
         // 编辑按钮打开编辑modal
         $("#id").val($(this).data("id")).prop("disabled",false);
-        var editData = $(this).data("json"); // 从tr中读取出的待编辑的数据
+        var editData = $(this).parents("tr").data("json"); // 从tr中读取出的待编辑的数据
 
-        $("#SaveModalLabel").text("编辑前台图文");
+        $("#SaveModalLabel").text("编辑Tag关键词");
         $(".btn-edit-submit").show();
         $(".btn-create-submit").hide();
 
-        // todo 编辑模式需处理的逻辑
-        // sample
-        $("#real_name").val(editData.real_name);
+        $("#tag").val(editData.tag);
+        $("#excerpt").val(editData.excerpt);
+
+        $("#cover_img").remove();
+        $("#cover_id").val("");
+        if (!utils.isEmpty(editData.cover_id)) {
+            var html = "<div id=\"cover_img\" class=\"upload-preview\"><img src=\"/manage/common/attach?id="+editData.cover_id+"\"></div>";
+            $(".cover-image-file-container").prepend(html);
+            $("#cover_id").val(editData.cover_id);
+        }
 
         $("#SaveModal").modal("show");
         return false;
+    }).on("change",".list-sort-input",function () {
+        // 快速设置排序
+        var id   = $(this).data("id");
+        var sort = $(this).val();
+        utils.ajaxConfirm("确认修改排序么？",'/manage/tag/sort',{"id":id,"sort":sort},function () {
+            refreshTable();
+        });
+    }).on("click",".delete",function () {
+        // 删除
+        var id   = $(this).data("id");
+        utils.ajaxConfirm("确认删除该tag关键词么？",'/manage/tag/delete',{"id":id},function () {
+            refreshTable();
+        });
+    });
+
+    //上传封面裁剪插件
+    utils.bindCutImageUploader('cover_image_file',{
+        title:'裁剪并上传Tag封面图',
+        rate:'4/3',//裁剪图的比例
+        width:120,//指定裁剪后图片宽度
+        height:90,//指定裁剪后图片高度
+        extraData:{'file_type':'image'},//额外塞入上传的post数据体重的filed-value对象数组
+        success:function (data) {
+            if(data['error_code'] == 0)
+            {
+                $('#cover_img').remove();
+                $('.cover-image-file-container').prepend('<div id="cover_img" class="upload-preview"><img src="'+data.data.file_path+'"></div>');
+                $('#cover_image_id').val(data.data.id);
+            }else{
+                utils.alert(data.error_msg ? data.error_msg : '未知错误');
+            }
+        },//裁剪并上传成功后的回调函数，data参数为服务器返回的json对象
+        error:function () {
+            utils.alert('网络或服务器异常，文件上传失败！');
+        }//裁剪或上传失败的回调函数
     });
 
     // 新增
     $("#create").on('click',function () {
         $("#id").val($(this).data("id")).prop("disabled",false);
         $("#SaveModalForm").get(0).reset();
-        $("#SaveModalLabel").text("新增前台图文");
+        $("#SaveModalLabel").text("新增Tag关键词");
 
         $(".btn-edit-submit").hide();
         $(".btn-create-submit").show();
 
-        // todo 新增模式需处理的逻辑
+        $("#tag").val("");
+        $("#excerpt").val("");
+        $("#cover_img").remove();
 
         $("#SaveModal").modal("show");
         return false;
@@ -174,17 +225,17 @@ $(function () {
         var that = this;
         var form = $("#SaveModalForm");
 
-        /**
-         * sample
-         */
-        var real_time = $("#real_name");
-        if (utils.isEmpty(real_time.val())) {
-            real_time.focus();
-            utils.toast("输入真实姓名");
+        var tag = $("#tag");
+        if (utils.isEmpty(tag.val())) {
+            tag.focus();
+            utils.toast("输入Tag关键词");
             return false;
         }
-
-        // todo 边界效验逻辑
+        if (tag.val().length > 12) {
+            tag.focus();
+            utils.toast("Tag关键词大于12个字符");
+            return false;
+        }
 
         var data = form.serializeArray();
         $(that).prop("disabled",true).text("提交中...");
@@ -196,8 +247,8 @@ $(function () {
             success: function (data) {
                 utils.hideLoading();
                 if (data.error_code === 0) {
+                    $("#SaveModal").modal("hide");
                     utils.toast(data.error_msg, 3000,function () {
-                        $("#SaveModal").modal("hide");
                         refreshTable();
                     });
                 } else {
@@ -224,17 +275,17 @@ $(function () {
         var that = this;
         var form = $("#SaveModalForm");
 
-        /**
-         * sample
-         */
-        var real_time = $("#real_name");
-        if (utils.isEmpty(real_time.val())) {
-            real_time.focus();
-            utils.toast("输入真实姓名");
+        var tag = $("#tag");
+        if (utils.isEmpty(tag.val())) {
+            tag.focus();
+            utils.toast("输入Tag关键词");
             return false;
         }
-
-        // todo 边界效验逻辑
+        if (tag.val().length > 12) {
+            tag.focus();
+            utils.toast("Tag关键词大于12个字符");
+            return false;
+        }
 
         var data = form.serializeArray();
         $(that).prop("disabled",true).text("提交中...");
@@ -246,8 +297,8 @@ $(function () {
             success: function (data) {
                 utils.hideLoading();
                 if (data.error_code === 0) {
+                    $("#SaveModal").modal("hide");
                     utils.toast(data.error_msg, 3000,function () {
-                        $("#SaveModal").modal("hide");
                         refreshTable();
                     });
                 } else {
@@ -263,12 +314,6 @@ $(function () {
         });
         return false;
     });
-
-
-
-
-
-
 
 
     /**
@@ -316,7 +361,13 @@ $(function () {
                  */
                 data: function (data) {
                     return $.extend({}, data, {
-                        // todo 额外塞入请求体的数据获取方法
+                        keyword:txtSearch.val(),
+                        begin_date:searchBeginDate.val(),
+                        end_date:searchEndDate.val(),
+                        dept_id:dept_id.val(),
+                        user_id:user_id.val(),
+                        quota_begin:quota_begin.val(),
+                        quota_end:quota_end.val()
                     });
                 },
                 /**
@@ -333,9 +384,6 @@ $(function () {
                             json.data[n].DT_RowClass = "DT_class" + json.data[n].id;
                             json.data[n].DT_RowId    = "DT_" + json.data[n].id;
                             json.data[n].DT_RowAttr  = {"data-id":json.data[n].id,"data-json":JSON.stringify(json.data[n])};
-
-                            // todo 若需添加额外的filter方法，在此添加
-
                         }
                         return JSON.stringify(json);
                     } catch (e) {
@@ -363,6 +411,17 @@ $(function () {
                             if (has_edit_permission) {
                                 items[n].operate += " <a data-href=\"/manage/tag/edit?id="+data.id+"\" class=\"btn btn-xs btn-primary edit\" data-id=\""+data.id+"\"><i class=\"fa fa-pencil-square-o\"></i> 编辑</a>";
                             }
+
+                            /**
+                             * 拥有删除权限，则显示删除按钮
+                             */
+                            if (has_delete_permission) {
+                                items[n].operate += " <a data-href=\"/manage/tag/delete?id="+data.id+"\" class=\"btn btn-xs btn-danger delete\" data-id=\""+data.id+"\"><i class=\"fa fa-trash\"></i> 删除</a>";
+                            }
+
+                            items[n].sort ="<div class=\"layui-input-inline\">" +
+                                "<input type=\"text\" class=\"list-sort-input\" data-id=\""+data.id+"\" value=\""+data.sort+"\">" +
+                                "</div>";
                         }
                         return items;
                     }
@@ -386,20 +445,13 @@ $(function () {
                     }
                 },
                 {data:"id"},
-                {data:"title"},
-                {data:"article_cat_name",className:"text-center"},
-                {data:"article_author_name",className:"text-center"},
-                {data:"content_type",className:"text-center"},
-                {data:"sort",className:"text-center"},
-                {data:"awesome",className:"text-center"},
-                {data:"click",className:"text-center"},
-                {data:"is_home",className:"text-center"},
-                {data:"is_top",className:"text-center"},
-                {data:"allow_comment",className:"text-center"},
-                {data:"display_time",className:"text-center"},
-                {data:"create_time",className:"text-center"},
-                {data:"update_time",className:"text-center"},
-                {data:"enable",className:"text-center"},
+                {data:"tag"},
+                {data:"quota",className:"text-center"},
+                {data:"sort"},
+                {data:"real_name"},
+                {data:"dept_name"},
+                {data:"create_time"},
+                {data:"update_time"},
                 {data:"operate",className:"text-center"}
             ],
             /**

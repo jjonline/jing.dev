@@ -32,6 +32,23 @@ class Tag extends Model
     }
 
     /**
+     * Tag唯一关键词查找
+     * @param string $tag
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getDataByTag($tag)
+    {
+        if (empty($tag)) {
+            return [];
+        }
+        $result = $this->where('tag', $tag)->find();
+        return empty($result) ? [] : $result->toArray();
+    }
+
+    /**
      * 关键词自动存储读取
      * @param string $tag tag1|tag2 形式的多个关键词
      * @param bool $is_update 使用tag的文章、单独页等是否处于更新模式
