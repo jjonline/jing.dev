@@ -8,6 +8,7 @@
 
 namespace app\common\model;
 
+use app\common\helper\TreeHelper;
 use think\Model;
 
 class Department extends Model
@@ -107,7 +108,7 @@ class Department extends Model
     /**
      * 通过部门id 查询该部门下的所有子部门id数组
      * @param $parent_id
-     * @return array
+     * @return array [1,2,3,5,12]
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
@@ -117,15 +118,45 @@ class Department extends Model
         if (empty($parent_id)) {
             return [];
         }
-        $dept_ids = [];
-        $children_dept = $this->getDeptInfoByParentId($parent_id);
-        if (!empty($children_dept)) {
-            foreach ($children_dept as $key => $value) {
-                $dept_ids[] = $value['id'];
-                $children   = $this->getChildDeptByParentId($value['id']);
-                $dept_ids   = array_merge($dept_ids, $children);
-            }
+
+        $dept_list   = $this->getDeptList(); // 所有部门信息
+        $vector_list = TreeHelper::child($dept_list, $parent_id); // 递归$parent_id的所有子部门
+
+        $dept_ids    = [];
+
+        // 获取所有子部门ID
+        foreach ($vector_list as $key => $value) {
+            $dept_ids[] = $value['id'];
         }
+
+        return $dept_ids;
+    }
+
+    /**
+     * 通过部门id 查询该部门下的所有子部门id和自己本身构成的一维数组
+     * @param $parent_id
+     * @return array [$parent_id,2,3,5,12]
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getDeptChildAndSelfIdArrayById($parent_id)
+    {
+        if (empty($parent_id)) {
+            return [];
+        }
+
+        $dept_list   = $this->getDeptList(); // 所有部门信息
+        $vector_list = TreeHelper::child($dept_list, $parent_id); // 递归$parent_id的所有子部门
+
+        $dept_ids    = [];
+        // 将指定部门id加入第一个元素
+        $dept_ids[]  = $parent_id;
+        // 获取所有子部门ID
+        foreach ($vector_list as $key => $value) {
+            $dept_ids[] = $value['id'];
+        }
+
         return $dept_ids;
     }
 

@@ -96,7 +96,29 @@ $(function () {
         });
     });
 
-    // 提交新增
+    // 指定创建者
+    $(".create_user_btn").on("click", function () {
+        utils.bindSearchUser({
+            dept_id:dept_id,
+            select:function (data) {
+                $("#create_user_id").val(data.id);
+                $("#create_user_container").html(
+                    "<div class=\"create_user\">"+data.real_name+" <i class=\"fa fa-trash\"></i></div>"
+                );
+                utils.toast("已指定创建人：" + data.real_name);
+            }
+        });
+    });
+    // 删除创建人
+    $("#create_user_container").on("click", ".fa-trash", function () {
+        utils.confirm("确认删除指定的创建人么？", function () {
+            $("#create_user_id").val("");
+            $("#create_user_container").html("");
+            utils.toast("已删除指定的创建人");
+        });
+    });
+
+    // 提交
     $("#ArticleForm").submit(function () {
         if(utils.isEmpty($("#title").val()))
         {

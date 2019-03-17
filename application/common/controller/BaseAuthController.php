@@ -164,12 +164,8 @@ class BaseAuthController extends BasicController
 
     /**
      * 获取用户指定Url的权限标记，即返回：['super','leader','staff','guest']中的一者
-     * @param null $url
-     * @return mixed|string
-     * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @param mixed $tag 待检查的菜单标签名称或菜单无前缀url
+     * @return string 一下4个中的1个-super|leader|staff|guest
      */
     protected function getUserPermissionsTag($url = null)
     {

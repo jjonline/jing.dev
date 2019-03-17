@@ -141,9 +141,10 @@
                             <label class="col-sm-2 control-label">指定创建人 <span class="not-required">*</span></label>
                             <div class="col-sm-10">
                                 <div id="create_user_container">
-                                    <div class="create_user"><%{:session('user_info.real_name')}%> <i class="fa fa-trash"></i></div>
-                                    <div class="create_user_context">指定文章创建人，点击按钮编辑，不编辑或留空则不指定[变更创建人后所属部门自动跟随创建人变更]</div>
+                                    <!--<div class="create_user">super <i class="fa fa-trash"></i></div>-->
                                 </div>
+                                <button type="button" class="btn btn-default create_user_btn"><i class="fa fa-user-o"></i> 指定创建人</button>
+                                <div class="create_user_context">不指定则创建人就是你自己，指定创建人后所属部门自动跟随创建人变更</div>
                             </div>
                         </div>
                         <%{/if}%>
@@ -159,3 +160,7 @@
         </div>
     </div>
 </div>
+
+<script>
+    var dept_id = <%{$search_user_with_dept_id}%>;
+</script>

@@ -41,7 +41,9 @@
     color:#e26969;
 }
 /*指定创建人*/
-#create_user_container {}
+#create_user_container {
+    display: inline-block;
+}
 #create_user_container .create_user {
     position: relative;
     display: inline-block;
@@ -78,7 +80,10 @@
     cursor: pointer;
     color:#fff;
 }
-#create_user_container .create_user_context {
+.create_user_btn {
+    margin-right:5px;
+}
+.create_user_context {
     display: inline-block;
     line-height: 34px;
     font-size: 12px;
