@@ -119,9 +119,19 @@ $(function () {
     }
     if(level == 3)
     {
-        var level2_id = item.parent_id;
-        var level2Node  = menu[level2_id];
-        var level1Node  = menu[level2Node.parent_id];
+        var level2_id   = item.parent_id;
+        var level2Node;
+        var level1Node;
+        $.each(menu,function (i,n) {
+            if (n.id == level2_id) {
+                level2Node = n;
+            }
+        });
+        $.each(menu,function (i,n) {
+            if (n.id == level2Node.parent_id) {
+                level1Node = n;
+            }
+        });
         // 渲染二级菜单
         var option = '<option value="">--新建二级菜单--</option>';
         $.each(menu,function (i,n) {
