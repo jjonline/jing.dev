@@ -1,18 +1,6 @@
 <div class="row">
     <div class="col-md-12">
 
-        <%{if condition = "user_has_permission('manage/__CONTROLLER_UNDER_SCORE__/create')"}%>
-            <div class="box box-solid">
-                <div class="box-body">
-                    <div class="row">
-                        <div class="col-xs-12 col-sm-2">
-                            <a href="javascript:;" data-href="<%{:url('manage/__CONTROLLER_UNDER_SCORE__/create')}%>"  class="btn btn-primary" id="create"><i class="fa fa-plus"></i> 新增__LIST_NAME__</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <%{/if}%>
-
         <div class="box box-solid">
             <div class="box-body">
                 <div class="row">
@@ -20,7 +8,7 @@
                         <div class="row">
                             <div class="col-xs-12 col-sm-3">
                                 <div class="has-feedback">
-                                    <input id="txt_search" type="text" class="form-control" placeholder="搜索__LIST_NAME__">
+                                    <input id="txt_search" type="text" class="form-control" placeholder="搜索标题、flag">
                                     <span class="glyphicon glyphicon-search form-control-feedback"></span>
                                 </div>
                             </div>
@@ -49,15 +37,21 @@
 
         <div class="box box-primary">
             <div class="box-body">
-                <table class="table table-bordered table-striped table-hover display responsive nowrap" cellspacing="0" width="100%" id="table" data-order='[[ 1, "desc" ]]'>
+                <table class="table table-bordered table-striped table-hover display responsive nowrap" cellspacing="0" width="100%" id="table" data-order='[[ 5, "desc" ]]'>
                     <thead>
                     <tr>
                         <th data-priority="false" data-orderable="false">
                             <input type="checkbox" class="check_all" title="选中/反选全部">
                         </th>
                         <th data-priority="1">ID</th>
-
-                        <th data-priority="20" data-orderable="false">操作</th>
+                        <th data-priority="2">Flag</th>
+                        <th data-priority="3">单页标题</th>
+                        <th data-priority="4">模板</th>
+                        <th data-priority="5" class="text-center">排序</th>
+                        <th data-priority="6" class="text-center">状态</th>
+                        <th data-priority="7">创建时间</th>
+                        <th data-priority="8">更新时间</th>
+                        <th data-priority="9" data-orderable="false">操作</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -68,75 +62,6 @@
         </div>
     </div>
 </div>
-
-<!--新增|编辑modal-->
-<div class="modal fade" id="SaveModal" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="SaveModalLabel">编辑__LIST_NAME__</h4>
-            </div>
-            <div class="modal-body">
-                <form data-edit="<%{:url('manage/__CONTROLLER_UNDER_SCORE__/edit')}%>" data-create="<%{:url('manage/__CONTROLLER_UNDER_SCORE__/create')}%>" class="form-horizontal" id="SaveModalForm">
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">真实姓名 <span class="required">*</span></label>
-                            <div class="col-sm-7">
-                                <input type="text" id="real_name" class="form-control" name="Member[real_name]" placeholder="账号使用者的真实姓名，请务必填写真实姓名">
-                            </div>
-                        </div>
-
-                        <input type="hidden" id="id" name="Member[id]" >
-
-                        <div class="form-group" id="gender_container">
-                            <label class="col-sm-3 control-label">性别 <span class="required">*</span></label>
-                            <div class="col-sm-7">
-                                <select name="Member[gender]" id="gender" class="form-control select2" style="width: 100%;">
-                                    <option value="1">男</option>
-                                    <option value="0">女</option>
-                                    <option value="-1">未知</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">是否启用 <span class="required">*</span></label>
-                            <div class="col-sm-7">
-                                <div class="js-switch-container">
-                                    <input type="checkbox" id="enable" name="Member[enable]" title="是" data-on-text="是" data-off-text="否" checked="checked">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">备注信息 </label>
-                            <div class="col-sm-7">
-                                <textarea id="remark" rows=3 class="form-control" name="Member[remark]" placeholder="备注信息，便于管理员识别，可留空"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <div class="row">
-                    <div class="col-sm-12 text-center">
-                        <div class="col-xs-6 text-right">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                        </div>
-                        <div class="col-xs-6 text-left edit_sub">
-                            <button type="button" class="btn btn-info btn-edit-submit">提交</button>
-                        </div>
-                        <div class="col-xs-6 text-left create_sub">
-                            <button type="button" class="btn btn-info btn-create-submit">提交</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 <!--高级查询modal Begin-->
 <div class="modal fade" id="SearchModal" role="dialog" aria-hidden="true">
@@ -149,10 +74,10 @@
             <div class="modal-body">
                 <form action="" class="form-horizontal" id="SearchForm">
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">__LIST_NAME__状态</label>
+                        <label class="col-sm-3 control-label">状态</label>
                         <div class="col-sm-8">
                             <select name="adv_enable" id="adv_enable" class="form-control select2" style="width: 100%;">
-                                <option value="">--选择xx状态--</option>
+                                <option value="">--选择状态--</option>
                                 <option value="0">禁用</option>
                                 <option value="1">启用</option>
                             </select>
@@ -160,7 +85,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">xx时间</label>
+                        <label class="col-sm-3 control-label">创建时间</label>
                         <div class="col-sm-4">
                             <div class="input-group date">
                                 <div class="input-group-addon">
@@ -185,13 +110,6 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="col-sm-3 control-label">text</label>
-                        <div class="col-sm-8">
-                            <input id="text" type="text" class="form-control" placeholder="text">
-                        </div>
-                    </div>
-
                 </form>
             </div>
             <div class="box-footer">
@@ -212,5 +130,5 @@
 <!--高级查询结束-->
 
 <script>
-    var has_edit_permission = <%{:user_has_permission('manage/__CONTROLLER_UNDER_SCORE__/edit') ? 'true' : 'false'}%>;
+    var has_save_permission = <%{:user_has_permission('manage/page/save') ? 'true' : 'false'}%>;
 </script>

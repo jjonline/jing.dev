@@ -31,13 +31,20 @@ class Page extends Migrator
                     'null'    => false,
                     'comment' => '落地页唯一flag标记',
                 ])
+                ->addColumn('title', 'string', [
+                    'limit'   => 32,
+                    'null'    => false,
+                    'default' => '',
+                    'comment' => '落地页标题',
+                ])
                 ->addColumn('cover_id', 'string', [
                     'limit'   => 36,
                     'default' => '',
                     'null'    => false,
                     'comment' => '落地页单独的可选的大封面图id',
                 ])->addColumn('keywords', 'string', [
-                    'limit'   => 128,
+                    'limit'   => 64,
+                    'default' => '',
                     'null'    => false,
                     'comment' => '页面关键词，用于落地页面的keywords标签，半角逗号分隔不宜过多',
                 ])

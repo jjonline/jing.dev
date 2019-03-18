@@ -1,16 +1,16 @@
 <?php
 /**
- * __LIST_NAME__检索类
+ * 网站单页检索类
  * @user Jea杨 (JJonline@JJonline.Cn)
- * @date __CREATE_TIME__
- * @file __CONTROLLER__Search.php
+ * @date 2019-03-18 21:54:00
+ * @file PageSearch.php
  */
 
 namespace app\manage\model\search;
 
 use think\Db;
 
-class __CONTROLLER__Search extends BaseSearch
+class PageSearch extends BaseSearch
 {
     /**
      * 前台不呈现异常信息
@@ -28,7 +28,7 @@ class __CONTROLLER__Search extends BaseSearch
     }
 
     /**
-     * 前台__LIST_NAME__搜索
+     * 前台网站单页搜索
      * @param $act_member_info
      * @return array
      * @throws \think\Exception
@@ -39,21 +39,25 @@ class __CONTROLLER__Search extends BaseSearch
     protected function search($act_member_info)
     {
         // 构造Query对象
-        $Query = Db::name('__CONTROLLER_UNDER_SCORE__ __CONTROLLER_UNDER_SCORE__')
+        $Query = Db::name('page page')
                ->field([
                    //'CONCAT("DT_Member_",member.id) as DT_RowId',
-                   '__CONTROLLER_UNDER_SCORE__.id',
-
-                   '__CONTROLLER_UNDER_SCORE__.create_time',
-                   '__CONTROLLER_UNDER_SCORE__.remark'
+                   'page.id',
+                   'page.flag',
+                   'page.title',
+                   'page.enable',
+                   'page.template',
+                   'page.sort',
+                   'page.create_time',
+                   'page.update_time',
                ]);
                // ->leftJoin('member_level member_level', 'member_level.id = member.member_level_id');
 
-        // 部门检索 + 权限限制
+        // 部门检索 + 权限限制 [单页面没有部门限制，此处调用直接返回]
         $this->permissionLimitOrDeptSearch(
             $Query,
-            '__CONTROLLER_UNDER_SCORE__.dept_id',
-            '__CONTROLLER_UNDER_SCORE__.user_id',
+            'page.dept_id',
+            'page.user_id',
             $act_member_info
         );
 
@@ -61,29 +65,27 @@ class __CONTROLLER__Search extends BaseSearch
          * 检索条件
          */
         // 关键词搜索--方法体内部自动判断$this->keyword是否有值并执行sql构造
-        $search_columns = ['__CONTROLLER_UNDER_SCORE__.remark'];
+        $search_columns = ['page.title','page.flag'];
         $this->keywordSearch($Query, $search_columns, $this->keyword);
 
         // 禁用|启用状态
-        // $enable = $this->request->param('enable');
-        // if (in_array($enable, ['0','1'])) {
-        //    $Query->where('__CONTROLLER_UNDER_SCORE__.enable', $enable);
-        //}
+        $enable = $this->request->param('adv_enable');
+        if (in_array($enable, ['0','1'])) {
+            $Query->where('page.enable', $enable);
+        }
 
         // 时间范围检索
-        $this->dateTimeSearch($Query, '__CONTROLLER_UNDER_SCORE__.create_time');
+        $this->dateTimeSearch($Query, 'page.create_time');
 
-        // 数字范围检索
-        // $this->rangeSearch($Query, '__CONTROLLER_UNDER_SCORE__.xxx', $begin_range, $end_range);
 
         // 克隆Query对象读取总记录数
         $countQuery       = clone $Query;
         $this->totalCount = $countQuery->count();
 
         // 字段排序以及没有排序的情况下设定一个默认排序字段
-        $this->orderBy($Query, '__CONTROLLER_UNDER_SCORE__');
+        $this->orderBy($Query, 'page');
         if ($Query->getOptions('order') === null) {
-            $Query->order('__CONTROLLER_UNDER_SCORE__.id', 'DESC');
+            $Query->order('page.id', 'DESC');
         }
 
         // 查询当前分页列表数据
