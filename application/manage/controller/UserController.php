@@ -43,7 +43,7 @@ class UserController extends BaseController
         $this->assign($common);
 
         // 仅能分配当前账号所下辖的部门
-        $dept_list = $this->UserInfo['dept_auth']['dept_list_tree'];
+        $dept_list = $this->DepartmentService->getDeptTreeList();
         $role_list = $userService->Role->getRoleList(); // 角色显示所有
 
         $this->assign('dept_list', $dept_list);
@@ -67,27 +67,7 @@ class UserController extends BaseController
             $result = $userService->superUserInsertUser($this->request);
             return $this->asJson($result);
         }
-        $common = [
-            'title'            => '用户管理 - ' . config('local.site_name'),
-            'content_title'    => '新增用户',
-            'content_subtitle' => '后台用户列表管理',
-            'breadcrumb'       => [
-                ['label' => '用户管理', 'url' => url('user/list')],
-                ['label' => '新增用户', 'url' => ''],
-            ],
-            'load_layout_css'  => false,
-            'load_layout_js'   => true,
-        ];
-        $this->assign($common);
-
-        // 仅能分配当前账号所下辖的部门
-        $dept_list = $this->UserInfo['dept_auth']['dept_list_tree'];
-        $role_list = $userService->Role->getRoleList(); // 角色显示所有
-
-        $this->assign('dept_list', $dept_list);
-        $this->assign('role_list', $role_list);
-
-        return $this->fetch();
+        return $this->renderJson("error");
     }
 
     /**
@@ -105,35 +85,7 @@ class UserController extends BaseController
             $result = $userService->superUserUpdateUser($this->request, $this->UserInfo);
             return $this->asJson($result);
         }
-        $common = [
-            'title'            => '用户管理 - ' . config('local.site_name'),
-            'content_title'    => '编辑用户',
-            'content_subtitle' => '后台用户列表管理',
-            'breadcrumb'       => [
-                ['label' => '用户管理', 'url' => url('user/list')],
-                ['label' => '编辑用户', 'url' => ''],
-            ],
-            'load_layout_css'  => false,
-            'load_layout_js'   => true,
-        ];
-        $this->assign($common);
-
-        $user = $userService->User->getUserInfoById($this->request->get('id'));
-        if (empty($user) || !in_array($user['dept_id'], $this->UserInfo['dept_auth']['dept_id_vector'])) {
-            $this->error('您无权限编辑该账户信息');
-        }
-
-        // 待编辑用户信息
-        $this->assign('user', $user);
-
-        // 仅能分配当前账号所下辖的部门
-        $dept_list = $this->UserInfo['dept_auth']['dept_list_tree'];
-        $role_list = $userService->Role->getRoleList(); // 角色显示所有
-
-        $this->assign('dept_list', $dept_list);
-        $this->assign('role_list', $role_list);
-
-        return $this->fetch();
+        return $this->renderJson("error");
     }
 
     /**

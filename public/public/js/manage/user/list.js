@@ -88,7 +88,7 @@ $(function () {
                             // 启用|禁用账号按钮
                             if(user_id != json.data[n].id)
                             {
-                                json.data[n].operate += ' <a href="javascript:;" data-href="/manage/user/edit?id='+json.data[n].id+'" class="btn btn-xs btn-primary edit" data-id="'+json.data[n].id+'" data-user_name="'+ json.data[n].user_name +'" data-real_name="'+json.data[n].real_name+'" data-gender="'+json.data[n].gender+'" data-mobile="'+json.data[n].mobile+'" data-email="'+json.data[n].email+'" data-telephone="'+json.data[n].telephone+'" data-dept_id="'+json.data[n].dept_id+'"  data-role_id="'+json.data[n].role_id+'" data-remark="'+json.data[n].remark+'" data-is_leader="'+json.data[n].is_leader+'" data-enable="'+ json.data[n].enable +'"><i class="fa fa-pencil-square-o"></i> 编辑</a>';
+                                json.data[n].operate += ' <a href="javascript:;" data-href="/manage/user/edit?id='+json.data[n].id+'" class="btn btn-xs btn-primary edit" data-id="'+json.data[n].id+'" data-json=\''+JSON.stringify(json.data[n])+'\'><i class="fa fa-pencil-square-o"></i> 编辑</a>';
                                 if(json.data[n].enable == 1)
                                 {
                                     json.data[n].operate += ' <a href="javascript:;" data-href="/manage/user/enableToggle?id='+json.data[n].id+'" class="btn btn-xs btn-danger enableToggle" data-id="'+json.data[n].id+'" data-enable="'+ json.data[n].enable +'"><i class="fa fa-toggle-off"></i> 禁用</a>';
@@ -167,25 +167,64 @@ $(function () {
         return false;
     // 显示编辑浮层
     }).on('click','.edit',function () {
-        $('#id').val($(this).data('id'));
-        $('#real_name').val($(this).data('real_name'));
-        $('#user_name').val($(this).data('user_name'));
-        $('#mobile').val($(this).data('mobile'));
-        $('#email').val($(this).data('email'));
-        $('#telephone').val($(this).data('telephone'));
-        $('#remark').val($(this).data('remark'));
+        var data = $(this).data("json");
+        $("#UserModelLabel").text("编辑后台用户");
+        $('#id').val(data.id).prop("disabled", false);
+        $('#real_name').val(data.real_name);
+        $('#user_name').val(data.user_name);
+        $('#mobile').val(data.mobile);
+        $('#email').val(data.email);
+        $('#telephone').val(data.telephone);
+        $('#remark').val(data.remark);
 
-        $('#gender').val($(this).data('gender')).trigger('change');
-        $('#dept_id').val($(this).data('dept_id')).trigger('change');
-        $('#role_id').val($(this).data('role_id')).trigger('change');
+        $('#gender').val(data.gender).trigger('change');
+        $('#dept_id').val(data.dept_id).trigger('change');
+        $('#role_id').val(data.role_id).trigger('change');
 
-        $('#is_leader').bootstrapSwitch('state',!!$(this).data('is_leader'));
-        $('#enable').bootstrapSwitch('state',!!$(this).data('enable'));
+        $('#is_leader').bootstrapSwitch('state',!!data.is_leader);
+        $('#enable').bootstrapSwitch('state',!!data.enable);
+        $('#is_root').bootstrapSwitch('state',!!data.is_root);
 
         $('#UserModal').modal('show');
     });
 
-    // 提交编辑
+    // 浮层新增
+    $("#btn-create").on("click",function () {
+        $("#UserModelLabel").text("新增后台用户");
+        $('#id').val("").prop("disabled", true);
+        $('#real_name').val("");
+        $('#user_name').val("");
+        $('#mobile').val("");
+        $('#email').val("");
+        $('#telephone').val("");
+        $('#remark').val("");
+
+        $('#gender').val("-1").trigger('change');
+        $('#dept_id').val("").trigger('change');
+        $('#role_id').val("").trigger('change');
+
+        $('#is_leader').bootstrapSwitch('state',false);
+        $('#enable').bootstrapSwitch('state',true);
+        $('#is_root').bootstrapSwitch('state',false);
+
+        $('#UserModal').modal('show');
+        return false;
+    });
+
+    // 真实姓名转拼音
+    $('#real_name').change(function () {
+        if(!utils.isEmpty($(this).val()) && utils.isEmpty($('#user_name').val()))
+        {
+            $.get('/manage/common/chineseToPinyin',{chinese:$(this).val()},function (data) {
+                if(data.error_code == 0)
+                {
+                    $('#user_name').val(data.data);
+                }
+            });
+        }
+    });
+
+    // 提交新增|编辑
     $('.btn-submit-edit').click(function () {
         if(utils.isEmpty($('#real_name').val()))
         {
@@ -234,24 +273,32 @@ $(function () {
             utils.toast('请选择所属部门');
             return false;
         }
+        var action = '';
+        if(utils.isEmpty($('#id').val()))
+        {
+            action = $('#userEdit').data('create');
+        }else
+        {
+            action = $('#userEdit').data('edit')
+        }
         var data = $('#userEdit').serializeArray();
-        //$('.btn-submit').prop('disabled',true).text('提交中...');
+        $('.btn-submit').prop('disabled',true).text('提交中...');
         $.ajax({
-            url: $('#userEdit').attr('action'),
+            url: action,
             type: 'POST',
             data: data,
             success: function (data) {
-                if(data.error_code == 0){
+                if(data.error_code == 0) {
                     utils.alert(data.error_msg,function () {
-                        location.href = '/manage/user/list';
+                        $('#UserModal').modal('hide');
+                        refreshTable();
                     });
                 }else{
                     utils.toast(data.error_msg ? data.error_msg : '未知错误');
                 }
-                //$('.btn-submit').prop('disabled',false).text('提交');
             },
             error:function () {
-                //$('.btn-submit').prop('disabled',false).text('提交');
+                $('.btn-submit').prop('disabled',false).text('提交');
                 utils.alert('网络或服务器异常，请稍后再试');
             }
         });

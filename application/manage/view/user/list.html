@@ -6,7 +6,7 @@
             <div class="box-body">
                 <div class="row">
                     <div class="col-xs-12 col-sm-2">
-                        <a href="<%{:url('manage/user/create')}%>" class="btn btn-primary" id="btn-create"><i class="fa fa-plus"></i> 新增后台用户</a>
+                        <a href="javascript:" class="btn btn-primary" id="btn-create"><i class="fa fa-plus"></i> 新增后台用户</a>
                     </div>
                 </div>
             </div>
@@ -19,7 +19,6 @@
                     <div class="col-xs-12 col-sm-12">
                         <div class="row">
                             <div class="col-xs-12 col-sm-3">
-                                <!--common.js初始化该select以及处理选中事件-->
                                 <select name="dept_id" id="select_dept" class="form-control select2" style="width: 100%;">
                                     <option value="0">--选择部门--</option>
                                     <%{volist name="dept_list" id="_dept"}%>
@@ -88,18 +87,18 @@
 </div>
 
 <div class="modal fade" id="UserModal" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="DeptModelLabel">编辑账号</h4>
+                <h4 class="modal-title" id="UserModelLabel">编辑后台用户</h4>
             </div>
             <div class="modal-body">
-                <form action="<%{:url('user/edit')}%>" class="form-horizontal" id="userEdit">
+                <form data-edit="<%{:url('user/edit')}%>" data-create="<%{:url('user/create')}%>" class="form-horizontal" id="userEdit" autocomplete="off">
                     <div class="box-body">
                         <div class="form-group">
                             <label class="col-sm-3 control-label">真实姓名：</label>
-                            <div class="col-sm-8">
+                            <div class="col-sm-7">
                                 <input type="text" id="real_name" class="form-control" name="User[real_name]" placeholder="账号使用者的真实姓名，不会对外泄露，请务必填写真实姓名">
                             </div>
                         </div>
@@ -108,7 +107,7 @@
 
                         <div class="form-group" id="gender_container">
                             <label class="col-sm-3 control-label">性别：</label>
-                            <div class="col-sm-8">
+                            <div class="col-sm-7">
                                 <select name="User[gender]" id="gender" class="form-control select2" style="width: 100%;">
                                     <option value="1">男</option>
                                     <option value="0">女</option>
@@ -119,41 +118,41 @@
 
                         <div class="form-group">
                             <label class="col-sm-3 control-label">用户名：</label>
-                            <div class="col-sm-8"><input type="text" id="user_name" class="form-control" name="User[user_name]" placeholder="用户名，用于登录后台的账号，字母和数字构成">
+                            <div class="col-sm-7"><input type="text" id="user_name" class="form-control" name="User[user_name]" placeholder="用户名，用于登录后台的账号，字母和数字构成">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-sm-3 control-label">新登录密码：</label>
-                            <div class="col-sm-8">
-                                <input type="password" id="password" class="form-control" name="User[password]" placeholder="数字和字母6至18位，不修改请留空">
+                            <label class="col-sm-3 control-label">登录密码：</label>
+                            <div class="col-sm-7">
+                                <input type="text" id="password" class="form-control" name="User[password]" placeholder="数字和字母6至18位，编辑模式不修改请留空，新增模式必填">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="col-sm-3 control-label">手机号：</label>
-                            <div class="col-sm-8">
+                            <div class="col-sm-7">
                                 <input type="text" id="mobile" class="form-control" name="User[mobile]" placeholder="账号使用者的手机号，填写则可作为登录账号，可留空">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="col-sm-3 control-label">邮箱地址：</label>
-                            <div class="col-sm-8">
+                            <div class="col-sm-7">
                                 <input type="text" id="email" class="form-control" name="User[email]" placeholder="账号使用者的邮箱，填写则可作为登录账号，可留空">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="col-sm-3 control-label">座机号码：</label>
-                            <div class="col-sm-8">
+                            <div class="col-sm-7">
                                 <input type="text" id="telephone" class="form-control" name="User[telephone]" placeholder="账号使用者的办公电话等固定电话号码，可留空">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="col-sm-3 control-label">所属角色：</label>
-                            <div class="col-sm-8">
+                            <div class="col-sm-7">
                                 <select name="User[role_id]" id="role_id" class="form-control select2" style="width: 100%;">
                                     <option value="">--请选择角色--</option>
                                     <%{volist name="role_list" id="_role"}%>
@@ -165,7 +164,7 @@
 
                         <div class="form-group" id="level2_container">
                             <label class="col-sm-3 control-label">所属部门：</label>
-                            <div class="col-sm-8">
+                            <div class="col-sm-7">
                                 <select name="User[dept_id]" id="dept_id" class="form-control select2" style="width: 100%;">
                                     <option value="">--请选择部门--</option>
                                     <%{volist name="dept_list" id="_dept"}%>
@@ -176,26 +175,38 @@
                         </div>
 
                         <div class="form-group">
+                            <label class="col-sm-3 control-label">是否根用户：</label>
+                            <div class="col-sm-7">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="is_root" name="User[is_root]" data-on-text="是" data-off-text="否"<%{if condition="empty(session('user_info.is_root'))"}%> disabled="disabled"<%{/if}%>>
+                                    <div class="js-switch-context">根用户永远具备所有菜单权限，仅根用户可选择</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
                             <label class="col-sm-3 control-label">是否部门领导：</label>
-                            <div class="col-sm-8">
+                            <div class="col-sm-7">
                                 <div class="js-switch-container">
                                     <input type="checkbox" id="is_leader" name="User[is_leader]" title="是" data-on-text="是" data-off-text="否">
+                                    <div class="js-switch-context">仅仅是一个是否领导标记不标明任何权限</div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="col-sm-3 control-label">是否启用：</label>
-                            <div class="col-sm-8">
+                            <div class="col-sm-7">
                                 <div class="js-switch-container">
                                     <input type="checkbox" id="enable" name="User[enable]" title="是" data-on-text="是" data-off-text="否" checked="checked">
+                                    <div class="js-switch-context">选否则禁用用户无法登陆</div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="col-sm-3 control-label">备注信息：</label>
-                            <div class="col-sm-8">
+                            <div class="col-sm-7">
                                 <textarea id="remark" rows=3 class="form-control" name="User[remark]" placeholder="菜单备注信息，便于管理员识别，可留空"></textarea>
                             </div>
                         </div>
@@ -203,8 +214,10 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-info btn-submit-edit">提交</button>
+                <div class="row text-center">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-info btn-submit-edit">提交</button>
+                </div>
             </div>
         </div>
     </div>
