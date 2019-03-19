@@ -124,13 +124,11 @@ class PageService
     public function delete(Request $request)
     {
         try {
-            $id = $request->post('id/i');
+            $id   = $request->post('id/i');
             $page = $this->Page->getDataById($id);
             if (empty($page)) {
                 throw new Exception('拟删除的网站单页数据不存在');
             }
-
-            // todo 删除的其他检查
 
             $effect_rows = $this->Page->db()->where('id', $id)->delete();
             if (false === $effect_rows) {
