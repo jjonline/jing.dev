@@ -27,7 +27,14 @@ class GenerateHelper
         $low              = bcmod($ticks, $maxUint) - $high;
         $highBit          = (pack("N*", $high));
         $lowBit           = (pack("N*", $low));
-        $guid             = str_pad(dechex(ord($highBit[2])), 2, "0", STR_PAD_LEFT) . str_pad(dechex(ord($highBit[3])), 2, "0", STR_PAD_LEFT) . str_pad(dechex(ord($lowBit[0])), 2, "0", STR_PAD_LEFT) . str_pad(dechex(ord($lowBit[1])), 2, "0", STR_PAD_LEFT) . "-" . str_pad(dechex(ord($lowBit[2])), 2, "0", STR_PAD_LEFT) . str_pad(dechex(ord($lowBit[3])), 2, "0", STR_PAD_LEFT) . "-";
+        $guid             = str_pad(dechex(ord($highBit[2])), 2, "0", STR_PAD_LEFT)
+            . str_pad(dechex(ord($highBit[3])), 2, "0", STR_PAD_LEFT)
+            . str_pad(dechex(ord($lowBit[0])), 2, "0", STR_PAD_LEFT)
+            . str_pad(dechex(ord($lowBit[1])), 2, "0", STR_PAD_LEFT)
+            . "-" .
+            str_pad(dechex(ord($lowBit[2])), 2, "0", STR_PAD_LEFT)
+            . str_pad(dechex(ord($lowBit[3])), 2, "0", STR_PAD_LEFT)
+            . "-";
         $chars = "abcdef0123456789";
         for ($i = 0; $i < 4; $i++) {
             $guid .= $chars[mt_rand(0, 15)];
@@ -51,7 +58,8 @@ class GenerateHelper
     public static function guid($opt = false)
     {
         // 获取服务器IP作为uuid一个变量因子
-        $server_ip   = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
+        $server_ip   = isset($_SERVER['HTTP_X_FORWARDED_HOST'])
+            ? $_SERVER['HTTP_X_FORWARDED_HOST'] : (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
         // PHP7.1下可使用内置生成session_id唯一性相当好的方法生成一个session_id使用
         $session_id  = uniqid($server_ip.mt_rand());
         $charid      = md5(uniqid($session_id.mt_rand().$server_ip, true));
