@@ -31,7 +31,7 @@ class PageService
     }
 
     /**
-     * 网站单页新增|编辑
+     * 单页新增|编辑config的设置参数
      * @param Request $request
      * @return array
      */
@@ -63,6 +63,22 @@ class PageService
                 ($is_edit ? "编辑" : "新增")."网站单页"
             );
             return ['error_code' => 0, 'error_msg' => '保存成功'];
+        } catch (\Throwable $e) {
+            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * 提交单页面设置数据
+     * @param Request $request
+     * @return array
+     */
+    public function setting(Request $request)
+    {
+        try {
+            $request->post('Setting/a');
+
+            return [];
         } catch (\Throwable $e) {
             return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
         }

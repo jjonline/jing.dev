@@ -138,6 +138,12 @@ $(function () {
         utils.ajaxConfirm("确认修改排序么？",'/manage/page/sort',{"id":id,"sort":sort},function () {
             refreshTable();
         });
+    }).on("click",".delete",function () {
+        // 删除
+        var id   = $(this).data("id");
+        utils.ajaxConfirm("确认删除该单页面么？",'/manage/page/delete',{"id":id},function () {
+            refreshTable();
+        });
     });
 
     /**
@@ -174,7 +180,7 @@ $(function () {
                 rightColumns: 1
             },
             ajax: {
-                url: "/manage/page/list.html",
+                url: "/manage/page/config.html",
                 type: "POST",
                 /**
                  * +++++++++++++++++++++++++++++++++++++++++++
@@ -227,10 +233,20 @@ $(function () {
                             var data = items[n];
                             items[n].operate = ""; // 操作按钮
                             /**
-                             * 设置权限
+                             * 拥有编辑权限，则显示编辑按钮
                              */
-                            if (has_save_permission) {
+                            if (has_edit_permission) {
+                                items[n].operate += " <a href=\"/manage/page/edit?id="+data.id+"\" class=\"btn btn-xs btn-primary\"><i class=\"fa fa-pencil-square-o\"></i> 编辑</a>";
+                            }
+                            // 设置权限
+                            if (has_setting_permission) {
                                 items[n].operate += " <a href=\"/manage/page/setting?id="+data.id+"\" class=\"btn btn-xs btn-success\"><i class=\"fa fa-cog\"></i> 设置</a>";
+                            }
+                            /**
+                             * 拥有删除权限，则显示删除按钮
+                             */
+                            if (has_delete_permission) {
+                                items[n].operate += " <a data-href=\"/manage/page/delete?id="+data.id+"\" class=\"btn btn-xs btn-danger delete\" data-id=\""+data.id+"\"><i class=\"fa fa-trash\"></i> 删除</a>";
                             }
                             if (data.enable) {
                                 items[n].enable = "<label class=\"btn btn-xs bg-olive\">启用</label>";

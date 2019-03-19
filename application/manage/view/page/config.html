@@ -130,5 +130,8 @@
 <!--高级查询结束-->
 
 <script>
-    var has_save_permission = <%{:user_has_permission('manage/page/setting') ? 'true' : 'false'}%>;
+    var has_setting_permission = <%{:user_has_permission('manage/page/setting') ? 'true' : 'false'}%>;
+    var has_edit_permission = <%{:user_has_permission('manage/page/edit') ? 'true' : 'false'}%>;
+    var has_delete_permission = <%{:user_has_permission('manage/page/delete') ? 'true' : 'false'}%>;
+    var has_enable_permission = <%{:user_has_permission('manage/page/enable') ? 'true' : 'false'}%>;
 </script>

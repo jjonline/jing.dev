@@ -2,7 +2,7 @@
 /**
  * 菜单生成的seed数组
  * @user Jea杨 (JJonline@JJonline.Cn)
- * @date 2019-03-18 22:54:39
+ * @date 2019-03-19 19:39:21
  * @file menu_seed.php
  */
 $date_time = date('Y-m-d H:i:s');
@@ -465,10 +465,10 @@ return [
     ],
     [
         'id' => '25',
-        'tag' => 'Article_Page_Save',
-        'name' => '保存单页节点数据',
+        'tag' => 'Article_Page_Setting',
+        'name' => '单页节点设置和保存',
         'icon' => '',
-        'url' => 'manage/page/save',
+        'url' => 'manage/page/setting',
         'parent_id' => '24',
         'level' => '3',
         'is_required' => '0',
@@ -503,10 +503,10 @@ return [
     ],
     [
         'id' => '27',
-        'tag' => 'Article_Page_Setting',
+        'tag' => 'Article_Page_Config',
         'name' => '单页面配置',
         'icon' => 'fa fa-cogs',
-        'url' => 'manage/page/setting',
+        'url' => 'manage/page/config',
         'parent_id' => '2',
         'level' => '2',
         'is_required' => '0',
