@@ -103,7 +103,20 @@ class PageController extends BaseController
         if ($this->request->isPost() && $this->request->isAjax()) {
             return $pageService->save($this->request);
         }
-        return $this->renderJson('error', 500);
+        $common = [
+            'title'            => '新增单页 - ' . config('local.site_name'),
+            'content_title'    => '新增单页',
+            'content_subtitle' => '新增单页',
+            'breadcrumb'       => [
+                ['label' => '新增单页', 'url' => url('page/create')],
+                ['label' => '新增单页', 'url' => ''],
+            ],
+            'load_layout_css'  => true,
+            'load_layout_js'   => true,
+        ];
+        $this->assign($common);
+
+        return $this->fetch();
     }
 
     /**
@@ -116,7 +129,20 @@ class PageController extends BaseController
         if ($this->request->isPost() && $this->request->isAjax()) {
             return $pageService->save($this->request);
         }
-        return $this->renderJson('error', 500);
+        $common = [
+            'title'            => '编辑单页 - ' . config('local.site_name'),
+            'content_title'    => '编辑单页',
+            'content_subtitle' => '编辑单页的各项配置属性',
+            'breadcrumb'       => [
+                ['label' => '编辑单页', 'url' => url('page/config')],
+                ['label' => '编辑单页', 'url' => ''],
+            ],
+            'load_layout_css'  => true,
+            'load_layout_js'   => true,
+        ];
+        $this->assign($common);
+
+        return $this->fetch();
     }
 
     /**
