@@ -14,7 +14,7 @@ use app\manage\model\search\PageSearch;
 class PageController extends BaseController
 {
     /**
-     * 网站单页管理
+     * 网站单页setting列表管理
      * @param PageSearch $pageSearch
      * @return mixed
      */
@@ -31,6 +31,59 @@ class PageController extends BaseController
             'breadcrumb'       => [
                 ['label' => '网站单页管理', 'url' => url('page/list')],
                 ['label' => '网站单页列表和管理', 'url' => ''],
+            ],
+            'load_layout_css'  => false,
+            'load_layout_js'   => true,
+        ];
+        $this->assign($common);
+
+        return $this->fetch();
+    }
+
+    /**
+     * 单页面设置数据提交
+     * @param PageService $pageService
+     * @return array|mixed
+     */
+    public function settingAction(PageService $pageService)
+    {
+        if ($this->request->isPost() && $this->request->isAjax()) {
+            return $pageService->setting($this->request);
+        }
+        $common = [
+            'title'            => '设置单页面 - ' . config('local.site_name'),
+            'content_title'    => '设置单页面',
+            'content_subtitle' => '网站单页参数设置',
+            'breadcrumb'       => [
+                ['label' => '设置单页面', 'url' => url('page/list')],
+                ['label' => '网站单页参数设置', 'url' => 'page/save'],
+            ],
+            'load_layout_css'  => true,
+            'load_layout_js'   => true,
+        ];
+        $this->assign($common);
+
+        return $this->fetch();
+    }
+
+    /**
+     * 网站单页面config配置列表管理
+     * @param PageSearch $pageSearch
+     * @return mixed
+     */
+    public function configAction(PageSearch $pageSearch)
+    {
+        if ($this->request->isAjax()) {
+            $result = $pageSearch->config($this->UserInfo);
+            return $this->asJson($result);
+        }
+        $common = [
+            'title'            => '单页配置管理 - ' . config('local.site_name'),
+            'content_title'    => '单页配置管理',
+            'content_subtitle' => '配置各个单页面的设置特性',
+            'breadcrumb'       => [
+                ['label' => '单页配置管理', 'url' => url('page/config')],
+                ['label' => '单页配置管理', 'url' => ''],
             ],
             'load_layout_css'  => false,
             'load_layout_js'   => true,
