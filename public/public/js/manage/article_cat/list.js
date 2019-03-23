@@ -127,7 +127,7 @@ $(function () {
             success: function (data) {
                 if(data.error_code == 0)
                 {
-                    utils.toast(data.error_msg,3000,function () {
+                    utils.alert(data.error_msg,function () {
                         location.href = '/manage/article_cat/list';
                     });
                 } else {
