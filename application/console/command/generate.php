@@ -14,7 +14,7 @@ use think\console\input\Option;
 use think\console\Output;
 use think\Exception;
 
-class generate extends Command
+class Generate extends Command
 {
     protected function configure()
     {
