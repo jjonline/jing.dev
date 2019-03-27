@@ -129,7 +129,7 @@ class ArticleSearch extends BaseSearch
         // 时间范围检索--更新时间
         $this->dateTimeSearch(
             $Query,
-            'article.show_time',
+            'article.update_time',
             $this->request->param('update_time_begin'),
             $this->request->param('update_time_end')
         );

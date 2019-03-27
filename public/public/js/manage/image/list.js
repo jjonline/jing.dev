@@ -5,12 +5,14 @@ $(function () {
     var searchBeginDate = $("#search_begin_date"); // 时间范围检索开始
     var searchEndDate   = $("#search_end_date");// 时间范围检索结束
 
-
+    var update_time_begin = $("#update_time_begin");
+    var update_time_end = $("#update_time_end");
+    var adv_enable = $("#adv_enable");
     /**
      * 文本检索和cookie记录检索值
      * 以及绑定检索输入框的自动提交事件
      */
-    var targetSearch = utils.cookie("txt__CONTROLLER__Search");
+    var targetSearch = utils.cookie("txtImageSearch");
     if (!utils.isEmpty(targetSearch)) {
         txtSearch.val(targetSearch);
         txtSearch.select();
@@ -18,7 +20,7 @@ $(function () {
     txtSearch.on("keyup", function () {
         keyUpHandle && clearTimeout(keyUpHandle);
         keyUpHandle = setTimeout(function () {
-            utils.cookie('txt__CONTROLLER__Search', txtSearch.val());
+            utils.cookie('txtImageSearch', txtSearch.val());
             refreshTable();
         }, 600);
     });
@@ -74,11 +76,33 @@ $(function () {
     $("#exec_reset").click(function () {
         searchBeginDate.val("");
         searchEndDate.val("");
-
-        // todo 清除高级查询modal上的输入框值等内容，一般先在顶部定义各个输入框的对象，此处直接用
+        adv_enable.val("").trigger("change");
+        update_time_begin.val();
+        update_time_end.val();
 
         refreshTable();
         return false;
+    });
+
+    // 带上传进度条的文件上传
+    utils.bindAjaxUploader("cover_image_file",{
+        // url:'',//上传文件后端Url，留空则为/manage/upload/upload?origin=ajax
+        allow_extension: ['jpg','jpeg', 'png'],//null不限制、需限制时使用数组 ['jpg','jpeg']
+        extraData: {'is_safe':0}, //上传额外附带的key-value
+        multiple:true,//是否允许选择多个文件，默认允许多个
+        success:function (data) {
+            if(data['error_code'] == 0)
+            {
+                $('#cover_img').remove();
+                $('.cover-image-file-container').prepend('<div id="cover_img" class="upload-preview"><img src="'+data.data.file_path+'"></div>');
+                $('#cover_image_id').val(data.data.id);
+            }else{
+                utils.alert(data.error_msg ? data.error_msg : '未知错误');
+            }
+        },//上传成功的回调函数
+        error:function () {
+            utils.alert("网络或服务器异常，文件上传失败！");
+        }//上传失败的回调函数
     });
 
 
@@ -135,35 +159,41 @@ $(function () {
     }).on("click",".enable",function () {
         // 启用禁用
         var data = $(this).parents("tr").data("json");
-        var text = data.enable ? "确认禁用该__LIST_NAME__么？" : "确认启用该__LIST_NAME__么？";
-        utils.ajaxConfirm(text,"/manage/__CONTROLLER_UNDER_SCORE__/enable",{"id":data.id},function () {
+        var text = data.enable ? "确认禁用该轮播图么？" : "确认启用该轮播图么？";
+        utils.ajaxConfirm(text,"/manage/image/enable",{"id":data.id},function () {
             refreshTable();
         });
     }).on("change",".list-sort-input",function () {
         // 快速设置排序
         var id   = $(this).data("id");
         var sort = $(this).val();
-        utils.ajaxConfirm("确认修改排序么？",'/manage/__CONTROLLER_UNDER_SCORE__/sort',{"id":id,"sort":sort},function () {
+        utils.ajaxConfirm("确认修改排序么？",'/manage/image/sort',{"id":id,"sort":sort},function () {
             refreshTable();
         });
     }).on("click",".delete",function () {
         // 删除
         var id   = $(this).data("id");
-        utils.ajaxConfirm("确认删除该__LIST_NAME__么？删除后将无法找回",'/manage/__CONTROLLER_UNDER_SCORE__/delete',{"id":id},function () {
+        utils.ajaxConfirm("确认删除该轮播图么？删除后将无法找回，若无需前台显示建议选禁用功能",'/manage/image/delete',{"id":id},function () {
             refreshTable();
         });
-    }).on("click",'.edit',function () {
-        // 编辑按钮打开编辑modal
-        $("#id").val($(this).data("id")).prop("disabled",false);
-        var editData = $(this).parents("tr").data("json"); // 从tr中读取出的待编辑的数据
+    }).on('click','.edit',function () {
+        // 编辑模式
+        var data = $(this).parents('tr').data('json');
+        $("#id").val(data.id).prop("disabled",false);
+        $("#cover_image_id").val(data.cover_id);
+        $("#SaveModalLabel").text("编辑轮播图");
+        $("#title").val(data.title);
+        $("#tag").val(data.tag);
+        $("#url").val(data.url);
+        $("#sort").val(data.sort);
+        $("#remark").val(data.remark);
+        $("#enable").prop("checked",!!data.enable).trigger("change");
 
-        $("#SaveModalLabel").text("编辑__LIST_NAME__");
+        $('#cover_img').remove();
+        $('.cover-image-file-container').prepend('<div id="cover_img" class="upload-preview"><img src="'+data.cover+'"></div>');
+
         $(".btn-edit-submit").show();
         $(".btn-create-submit").hide();
-
-        // todo 编辑模式需处理的逻辑
-        // sample
-        $("#real_name").val(editData.real_name);
 
         $("#SaveModal").modal("show");
         return false;
@@ -171,14 +201,15 @@ $(function () {
 
     // 新增
     $("#create").on('click',function () {
-        $("#id").val('').prop("disabled",false);
+        $("#id").val('').prop("disabled",true);
+        $("#cover_image_id").val('');
         $("#SaveModalForm").get(0).reset();
-        $("#SaveModalLabel").text("新增__LIST_NAME__");
+        $("#SaveModalLabel").text("新增轮播图");
+
+        $('#cover_img').remove();
 
         $(".btn-edit-submit").hide();
         $(".btn-create-submit").show();
-
-        // todo 新增模式需处理的逻辑
 
         $("#SaveModal").modal("show");
         return false;
@@ -194,17 +225,24 @@ $(function () {
         var that = this;
         var form = $("#SaveModalForm");
 
-        /**
-         * sample
-         */
-        var real_time = $("#real_name");
-        if (utils.isEmpty(real_time.val())) {
-            real_time.focus();
-            utils.toast("输入真实姓名");
+        var tag = $("#tag");
+        if (utils.isEmpty(tag.val())) {
+            tag.focus();
+            utils.toast("请输入分组tag");
             return false;
         }
-
-        // todo 边界效验逻辑
+        var title = $("#title");
+        if (utils.isEmpty(title.val())) {
+            title.focus();
+            utils.toast("请输入轮播图标题");
+            return false;
+        }
+        var cover_image_id = $("#cover_image_id");
+        if (utils.isEmpty(cover_image_id.val())) {
+            cover_image_id.focus();
+            utils.toast("请上传轮播图");
+            return false;
+        }
 
         var data = form.serializeArray();
         $(that).prop("disabled",true).text("提交中...");
@@ -244,17 +282,24 @@ $(function () {
         var that = this;
         var form = $("#SaveModalForm");
 
-        /**
-         * sample
-         */
-        var real_time = $("#real_name");
-        if (utils.isEmpty(real_time.val())) {
-            real_time.focus();
-            utils.toast("输入真实姓名");
+        var tag = $("#tag");
+        if (utils.isEmpty(tag.val())) {
+            tag.focus();
+            utils.toast("请输入分组tag");
             return false;
         }
-
-        // todo 边界效验逻辑
+        var title = $("#title");
+        if (utils.isEmpty(title.val())) {
+            title.focus();
+            utils.toast("请输入轮播图标题");
+            return false;
+        }
+        var cover_image_id = $("#cover_image_id");
+        if (utils.isEmpty(cover_image_id.val())) {
+            cover_image_id.focus();
+            utils.toast("请上传轮播图");
+            return false;
+        }
 
         var data = form.serializeArray();
         $(that).prop("disabled",true).text("提交中...");
@@ -283,7 +328,6 @@ $(function () {
         });
         return false;
     });
-
 
 
     /**
@@ -320,7 +364,7 @@ $(function () {
                 rightColumns: 1
             },
             ajax: {
-                url: "/manage/__CONTROLLER_UNDER_SCORE__/list.html",
+                url: "/manage/image/list.html",
                 type: "POST",
                 /**
                  * +++++++++++++++++++++++++++++++++++++++++++
@@ -331,7 +375,12 @@ $(function () {
                  */
                 data: function (data) {
                     return $.extend({}, data, {
-                        // todo 额外塞入请求体的数据获取方法
+                        keyword:txtSearch.val(),
+                        begin_date:searchBeginDate.val(),
+                        end_date:searchEndDate.val(),
+                        adv_enable:adv_enable.val(),
+                        update_time_begin:update_time_begin.val(),
+                        update_time_end:update_time_end.val()
                     });
                 },
                 /**
@@ -348,9 +397,6 @@ $(function () {
                             json.data[n].DT_RowClass = "DT_class" + json.data[n].id;
                             json.data[n].DT_RowId    = "DT_" + json.data[n].id;
                             json.data[n].DT_RowAttr  = {"data-id":json.data[n].id,"data-json":JSON.stringify(json.data[n])};
-
-                            // todo 若需添加额外的filter方法，在此添加
-
                         }
                         return JSON.stringify(json);
                     } catch (e) {
@@ -375,9 +421,34 @@ $(function () {
                             /**
                              * 拥有编辑权限，则显示编辑按钮
                              */
+                            /**
+                             * 拥有编辑权限，则显示编辑按钮
+                             */
                             if (has_edit_permission) {
-                                items[n].operate += " <a data-href=\"/manage/__CONTROLLER_UNDER_SCORE__/edit?id="+data.id+"\" class=\"btn btn-xs btn-primary edit\" data-id=\""+data.id+"\"><i class=\"fa fa-pencil-square-o\"></i> 编辑</a>";
+                                items[n].operate += " <a data-href=\"/manage/image/edit?id="+data.id+"\" class=\"btn btn-xs btn-primary edit\" data-id=\""+data.id+"\"><i class=\"fa fa-pencil-square-o\"></i> 编辑</a>";
                             }
+                            /**
+                             * 拥有删除权限，则显示删除按钮
+                             */
+                            if (has_delete_permission) {
+                                items[n].operate += " <a data-href=\"/manage/image/delete?id="+data.id+"\" class=\"btn btn-xs btn-danger delete\" data-id=\""+data.id+"\"><i class=\"fa fa-trash\"></i> 删除</a>";
+                            }
+                            items[n].cover = '<a href="'+items[n].cover+'" target="_blank"><i class="fa fa-image"></i></a>';
+                            // 状态、连接
+                            if (data.enable) {
+                                items[n].enable = "<button class=\"btn btn-xs bg-olive enable\">启用</button>";
+                            } else {
+                                items[n].enable = "<button class=\"btn btn-xs bg-teal enable\">禁用</button>";
+                            }
+                            if (data.url) {
+                                items[n].url = '<a href="'+items[n].url+'" target="_blank"><i class="fa fa-link"></i></a>';
+                            } else {
+                                items[n].url = "-";
+                            }
+                            items[n].sort ="<div class=\"layui-input-inline\">" +
+                                "<input type=\"text\" class=\"list-sort-input\" data-id=\""+data.id+"\" value=\""+data.sort+"\">" +
+                                "</div>";
+
                         }
                         return items;
                     }
@@ -400,21 +471,15 @@ $(function () {
                         return "";
                     }
                 },
-                {data:"id"},
+                {data:"tag"},
+                {data:"cover",className:"text-center"},
                 {data:"title"},
-                {data:"article_cat_name",className:"text-center"},
-                {data:"article_author_name",className:"text-center"},
-                {data:"content_type",className:"text-center"},
+                {data:"url",className:"text-center"},
+                {data:"enable",className:"text-center"},
                 {data:"sort",className:"text-center"},
-                {data:"awesome",className:"text-center"},
-                {data:"click",className:"text-center"},
-                {data:"is_home",className:"text-center"},
-                {data:"is_top",className:"text-center"},
-                {data:"allow_comment",className:"text-center"},
-                {data:"display_time",className:"text-center"},
+                {data:"remark",className:"text-center"},
                 {data:"create_time",className:"text-center"},
                 {data:"update_time",className:"text-center"},
-                {data:"enable",className:"text-center"},
                 {data:"operate",className:"text-center"}
             ],
             /**
