@@ -15,7 +15,7 @@ use think\console\input\Option;
 use think\console\Output;
 use think\Exception;
 
-class init extends Command
+class Init extends Command
 {
     protected function configure()
     {

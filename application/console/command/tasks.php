@@ -10,6 +10,7 @@ namespace app\console\command;
 
 use app\common\helper\ArrayHelper;
 use app\console\service\SwooleService;
+use app\console\swoole\RedisServerManager;
 use Swoole\Redis\Server;
 use think\console\Command;
 use think\console\Input;
@@ -20,7 +21,7 @@ use think\Exception;
 use think\facade\Config;
 use think\facade\Log;
 
-class tasks extends Command
+class Tasks extends Command
 {
     /**
      * 配置命令行参数、参数说明
@@ -29,11 +30,11 @@ class tasks extends Command
     {
         $this->setName('tasks')
              ->addArgument('env', Argument::OPTIONAL, "Environments Type.[dev|test|beta|prod]")
-             ->setDescription('ASYNC Task TCP Server.');
+             ->setDescription('ASYNC Task Redis-Like Server.');
     }
 
     /**
-     *
+     * 执行`php think tasks`的入口方法
      * @param Input $input
      * @param Output $output
      * @return int|null|void
@@ -49,6 +50,10 @@ class tasks extends Command
         if (empty($env) || !in_array($env, ['dev','test','beta','prod'])) {
             throw new Exception("Usage:`php think task [dev|test|beta|prod]` Start Task TCP Server.");
         }
+
+        RedisServerManager::getInstance()->createServer();
+        RedisServerManager::getInstance()->start();
+        return;
 
         // callBack functions
         $swooleService = new SwooleService();

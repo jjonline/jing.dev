@@ -16,7 +16,7 @@ use think\console\input\Option;
 use think\console\Output;
 use think\Exception;
 
-class password extends Command
+class Password extends Command
 {
     protected function configure()
     {
