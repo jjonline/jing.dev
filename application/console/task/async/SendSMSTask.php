@@ -6,15 +6,16 @@
  * @file SendSMSTask.php
  */
 
-namespace app\console\task;
+namespace app\console\task\async;
 
+use app\console\swoole\framework\AsyncTaskAbstract;
 use think\Exception;
 use Aliyun\Core\Config as AliyunConfig;
 use Aliyun\Core\Profile\DefaultProfile;
 use Aliyun\Core\DefaultAcsClient;
 use Aliyun\Api\Sms\Request\V20170525\SendSmsRequest;
 
-class SendSMSTask extends BaseTask
+class SendSMSTask extends AsyncTaskAbstract
 {
     /**
      * @var string 固定的任务标题
@@ -28,9 +29,9 @@ class SendSMSTask extends BaseTask
     /**
      * 异步任务执行的入口
      * @param array $task_data
-     * @return boolean true执行成功、false执行失败或出异常
+     * @return bool true执行成功、false执行失败或出异常
      */
-    public function execute(array $task_data)
+    public function run(array $task_data): bool
     {
         try {
             $this->task_data = $task_data;
@@ -53,7 +54,18 @@ class SendSMSTask extends BaseTask
             return true;
         } catch (\Throwable $e) {
             $this->finishFail('发送短信失败：'.$e->getMessage());
+            return false;
         }
+    }
+
+    public function init(): void
+    {
+        // TODO: Implement init() method.
+    }
+
+    public function finish(): void
+    {
+        // TODO: Implement finish() method.
     }
 
     /**
