@@ -1,20 +1,16 @@
 <?php
 /**
- * 异步任务基类
- * ---
- * 异步任务执行的入口方法：execute
- * 所有异步任务均需实现该抽象类
- * ---
+ * 普通异步任务抽象类
  * @user Jea杨 (JJonline@JJonline.Cn)
- * @date 2018-04-26 13:27
- * @file BaseTask.php
+ * @date 2019-03-25
+ * @file AsyncTaskAbstract.php
  */
 
-namespace app\console\task;
+namespace app\console\swoole\framework;
 
 use think\Db;
 
-class BaseTask
+abstract class AsyncTaskAbstract
 {
     /**
      * @var string 固定的任务标题，继承类必须重写
@@ -33,22 +29,44 @@ class BaseTask
      */
     protected $temp_path;
 
-
-    public function __construct()
-    {
-        $this->root_path = app()->getRootPath().'manage/';
-        $this->temp_path = $this->root_path.'_temp/'.date('Ym').'/'.substr(uniqid(), 0, 2).'/';
-        if (!is_dir($this->temp_path)) {
-            mkdir($this->temp_path, 0777, true);
-        }
-    }
+    /**
+     * 初始化步骤
+     * ---
+     * 1、做一些准备工作，类似构造函数的功能
+     * 2、做一些检查工作 等
+     * ---
+     * @return bool
+     */
+    abstract public function init():void;
 
     /**
-     * 异步任务执行的入口方法
-     * @param array $param
+     * 异步被执行的任务入口
+     * @param array $task_data 投递的任务参数
+     * @return bool
      */
-    public function execute(array $param)
+    abstract public function run(array $task_data):bool;
+
+    /**
+     * 异步任务执行完毕之后额外执行的逻辑
+     * ---
+     * 1、做一些对象清理动作
+     * 2、做一些手动的垃圾回收
+     * ---
+     * @return bool
+     */
+    abstract public function finish():void;
+
+    /**
+     * AsyncTaskAbstract constructor.
+     */
+    public function __construct()
     {
+        $this->root_path = app()->getRootPath().'public/';
+        $this->temp_path = $this->root_path.'_temp/'.date('Ym').'/'.substr(uniqid(), 0, 2).'/';
+        if (!is_dir($this->temp_path)) {
+            mkdir($this->temp_path, 0755, true);
+        }
+        $this->init();
     }
 
     /**
@@ -118,29 +136,6 @@ class BaseTask
                     'task_status'   => 3,
                     'result'        => empty($result) ? implode("\n", $this->log()) : $result,
                     'finish_time'   => date('Y-m-d H:i:s')
-                ]);
-                return !!$ret;
-            } catch (\Throwable $e) {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 设置导出任务生成的导出文件地址
-     * @param string $async_task_id     任务ID
-     * @param string $export_file_path  导出任务生成的文件完整绝对路径
-     * @return bool
-     */
-    protected function saveExportFilePath($async_task_id, $export_file_path)
-    {
-        $file_path = '/'.str_replace($this->root_path, '', $export_file_path);
-        if (!empty($async_task_id)) {
-            try {
-                $ret = Db::name('async_task')->update([
-                    'id'            => $async_task_id,
-                    'export_path'   => $file_path
                 ]);
                 return !!$ret;
             } catch (\Throwable $e) {

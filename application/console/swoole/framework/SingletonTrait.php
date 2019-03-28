@@ -58,9 +58,39 @@ trait SingletonTrait
      * @param mixed $log
      * @param string $tag
      */
-    public function greenLog($log, $tag = 'info')
+    public function logGreen($log, $tag = 'info')
     {
         self::$outPut->info($this->dealLog($log, $tag));
+    }
+
+    /**
+     * 输出红色文字log-如果支持的话
+     * @param mixed $log
+     * @param string $tag
+     */
+    public function logRed($log, $tag = 'info')
+    {
+        self::$outPut->highlight($this->dealLog($log, $tag));
+    }
+
+    /**
+     * 输出黄色背景白色文字log-如果支持的话
+     * @param mixed $log
+     * @param string $tag
+     */
+    public function logWarn($log, $tag = 'info')
+    {
+        self::$outPut->warning($this->dealLog($log, $tag));
+    }
+
+    /**
+     * 输出红色背景白色文字log-如果支持的话
+     * @param mixed $log
+     * @param string $tag
+     */
+    public function logError($log, $tag = 'info')
+    {
+        self::$outPut->error($this->dealLog($log, $tag));
     }
 
     /**

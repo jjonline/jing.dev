@@ -7,6 +7,9 @@
  */
 namespace app\console\swoole;
 
+use app\console\swoole\framework\AsyncTaskAbstract;
+use app\console\swoole\framework\CronProcessRunner;
+use app\console\swoole\framework\CronTaskAbstract;
 use app\console\swoole\framework\SingletonTrait;
 use Swoole\Process;
 use Swoole\Redis\Server;
@@ -30,7 +33,7 @@ class RedisServerManager
     /**
      * @var integer 信号|消息传递的任务类型标记：普通异步任务
      */
-    const TASK_SYNC = 1;
+    const TASK_ASYNC = 1;
     /**
      * @var integer 信号|消息传递的任务类型标记：定时异步任务
      */
@@ -46,11 +49,11 @@ class RedisServerManager
         if (!empty($socket)) {
             $this->log('unix socket模式启动Redis-like Server');
             $this->server = new Server($socket, $port, SWOOLE_PROCESS, SWOOLE_UNIX_STREAM);
-            $this->greenLog('unix socket地址：'.$socket);
+            $this->logGreen('unix socket地址：'.$socket);
         } else {
             $this->log('ip模式启动Redis-like Server');
             $this->server = new Server($ip, $port, SWOOLE_PROCESS);
-            $this->greenLog("ip/tcp模式链接地址：tcp://{$ip}:{$port}");
+            $this->logGreen("ip/tcp模式链接地址：tcp://{$ip}:{$port}");
         }
 
         // server设置项
@@ -65,7 +68,7 @@ class RedisServerManager
         $this->bindOnPipeMessage();
 
         // 添加定时任务process
-        // $this->addCronProcess();
+        $this->addCronProcess();
 
         return $this->server;
     }
@@ -96,7 +99,7 @@ class RedisServerManager
     {
         $this->cronProcess = new Process([CronProcessRunner::getInstance(), 'start']);
         $this->server->addProcess($this->cronProcess);
-        $this->log('Create cron task process Eatojoy.CronTask.Process');
+        $this->log('Create cron task process Jing.CronTask.Process');
     }
 
     /**
@@ -113,24 +116,24 @@ class RedisServerManager
             $data = unserialize($message);
 
             // 普通异步任务直接在接收到信号的当前进程执行
-            if (self::TASK_SYNC == $data['type']) {
-                $data['task']::run($data['data']);
+            if (self::TASK_ASYNC == $data['type']) {
+                // todo
             }
 
             /**
-             * task_worker执行的异步任务，投递到task进程
+             * task_worker执行的定时任务，投递到task进程
              * ++++++++++++++++++++++++++++++++++++
              * 向task_worker进程投递任务数据结构限定
              * ++++++++++++++++++++++++++++++++++++
              * [
              *    'task' => className,
-             *    'data' => mixed
+             *    'data' => null
              * ]
              */
             if (self::TASK_CRON == $data['type']) {
                 $server->task([
                     'task' => $data['task'],
-                    'data' => $data['data']
+                    'data' => null
                 ]);
             }
         });
@@ -154,28 +157,42 @@ class RedisServerManager
          * @param $server
          * @param int $task_id 任务ID，用于区分不同的任务
          * @param int $from_worker_id 异步任务来源worker_id
-         * @param $data
+         * @param $data ['task' => ClassName,'data' => mixedParam]
          */
         $this->server->on('task', function (Server $server, $task_id, $from_worker_id, $data) {
             $this->log(
-                "Jing.Redis.Task-{$task_id} received task,from Jing.Redis.Worker-{$from_worker_id}",
+                'Jing.Redis.Task-'.$server->worker_id
+                .' received task-'.$task_id
+                .' from Jing.Redis.Worker-'.$from_worker_id,
                 "debug"
             );
 
             try {
                 $class_name = $data['task'];
                 $reflect    = new \ReflectionClass($class_name);
+
+                // 定时任务
                 if ($reflect->isSubclassOf(CronTaskAbstract::class)) {
-                    // cronTask run
-                    $class_name::run($server, $task_id, $from_worker_id);
-                } else {
+                    /**
+                     * @var CronTaskAbstract $class_name
+                     */
+                    $class_name::run();
+                }
+
+                // 异步任务
+                if ($reflect->isSubclassOf(AsyncTaskAbstract::class)) {
+                    /**
+                     * @var AsyncTaskAbstract $task_obj
+                     */
                     $task_obj = new $class_name();
-                    $task_obj->run($server, $task_id, $from_worker_id);
+                    $task_obj->run($data['data']);
+                    $task_obj->finish();
                     unset($task_obj);
                 }
+
                 unset($reflect);
             } catch (\Throwable $e) {
-                $this->log('Message='.$e->getMessage().'Code='.$e->getCode(), 'onTask Exception');
+                $this->logError('Msg='.$e->getMessage().' Code='.$e->getCode(), 'onTask Exception');
             }
         });
 
@@ -183,15 +200,16 @@ class RedisServerManager
     }
 
     /**
-     * 投递异步任务到worker进程
-     * @param array $task ['type' => 1, 'task' => 'className', 'data' => mixed]
-     * @param int $worker_id 指定执行异步任务的task进程
-     * @param null $task_finish_callable $task中指定的异步任务执行完毕后被执行的回到函数，可选
+     * worker进程内投递异步任务到task-worker中异步执行
+     * @param array $task ['type' => 1, 'task' => 'className', 'data' => mixed] 传递给异步任务的参数，不易过大
+     * @param int $dst_task_worker_id 指定执行异步任务的task进程，默认不指定
+     * @return bool
      */
-    public function async($task, $worker_id = -1, $task_finish_callable = null)
+    public function async($task_data, $dst_task_worker_id = -1)
     {
-        $task['type'] = self::TASK_SYNC;
-        $this->server->task($task, $worker_id, $task_finish_callable);
+        $task['type'] = self::TASK_ASYNC;
+        $result = $this->server->task($task_data, $dst_task_worker_id);
+        return false !== $result;
     }
 
     /**
