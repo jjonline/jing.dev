@@ -43,9 +43,6 @@ abstract class CronTaskAbstract
     /**
      * rule规则制定的定时被执行的任务方法，定时被执行的任务在此方法中实现
      * 执行成功返回true执行失败返回false，注意try-catch异常
-     * @param Server $server
-     * @param int    $task_id 当前执行任务的进程id，task_worker
-     * @param int    $from_worker_id 投递任务的工作进程来源worker_id
      * @return bool
      */
     abstract public static function run():bool;
