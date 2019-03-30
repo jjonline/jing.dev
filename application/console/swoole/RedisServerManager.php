@@ -228,10 +228,8 @@ class RedisServerManager
                     $status   = $task_obj->run($data['data']);
                     $task_obj->finish();
                     if ($status) {
-                        // 执行成功回写状态至Db
                         $this->logGreen("{$task_name} Run async `{$class_name}` Success", 'ok');
                     } else {
-                        // 执行失败回写状态至Db
                         $this->logWarn("{$task_name} Run async `{$class_name}` Fail", 'warn');
                     }
                     unset($task_obj);
