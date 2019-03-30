@@ -1,0 +1,53 @@
+
+/*开关触发的填写区域默认隐藏*/
+#use_cover_setting,#use_template_setting {
+    display: none;
+}
+
+/*模板下拉选项增减容器*/
+#template_options {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.template_options {
+    position: relative;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    background-color: #fafaf4;
+}
+.template_options .col-xs-5 {
+    padding-right: 0;
+    padding-left: 0;
+}
+.template_options .input-group-addon {
+    background-color: #eee;
+}
+/*删除、移动排序模板待选按钮*/
+.template_options_manage {
+    z-index: 9999;
+    position: absolute;
+    right: 10px;
+    top: 7px;
+}
+.template_options_manage .fa-trash {
+    display: inline-block;
+    cursor: pointer;
+    margin-right:5px;
+    color:#e26969;
+}
+.template_options_manage .fa-arrows-alt {
+    display: inline-block;
+    cursor: move;
+    margin-left:5px;
+    color:#2c9a22;
+}
+/*模板待选项拖动样式*/
+.template_sortable,.template_sortable input,.template_sortable .input-group-addon {
+    background-color: #fef5ba;
+}
+/*新增模板待选项按钮*/
+.template_group_btn {
+    margin-right: 5px !important;
+    margin-left: 5px !important;
+}

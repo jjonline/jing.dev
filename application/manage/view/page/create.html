@@ -1,12 +1,139 @@
 <div class="row">
     <div class="col-md-12">
-        <div class="box box-primary">
+        <div class="box box-danger">
             <div class="box-header with-border">
                 <h4 class="box-title">新增单页</h4>
             </div>
-            <div class="box-body">
-                body
-            </div>
+            <form action="<%{:url('page/create')}%>" class="form-horizontal" id="ArticleForm">
+                <div class="box-body">
+                    <div class="col-sm-10">
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">使用标题 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="is_home" name="Config[use_title]" title="是" data-on-text="是" data-off-text="否">
+                                    <div class="js-switch-context">是否允许自定义单页面设置标题</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">使用关键词 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="use_keywords" name="Config[use_keywords]" title="是" data-on-text="是" data-off-text="否">
+                                    <div class="js-switch-context">是否允许自定义单页面设置关键词</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">使用封面图 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="use_cover" name="Config[use_cover]" title="是" data-on-text="是" data-off-text="否">
+                                    <div class="js-switch-context">是否允许自定义单页面设置封面图</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="use_cover_setting">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">封面图宽度 <span class="required">*</span></label>
+                                <div class="col-sm-5">
+                                    <input type="number" id="cover_options_width" class="form-control" name="Page[cover_options_width]" placeholder="封面图宽度，单位：像素 px">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">封面图高度 <span class="required">*</span></label>
+                                <div class="col-sm-5">
+                                    <input type="number" id="cover_options_height" class="form-control" name="Page[cover_options_height]" placeholder="封面图高度，单位：像素 px">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">使用页面描述 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="use_description" name="Config[use_description]" title="是" data-on-text="是" data-off-text="否">
+                                    <div class="js-switch-context">是否允许自定义单页面设置页面描述</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">使用页面模板 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="use_template" name="Config[use_template]" title="是" data-on-text="是" data-off-text="否">
+                                    <div class="js-switch-context">是否允许自定义单页面选择不同的模板</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="use_template_setting">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">待选模板下拉项 <span class="required">*</span></label>
+                                <div class="col-sm-10">
+
+                                    <ul id="template_options">
+
+                                        <li class="form-group template_options">
+                                            <div class="template_options_manage">
+                                                <i class="fa fa-trash"></i>
+                                                <i class="fa fa-arrows-alt"></i>
+                                            </div>
+
+                                            <div class="col-xs-5">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">中文名称</div>
+                                                    <input type="text" class="form-control columns" name="Config[template_options_name][]" placeholder="例如：绿色主题">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-5">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">模板文件名</div>
+                                                    <input type="text" class="form-control name" name="Config[template_options_template][]" placeholder="例如：green_page">
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                    </ul>
+
+                                    <div class="form-group template_group_btn">
+                                        <div class="col-xs-4">
+                                            <button type="button" class="btn btn-block btn-default" id="insert_one_template">
+                                                <i class="fa fa-plus"></i> 点此新增1个待选项
+                                            </button>
+                                        </div>
+                                        <div class="col-xs-4">
+                                            <button type="button" class="btn btn-block btn-default"  id="insert_five_template">
+                                                <i class="fa fa-plus"></i> 点此新增5个待选项
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">使用页面正文 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="use_content" name="Config[use_content]" title="是" data-on-text="是" data-off-text="否">
+                                    <div class="js-switch-context">是否允许自定义单页面正文的各个区块</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
             <div class="box-footer">
                 <div class="row text-center">
                     <button type="submit" class="btn btn-success btn-submit">提交保存</button>
@@ -15,3 +142,4 @@
         </div>
     </div>
 </div>
+<script src="__PUBLIC__/plugin/sortable/Sortable.min.js" type="text/javascript"></script>
