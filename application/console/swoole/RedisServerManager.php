@@ -31,6 +31,22 @@ class RedisServerManager
      */
     private $cronProcess;
     /**
+     * @var string 主进程名称
+     */
+    const MASTER_PROCESS = 'Jing.Master';
+    /**
+     * @var string 工作worker进程名称[前缀]
+     */
+    const WORKER_PROCESS = 'Jing.Worker-';
+    /**
+     * @var string 任务工作task-worker进程名称[前缀]
+     */
+    const TASK_PROCESS   = 'Jing.Task-';
+    /**
+     * @var string 自定义定时任务进程名称
+     */
+    const CRON_PROCESS   = 'Jing.CronTask';
+    /**
      * @var integer 信号|消息传递的任务类型标记：普通异步任务
      */
     const TASK_ASYNC = 1;
@@ -39,6 +55,10 @@ class RedisServerManager
      */
     const TASK_CRON = 2;
 
+    /**
+     * Redis-like管理器创建服务器，警告：请使用管理器手动启动
+     * @return Server
+     */
     public function createServer()
     {
         $socket = Config::get('swoole.socket');
@@ -47,13 +67,13 @@ class RedisServerManager
         $config = Config::get('swoole.options');
 
         if (!empty($socket)) {
-            $this->log('unix socket模式启动Redis-like Server');
+            $this->log('Create unix socket Redis-like Server');
             $this->server = new Server($socket, $port, SWOOLE_PROCESS, SWOOLE_UNIX_STREAM);
-            $this->logGreen('unix socket地址：'.$socket);
+            $this->logGreen('unix socket address:'.$socket);
         } else {
-            $this->log('ip模式启动Redis-like Server');
+            $this->log('Create ip mode Redis-like Server');
             $this->server = new Server($ip, $port, SWOOLE_PROCESS);
-            $this->logGreen("ip/tcp模式链接地址：tcp://{$ip}:{$port}");
+            $this->logGreen("ip/tcp mode address:tcp://{$ip}:{$port}");
         }
 
         // server设置项
@@ -74,7 +94,7 @@ class RedisServerManager
     }
 
     /**
-     * 启动Server
+     * Redis-like管理器手动启动Server
      */
     public function start()
     {
@@ -88,7 +108,7 @@ class RedisServerManager
             // code
         });
 
-        $this->log('Redis Server is Starting');
+        $this->log('Redis-Like Server is Starting');
         $this->server->start();
     }
 
@@ -99,7 +119,7 @@ class RedisServerManager
     {
         $this->cronProcess = new Process([CronProcessRunner::getInstance(), 'start']);
         $this->server->addProcess($this->cronProcess);
-        $this->log('Create cron task process Jing.CronTask.Process');
+        $this->log('Create cron task process '.self::CRON_PROCESS);
     }
 
     /**
@@ -108,33 +128,42 @@ class RedisServerManager
     private function bindOnPipeMessage()
     {
         $this->server->on('pipeMessage', function (Server $server, $src_worker_id, $message) {
-            $this->log(
-                "Jing.Redis.Worker-{$server->worker_id} received PipeMessage,from process_id={$src_worker_id}",
-                "debug"
-            );
+            $worker_name  = self::WORKER_PROCESS.$server->worker_id;
+            $process_name = 'process-'.$src_worker_id;
+            $this->log("{$worker_name} received PipeMessage,from {$process_name}", "debug");
+            try {
+                $data = unserialize($message);
 
-            $data = unserialize($message);
+                // 普通异步任务直接在接收到信号的当前进程执行
+                if (self::TASK_ASYNC == $data['type']) {
+                    // todo
+                }
 
-            // 普通异步任务直接在接收到信号的当前进程执行
-            if (self::TASK_ASYNC == $data['type']) {
-                // todo
-            }
-
-            /**
-             * task_worker执行的定时任务，投递到task进程
-             * ++++++++++++++++++++++++++++++++++++
-             * 向task_worker进程投递任务数据结构限定
-             * ++++++++++++++++++++++++++++++++++++
-             * [
-             *    'task' => className,
-             *    'data' => null
-             * ]
-             */
-            if (self::TASK_CRON == $data['type']) {
-                $server->task([
-                    'task' => $data['task'],
-                    'data' => null
-                ]);
+                /**
+                 * task_worker执行的定时任务，投递到task进程
+                 * ++++++++++++++++++++++++++++++++++++
+                 * 向task_worker进程投递任务数据结构限定
+                 * ++++++++++++++++++++++++++++++++++++
+                 * [
+                 *    'task' => className,
+                 *    'data' => null
+                 * ]
+                 */
+                if (self::TASK_CRON == $data['type']) {
+                    $server->task([
+                        'task' => $data['task'],
+                        'data' => null
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                // worker进程接收任务出错，输出出错的详情
+                $log = [
+                    'WorkerName='.$worker_name,
+                    'ProcessName='.$process_name,
+                    'Msg='.$e->getMessage(),
+                    'Code='.$e->getCode(),
+                ];
+                $this->logError($log, 'onPipeMessage Exception');
             }
         });
 
@@ -160,12 +189,9 @@ class RedisServerManager
          * @param $data ['task' => ClassName,'data' => mixedParam]
          */
         $this->server->on('task', function (Server $server, $task_id, $from_worker_id, $data) {
-            $this->log(
-                'Jing.Redis.Task-'.$server->worker_id
-                .' received task-'.$task_id
-                .' from Jing.Redis.Worker-'.$from_worker_id,
-                "debug"
-            );
+            $task_name   = self::TASK_PROCESS.$server->worker_id;
+            $worker_name = self::WORKER_PROCESS.$from_worker_id;
+            $this->log("{$task_name} received task-{$task_id} from {$worker_name}", "debug");
 
             try {
                 $class_name = $data['task'];
@@ -192,7 +218,14 @@ class RedisServerManager
 
                 unset($reflect);
             } catch (\Throwable $e) {
-                $this->logError('Msg='.$e->getMessage().' Code='.$e->getCode(), 'onTask Exception');
+                // 执行任务出错，输出出错的详情
+                $log = [
+                    'WorkerName='.$worker_name,
+                    'TaskName='.$task_name,
+                    'Msg='.$e->getMessage(),
+                    'Code='.$e->getCode(),
+                ];
+                $this->logError($log, 'onTask Exception');
             }
         });
 
@@ -241,11 +274,20 @@ class RedisServerManager
         $this->server->sendMessage(serialize($task), $worker_id);
 
         $this->log(
-            "Send task to Jing.Redis.Worker-".$worker_id,
+            'Send task to '.self::WORKER_PROCESS.$worker_id,
             'debug'
         );
 
         return true;
+    }
+
+    /**
+     * 静态短方法获取Server对象
+     * @return Server
+     */
+    public static function server()
+    {
+        return self::getInstance()->getServer();
     }
 
     /**

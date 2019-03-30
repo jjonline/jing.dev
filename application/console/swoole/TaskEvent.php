@@ -21,8 +21,6 @@ class TaskEvent
      */
     public static function onStart(Server $server)
     {
-        RedisServerManager::getInstance()->log("onStart Event execute");
-
         // swoole相关文件路径
         $path = app()->getRootPath() . 'runtime/swoole';
 
@@ -39,16 +37,10 @@ class TaskEvent
         });
 
         // 设置主进程名称，不支持 MacOS
-        $master_process_name = 'Jing.Redis.Master';
-        if (SwooleHelper::setProcessName($master_process_name)) {
-            RedisServerManager::getInstance()->log(
-                "Master started, name={$master_process_name}, pid={$server->master_pid}"
-            );
-        } else {
-            RedisServerManager::getInstance()->log(
-                "Master started, pid={$server->master_pid}"
-            );
-        }
+        SwooleHelper::setProcessName(RedisServerManager::MASTER_PROCESS);
+        RedisServerManager::getInstance()->log(
+            RedisServerManager::MASTER_PROCESS." started,pid={$server->master_pid}"
+        );
     }
 
     /**
@@ -58,29 +50,19 @@ class TaskEvent
      */
     public static function onWorkStart(Server $server, $worker_id)
     {
-        // task和worker进程重命名
+        // task和worker进程重命名，不支持 MacOS
         if ($server->taskworker) {
-            $master_process_name = 'Jing.Redis.Task-'.$worker_id;
-            if (SwooleHelper::setProcessName($master_process_name)) {
-                RedisServerManager::getInstance()->log(
-                    "TaskWorker started, name=`{$master_process_name}` pid=".$server->worker_pid
-                );
-            } else {
-                RedisServerManager::getInstance()->log(
-                    "TaskWorker started, pid=".$server->worker_pid
-                );
-            }
+            $task_process_name = RedisServerManager::TASK_PROCESS.$worker_id;
+            SwooleHelper::setProcessName($task_process_name);
+            RedisServerManager::getInstance()->log(
+                $task_process_name." started,pid=".$server->worker_pid
+            );
         } else {
-            $master_process_name = 'Jing.Redis.Worker-'.$worker_id;
-            if (SwooleHelper::setProcessName($master_process_name)) {
-                RedisServerManager::getInstance()->log(
-                    "Worker started, name=`{$master_process_name}` pid=".$server->worker_pid
-                );
-            } else {
-                RedisServerManager::getInstance()->log(
-                    "Worker started, pid=".$server->worker_pid
-                );
-            }
+            $worker_process_name = RedisServerManager::WORKER_PROCESS.$worker_id;
+            SwooleHelper::setProcessName($worker_process_name);
+            RedisServerManager::getInstance()->log(
+                $worker_process_name." started,pid=".$server->worker_pid
+            );
         }
     }
 
@@ -166,7 +148,7 @@ class TaskEvent
             }
 
             // 向客户端返回队列长度
-            RedisServerManager::getInstance()->getServer()->send(
+            RedisServerManager::server()->send(
                 $fd,
                 Server::format(Server::INT, count($result))
             );
@@ -176,7 +158,7 @@ class TaskEvent
                 'lPushReceiver Exception'
             );
             // 向客户端返回错误
-            RedisServerManager::getInstance()->getServer()->send(
+            RedisServerManager::server()->send(
                 $fd,
                 Server::format(Server::NIL)
             );
