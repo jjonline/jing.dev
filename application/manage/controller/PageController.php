@@ -106,7 +106,7 @@ class PageController extends BaseController
         $common = [
             'title'            => '新增单页 - ' . config('local.site_name'),
             'content_title'    => '新增单页',
-            'content_subtitle' => '新增单页',
+            'content_subtitle' => '新增单页并设定单页可设置选项',
             'breadcrumb'       => [
                 ['label' => '新增单页', 'url' => url('page/create')],
                 ['label' => '新增单页', 'url' => ''],

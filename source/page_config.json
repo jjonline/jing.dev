@@ -1,0 +1,41 @@
+{
+    "use_title":true,
+    "use_cover":true,
+    "cover_options":{
+        "width":"1000px",
+        "height":"900px"
+    },
+    "use_keywords":true,
+    "use_description":true,
+    "use_template":true,
+    "template_options":[
+        {
+            "name":"显示的名称",
+            "template":"模板名称"
+        },
+        {
+            "name":"显示的名称",
+            "template":"模板名称"
+        }
+    ],
+    "use_content":true,
+    "content_options":[
+        {
+            "type":"内容区块1的类型，1-textarea类型的小片段文字 2-固定尺寸的图片[标题|src形式] 3-视频[标题|src形式]",
+            "name":"内容区块1填写时显示的提示名称",
+            "id":"内容区块1的唯一id",
+            "text_length":"内容区块1为文本时最大长度",
+            "image_width":"图片类型时限制图片的宽度",
+            "image_height":"图片类型时限制图片的高度"
+        },
+        {
+            "type":"内容区块2的类型，1-textarea类型的小片段文字 2-固定尺寸的图片 3-视频",
+            "name":"内容区块2填写时显示的名称",
+            "id":"内容区块2的唯一id",
+            "text_length":"内容区块1为文本时最大长度",
+            "image_width":"图片类型时限制图片的宽度",
+            "image_height":"图片类型时限制图片的高度"
+        }
+    ],
+    "content_sample":"内容区块布局位置的样例说明图id"
+}
