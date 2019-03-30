@@ -158,10 +158,11 @@ class RedisServerManager
             } catch (\Throwable $e) {
                 // worker进程接收任务出错，输出出错的详情
                 $log = [
-                    'WorkerName='.$worker_name,
-                    'ProcessName='.$process_name,
-                    'Msg='.$e->getMessage(),
-                    'Code='.$e->getCode(),
+                    'worker'     => $worker_name,
+                    'process'    => $process_name,
+                    'error_msg'  => $e->getMessage(),
+                    'error_code' => $e->getCode(),
+                    'data'       => $data ?? []
                 ];
                 $this->logError($log, 'onPipeMessage Exception');
             }
@@ -220,11 +221,16 @@ class RedisServerManager
             } catch (\Throwable $e) {
                 // 执行任务出错，输出出错的详情
                 $log = [
-                    'WorkerName='.$worker_name,
-                    'TaskName='.$task_name,
-                    'Msg='.$e->getMessage(),
-                    'Code='.$e->getCode(),
+                    'worker'     => $worker_name,
+                    'task'       => $task_name,
+                    'error_msg'  => $e->getMessage(),
+                    'error_code' => $e->getCode(),
+                    'data'       => $data
                 ];
+
+                // 设置异步任务执行失败到Db中，方法体自动判断是否要处理
+                TaskEvent::setAsyncTaskFail($data, $log);
+
                 $this->logError($log, 'onTask Exception');
             }
         });

@@ -11,6 +11,24 @@ namespace app\common\helper;
 class ArrayHelper
 {
     /**
+     * 将目标转换为异步任务结果集的一维数组结构
+     * @param $origin
+     * @return array
+     */
+    public static function toAsyncResultArray($origin)
+    {
+        if (!is_array($origin)) {
+            return $origin;
+        }
+        $result = [];
+        foreach ($origin as $key => $value) {
+            $val = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
+            $result[] = "$key => ".$val;
+        }
+        return $result;
+    }
+
+    /**
      * 一维数组去除等价false值 + 去重 + 每个元素去除两端空白
      * @param array $origin 一维数组
      * @return array

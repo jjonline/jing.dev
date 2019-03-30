@@ -67,11 +67,13 @@ class CreateAsyncTask extends Migrator
                 ])
                 ->addColumn('delivery_time', 'datetime', [
                     'default' => null,
-                    'comment' => '任务投递时间',
+                    'null'    => true,
+                    'comment' => '任务投递开始执行时间',
                 ])
                 ->addColumn('finish_time', 'datetime', [
                     'default' => null,
-                    'comment' => '任务结束时间',
+                    'null'    => true,
+                    'comment' => '任务执行结束时间',
                 ])
                 ->addColumn('create_time', 'datetime', [
                     'default' => 'CURRENT_TIMESTAMP',
