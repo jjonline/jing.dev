@@ -130,6 +130,7 @@ class AsyncTaskService
         if (!empty($data) && !empty($data['result'])) {
             $data['result'] = UtilHelper::nl2p($data['result']);
         }
-        return ['error_code' => 0,'error_msg'=>'Success:请求成功','data'=>$data];
+        unset($data['task_data']); // 清理可能泄露机密信息的字段
+        return ['error_code' => 0,'error_msg'=>'ok','data'=>$data];
     }
 }
