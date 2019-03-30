@@ -63,14 +63,14 @@ class CronProcessRunner
             $next_run_time  = CronExpression::factory($task['rule'])->getNextRunDate();
             $distance_time  = $next_run_time->getTimestamp() - time();
             if ($distance_time < 30) {
-                swoole_timer_after($distance_time * 1000, function () use ($task) {
+                swoole_timer_after($distance_time * 1000, function () use ($name, $task) {
                     /**
                      * 1、定时任务通过管道从Process进程中投递到Worker进程中
                      * 2、Worker进程从管道中读取到进程任务后，再次将任务投递给随机的Task进程去具体执行
                      */
                     $send_status = RedisServerManager::getInstance()->processAsync([
                         'task' => $task['task'],
-                        'data' => null,
+                        'data' => $task,
                     ]);
                     if ($send_status) {
                         RedisServerManager::getInstance()->logGreen(
@@ -123,6 +123,7 @@ class CronProcessRunner
 
                     // 添加到定时异步任务中
                     $this->tasks[$task_name] = [
+                        'name' => $task_name,
                         'rule' => $task_rule,
                         'task' => $cron_task_class
                     ];

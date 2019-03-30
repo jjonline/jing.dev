@@ -8,6 +8,7 @@
 namespace app\console\swoole;
 
 use app\common\helper\ArrayHelper;
+use app\common\helper\GenerateHelper;
 use app\common\model\AsyncTask;
 use app\console\swoole\framework\SwooleHelper;
 use Swoole\Coroutine;
@@ -157,7 +158,7 @@ class TaskEvent
             );
         } catch (\Throwable $e) {
             RedisServerManager::getInstance()->logError(
-                "receive redis-like server lpush Error, msg={$e->getMessage()}, code={$e->getCode()}",
+                "lpush execute Error, msg={$e->getMessage()}, code={$e->getCode()}",
                 'lPushReceiver Exception'
             );
             // 向客户端返回错误
@@ -165,6 +166,41 @@ class TaskEvent
                 $fd,
                 Server::format(Server::NIL)
             );
+        }
+    }
+
+    /**
+     * 设置某个定时任务开始执行
+     * @param array $task_data  定时任务执行传递的参数
+     *  [
+     *      'task' => '定时任务类名',
+     *      'type' => '定时任务类型',
+     *      'data' => ['name' => , 'rule' => , 'task' =>]]
+     * @return bool|string
+     */
+    public static function setCronTaskBegin($task_data)
+    {
+        try {
+            $id = GenerateHelper::uuid();
+            $task_data['task_id'] = $id; // 任务参数补充任务ID
+            $task = [
+                'id'            => $id,
+                'title'         => '定时任务：' . $task_data['data']['name'],
+                'user_id'       => 1,
+                'dept_id'       => 1,
+                'task'          => $task_data['task'],
+                'task_status'   => AsyncTask::STATUS_RUNNING,
+                'delivery_time' => date('Y-m-d H:i:s'),
+                'task_data'     => json_encode($task_data, JSON_UNESCAPED_UNICODE),
+                'result'        => '',// 将结果集先设置为空
+            ];
+            /**
+             * @var AsyncTask $model
+             */
+            $model = app()->get(AsyncTask::class);
+            return $model->db()->insert($task) ? $id : false;
+        } catch (\Throwable $e) {
+            return false;
         }
     }
 
@@ -195,6 +231,35 @@ class TaskEvent
              */
             $model = app()->get(AsyncTask::class);
             return $model->setAsyncTaskFail($task_id, $fail_reason);
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * 设置某条定时任务Db记录执行成功
+     * @param array  $task_data   传递执行的定时任务参数，内部处理包含任务id
+     * @param mixed  $fail_reason 执行结果
+     * @return bool
+     */
+    public static function setAsyncTaskSuccess(array $task_data, $result)
+    {
+        try {
+            // 检查任务中有没有Db中的id
+            if (empty($task_data['task_id']) && empty($task_data['data']['task_id'])) {
+                return false;
+            }
+            // 处理失败原因
+            if (is_array($result)) {
+                $result = implode("\n", ArrayHelper::toAsyncResultArray($result));
+            }
+            // 智能读取使用任务id
+            $task_id = $task_data['task_id'] ?? $task_data['data']['task_id'];
+            /**
+             * @var AsyncTask $model
+             */
+            $model = app()->get(AsyncTask::class);
+            return $model->setAsyncTaskSuccess($task_id, $result);
         } catch (\Throwable $e) {
             return false;
         }

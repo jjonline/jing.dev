@@ -45,8 +45,11 @@ abstract class CronTaskAbstract
 
     /**
      * rule规则制定的定时被执行的任务方法，定时被执行的任务在此方法中实现
-     * 执行成功返回true执行失败返回false，注意try-catch异常
-     * @return bool
+     * 返回数组：
+     *  1、第一个元素bool值true执行成功false执行失败
+     *  2、第二个元素需要回写至Db中的结果内容，字符串或数组
+     * 注意try-catch异常
+     * @return [bool,mixed]
      */
-    abstract public static function run():bool;
+    abstract public static function run():array;
 }

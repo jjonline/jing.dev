@@ -86,4 +86,22 @@ class AsyncTask extends Model
         ];
         return !!$this->db()->where('id', $id)->update($task);
     }
+
+    /**
+     * 设置任务执行成功
+     * @param mixed $id 任务id
+     * @param string $result 任务结果描述字符串，这里就是失败原因咯
+     * @return bool
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    public function setAsyncTaskSuccess($id, $result = '')
+    {
+        $task = [
+            'result'      => $result,
+            'task_status' => self::STATUS_SUCCESS,
+            'finish_time' => date('Y-m-d H:i:s'),
+        ];
+        return !!$this->db()->where('id', $id)->update($task);
+    }
 }
