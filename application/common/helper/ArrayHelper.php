@@ -22,8 +22,9 @@ class ArrayHelper
         }
         $result = [];
         foreach ($origin as $key => $value) {
-            $val = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
-            $result[] = "$key => ".$val;
+            $prefix   = is_numeric($key) ? '' : "$key => ";
+            $val      = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
+            $result[] = $prefix . $val;
         }
         return $result;
     }

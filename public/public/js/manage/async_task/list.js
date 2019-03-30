@@ -146,12 +146,12 @@ $(function () {
             columns: [
                 {data: 'real_name'},
                 {data: 'title'},
-                {data: 'task_status'},
-                {data: 'delivery_time'},
-                {data: 'finish_time'},
-                {data: 'create_time'},
+                {data: 'task_status',className:"text-center"},
+                {data: 'delivery_time',className:"text-center"},
+                {data: 'finish_time',className:"text-center"},
+                {data: 'create_time',className:"text-center"},
                 {data: 'dept_name'},
-                {data: 'operate'}
+                {data: 'operate',className:"text-center"}
             ],
             language: {
                 "sProcessing": "<i class=\"fa fa-refresh fa-spin\"></i> 载入中...",
