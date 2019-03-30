@@ -45,7 +45,7 @@ class RedisServerManager
     /**
      * @var string 自定义定时任务进程名称
      */
-    const CRON_PROCESS   = 'Jing.CronTask';
+    const CRON_PROCESS   = 'Jing.Cron';
     /**
      * @var integer 信号|消息传递的任务类型标记：普通异步任务
      */
@@ -145,15 +145,13 @@ class RedisServerManager
                  * 向task_worker进程投递任务数据结构限定
                  * ++++++++++++++++++++++++++++++++++++
                  * [
+                 *    'type' => type,
                  *    'task' => className,
-                 *    'data' => null
+                 *    'data' => ['name' => ,'rule' =>, 'task' => ]
                  * ]
                  */
                 if (self::TASK_CRON == $data['type']) {
-                    $server->task([
-                        'task' => $data['task'],
-                        'data' => null
-                    ]);
+                    $server->task($data);
                 }
             } catch (\Throwable $e) {
                 // worker进程接收任务出错，输出出错的详情
@@ -200,10 +198,25 @@ class RedisServerManager
 
                 // 定时任务
                 if ($reflect->isSubclassOf(CronTaskAbstract::class)) {
-                    /**
-                     * @var CronTaskAbstract $class_name
-                     */
-                    $class_name::run();
+                    // 记录定时任务数据至Db返回任务ID
+                    $task_id = TaskEvent::setCronTaskBegin($data);
+                    if (!empty($task_id)) {
+                        /**
+                         * @var CronTaskAbstract $class_name
+                         */
+                        list($status, $result) = $class_name::run();
+                        $data['task_id'] = $task_id;
+
+                        if ($status) {
+                            // 执行成功回写状态至Db
+                            TaskEvent::setAsyncTaskSuccess($data, $result);
+                            $this->logGreen("{$task_name} Run cron `{$class_name}` Success", 'ok');
+                        } else {
+                            // 执行失败回写状态至Db
+                            TaskEvent::setAsyncTaskFail($data, $result);
+                            $this->logWarn("{$task_name} Run cron `{$class_name}` Fail", 'warn');
+                        }
+                    }
                 }
 
                 // 异步任务
@@ -212,8 +225,15 @@ class RedisServerManager
                      * @var AsyncTaskAbstract $task_obj
                      */
                     $task_obj = new $class_name();
-                    $task_obj->run($data['data']);
+                    $status   = $task_obj->run($data['data']);
                     $task_obj->finish();
+                    if ($status) {
+                        // 执行成功回写状态至Db
+                        $this->logGreen("{$task_name} Run async `{$class_name}` Success", 'ok');
+                    } else {
+                        // 执行失败回写状态至Db
+                        $this->logWarn("{$task_name} Run async `{$class_name}` Fail", 'warn');
+                    }
                     unset($task_obj);
                 }
 

@@ -19,7 +19,7 @@ class DemoTask extends CronTaskAbstract
      */
     public static function rule(): string
     {
-        return '* * * * *';
+        return '*/60 * * * *';
     }
 
     /**
@@ -32,16 +32,23 @@ class DemoTask extends CronTaskAbstract
     }
 
     /**
-     * 每一分钟被执行的方法
-     * @return bool
+     * rule规则制定的定时被执行的任务方法，定时被执行的任务在此方法中实现
+     * 返回数组：
+     *  1、第一个元素bool值true执行成功false执行失败
+     *  2、第二个元素需要回写至Db中的结果内容，字符串或数组
+     * 注意try-catch异常
+     * @return array
      */
-    public static function run(): bool
+    public static function run(): array
     {
-        // todo 异步执行的业务逻辑
+        try {
+            // todo 异步执行的业务逻辑
 
-        // WsServerManager::getInstance()->debug("DemoTask Call Run", 'debug'); // 该方法可以向swoole日志文件写入日志内容
-        RedisServerManager::getInstance()->log("DemoTask Call Run", 'debug');
-
-        return true;
+            // WsServerManager::getInstance()->debug("DemoTask Call Run", 'debug'); // 该方法可以向swoole日志文件写入日志内容
+            RedisServerManager::getInstance()->log("DemoTask Call Run", 'debug');
+            return [true, ['log', 'status']];
+        } catch (\Throwable $e) {
+            return [false,[$e->getMessage(),$e->getCode()]];
+        }
     }
 }
