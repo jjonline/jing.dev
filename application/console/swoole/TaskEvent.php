@@ -8,6 +8,7 @@
 namespace app\console\swoole;
 
 use app\common\helper\ArrayHelper;
+use app\common\model\AsyncTask;
 use app\console\swoole\framework\SwooleHelper;
 use Swoole\Coroutine;
 use Swoole\Redis\Server;
@@ -118,7 +119,7 @@ class TaskEvent
 
             // 输出接收到的任务原始数据
             RedisServerManager::getInstance()->log(
-                'receive async task: '. json_encode($data, JSON_UNESCAPED_UNICODE)
+                'receive client async task: '. json_encode($data, JSON_UNESCAPED_UNICODE)
             );
 
             // 一次往队列里塞入多个值的情况，拆分成多个任务塞进去
@@ -136,8 +137,10 @@ class TaskEvent
                     throw new Exception('task param error, must pair data');
                 }
 
-                $task_name = $task_pair[0]; // 解析出的任务名称，也就是lpush过来的队列名称
-                $task_data = $task_pair[1]; // 解析出的任务参数，也就是lpush过来到队列中的数据
+                // 解析出的任务名称，也就是lpush过来的队列名称
+                $task_name = $task_pair[0];
+                // 解析出的任务参数，也就是lpush过来到队列中的数据，字符串形式的需转换成数组
+                $task_data = json_decode($task_pair[1], true);
 
                 // 构造任务数据
                 $task = [
@@ -162,6 +165,38 @@ class TaskEvent
                 $fd,
                 Server::format(Server::NIL)
             );
+        }
+    }
+
+    /**
+     * 设置某条异步Db记录执行失败
+     * @param array  $task_data   传递执行的异步任务参数，内部处理包含任务id
+     * @param mixed  $fail_reason 异步任务执行失败的原因字符串，或多条的索引数组
+     * @return bool
+     */
+    public static function setAsyncTaskFail(array $task_data, $fail_reason)
+    {
+        try {
+            // 检查任务中有没有Db中的id
+            if (empty($task_data['task_id']) && empty($task_data['data']['task_id'])) {
+                return false;
+            }
+            if (empty($fail_reason)) {
+                return false;
+            }
+            // 处理失败原因
+            if (is_array($fail_reason)) {
+                $fail_reason = implode("\n", ArrayHelper::toAsyncResultArray($fail_reason));
+            }
+            // 智能读取使用任务id
+            $task_id = $task_data['task_id'] ?? $task_data['data']['task_id'];
+            /**
+             * @var AsyncTask $model
+             */
+            $model = app()->get(AsyncTask::class);
+            return $model->setAsyncTaskFail($task_id, $fail_reason);
+        } catch (\Throwable $e) {
+            return false;
         }
     }
 }

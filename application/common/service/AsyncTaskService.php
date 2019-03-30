@@ -14,6 +14,7 @@ use app\common\model\AsyncTask;
 use think\Exception;
 use think\facade\Config;
 use think\facade\Log;
+use think\facade\Session;
 use think\Request;
 
 class AsyncTaskService
@@ -48,8 +49,8 @@ class AsyncTaskService
         $port    = Config::get('swoole.port');
         $socket  = Config::get('swoole.socket');
         $timeout = Config::get('swoole.timeout');
-        // 依据配置选择tcp连接方式
-        if ($host) {
+        // 依据配置选择连接方式，依据是否配置有unix socket优先
+        if (empty($socket)) {
             $this->Client->connect($host, $port, $timeout);
         } else {
             $this->Client->connect($socket);
@@ -63,18 +64,30 @@ class AsyncTaskService
      * --
      * @param string $task 投递需执行异步任务的class名，在异步服务中可以理解成一个Redis的List键名
      * @param array  $task_data 投递给$task指定的类执行的数组参数
-     * @param int    $user_id 执行异步任务的用户ID
-     * @param int    $dept_id 用户所属部门ID
+     * @param int    $user_id 执行异步任务的用户ID，不传默认当前用户
+     * @param int    $dept_id 用户所属部门ID，不传默认当前用户所属部门
      * @return bool|string 任务投递成功返回任务ID（UUID形式），任务投递失败返回false
      */
-    public function delivery($task, array $task_data, $user_id = 0, $dept_id = 0)
+    public function delivery($task, array $task_data, $user_id = null, $dept_id = null)
     {
+        // 完善任务用户和部门信息
+        $user_id = $user_id ?? Session::get('user_info.id');
+        $dept_id = $dept_id ?? Session::get('user_info.dept_id');
+
+        // 将任务名称补充至任务参数中
+        $task_data['task'] = $task;
+
+        // 将任务用户和任务用户部门酌情补充到任务参数中
+        if (empty($task_data['user_id'])) {
+            $task_data['user_id'] = $user_id;
+        }
+        if (empty($task_data['dept_id'])) {
+            $task_data['dept_id'] = $dept_id;
+        }
+
         try {
-            // 将task即任务类名塞入task_data
-            $id                         = GenerateHelper::uuid();// 任务ID
-            $task_data['async_task_id'] = $id; // 异步class的execute方法的参数数组中可以拿到该值
-            $data['task']               = $task;
-            $data['data']               = $task_data;
+            $id                   = GenerateHelper::uuid();// 任务ID
+            $task_data['task_id'] = $id;
 
             // 记录异步任务信息
             $async_task = [
@@ -93,11 +106,11 @@ class AsyncTaskService
             if (empty($this->Client)) {
                 $this->connect();
             }
-            $result = $this->Client->lPush($task, json_encode($data));
+            $result = $this->Client->lPush($task, json_encode($task_data));
 
             return $result !== false ? $id : false;
         } catch (\Throwable $e) {
-            Log::record('投递异步任务失败：'.$e->getMessage().'['.json_encode($data).']');
+            Log::record('投递异步任务失败：'.$e->getMessage().'['.json_encode($task_data).']');
             return false;
         }
     }
