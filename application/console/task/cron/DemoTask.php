@@ -10,7 +10,6 @@ namespace app\console\task\cron;
 
 use app\console\swoole\framework\CronTaskAbstract;
 use app\console\swoole\RedisServerManager;
-use Swoole\Server;
 
 class DemoTask extends CronTaskAbstract
 {
@@ -20,7 +19,7 @@ class DemoTask extends CronTaskAbstract
      */
     public static function rule(): string
     {
-        return '*/60 * * * *';
+        return '* * * * *';
     }
 
     /**

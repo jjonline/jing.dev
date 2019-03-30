@@ -3,12 +3,13 @@
  * 定时任务|循环相关的自定义进程实现
  * ---
  * 功能：
- * 1、定时循环的发生器
- * 2、定时任务定时执行
+ * 1、自定义进程内的定时循环的发生器
+ * 2、自定义进程的自管理
  * ---
  * 机制：
- * 1、定时任务：解析定时规则之后倒计时定时器触发onMessage推送定时任务结构到task_worker中立即执行
- * 2、
+ * 1、自定义进程被创建时触发start执行1次，完成进程重命名、信号回调注册、定时任务解析、定时解析后倒计时投递
+ * 2、通过进程间通信(sendMessage)从自定义进程中投递任务到worker进程
+ * 3、工作worker进程收到进程通信(onPipeMessage)之后投递任务到task-worker中具体执行
  * ---
  * @user Jea杨 (JJonline@JJonline.Cn)
  * @date 2019-03-25
@@ -29,18 +30,21 @@ class CronProcessRunner
     protected $tasks;
 
     /**
-     * 自定义Runner进程被启动后被执行1次的方法
+     * 自定义Runner进程被启动后被start所触发执行1次的方法
+     * @param Process $process
      * @throws \Exception
      */
-    public function run()
+    public function run(Process $process)
     {
-        // 启动进程时执行一次
+        // 启动进程时执行一次解析所有定时任务
         $this->parseCronTask();
         $this->cronProcess();
 
-        RedisServerManager::getInstance()->log('Jing.CronTask.Process start Running');
+        RedisServerManager::getInstance()->log(
+            RedisServerManager::CRON_PROCESS.' started,pid='.$process->pid
+        );
 
-        // 每29秒tick执行一次
+        // 自定义定时任务经常内每29秒tick执行一次
         swoole_timer_tick(29 * 1000, function () {
             $this->cronProcess();
         });
@@ -70,13 +74,13 @@ class CronProcessRunner
                     ]);
                     if ($send_status) {
                         RedisServerManager::getInstance()->logGreen(
-                            "Send Cron Task `{$task['task']}` Success",
-                            'debug'
+                            RedisServerManager::CRON_PROCESS." Send `{$task['task']}` Success",
+                            'cron'
                         );
                     } else {
-                        RedisServerManager::getInstance()->log(
-                            "Send Cron Task `{$task['task']}` Fail.",
-                            'error'
+                        RedisServerManager::getInstance()->logError(
+                            RedisServerManager::CRON_PROCESS." Send `{$task['task']}` Fail.",
+                            'cron'
                         );
                     }
                 });
@@ -135,14 +139,15 @@ class CronProcessRunner
     }
 
     /**
-     * server中注册Process的入口
+     * server中注册Process后被执行的入口
      * @param Process $process
      * @throws \Exception
      */
     public function start(Process $process)
     {
+        // 自定义定时任务进程命名
         if (PHP_OS != 'Darwin') {
-            $process->name('Jing.CronTask.Process');
+            $process->name(RedisServerManager::CRON_PROCESS);
         }
 
         /**
@@ -164,6 +169,6 @@ class CronProcessRunner
             });
         });
 
-        $this->run();
+        $this->run($process);
     }
 }
