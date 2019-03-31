@@ -1,17 +1,336 @@
 <div class="row">
     <div class="col-md-12">
-        <div class="box box-primary">
+        <div class="box box-danger">
             <div class="box-header with-border">
-                <h4 class="box-title">编辑设置</h4>
+                <h4 class="box-title">编辑单页</h4>
             </div>
-            <div class="box-body">
-                body
-            </div>
+            <form action="<%{:url('page/create')}%>" class="form-horizontal" id="ContentSecForm">
+                <div class="box-body">
+                    <div class="col-sm-10">
+
+                        <input type="hidden" name="Config[id]" value="<%{$page.id}%>">
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">页面标识 <span class="required">*</span></label>
+                            <div class="col-sm-6">
+                                <input type="text" id="flag" class="form-control" name="Config[flag]" placeholder="填写页面唯一标识，字母和数字构成，全局唯一，32字符以内" value="<%{$page.flag}%>">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">页面样图 <span class="not-required">*</span></label>
+                            <input type="hidden" name="Config[sample_id]" value="<%{$page.sample_id}%>" id="cover_image_id">
+                            <div class="col-sm-6 cover-image-file-container">
+                                <%{if condition="!empty($page.sample_id)"}%>
+                                    <div id="cover_img" class="upload-preview">
+                                        <img src="<%{$page.file_path}%>">
+                                    </div>
+                                <%{/if}%>
+                                <div class="upload-container">
+                                    <span class="upload">
+                                        <input type="file" name="cover_image_file" title="点击选择并上传页面样图" id="cover_image_file">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">使用标题 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="use_title" name="Config[use_title]" title="是" data-on-text="是" data-off-text="否"<%{if condition="!empty($config.use_title)"}%> checked="checked"<%{/if}%>>
+                                    <div class="js-switch-context">是否允许自定义单页面设置标题</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">使用关键词 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="use_keywords" name="Config[use_keywords]" title="是" data-on-text="是" data-off-text="否"<%{if condition="!empty($config.use_keywords)"}%> checked="checked"<%{/if}%>>
+                                    <div class="js-switch-context">是否允许自定义单页面设置关键词</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">使用封面图 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="use_cover" name="Config[use_cover]" title="是" data-on-text="是" data-off-text="否"<%{if condition="!empty($config.use_cover)"}%> checked="checked"<%{/if}%>>
+                                    <div class="js-switch-context">是否允许自定义单页面设置封面图</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="use_cover_setting">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">封面图宽度 <span class="required">*</span></label>
+                                <div class="col-sm-5">
+                                    <input type="number" id="cover_options_width" class="form-control" name="Config[cover_options_width]" placeholder="封面图宽度，整数，单位：像素 px" value="<%{$config.cover_options.width ?? ''}%>">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">封面图高度 <span class="required">*</span></label>
+                                <div class="col-sm-5">
+                                    <input type="number" id="cover_options_height" class="form-control" name="Config[cover_options_height]" placeholder="封面图高度，整数，单位：像素 px" value="<%{$config.cover_options.height ?? ''}%>">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">使用页面描述 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="use_description" name="Config[use_description]" title="是" data-on-text="是" data-off-text="否"<%{if condition="!empty($config.use_description)"}%> checked="checked"<%{/if}%>>
+                                    <div class="js-switch-context">是否允许自定义单页面设置页面描述</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">使用页面模板 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="use_template" name="Config[use_template]" title="是" data-on-text="是" data-off-text="否"<%{if condition="!empty($config.use_template)"}%> checked="checked"<%{/if}%>>
+                                    <div class="js-switch-context">是否允许自定义单页面选择不同的模板</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="use_template_setting">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">待选模板下拉项 <span class="required">*</span></label>
+                                <div class="col-sm-10">
+
+                                    <ul id="template_options">
+                                        <%{if condition="!empty($config.use_template)"}%>
+                                            <%{volist name="config.template_options" id="template"}%>
+                                            <li class="form-group template_options">
+                                                <div class="template_options_manage">
+                                                    <i class="fa fa-trash"></i>
+                                                    <i class="fa fa-arrows-alt"></i>
+                                                </div>
+
+                                                <div class="col-xs-5">
+                                                    <div class="input-group">
+                                                        <div class="input-group-addon">中文名称</div>
+                                                        <input type="text" class="form-control columns" name="Config[template_options_name][]" placeholder="例如：绿色主题" value="<%{$template.name}%>">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-xs-5">
+                                                    <div class="input-group">
+                                                        <div class="input-group-addon">模板文件名</div>
+                                                        <input type="text" class="form-control name" name="Config[template_options_template][]" placeholder="例如：green_page" value="<%{$template.template}%>">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <%{/volist}%>
+                                        <%{/if}%>
+
+                                    </ul>
+
+                                    <div class="form-group template_group_btn">
+                                        <div class="col-xs-4">
+                                            <button type="button" class="btn btn-block btn-default" id="insert_one_template">
+                                                <i class="fa fa-plus"></i> 点此新增1个待选项
+                                            </button>
+                                        </div>
+                                        <div class="col-xs-4">
+                                            <button type="button" class="btn btn-block btn-default"  id="insert_five_template">
+                                                <i class="fa fa-plus"></i> 点此新增5个待选项
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">使用页面正文 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="use_content" name="Config[use_content]" title="是" data-on-text="是" data-off-text="否"<%{if condition="!empty($config.use_content)"}%> checked="checked"<%{/if}%>>
+                                    <div class="js-switch-context">是否允许自定义单页面正文的各个区块</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="use_content_options">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">正文区块选项 <span class="required">*</span></label>
+                                <div class="col-sm-10">
+
+                                    <ul id="content_options">
+
+                                        <%{volist name="config.content_options" id="content"}%>
+                                        <li class="form-group content_options">
+                                            <div class="content_options_manage">
+                                                <i class="fa fa-trash"></i>
+                                                <i class="fa fa-arrows-alt"></i>
+                                            </div>
+                                            <div class="content_options_section">
+                                                <input type="hidden" name="Content[id][]" class="id" value="<%{$content.id}%>">
+                                                <input type="hidden" name="Content[name][]" class="name" value="<%{$content.name}%>">
+                                                <input type="hidden" name="Content[type][]" class="type" value="<%{$content.type}%>">
+                                                <input type="hidden" name="Content[length][]" class="length" value="<%{$content.length}%>">
+                                                <input type="hidden" name="Content[width][]" class="width" value="<%{$content.width}%>">
+                                                <input type="hidden" name="Content[height][]" class="height" value="<%{$content.height}%>">
+                                                <input type="hidden" name="Content[explain][]" class="explain" value="<%{$content.explain}%>">
+                                                <div class="view_section view_id">
+                                                    <span>ID：</span><%{$content.id}%>
+                                                </div>
+                                                <div class="view_section view_name">
+                                                    <span>名称：</span><%{$content.name}%>
+                                                </div>
+                                                <div class="view_section view_type">
+                                                    <span>类型：</span><%{$content.type_readable}%>
+                                                </div>
+                                                <div class="view_section view_length">
+                                                    <span>文本长度：</span><%{$content.length}%>
+                                                </div>
+                                                <div class="view_section view_width">
+                                                    <span>图片长度：</span><%{$content.width}%>
+                                                </div>
+                                                <div class="view_section view_height">
+                                                    <span>图片宽度：</span><%{$content.height}%>
+                                                </div>
+                                                <div class="view_section view_explain">
+                                                    <span>填写说明：</span><%{$content.explain}%>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <%{/volist}%>
+
+                                    </ul>
+
+                                    <div class="form-group content_group_btn">
+                                        <div class="col-xs-4">
+                                            <button type="button" class="btn btn-block btn-default" id="insert_one_content">
+                                                <i class="fa fa-plus"></i> 点此新增1个正文区块
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">单页面状态 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="enable" name="Config[enable]" title="是" data-on-text="是" data-off-text="否" checked="checked"<%{if condition="!empty($config.enable)"}%> checked="checked"<%{/if}%>>
+                                    <div class="js-switch-context">是否启用该单页面，选中启用，不选中则禁用</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">页面排序 <span class="required">*</span></label>
+                            <div class="col-sm-6">
+                                <input type="number" id="sort" class="form-control" name="Config[sort]" placeholder="设置单页面排序，数字越小越靠前" value="<%{$page.sort}%>">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
             <div class="box-footer">
                 <div class="row text-center">
-                    <button type="submit" class="btn btn-success btn-submit">提交保存</button>
+                    <button type="submit" class="btn btn-success btn-submit">保存</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!--新增|编辑正文区块-->
+<div class="modal fade" id="ContentModal" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="ContentModalLabel">新增正文区块</h4>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="form-horizontal" id="ContentForm">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">区块ID <span class="required">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" id="content_id" class="form-control" name="content_id" placeholder="正文区块唯一ID，1条单页数据内唯一">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">区块名称 <span class="required">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" id="content_name" class="form-control" name="content_name" placeholder="区块名称，用于设置单页时的显示名称">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">区块类型 <span class="required">*</span></label>
+                        <div class="col-sm-8">
+                            <select name="content_type" id="content_type" class="form-control select2" style="width: 100%;">
+                                <option value="">--请选择区块类型--</option>
+                                <option value="1">文字</option>
+                                <option value="2">图片</option>
+                                <option value="3">视频</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="text_setting">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">文本长度 <span class="required">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="number" id="content_length" class="form-control" name="content_length" placeholder="文本的最大长度，区块类型为文字时有效，必填">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="image_setting">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">图片宽度 <span class="required">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="number" id="image_width" class="form-control" name="image_width" placeholder="区块类型为图片时有效必填">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">图片高度 <span class="required">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="number" id="image_height" class="form-control" name="image_height" placeholder="区块类型为图片时有效必填">
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="edit_node" name="edit_node" value="" disabled="disabled">
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">填写说明 <span class="required">*</span></label>
+                        <div class="col-sm-8">
+                            <textarea id="content_explain" rows=3 class="form-control" name="content_explain" placeholder="该区块的填写说明文字"></textarea>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info btn-submit-content">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="__PUBLIC__/plugin/sortable/Sortable.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var config = <%{:json_encode($config)}%>;
+</script>

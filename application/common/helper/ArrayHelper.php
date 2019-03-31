@@ -58,7 +58,7 @@ class ArrayHelper
     public static function toArray($origin)
     {
         if (empty($origin)) {
-            return null;
+            return $origin;//原样返回
         }
         if (is_string($origin)) {
             return json_decode($origin, true);
