@@ -144,6 +144,16 @@ class PageService
                 $content_heights  = $_contents['height'];
                 $content_explains = $_contents['explain'];
 
+                if (count($content_ids) != count($content_names)
+                    || count($content_ids) != count($content_types)
+                    || count($content_ids) != count($content_lengths)
+                    || count($content_ids) != count($content_widths)
+                    || count($content_ids) != count($content_heights)
+                    || count($content_ids) != count($content_explains)
+                ) {
+                    throw new Exception('区块ID有重复或区块配置项中有缺失选项');
+                }
+
                 if (empty($content_ids)) {
                     throw new Exception('请完善区块ID');
                 }
@@ -204,6 +214,8 @@ class PageService
             $page = [
                 'flag'      => $_config['flag'],
                 'sample_id' => $_config['sample_id'] ?? '', // 配置样例图
+                'enable'    => !empty($_config['enable']),
+                'sort'      => intval($_config['sort']) < 0 ? 0 : intval($_config['sort']),
                 'config'    => $config, // json格式的单页面配置参数
             ];
 
