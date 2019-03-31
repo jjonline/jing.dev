@@ -16,6 +16,18 @@
                         </div>
 
                         <div class="form-group">
+                            <label class="col-sm-2 control-label">页面样图 <span class="not-required">*</span></label>
+                            <input type="hidden" name="Config[sample_id]" value="" id="cover_image_id">
+                            <div class="col-sm-6 cover-image-file-container">
+                                <div class="upload-container">
+                                    <span class="upload">
+                                        <input type="file" name="cover_image_file" title="点击选择并上传页面样图" id="cover_image_file">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
                             <label class="col-sm-2 control-label">使用标题 <span class="required">*</span></label>
                             <div class="col-sm-10">
                                 <div class="js-switch-container">
@@ -194,6 +206,23 @@
                                     </div>
 
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">单页面状态 <span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="js-switch-container">
+                                    <input type="checkbox" id="enable" name="Config[enable]" title="是" data-on-text="是" data-off-text="否" checked="checked">
+                                    <div class="js-switch-context">是否启用该单页面，选中启用，不选中则禁用</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">页面排序 <span class="required">*</span></label>
+                            <div class="col-sm-6">
+                                <input type="number" id="sort" class="form-control" name="Config[sort]" placeholder="设置单页面排序，数字越小越靠前">
                             </div>
                         </div>
 

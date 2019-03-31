@@ -11,6 +11,30 @@ $(function () {
         ghostClass: "template_sortable"
     });
 
+    /**
+     * 页面样图
+     * 带上传进度条的文件上传
+     */
+    utils.bindAjaxUploader("cover_image_file",{
+        // url:'',//上传文件后端Url，留空则为/manage/upload/upload?origin=ajax
+        allow_extension: ['jpg','jpeg', 'png'],//null不限制、需限制时使用数组 ['jpg','jpeg']
+        extraData: {'is_safe':0}, //上传额外附带的key-value
+        multiple:true,//是否允许选择多个文件，默认允许多个
+        success:function (data) {
+            if(data['error_code'] == 0)
+            {
+                $('#cover_img').remove();
+                $('.cover-image-file-container').prepend('<div id="cover_img" class="upload-preview"><img src="'+data.data.file_path+'"></div>');
+                $('#cover_image_id').val(data.data.id);
+            }else{
+                utils.alert(data.error_msg ? data.error_msg : '未知错误');
+            }
+        },//上传成功的回调函数
+        error:function () {
+            utils.alert("网络或服务器异常，文件上传失败！");
+        }//上传失败的回调函数
+    });
+
     // 删除模板待选项确认提醒
     $(sortAble1).on("click", ".fa-trash", function () {
         var item = $(this).parents('li');
@@ -161,6 +185,9 @@ $(function () {
      */
     // 浮层新增1个正文区块
     $("#insert_one_content").on("click",function () {
+        $('#ContentForm').get(0).reset();// reset输入
+        $("#content_type").val("").trigger("change");
+        changeSectionInput(0); // 重置区块类型
         $("#ContentModal").modal("show");
     });
 
