@@ -214,7 +214,7 @@ class PageService
             $page = [
                 'flag'      => $_config['flag'],
                 'sample_id' => $_config['sample_id'] ?? '', // 配置样例图
-                'enable'    => !empty($_config['enable']),
+                'enable'    => empty($_config['enable']) ? 0 : 1,
                 'sort'      => intval($_config['sort']) < 0 ? 0 : intval($_config['sort']),
                 'config'    => $config, // json格式的单页面配置参数
             ];
@@ -270,6 +270,36 @@ class PageService
             return [];
         } catch (\Throwable $e) {
             return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * 页面id读取页面完整数据，返回纯数组没有stdClass
+     * @param $id
+     * @return array
+     */
+    public function getPageById($id)
+    {
+        try {
+            $page = $this->Page->getFullPageById($id);
+            if (empty($page)) {
+                return [];
+            }
+            $page['config']  = ArrayHelper::toArray($page['config']);
+            $page['setting'] = ArrayHelper::toArray($page['setting']);
+
+            // 处理配置中类型为可识读
+            if (!empty($page['config']['content_options'])) {
+                $options = $page['config']['content_options'];
+                foreach ($options as $key => $value) {
+                    $options[$key]['type_readable'] = $this->Page->getPageConfigTypeReadable($value['type']);
+                }
+                $page['config']['content_options'] = $options;
+            }
+
+            return $page;
+        } catch (\Throwable $e) {
+            return [];
         }
     }
 
