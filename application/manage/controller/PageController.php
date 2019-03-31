@@ -104,12 +104,12 @@ class PageController extends BaseController
             return $pageService->save($this->request);
         }
         $common = [
-            'title'            => '新增单页 - ' . config('local.site_name'),
-            'content_title'    => '新增单页',
+            'title'            => '新增单页配置 - ' . config('local.site_name'),
+            'content_title'    => '新增单页配置',
             'content_subtitle' => '新增单页并设定单页可设置选项',
             'breadcrumb'       => [
-                ['label' => '新增单页', 'url' => url('page/create')],
-                ['label' => '新增单页', 'url' => ''],
+                ['label' => '新增单页配置', 'url' => url('page/create')],
+                ['label' => '新增单页配置', 'url' => ''],
             ],
             'load_layout_css'  => true,
             'load_layout_js'   => true,
@@ -130,12 +130,12 @@ class PageController extends BaseController
             return $pageService->save($this->request);
         }
         $common = [
-            'title'            => '编辑单页 - ' . config('local.site_name'),
-            'content_title'    => '编辑单页',
+            'title'            => '编辑单页配置 - ' . config('local.site_name'),
+            'content_title'    => '编辑单页配置',
             'content_subtitle' => '编辑单页的各项配置属性',
             'breadcrumb'       => [
-                ['label' => '编辑单页', 'url' => url('page/config')],
-                ['label' => '编辑单页', 'url' => ''],
+                ['label' => '编辑单页配置', 'url' => url('page/config')],
+                ['label' => '编辑单页配置', 'url' => ''],
             ],
             'load_layout_css'  => true,
             'load_layout_js'   => true,
