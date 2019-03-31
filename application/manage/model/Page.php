@@ -12,6 +12,8 @@ use think\Model;
 
 class Page extends Model
 {
+    protected $json = ['config', 'setting'];
+
     /**
      * 主键查询
      * @param $id
@@ -26,6 +28,23 @@ class Page extends Model
             return [];
         }
         $result = $this->where('id', $id)->find();
+        return empty($result) ? [] : $result->toArray();
+    }
+
+    /**
+     * 单页唯一标识查找单页数据
+     * @param $flag
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getDataByFlag($flag)
+    {
+        if (empty($flag)) {
+            return [];
+        }
+        $result = $this->where('flag', $flag)->find();
         return empty($result) ? [] : $result->toArray();
     }
 }
