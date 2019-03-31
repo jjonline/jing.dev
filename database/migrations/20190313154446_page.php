@@ -62,6 +62,12 @@ class Page extends Migrator
                     'null'    => true,
                     'comment' => 'json格式的落地页配置项对应的具体参数内容',
                 ])
+                ->addColumn('sample_id', 'string', [
+                    'limit'   => 36,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '单页面配置效果样例附图id',
+                ])
                 ->addColumn('enable', 'boolean', [ // tinyint(1)类型
                     'default' => '1',
                     'null'    => false,
