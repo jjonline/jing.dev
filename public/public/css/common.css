@@ -167,6 +167,10 @@ tr.selected>td {}
 /**
  * upload-container btn
  */
+.upload_wrapper {
+    height:50px;
+    position: relative;
+}
 .upload-container {
     display: inline-block;
     height: 50px;
@@ -198,6 +202,16 @@ tr.selected>td {}
     height:100%;
     opacity:0;
     cursor:pointer
+}
+.uploader_context {
+    display: inline-block;
+    position: absolute;
+    top:15px;
+    left:55px;
+    height:20px;
+    line-height:20px;
+    font-size: 12px;
+    color: #999;
 }
 
 .jcrop-holder {
