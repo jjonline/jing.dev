@@ -63,6 +63,18 @@ class PageController extends BaseController
         ];
         $this->assign($common);
 
+        // 读取单页数据
+        $page = $pageService->getPageById($this->request->get('id'));
+        if (empty($page)) {
+            $this->error('单页面数据不存在');
+        }
+
+        $this->assign('page', $page);
+        $this->assign('config', $page['config']);
+        $this->assign('setting', $page['setting']);
+
+        //dump($page);
+
         return $this->fetch();
     }
 

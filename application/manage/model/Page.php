@@ -33,6 +33,10 @@ class Page extends Model
         self::CONTENT_IMAGE => '图片',
         self::CONTENT_VIDEO => '视频',
     ];
+    /**
+     * @var string 单页面全局缓存tag
+     */
+    const CACHE_TAG = 'page.cache.tag';
 
     /**
      * 区块类型标记转可识读文字

@@ -96,7 +96,7 @@ class PageService
                 if (empty($_config['cover_options_height'])) {
                     throw new Exception('封面图高度不得为空');
                 }
-                $config['user_cover'] = true;
+                $config['use_cover']               = true;
                 $config['cover_options']['width']  = intval($_config['cover_options_width']);
                 $config['cover_options']['height'] = intval($_config['cover_options_height']);
             } else {
@@ -134,7 +134,7 @@ class PageService
             if (!empty($_config['use_content'])) {
                 $_contents = $request->post('Content/a');
                 if (empty($_contents)) {
-                    throw new Exception('请完善待正文区块选项');
+                    throw new Exception('请完善正文区块选项');
                 }
                 $content_ids      = ArrayHelper::uniqueAndTrimOneDimissionArray($_contents['id']); // ID单页面内唯一
                 $content_names    = $_contents['name'];
@@ -174,12 +174,14 @@ class PageService
                     $_content_options['width']  = 0;
                     $_content_options['height'] = 0;
                     $_content_options['type']   = $content_types[$key];
+                    $_content_options['rows']   = 0;
                     switch ($content_types[$key]) {
                         case 1:
                             if (empty($content_lengths[$key]) || intval($content_lengths[$key]) <= 0) {
                                 throw new Exception($value.'对应的文字最大长度必须是正整数');
                             }
                             $_content_options['length'] = intval($content_lengths[$key]);
+                            $_content_options['rows']   = $this->calcTextRows($_content_options['length']);
                             break;
                         case 2:
                             if (empty($content_widths[$key]) || intval($content_widths[$key]) <= 0) {
@@ -362,5 +364,19 @@ class PageService
         } catch (\Throwable $e) {
             return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
         }
+    }
+
+    /**
+     * 计算单页面文本类型的row行数
+     * @param int $length
+     * @return int
+     */
+    protected function calcTextRows($length = 0)
+    {
+        if (empty($length)) {
+            return 0;
+        }
+        $rows = ceil($length / 60) + 3;
+        return $rows <= 4 ? 5 : $rows + 3;
     }
 }
