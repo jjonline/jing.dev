@@ -178,7 +178,8 @@ class MenuService
             ['error_code' => 500, 'error_msg' => '菜单保存失败：系统异常'];
     }
 
-    /** 菜单排序调整
+    /**
+     * 菜单排序调整
      * @param Request $request
      * @return array
      * @throws \think\db\exception\DataNotFoundException
