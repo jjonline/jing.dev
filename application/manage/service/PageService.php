@@ -269,6 +269,16 @@ class PageService
         try {
             $request->post('Setting/a');
 
+            /**
+             * 单页面的设置参数json结构，setting里仅设置正文相关区块的内容
+             * [
+             *      '区块ID1' => '区块内容1，可能是 src|title 即图片`src|图片说明`',
+             *      '区块ID2' => '区块内容2，可能就是一个src，即视频`src`',
+             *      '区块ID3' => '区块内容3，可能就是一长串字符串，即文字内容',
+             * ]
+             */
+            $setting = [];
+
             return [];
         } catch (\Throwable $e) {
             return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
