@@ -86,10 +86,11 @@
 
                                             <%{if condition="$op.type EQ 2"}%>
                                             <!--图片-->
+                                            <input type="hidden" id="<%{$op.id}%>" name="Content[<%{$op.id}%>]">
                                             <div class="upload_wrapper">
                                                 <div class="upload-container">
                                                     <span class="upload">
-                                                        <input type="file" name="file_upload" title="点此选择图片并上传" class="image_file_upload">
+                                                        <input type="file" name="image_upload_<%{$op.id}%>" title="点此选择图片并上传" class="image_file_upload">
                                                     </span>
                                                 </div>
                                                 <div class="uploader_context">请将图片处理成宽：<%{$op.width}%>px 高：<%{$op.height}%>px 保证文件体积在2M以内</div>
@@ -99,10 +100,11 @@
 
                                             <%{if condition="$op.type EQ 3"}%>
                                             <!--视频-->
+                                            <input type="hidden" id="<%{$op.id}%>" name="Content[<%{$op.id}%>]">
                                             <div class="upload_wrapper">
                                                 <div class="upload-container">
                                                     <span class="upload">
-                                                        <input type="file" name="file_upload" title="点此选择视频并上传" class="video_file_upload">
+                                                        <input type="file" name="video_upload_<%{$op.id}%>" title="点此选择视频并上传" class="video_file_upload">
                                                     </span>
                                                 </div>
                                                 <div class="uploader_context">点击图标选择视频并上传，仅支持mp4格式，文件体积100M以内</div>
@@ -126,3 +128,6 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    var config = <%{:json_encode($config)}%>;
+</script>

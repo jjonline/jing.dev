@@ -73,7 +73,7 @@ class PageController extends BaseController
         $this->assign('config', $page['config']);
         $this->assign('setting', $page['setting']);
 
-        //dump($page);
+        // dump($page);
 
         return $this->fetch();
     }
