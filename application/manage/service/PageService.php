@@ -267,7 +267,65 @@ class PageService
     public function setting(Request $request)
     {
         try {
-            $request->post('Setting/a');
+            $_page      = $request->post('Page/a');
+            $_content   = $request->post('Content/a');
+            $id         = $_page['id'];
+
+            $exist_page = $this->getPageById($id);
+            if (empty($exist_page)) {
+                throw new Exception('设置的单页面数据不存在');
+            }
+
+            // setting能配置的单页面数据
+            $page = [
+                'id'          => $id,
+                'title'       => '',
+                'cover_id'    => '',
+                'keywords'    => '',
+                'description' => '',
+                'template'    => '',
+                'remark'      => '',
+                'sort'        => '',
+                'setting'     => null,
+            ];
+
+            // 单页面配置
+            $config = $exist_page['config'];
+            // 标题
+            if (!empty($config['use_title'])) {
+                if (empty($_page['title']) || mb_strlen($_page['title']) > 32) {
+                    throw new Exception('标题不得为空或大于32字符');
+                }
+                $page['title'] = $_page['title'];
+            }
+            // 关键词
+            if (!empty($config['use_keywords'])) {
+                if (empty($_page['keywords']) || mb_strlen($_page['title']) > 64) {
+                    throw new Exception('关键词不得为空或大于64字符');
+                }
+                $page['keywords'] = $_page['keywords'];
+            }
+            // 页面描述
+            if (!empty($config['use_description'])) {
+                if (empty($_page['description']) || mb_strlen($_page['description']) > 256) {
+                    throw new Exception('关键词不得为空或大于256字符');
+                }
+                $page['description'] = $_page['description'];
+            }
+            // 模板
+            if (!empty($config['use_template'])) {
+                if (empty($_page['template'])) {
+                    throw new Exception('请选择页面模板');
+                }
+                $page['template'] = $_page['template'];
+            }
+            // 封面图
+            if (!empty($config['use_cover'])) {
+                if (empty($_page['cover_id'])) {
+                    throw new Exception('请上传单页面封面图');
+                }
+                $page['cover_id'] = $_page['cover_id'];
+            }
 
             /**
              * 单页面的设置参数json结构，setting里仅设置正文相关区块的内容
@@ -279,7 +337,44 @@ class PageService
              */
             $setting = [];
 
-            return [];
+            // 正文区块
+            if (!empty($config['use_content'])) {
+                if (empty($_content)) {
+                    throw new Exception('请完善正文区块内容');
+                }
+                $content_options = $config['content_options'];
+                foreach ($content_options as $key => $value) {
+                    $section_id = $value['id'];
+                    if (empty($_content[$section_id])) {
+                        throw new Exception('请完善区块'.$section_id.'数据');
+                    }
+                    // 依据类型做边界检查
+                    switch ($value['type']) {
+                        case Page::CONTENT_TEXT:
+                            if (mb_strlen($_content[$section_id]) > $value['length']) {
+                                throw new Exception('区块'.$section_id.'文字的长度不得大于'.$value['length']);
+                            }
+                            break;
+                        case Page::CONTENT_IMAGE:
+                            break;
+                        case Page::CONTENT_VIDEO:
+                            break;
+                    }
+                    $setting[$section_id] = $_content[$section_id];
+                }
+                $page['setting'] = $setting;
+            }
+
+            $effect_rows = $this->Page->db()->update($page);
+            if (false === $effect_rows) {
+                throw new Exception('系统异常：保存数据失败');
+            }
+            // 记录日志
+            $this->LogService->logRecorder(
+                [$page,$_page,$_content],
+                "设置单页面"
+            );
+            return ['error_code' => 0, 'error_msg' => '保存成功'];
         } catch (\Throwable $e) {
             return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
         }
@@ -304,7 +399,12 @@ class PageService
             if (!empty($page['config']['content_options'])) {
                 $options = $page['config']['content_options'];
                 foreach ($options as $key => $value) {
+                    // 设置区块类型标记
                     $options[$key]['type_readable'] = $this->Page->getPageConfigTypeReadable($value['type']);
+                    $options[$key]['value']         = ''; // 补充设置的值，便于设置界面编辑模式使用
+                    if (isset($page['setting'][$value['id']])) {
+                        $options[$key]['value'] = $page['setting'][$value['id']];
+                    }
                 }
                 $page['config']['content_options'] = $options;
             }

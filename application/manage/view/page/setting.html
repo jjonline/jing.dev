@@ -4,9 +4,10 @@
             <div class="box-header with-border">
                 <h4 class="box-title">设置单页</h4>
             </div>
-            <form action="<%{:url('page/create')}%>" class="form-horizontal" id="ArticleForm">
+            <form action="<%{:url('page/setting')}%>" class="form-horizontal" id="PageForm">
                 <div class="box-body">
                     <div class="col-sm-11">
+                        <input type="hidden" name="Page[id]" value="<%{$page.id}%>">
 
                         <%{if condition="!empty($config['use_title'])"}%>
                         <div class="form-group">
@@ -38,15 +39,16 @@
                         <%{if condition="!empty($config['use_cover'])"}%>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">封面图 <span class="required">*</span></label>
-                            <input type="hidden" name="Page[cover_id]" value="" id="cover_id">
+                            <input type="hidden" name="Page[cover_id]" value="<%{$page.cover_id}%>" id="cover_id">
                             <div class="col-sm-6 cover-image-file-container">
+                                <div id="cover_img" class="upload-preview"><img src="<%{$page.cover_file_path}%>"></div>
                                 <div class="upload_wrapper">
                                     <div class="upload-container">
                                         <span class="upload">
                                             <input type="file" name="image" title="点此选择图片并裁剪上传" id="cut_upload">
                                         </span>
                                     </div>
-                                    <div class="uploader_context">点此选择图片并裁剪上传，宽：<%{$config.cover_options.width}%>px 高：<%{$config.cover_options.height}%>px</div>
+                                    <div class="uploader_context">点此选择图片并裁剪上传，宽<span><%{$config.cover_options.width}%>px</span> 高<span><%{$config.cover_options.height}%>px</span></div>
                                 </div>
                             </div>
                         </div>
@@ -56,7 +58,7 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label">页面模板 <span class="required">*</span></label>
                             <div class="col-sm-6">
-                                <select name="template" id="template" class="form-control select2" style="width: 100%;">
+                                <select name="Page[template]" id="template" class="form-control select2" style="width: 100%;">
                                     <option value="">--请选择页面使用的模板--</option>
                                     <%{volist name="config.template_options" id="temp"}%>
                                         <option value="<%{$temp.template}%>" <%{if condition="$page['template'] EQ $temp.template"}%> selected="selected"<%{/if}%>><%{$temp.name}%></option>
@@ -74,41 +76,43 @@
                                 <%{volist name="config.content_options" id="op"}%>
                                     <div class="content_section">
                                         <div class="content_section_header">
-                                            <h2><%{$op.name}%>（<%{$op.type_readable}%>）</h2>
+                                            <h2><%{$op.name}%>（<%{$op.type_readable}%>）_<%{$op.id}%>区块</h2>
                                             <p><%{$op.explain}%></p>
                                         </div>
                                         <div class="content_section_body">
 
                                             <%{if condition="$op.type EQ 1"}%>
                                             <!--文字-->
-                                            <textarea type="text" id="<%{$op.id}%>" class="form-control" name="Content[<%{$op.id}%>]" placeholder="此处填写文字内容，最多<%{$op.length}%>字，需换行请使用回车键" rows="<%{$op.rows}%>"></textarea>
+                                            <textarea type="text" id="<%{$op.id}%>" class="form-control" name="Content[<%{$op.id}%>]" placeholder="此处填写文字内容，最多<%{$op.length}%>字，需换行请使用回车键" rows="<%{$op.rows}%>"><%{$op.value}%></textarea>
                                             <%{/if}%>
 
                                             <%{if condition="$op.type EQ 2"}%>
                                             <!--图片-->
-                                            <input type="hidden" id="<%{$op.id}%>" name="Content[<%{$op.id}%>]">
+                                            <div class="upload-preview"><img src="<%{$op.value}%>"></div>
+                                            <input type="hidden" id="<%{$op.id}%>" name="Content[<%{$op.id}%>]" value="<%{$op.value}%>">
                                             <div class="upload_wrapper">
                                                 <div class="upload-container">
                                                     <span class="upload">
-                                                        <input type="file" name="image_upload_<%{$op.id}%>" title="点此选择图片并上传" class="image_file_upload">
+                                                        <input type="file" name="image_upload_<%{$op.id}%>" title="点此选择图片并上传" id="image_upload_<%{$op.id}%>" class="image_file_upload" data-id="<%{$op.id}%>">
                                                     </span>
                                                 </div>
-                                                <div class="uploader_context">请将图片处理成宽：<%{$op.width}%>px 高：<%{$op.height}%>px 保证文件体积在2M以内</div>
+                                                <div class="uploader_context">请将图片处理成宽<span><%{$op.width}%>px</span> 高<span><%{$op.height}%>px</span> 保证文件体积在2M以内</div>
                                             </div>
                                             <%{/if}%>
 
 
                                             <%{if condition="$op.type EQ 3"}%>
                                             <!--视频-->
-                                            <input type="hidden" id="<%{$op.id}%>" name="Content[<%{$op.id}%>]">
-                                            <div class="upload_wrapper">
+                                            <div class="upload_wrapper" style="margin-bottom: 15px;">
                                                 <div class="upload-container">
                                                     <span class="upload">
-                                                        <input type="file" name="video_upload_<%{$op.id}%>" title="点此选择视频并上传" class="video_file_upload">
+                                                        <input type="file" name="video_upload_<%{$op.id}%>" title="点此选择视频并上传" id="video_upload_<%{$op.id}%>" class="video_file_upload" data-id="<%{$op.id}%>">
                                                     </span>
                                                 </div>
-                                                <div class="uploader_context">点击图标选择视频并上传，仅支持mp4格式，文件体积100M以内</div>
+                                                <div class="uploader_context">点击图标选择视频并上传，仅支持mp4格式，文件体积20M以内</div>
                                             </div>
+                                            <textarea type="text" id="<%{$op.id}%>" class="form-control" name="Content[<%{$op.id}%>]" placeholder="或在此处填写视频外链代码或视频外链地址" rows="5"><%{$op.value}%></textarea>
+
                                             <%{/if}%>
 
                                         </div>
