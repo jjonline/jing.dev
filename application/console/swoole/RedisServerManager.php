@@ -200,21 +200,38 @@ class RedisServerManager
                 if ($reflect->isSubclassOf(CronTaskAbstract::class)) {
                     // 记录定时任务数据至Db返回任务ID
                     $task_id = TaskEvent::setCronTaskBegin($data);
-                    if (!empty($task_id)) {
-                        /**
-                         * @var CronTaskAbstract $class_name
-                         */
-                        list($status, $result) = $class_name::run();
-                        $data['task_id'] = $task_id;
+                    try {
+                        if (!empty($task_id)) {
+                            /**
+                             * @var CronTaskAbstract $class_name
+                             */
+                            list($status, $result) = $class_name::run();
+                            $data['task_id'] = $task_id;
 
-                        if ($status) {
-                            // 执行成功回写状态至Db
-                            TaskEvent::setAsyncTaskSuccess($data, $result);
-                            $this->logGreen("{$task_name} Run cron `{$class_name}` Success", 'ok');
+                            if ($status) {
+                                // 执行成功回写状态至Db
+                                TaskEvent::setAsyncTaskSuccess($data, $result);
+                                $this->logGreen("{$task_name} Run cron `{$class_name}` Success", 'ok');
+                            } else {
+                                // 执行失败回写状态至Db
+                                TaskEvent::setAsyncTaskFail($data, $result);
+                                $this->logWarn("{$task_name} Run cron `{$class_name}` Fail", 'warn');
+                            }
+                        }
+                    } catch (\Throwable $e) {
+                        // 定时任务数据已经生成，定时逻辑执行过程中抛出了异常，回写异常信息
+                        if (!empty($task_id)) {
+                            TaskEvent::setAsyncTaskFail(
+                                ['task_id' => $task_id],
+                                ['msg' => $e->getMessage(), 'code' => $e->getMessage()]
+                            );
+                            $this->logWarn(
+                                "{$task_name} Run cron `{$class_name}` throw exception and Fail",
+                                'exception'
+                            );
                         } else {
-                            // 执行失败回写状态至Db
-                            TaskEvent::setAsyncTaskFail($data, $result);
-                            $this->logWarn("{$task_name} Run cron `{$class_name}` Fail", 'warn');
+                            // 抛出了异常同时未生成任务id，定时任务内核逻辑异常
+                            $this->logError("{$task_name} Kernel Fail", 'kernel error');
                         }
                     }
                 }
