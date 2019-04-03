@@ -29,7 +29,7 @@
 
                         <%{if condition="!empty($config['use_description'])"}%>
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">页面关键词 <span class="required">*</span></label>
+                            <label class="col-sm-2 control-label">页面描述 <span class="required">*</span></label>
                             <div class="col-sm-6">
                                 <textarea type="text" id="description" class="form-control" name="Page[description]" placeholder="填写页面描述，SEO使用，80字左右即可" rows="4"><%{$page.description}%></textarea>
                             </div>
@@ -41,7 +41,11 @@
                             <label class="col-sm-2 control-label">封面图 <span class="required">*</span></label>
                             <input type="hidden" name="Page[cover_id]" value="<%{$page.cover_id}%>" id="cover_id">
                             <div class="col-sm-6 cover-image-file-container">
-                                <div id="cover_img" class="upload-preview"><img src="<%{$page.cover_file_path}%>"></div>
+                                <%{if condition="!empty($page.cover_file_path)"}%>
+                                <div id="cover_img" class="upload-preview">
+                                    <img src="<%{$page.cover_file_path}%>">
+                                </div>
+                                <%{/if}%>
                                 <div class="upload_wrapper">
                                     <div class="upload-container">
                                         <span class="upload">
@@ -88,7 +92,9 @@
 
                                             <%{if condition="$op.type EQ 2"}%>
                                             <!--图片-->
+                                            <%{if condition="!empty($op.value)"}%>
                                             <div class="upload-preview"><img src="<%{$op.value}%>"></div>
+                                            <%{/if}%>
                                             <input type="hidden" id="<%{$op.id}%>" name="Content[<%{$op.id}%>]" value="<%{$op.value}%>">
                                             <div class="upload_wrapper">
                                                 <div class="upload-container">
