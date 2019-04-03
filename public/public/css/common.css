@@ -213,6 +213,9 @@ tr.selected>td {}
     font-size: 12px;
     color: #999;
 }
+.uploader_context span {
+    color:#f54949;
+}
 
 .jcrop-holder {
     text-align: center;

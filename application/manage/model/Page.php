@@ -100,9 +100,11 @@ class Page extends Model
         }
         $result = $this->db()->alias("page")
             ->leftJoin('attachment attachment', 'attachment.id = page.sample_id')
+            ->leftJoin('attachment attachment1', 'attachment1.id = page.cover_id')
             ->field([
                 'page.*',
-                'attachment.file_path'
+                'attachment.file_path',
+                'attachment1.file_path as cover_file_path',
             ])
             ->where('page.id', $id)
             ->find();
