@@ -284,9 +284,9 @@ class PageService
                 'keywords'    => '',
                 'description' => '',
                 'template'    => '',
-                'remark'      => '',
-                'sort'        => '',
                 'setting'     => null,
+                'sort'        => intval($_page['sort']) > 0 ? intval($_page['sort']) : 0,
+                'remark'      => $_page['remark'] ?? '',
             ];
 
             // 单页面配置
