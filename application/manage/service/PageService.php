@@ -224,6 +224,7 @@ class PageService
                 'sample_id' => $_config['sample_id'] ?? '', // 配置样例图
                 'enable'    => empty($_config['enable']) ? 0 : 1,
                 'sort'      => intval($_config['sort']) < 0 ? 0 : intval($_config['sort']),
+                'remark'    => $_config['remark'] ?? '',
                 'config'    => $config, // json格式的单页面配置参数
             ];
 

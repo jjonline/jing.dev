@@ -18,7 +18,7 @@ $(function () {
                     }
 
                     if (has_tag.length >= 5) {
-                        utils.toast("一篇文章最多5个关键词");
+                        utils.toast("最多设置5个关键词");
                         return false;
                     }
 

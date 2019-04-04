@@ -7,6 +7,13 @@
             <form action="<%{:url('page/setting')}%>" class="form-horizontal" id="PageForm">
                 <div class="box-body">
                     <div class="col-sm-11">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">备注 <span class="not-required">*</span></label>
+                            <div class="col-sm-6">
+                                <textarea id="remark" rows=6 class="form-control" name="Page[remark]" placeholder="备注信息，便于管理员自己识别的备注，最多250字，这里展示的是一些操作说明不建议修改"><%{$page.remark}%></textarea>
+                            </div>
+                        </div>
+
                         <input type="hidden" name="Page[id]" value="<%{$page.id}%>">
 
                         <%{if condition="!empty($config['use_title'])"}%>
@@ -41,6 +48,13 @@
                             </div>
                         </div>
                         <%{/if}%>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">页面排序 <span class="not-required">*</span></label>
+                            <div class="col-sm-6">
+                                <input type="number" id="sort" class="form-control" name="Page[sort]" placeholder="设置单页面排序，数字越小越靠前" value="<%{$page.sort}%>">
+                            </div>
+                        </div>
 
                         <%{if condition="!empty($config['use_cover'])"}%>
                         <div class="form-group">
@@ -133,20 +147,6 @@
                             </div>
                         </div>
                         <%{/if}%>
-
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">页面排序 <span class="not-required">*</span></label>
-                            <div class="col-sm-6">
-                                <input type="number" id="sort" class="form-control" name="Page[sort]" placeholder="设置单页面排序，数字越小越靠前" value="<%{$page.sort}%>">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">备注 <span class="not-required">*</span></label>
-                            <div class="col-sm-10">
-                                <textarea id="remark" rows=3 class="form-control" name="Page[remark]" placeholder="备注信息，便于管理员自己识别的备注"><%{$page.remark}%></textarea>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </form>
