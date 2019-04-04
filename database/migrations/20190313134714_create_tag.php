@@ -1,14 +1,14 @@
 <?php
 /**
- * 文章分类表
+ * 系统关键词
  */
 use think\migration\Migrator;
 use think\migration\db\Column;
 use Phinx\Db\Adapter\MysqlAdapter;
 
-class ArticleCat extends Migrator
+class CreateTag extends Migrator
 {
-    static private $table='article_cat';
+    static private $table='tag';
 
     /**
      * 执行迁移被运行的方法
@@ -24,42 +24,45 @@ class ArticleCat extends Migrator
                 //'primary_key' => 'id',
                 'engine'      => 'InnoDB',
                 'collation'   => 'utf8mb4_general_ci',
-                'comment'     => '文章分类',
+                'comment'     => '系统tag关键词表',
             ]);
-            $table->addColumn('name', 'string', [
-                    'limit'   => 32,
+            $table->addColumn('tag', 'string', [
+                    'limit'   => 24,
+                    'null'    => false,
+                    'comment' => 'tag关键词',
+                ])
+                ->addColumn('cover_id', 'string', [
+                    'limit'   => 36,
                     'default' => '',
                     'null'    => false,
-                    'comment' => '分类名称',
+                    'comment' => '可能的tag附图ID',
                 ])
-                ->addColumn('icon', 'string', [
-                    'limit'   => 64,
-                    'default' => '',
-                    'null'    => false,
-                    'comment' => '预留的分类icon图标',
-                ])
-                ->addColumn('parent_id', 'integer', [
-                    'default' => '0',
-                    'null'    => false,
-                    'comment' => '父分类ID，0为顶级无父分类',
-                ])
-                ->addColumn('level', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY, // tinyint类型
-                    // 'default' => '1', // 不得为空，必须赋值，不给默认值
-                    'null'    => false,
-                    'comment' => '层级 1一级 2二级 3三级',
-                ])
-                ->addColumn('sort', 'integer', [
-                    'limit'   => MysqlAdapter::INT_BIG, // bigint类型
-                    'default' => '0',
-                    'null'    => false,
-                    'comment' => '排序，数字越小越靠前',
-                ])
-                ->addColumn('remark', 'string', [
+                ->addColumn('excerpt', 'string', [
                     'limit'   => 255,
                     'default' => '',
                     'null'    => false,
-                    'comment' => '备注信息',
+                    'comment' => '可能的tag简介',
+                ])
+                ->addColumn('user_id', 'integer', [
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => '创建人ID',
+                ])
+                ->addColumn('dept_id', 'integer', [
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => '创建人部门ID',
+                ])
+                ->addColumn('quota', 'integer', [
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => 'tag引用次数',
+                ])
+                ->addColumn('sort', 'integer', [
+                    'limit'   => MysqlAdapter::INT_BIG,
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => '排序，数字越小越靠前',
                 ])
                 ->addColumn('create_time', 'datetime', [
                     'default' => 'CURRENT_TIMESTAMP',
@@ -70,7 +73,13 @@ class ArticleCat extends Migrator
                     'update'  => 'CURRENT_TIMESTAMP',
                     'comment' => '最后修改时间',
                 ])
-                ->addIndex('parent_id', [
+                ->addIndex('tag', [
+                    'unique' => true
+                ])
+                ->addIndex('user_id', [
+                    'unique' => false
+                ])
+                ->addIndex('dept_id', [
                     'unique' => false
                 ])
                 ->create();

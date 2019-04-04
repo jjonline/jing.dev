@@ -1,15 +1,14 @@
 <?php
 /**
- * 网页轮播图
+ * 文章分类表
  */
-
 use think\migration\Migrator;
 use think\migration\db\Column;
 use Phinx\Db\Adapter\MysqlAdapter;
 
-class Image extends Migrator
+class CreateArticleCat extends Migrator
 {
-    static private $table='image';
+    static private $table='article_cat';
 
     /**
      * 执行迁移被运行的方法
@@ -25,48 +24,42 @@ class Image extends Migrator
                 //'primary_key' => 'id',
                 'engine'      => 'InnoDB',
                 'collation'   => 'utf8mb4_general_ci',
-                'comment'     => '集中的网页轮播图表',
+                'comment'     => '文章分类',
             ]);
-            $table->addColumn('tag', 'string', [
+            $table->addColumn('name', 'string', [
+                    'limit'   => 32,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '分类名称',
+                ])
+                ->addColumn('icon', 'string', [
                     'limit'   => 64,
                     'default' => '',
                     'null'    => false,
-                    'comment' => '轮播图分组标签',
+                    'comment' => '预留的分类icon图标',
                 ])
-                ->addColumn('title', 'string', [
-                    'limit'   => 32,
+                ->addColumn('parent_id', 'integer', [
+                    'default' => '0',
                     'null'    => false,
-                    'default' => '',
-                    'comment' => '轮播图标题',
+                    'comment' => '父分类ID，0为顶级无父分类',
                 ])
-                ->addColumn('cover_id', 'string', [
-                    'limit'   => 36,
-                    'default' => '',
+                ->addColumn('level', 'integer', [
+                    'limit'   => MysqlAdapter::INT_TINY, // tinyint类型
+                    // 'default' => '1', // 不得为空，必须赋值，不给默认值
                     'null'    => false,
-                    'comment' => '轮播图附件ID',
+                    'comment' => '层级 1一级 2二级 3三级',
                 ])
-                ->addColumn('url', 'string', [
-                    'limit'   => 128,
-                    'default' => '',
+                ->addColumn('sort', 'integer', [
+                    'limit'   => MysqlAdapter::INT_BIG, // bigint类型
+                    'default' => '0',
                     'null'    => false,
-                    'comment' => '可选的轮播图点击后的跳转url',
-                ])
-                ->addColumn('enable', 'boolean', [ // tinyint(1)类型
-                    'default' => '1',
-                    'null'    => false,
-                    'comment' => '标记是否有效1-有效0-禁用',
+                    'comment' => '排序，数字越小越靠前',
                 ])
                 ->addColumn('remark', 'string', [
                     'limit'   => 255,
                     'default' => '',
                     'null'    => false,
                     'comment' => '备注信息',
-                ])
-                ->addColumn('sort', 'integer', [
-                    'limit'   => MysqlAdapter::INT_BIG,
-                    'default' => '0',
-                    'null'    => false,
-                    'comment' => '排序，数字越小越靠前',
                 ])
                 ->addColumn('create_time', 'datetime', [
                     'default' => 'CURRENT_TIMESTAMP',
@@ -77,7 +70,7 @@ class Image extends Migrator
                     'update'  => 'CURRENT_TIMESTAMP',
                     'comment' => '最后修改时间',
                 ])
-                ->addIndex('tag', [
+                ->addIndex('parent_id', [
                     'unique' => false
                 ])
                 ->create();
