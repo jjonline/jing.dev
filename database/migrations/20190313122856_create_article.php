@@ -6,7 +6,7 @@ use think\migration\Migrator;
 use think\migration\db\Column;
 use Phinx\Db\Adapter\MysqlAdapter;
 
-class Article extends Migrator
+class CreateArticle extends Migrator
 {
     static private $table='article';
 
