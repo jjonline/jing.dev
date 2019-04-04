@@ -32,6 +32,23 @@ class Tag extends Model
     }
 
     /**
+     * tag列表查询tag数组
+     * @param string $ids 逗号分隔的tag_id列表
+     * @return array
+     */
+    public function getTagListByIds($ids)
+    {
+        if (empty($ids)) {
+            return [];
+        }
+        $result = $this->where('id', 'IN', $ids)->column('tag');
+        if (empty($result)) {
+            return [];
+        }
+        return $result;
+    }
+
+    /**
      * Tag唯一关键词查找
      * @param string $tag
      * @return array
