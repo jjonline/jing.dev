@@ -11,6 +11,7 @@ namespace app\manage\service;
 use app\common\helper\ArrayHelper;
 use app\manage\model\Page;
 use app\common\service\LogService;
+use app\manage\model\Tag;
 use think\Exception;
 use think\Request;
 
@@ -21,13 +22,18 @@ class PageService
      */
     public $Page;
     /**
+     * @var Tag
+     */
+    public $Tag;
+    /**
      * @var LogService
      */
     public $LogService;
 
-    public function __construct(Page $page, LogService $logService)
+    public function __construct(Page $page, Tag $tag, LogService $logService)
     {
-        $this->Page = $page;
+        $this->Page       = $page;
+        $this->Tag        = $tag;
         $this->LogService = $logService;
     }
 
@@ -300,10 +306,11 @@ class PageService
             }
             // 关键词
             if (!empty($config['use_keywords'])) {
-                if (empty($_page['keywords']) || mb_strlen($_page['title']) > 64) {
+                if (empty($_page['tags']) || mb_strlen($_page['tags']) > 64) {
                     throw new Exception('关键词不得为空或大于64字符');
                 }
-                $page['keywords'] = $_page['keywords'];
+                $tags = $this->Tag->autoSaveTags($_page['tags'], $exist_page['keywords']);
+                $page['keywords'] = $tags;
             }
             // 页面描述
             if (!empty($config['use_description'])) {
@@ -408,6 +415,10 @@ class PageService
                 }
                 $page['config']['content_options'] = $options;
             }
+
+            // 处理tag关键词引用
+            $tags = $this->Tag->getTagListByIds($page['keywords']);
+            $page['tags'] = $tags;
 
             return $page;
         } catch (\Throwable $e) {

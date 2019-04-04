@@ -273,7 +273,7 @@ class ArticleService
         }
         // 补充关键词信息--统一转换为数组
         if (!empty($article['tags'])) {
-            $tags = $this->Tag->db()->where('id', 'IN', $article['tags'])->column('tag');
+            $tags = $this->Tag->getTagListByIds($article['tags']);
             $article['tags'] = $tags;
         } else {
             $article['tags'] = [];

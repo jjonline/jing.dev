@@ -21,8 +21,14 @@
                         <%{if condition="!empty($config['use_title'])"}%>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">页面关键词 <span class="required">*</span></label>
-                            <div class="col-sm-6">
-                                <input type="text" id="keywords" class="form-control" name="Page[keywords]" placeholder="填写页面关键词，使用逗号分隔多个关键词，一个页面最多5个关键词" value="<%{$page.keywords}%>">
+                            <div class="col-sm-10">
+                                <input type="hidden" name="Page[tags]" id="tags" value="<%{:implode('|', $page.tags)}%>">
+                                <div id="tag_container">
+                                    <%{volist name="page.tags" id="tags"}%>
+                                        <span class="tag_item"><%{$tags}%> <i class="fa fa-trash"></i></span>
+                                    <%{/volist}%>
+                                </div>
+                                <button type="button" class="btn btn-default add-tag-btn"><i class="fa fa-plus"></i> 新增关键词</button>
                             </div>
                         </div>
                         <%{/if}%>
@@ -154,4 +160,5 @@
 </div>
 <script type="text/javascript">
     var config = <%{:json_encode($config)}%>;
+    var page = <%{:json_encode($page)}%>;
 </script>
