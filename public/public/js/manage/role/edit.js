@@ -66,13 +66,24 @@ $(function () {
             utils.toast('请选择角色菜单和数据权限范围');
             return false;
         }
+
+        // 选择的可操作字段
+        var columns = [];
+        var show_columns = $(".check_item_columns");
+        $.each(show_columns, function (i,n) {
+            if ($(n).prop("checked")) {
+                columns.push($(n).val());
+            }
+        });
+
         var post = {
-            'id' : $('#role_id').val(),
-            'name' : $('#name').val(),
-            'sort' : $('#sort').val(),
-            'remark' : $('#remark').val(),
-            'ids' : post_ids,
-            'permissions' : post_permissions
+            "id" : $("#role_id").val(),
+            "name" : $("#name").val(),
+            "sort" : $("#sort").val(),
+            "remark" : $("#remark").val(),
+            "ids" : post_ids,
+            "permissions" : post_permissions,
+            "show_columns":columns
         };
         $('.btn-submit').prop('disabled',true).text('提交中...');
         $.ajax({
@@ -112,12 +123,37 @@ $(function () {
                     zTree.checkNode(treeNode, !treeNode.checked, false);
                     // console.log(treeNode);
                     $('#radio_' + treeNode.id).prop('checked',true);
-                }else {
+                } else {
                     zTree.checkNode(treeNode, !treeNode.checked, true);
                 }
+
+                // 选择可操作字段显示隐藏
+                var change_nodes = zTree.getChangeCheckedNodes();
+                $.each(change_nodes, function (i,node) {
+                    if (node.is_column) {
+                        if (node.checked) {
+                            $("#show_columns" + node.id).show();
+                        } else {
+                            $("#show_columns" + node.id).hide();
+                        }
+                    }
+                });
+
             },
             onCheck:function (event, treeId, treeNode) {
-                //console.log(treeNode);
+
+                // 选择可操作字段显示隐藏
+                var change_nodes = zTree.getChangeCheckedNodes();
+                $.each(change_nodes, function (i,node) {
+                    if (node.is_column) {
+                        if (node.checked) {
+                            $("#show_columns" + node.id).show();
+                        } else {
+                            $("#show_columns" + node.id).hide();
+                        }
+                    }
+                });
+
             }
         }
     };
@@ -211,14 +247,12 @@ $(function () {
         var super_id   = '#radio_permissions_super_' + node_id;
         var leader_id  = '#radio_permissions_leader_' + node_id;
         var staff_id   = '#radio_permissions_staff_' + node_id;
-        //var guest_id   = 'radio_permissions_guest_' + node_id + '_v';
         var radio_name = 'radio_' + node_id;
         switch (up_permissions)
         {
             case 'super':
                 break;
             case 'leader':
-                console.log(super_id);
                 $(super_id).prop('disabled',true).parent('li').on('click',function () {
                     return false;
                 }).find('span').css({'cursor':'not-allowed','color':'#bbb'});
@@ -249,5 +283,77 @@ $(function () {
             $("input:radio[name='"+radio_name+"'][value='"+check_permissions+"']").prop('checked',true);
         }
     }
+
+    /**
+     * 渲染当前角色拥有的字段权限:将当前用户所具有的菜单的可操作字段数据渲染成html
+     */
+    function initColumns() {
+        var html = '';
+        $.each(columns, function (i,column) {
+            html += "<div class=\"col-md-12 show_columns\" id=\"show_columns"+column.menu_id+"\">" +
+                "   <h4><i class=\"fa fa-check-square-o\"></i> "+column.name+" <span>["+column.url+"下可操作字段]</span></h4>" +
+                "   <div class=\"col-sm-12\">" +
+                "       <div class=\"checkbox\">" +
+                "           <label class=\"control-label text-maroon\">"  +
+                "               <input type=\"checkbox\" class=\"check_all_columns\"> 全选" +
+                "           </label>" +
+                "       </div>" +
+                "   </div>";
+
+            $.each(column.columns,function (j,item) {
+
+                // 必须 + 已选中处理
+                if (item.default) {
+                    html += "<div class=\"columns_items\">" +
+                        "   <div class=\"col-xs-2\">" +
+                        "       <div class=\"checkbox\">" +
+                        "           <label class=\"control-label\">" +
+                        "               <input type=\"checkbox\" checked=\"checked\" disabled=\"disabled\" class=\"check_item_columns\"  value=\""+column.menu_id+"."+item.columns+"\"  id=\""+item.columns.replace(".", "_") + column.menu_id +"\"> " + item.name +
+                        "           </label>" +
+                        "       </div>" +
+                        "   </div>"+
+                        "</div>";
+                } else {
+                    html += "<div class=\"columns_items\">" +
+                        "   <div class=\"col-xs-2\">" +
+                        "       <div class=\"checkbox\">" +
+                        "           <label class=\"control-label\">" +
+                        "               <input type=\"checkbox\" class=\"check_item_columns\"  value=\""+column.menu_id+"."+item.columns+"\" id=\""+item.columns.replace(".", "_") + column.menu_id +"\"> " + item.name +
+                        "           </label>" +
+                        "       </div>" +
+                        "   </div>"+
+                        "</div>";
+                }
+
+            });
+
+            html += "</div>";
+        });
+        $(".column_box").append(html);
+
+        // 编辑模式下 待编辑数据已选中的字段显示 + 选中
+        $.each(role_menu, function (i,menu) {
+            if (menu.is_column) {
+                // 显示待选字段区域
+                $("#show_columns" + menu.id).show();
+
+                // 选中对应已选字段
+                var show_columns = menu.show_columns;
+                $.each(show_columns, function (j, item) {
+                    $("#" + item.columns.replace(".", "_") + menu.id).prop("checked", true);
+                });
+            }
+        });
+    }
+    initColumns();
+
+    // 全选/反选操作
+    $(".column_box").on("change", ".check_all_columns",function () {
+        if ( $(this).prop('checked')) {
+            $(this).parents(".show_columns").find("input").prop("checked",true);
+        } else {
+            $(this).parents(".show_columns").find("input").not(":disabled").prop("checked",false);
+        }
+    });
 
 });

@@ -31,17 +31,22 @@
     padding-left: 5px;
 }
 
-/*Columns*/
-.columns_wrap {
-    background:#c1e6fb;
+/*选择可操作字段*/
+.show_columns {
     display: none;
-    padding-bottom: 15px;
-    margin-bottom: 10px;
+    border-bottom: 1px solid #c2ddfb;
+    padding-bottom: 20px;
+    margin-bottom: 15px;
 }
-.column_box{
+.show_columns h4 {
+    font-size:16px;
+    color:#69680c;
+}
+.show_columns h4 span {
+    display: inline-block;
+    font-size:14px;
+    color:#555;
+}
+.column_box {
     background:#e4f0fd;
-}
-.column_menu_title {
-    font-size: 15px;
-    font-weight: 700;
 }
