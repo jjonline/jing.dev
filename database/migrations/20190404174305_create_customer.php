@@ -33,6 +33,12 @@ class CreateCustomer extends Migrator
                     'null'    => false,
                     'comment' => '唯一用户名',
                 ])
+                ->addColumn('figure_id', 'char', [
+                    'limit'   => 36,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '会员头像ID，大图600*600，小图裁剪即可',
+                ])
                 ->addColumn('customer_type', 'integer', [
                     'limit'   => MysqlAdapter::INT_TINY,
                     'default' => '0',

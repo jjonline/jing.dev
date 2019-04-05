@@ -10,7 +10,7 @@ namespace app\manage\controller;
 
 use app\common\controller\BaseController;
 use app\common\model\Role;
-use app\common\service\RoleService;
+use app\manage\service\RoleService;
 
 class RoleController extends BaseController
 {
@@ -72,7 +72,7 @@ class RoleController extends BaseController
         ];
         $this->assign($common);
 
-        $menu_list = $roleService->getRoleMenuTreeDataByRoleId();
+        $menu_list = $roleService->getRoleMenuTreeDataByUserId($this->UserInfo['id']);
         $this->assign('menu_list', $menu_list);
         return $this->fetch();
     }
@@ -105,26 +105,18 @@ class RoleController extends BaseController
         ];
         $this->assign($common);
 
-        // 角色数据
-        $RoleModel = new Role();
-        $Role      = $RoleModel->getRoleInfoById($this->request->get('id'));
-        if (empty($Role)) {
-            $this->redirect(url('role/list'));
-        }
-        // 检查编辑者的角色权限是否有权编辑该角色
-        $has_edit_auth = $roleService->checkRoleEditorAuth($Role['id'], $this->UserInfo['role_id']);
-        if (!$has_edit_auth) {
-            $this->error('您的权限级无法编辑该角色数据，请联系上级进行编辑');
-        }
-        // 当前账号具备的所有菜单权限
-        $menu_list = $roleService->getRoleMenuTreeDataByRoleId();
+        $role_id   = $this->request->get('id');
+
+        // 当前登录用户所具备的角色菜单权限--内部自动处理根用户权限情况
+        $menu_list = $roleService->getRoleMenuTreeDataByUserId($this->UserInfo['id']);
         $this->assign('menu_list', $menu_list);
 
-        // 待编辑的菜单权限列表
-        $role_menu     = $roleService->RoleMenu->getRoleMenuListByRoleId($Role['id']);
+        // 待编辑的菜单权限
+        $role_menu = $roleService->RoleMenu->getRoleMenuListByRoleId($role_id);
         $this->assign('role_menu', $role_menu);
 
-        $this->assign('role', $Role);
+        // 角色本身数据
+        $this->assign('role', $roleService->Role->getRoleInfoById($role_id));
         return $this->fetch();
     }
 
