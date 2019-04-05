@@ -75,6 +75,77 @@ class CreateCustomer extends Migrator
                     'null'    => false,
                     'comment' => '邮箱',
                 ])
+                ->addColumn('birthday', 'date', [
+                    // 'default' => null,
+                    'null'    => true,
+                    'comment' => '出生年月日，null表示未知',
+                ])
+                ->addColumn('age', 'integer', [
+                    'limit'   => MysqlAdapter::INT_TINY,
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => '年龄，0默认值表示未知',
+                ])
+                ->addColumn('card_id', 'string', [
+                    'limit'   => 32,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '身份证号',
+                ])
+                ->addColumn('motto', 'string', [
+                    'limit'   => 64,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '座右铭，一句话简介',
+                ])
+                ->addColumn('province', 'string', [
+                    'limit'   => 32,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '所属省份',
+                ])
+                ->addColumn('city', 'string', [
+                    'limit'   => 32,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '所属地区|市',
+                ])
+                ->addColumn('district', 'string', [
+                    'limit'   => 32,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '所属县级',
+                ])
+                ->addColumn('location', 'string', [
+                    'limit'   => 256,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '去除省市县之外的归属地址',
+                ])
+                ->addColumn('job_organization', 'string', [
+                    'limit'   => 128,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '工作单位',
+                ])
+                ->addColumn('job_number', 'string', [
+                    'limit'   => 32,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '工作联系电话',
+                ])
+                ->addColumn('job_location', 'string', [
+                    'limit'   => 256,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '完整的工作单位地址',
+                ])
+                ->addColumn('level', 'string', [
+                    'limit'   => 32,
+                    'default' => '',
+                    'null'    => false,
+                    'comment' => '等级积分计算出来的用户等级名称',
+                ])
                 ->addColumn('points_effect', 'integer', [
                     'limit'   => MysqlAdapter::INT_REGULAR,
                     'default' => '0',
