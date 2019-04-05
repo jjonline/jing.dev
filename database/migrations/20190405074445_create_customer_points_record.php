@@ -52,37 +52,37 @@ class CreateCustomerPointsRecord extends Migrator
                     'comment' => '积分变动简要说明',
                 ])
                 ->addColumn('points_effect_change', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY,
+                    'limit'   => MysqlAdapter::INT_REGULAR,
                     'default' => '0',
                     'null'    => false,
                     'comment' => '有效积分变动数量：正数增加积分 负数扣减积分',
                 ])
                 ->addColumn('points_freeze_change', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY,
+                    'limit'   => MysqlAdapter::INT_REGULAR,
                     'default' => '0',
                     'null'    => false,
                     'comment' => '有效积分变动数量：正数增加积分 负数扣减积分',
                 ])
                 ->addColumn('points_level_change', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY,
+                    'limit'   => MysqlAdapter::INT_REGULAR,
                     'default' => '0',
                     'null'    => false,
                     'comment' => '等级积分变动数量：正数增加等级积分 负数扣减等级积分',
                 ])
                 ->addColumn('points_effect_total', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY,
+                    'limit'   => MysqlAdapter::INT_REGULAR,
                     'default' => '0',
                     'null'    => false,
                     'comment' => '变动后等级积分总数',
                 ])
                 ->addColumn('points_freeze_total', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY,
+                    'limit'   => MysqlAdapter::INT_REGULAR,
                     'default' => '0',
                     'null'    => false,
                     'comment' => '变动后动机积分总数：只可能是大于0的整数，表示冻结数量',
                 ])
                 ->addColumn('points_level_total', 'integer', [
-                    'limit'   => MysqlAdapter::INT_TINY,
+                    'limit'   => MysqlAdapter::INT_REGULAR,
                     'default' => '0',
                     'null'    => false,
                     'comment' => '变动后等级积分总数',
