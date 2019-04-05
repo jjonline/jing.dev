@@ -71,6 +71,11 @@ class CreateSiteConfig extends Migrator
                     'null'    => true,
                     'comment' => 'select类型时的待选项，[{"name": "选项名称", "value": "选项值"}...]',
                 ])
+                ->addColumn('is_config_hide', 'boolean', [ // tinyint(1)类型
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => '统一的配置页面是否隐藏 1-隐藏则有单独的页面进行配置 0不隐藏则统一的配置页面进行配置',
+                ])
                 ->addColumn('sort', 'integer', [
                     'limit'   => MysqlAdapter::INT_BIG,
                     'default' => '0',
