@@ -31,6 +31,10 @@
                     灰色不可选菜单表示必选菜单并且无数据权限之分，系统默认选择；带*号二级菜单与该二级菜单下第一个三级菜单本质是一个菜单
                 </div>
                 <div id="menu_tree" class="ztree"></div>
+                <h4 class="box-title">3、选择角色菜单可操作字段</h4>
+                <div class="box-body column_box">
+                    <!--角色菜单勾选后该菜单继续选择可操作的字段容器-->
+                </div>
             </div>
             <div class="box-footer">
                 <div class="row">
@@ -45,4 +49,5 @@
 </form>
 <script>
 var menu = <%{:json_encode($menu_list)}%>;
+var columns = <%{:json_encode($show_columns)}%>;
 </script>

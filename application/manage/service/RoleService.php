@@ -69,6 +69,7 @@ class RoleService
      * 保存角色数据||编辑+新增
      * @param Request $request
      * @return array
+     * @throws Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
@@ -79,6 +80,7 @@ class RoleService
         if (empty($data['name'])) {
             return ['error_code' => 400,'error_msg' => '角色名称不得为空'];
         }
+        $user_id    = Session::get('user_info.id');
         // 是否编辑模式
         $is_edit    = $request->has('id', 'post');
         $exist_role = $this->Role->getRoleInfoByName($data['name']);
@@ -90,6 +92,12 @@ class RoleService
             }
             if ($repeat_role['name'] != trim($data['name']) && !empty($exist_role)) {
                 return ['error_code' => 400,'error_msg' => '角色名称已存在，角色名称不能重复'];
+            }
+
+            // 编辑模式检查是否有权限编辑该角色
+            $can_deal = $this->isRoleCanDealByUserId($repeat_role['id'], $user_id);
+            if (empty($can_deal)) {
+                return ['error_code' => 400,'error_msg' => '您无权限编辑该角色'];
             }
         } else {
             if (!empty($exist_role)) {
@@ -106,40 +114,66 @@ class RoleService
         if (count($permissions) != count($menu_ids)) {
             return ['error_code' => 400,'error_msg' => '菜单权限数据有误'];
         }
-        // 角色菜单及权限
+
+        // 字段控制，解析保存的角色的字段信息
+        $_show_columns = $request->post('show_columns/a');
+
+        // 构造提交过来的角色菜单及权限
         $role_menu = [];
         foreach ($menu_ids as $key => $menu_id) {
             $_role_menu                = [];
             $_role_menu['menu_id']     = $menu_id;
             $_role_menu['permissions'] = $permissions[$key];
-            $role_menu[]               = $_role_menu;
+
+            // 解析可能的待选字段
+            foreach ($_show_columns as $column) {
+                // $column格式 22.customer.real_name
+                $parse_result = explode('.', $column, 2);
+                if (count($parse_result) == 2 && is_numeric($parse_result[0])) {
+                    if ($parse_result[0] == $menu_id) {
+                        $_role_menu['show_columns'][] = $parse_result[1]; // customer.real_name
+                    }
+                }
+            }
+            $role_menu[] = $_role_menu;
         }
 
         /**
-         * 检查当前用户所具备的菜单权限级别是否超限
-         * ---
-         * 根用户不受限制
-         * ---
+         * 检查提交过来的角色菜单数据权限是否超限：解决人为构造角色菜单和角色菜单权限范围的情况
          */
-        $user_id = Session::get('user_info.id');
-        if (!$this->User->isRootUser($user_id)) {
-            $user_role_menu = $this->RoleMenu->getRoleMenuListByRoleId(Session::get('user_info.role_id'));
-            $checked_menu   = $role_menu;
-            foreach ($role_menu as $key => $value) {
-                foreach ($user_role_menu as $_key => $_value) {
-                    if ($value['menu_id'] == $_value['id']) {
-                        unset($checked_menu[$key]);
-                        $permissions = $this->comparePermissions($_value['permissions'], $value['permissions']);
-                        if (!$permissions) {
-                            return ['error_code' => 400, 'error_msg' => '菜单权限级别非法'];
+        $user_role_menu = $this->getRoleMenuListByUserId($user_id);
+        $checked_menu   = $role_menu;
+        foreach ($role_menu as $key => $value) {
+            foreach ($user_role_menu as $_key => $_value) {
+                if ($value['menu_id'] == $_value['id']) {
+                    unset($checked_menu[$key]);
+                    $permissions = $this->comparePermissions($_value['permissions'], $value['permissions']);
+                    if (!$permissions) {
+                        return ['error_code' => 400, 'error_msg' => '菜单权限级别非法'];
+                    }
+                }
+            }
+        }
+        // 如果被unset后列表不为空，则是构造添加了额外的没有权限的菜单的情况
+        if (!empty($checked_menu)) {
+            return ['error_code' => 400, 'error_msg' => '拟分配的菜单不存在或您没有分配该菜单的权限'];
+        }
+
+        // 处理待选字段
+        foreach ($role_menu as $key => $_menu) {
+            $deal_show_columns = [];
+            foreach ($user_role_menu as $menu) {
+                if (!empty($_menu['show_columns']) && $menu['id'] == $_menu['menu_id']) {
+                    foreach ($_menu['show_columns'] as $column) {
+                        foreach ($menu['show_columns'] as $column_arr) {
+                            if ($column_arr['columns'] == $column) {
+                                $deal_show_columns[] = $column_arr;
+                            }
                         }
                     }
                 }
             }
-            // 如果菜单列表不为空，则添加了额外的没有权限的菜单列表
-            if (!empty($checked_menu)) {
-                return ['error_code' => 400, 'error_msg' => '拟分配的菜单不存在或您没有分配该菜单的权限'];
-            }
+            $role_menu[$key]['show_columns'] = $deal_show_columns;
         }
 
         // 角色数据
@@ -206,17 +240,17 @@ class RoleService
     /**
      * 删除菜单
      * @param Request $request
+     * @param array $act_user_info 操作者用户信息
      * @return array
-     * @throws \think\Exception
+     * @throws Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
-     * @throws \think\exception\PDOException
      */
-    public function delete(Request $request)
+    public function delete(Request $request, $act_user_info)
     {
-        $id   = $request->post('id/i');
-        $role = $this->Role->getRoleInfoById($id);
+        $id        = $request->post('id/i');
+        $role      = $this->Role->getRoleInfoById($id);
         $role_menu = $this->RoleMenu->getRoleMenuListByRoleId($id);
         if ($id == 1) {
             return ['error_code' => 400,'error_msg' => '开发者角色不允许删除'];
@@ -224,6 +258,13 @@ class RoleService
         if (empty($role)) {
             return ['error_code' => 400,'error_msg' => '拟删除的角色数据不存在'];
         }
+
+        // 检查权限范围是否允许删除
+        $can_deal = $this->isRoleCanDealByUserId($id, $act_user_info['id']);
+        if (empty($can_deal)) {
+            return ['error_code' => 400,'error_msg' => '您无权限删除该角色'];
+        }
+
         // 检查有木有用户已使用该角色
         $role_user = $this->User->where('role_id', $id)->select();
         if (!$role_user->isEmpty()) {
@@ -347,37 +388,44 @@ class RoleService
     }
 
     /**
-     * 检查编辑角色的管理员的角色是否有权限编辑该角色数据
+     * 检查编辑角色的管理员的角色是否有权限编辑|处理该角色数据
      * ---
-     * 1、菜单列表包含关系
+     * 1、检查当前编辑人所属角色权限是否完整包含了被编辑角色的权限范围
      * 2、每一个菜单的权限级别也是包含关系
+     * 3、如果存在自定义字段，自定义字段也是当前编辑中所属角色的字段范围要包含被编辑角色字段范围
      * ---
-     * @param $edit_role_id
-     * @param $editor_role_id
+     * @param integer $edit_role_id 被编辑的角色ID
+     * @param integer $editor_id    当前编辑人用户ID
      * @return bool
+     * @throws Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function checkRoleEditorAuth($edit_role_id, $editor_role_id)
+    public function isRoleCanDealByUserId($edit_role_id, $editor_id)
     {
-        // 跟用户则拥有所有权限
-        $user_id = Session::get('user_info.id');
-        if ($this->User->isRootUser($user_id)) {
-            return true;
-        }
-        $edit_role_menu_list   = $this->RoleMenu->getRoleMenuListByRoleId($edit_role_id);
-        $editor_role_menu_list = $this->RoleMenu->getRoleMenuListByRoleId($editor_role_id);
-        // 循环对比和检查
+        $edit_role_menu_list   = $this->getRoleMenuListByRoleId($edit_role_id);
+        $editor_role_menu_list = $this->getRoleMenuListByUserId($editor_id);
+
+        // 清除法循环对比每一个菜单和菜单权限范围及字段范围
         $check_data = $edit_role_menu_list;
         foreach ($edit_role_menu_list as $key => $value) {
             foreach ($editor_role_menu_list as $_key => $_value) {
                 if ($value['id'] == $_value['id']) {
                     unset($check_data[$key]);
+
                     // 检查权限，不符直接返回false不再执行
                     $permissions = $this->comparePermissions($_value['permissions'], $value['permissions']);
                     if (!$permissions) {
                         return false;
+                    }
+
+                    // 检查有字段控制的菜单字段包含情况，不通过直接返回false不再执行
+                    if (!empty($_value['is_column'])) {
+                        $compare_column = $this->compareColumns($_value['show_columns'], $value['show_columns']);
+                        if (!$compare_column) {
+                            return false;
+                        }
                     }
                 }
             }
@@ -397,9 +445,10 @@ class RoleService
     private function dealRoleMenuListToZTree($menu)
     {
         // 处理成3级数据
-        $menu1 = [];
-        $menu2 = [];
-        $menu3 = [];
+        $menu1        = [];
+        $menu2        = [];
+        $menu3        = [];
+        $show_columns = [];// 需要收集用于角色编辑自定义可操作字段的数据
         foreach ($menu as $key => $value) {
             // 超级管理员补充菜单权限标记
             if (!isset($menu[$key]['permissions'])) {
@@ -415,6 +464,18 @@ class RoleService
                 $value['checked']     = true;
                 $value['chkDisabled'] = true;
             }
+
+            // 收集处理可操作字段的指定功能
+            if (!empty($value['is_column'])) {
+                $_menu            = [];
+                $_menu['columns'] = $value['show_columns'];
+                $_menu['remark']  = $value['remark'];
+                $_menu['url']     = $value['_url'];
+                $_menu['menu_id'] = $value['id']; // 菜单表的ID，role_menu表ID无意义
+                $_menu['name']    = $value['name']; // 菜单名称
+                $show_columns[]   = $_menu;
+            }
+
             // 仅处理三级菜单
             switch ($value['level']) {
                 case 1:
@@ -478,7 +539,7 @@ class RoleService
             $tree[$key1]             = $value1;
             $tree[$key1]['children'] = $_menu2;
         }
-        return $tree;
+        return [$tree, $show_columns];
     }
 
     /**
@@ -674,6 +735,44 @@ class RoleService
             return false;
         }
         return in_array($per2, $per[$per1]);
+    }
+
+    /**
+     * 字段范围检查比较
+     * @param array $columns1 预期大的字段数组
+     * @param array $columns2 预期小的字段数组
+     * @return bool
+     */
+    private function compareColumns($columns1, $columns2)
+    {
+        // 两者都为空 通过
+        if (empty($columns1) && empty($column2)) {
+            return true;
+        }
+        // 预期小的为空 通过
+        if (!empty($columns1) && empty($column2)) {
+            return true;
+        }
+        // 预期小的不为空 不通过
+        if (empty($columns1) && !empty($column2)) {
+            return false;
+        }
+
+        // 两者都不为空 逐一比较
+        $check_columns = $columns2;
+        foreach ($columns2 as $key2 => $column2) {
+            foreach ($columns1 as $key1 => $column1) {
+                if ($column1['name'] == $columns2['name']) {
+                    unset($check_columns[$key2]);
+                }
+            }
+        }
+
+        // 如果$check_columns被unset完了 说明$columns1是完整包含$columns2的
+        if (empty($check_columns)) {
+            return true;
+        }
+        return false;
     }
 
     /**

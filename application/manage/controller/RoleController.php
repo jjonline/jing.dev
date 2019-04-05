@@ -60,11 +60,11 @@ class RoleController extends BaseController
             return $roleService->save($this->request);
         }
         $common = [
-            'title'            => '人事设置 - ' . config('local.site_name'),
+            'title'            => '新增角色 - ' . config('local.site_name'),
             'content_title'    => '新增角色',
-            'content_subtitle' => '人事设置-新增角色',
+            'content_subtitle' => '新增角色后台管理角色',
             'breadcrumb'       => [
-                ['label' => '人事设置', 'url' => url('role/list')],
+                ['label' => '新增角色', 'url' => url('role/list')],
                 ['label' => '角色管理', 'url' => ''],
             ],
             'load_layout_css'  => true,
@@ -72,8 +72,9 @@ class RoleController extends BaseController
         ];
         $this->assign($common);
 
-        $menu_list = $roleService->getRoleMenuTreeDataByUserId($this->UserInfo['id']);
+        list($menu_list, $show_columns) = $roleService->getRoleMenuTreeDataByUserId($this->UserInfo['id']);
         $this->assign('menu_list', $menu_list);
+        $this->assign('show_columns', $show_columns);
         return $this->fetch();
     }
 
@@ -108,11 +109,12 @@ class RoleController extends BaseController
         $role_id   = $this->request->get('id');
 
         // 当前登录用户所具备的角色菜单权限--内部自动处理根用户权限情况
-        $menu_list = $roleService->getRoleMenuTreeDataByUserId($this->UserInfo['id']);
+        list($menu_list, $show_columns) = $roleService->getRoleMenuTreeDataByUserId($this->UserInfo['id']);
         $this->assign('menu_list', $menu_list);
+        $this->assign('show_columns', $show_columns);
 
         // 待编辑的菜单权限
-        $role_menu = $roleService->RoleMenu->getRoleMenuListByRoleId($role_id);
+        $role_menu = $roleService->getRoleMenuListByRoleId($role_id);
         $this->assign('role_menu', $role_menu);
 
         // 角色本身数据
@@ -131,7 +133,7 @@ class RoleController extends BaseController
     public function sortAction(RoleService $roleService)
     {
         if ($this->request->isPost() && $this->request->isAjax()) {
-            return $this->asJson($roleService->sort($this->request));
+            return $roleService->sort($this->request);
         }
         return $this->renderJson('error', 500);
     }
@@ -149,12 +151,7 @@ class RoleController extends BaseController
     public function deleteAction(RoleService $roleService)
     {
         if ($this->request->isPost() && $this->request->isAjax()) {
-            // 检查编辑者的角色权限是否有权编辑该角色
-            $has_edit_auth = $roleService->checkRoleEditorAuth($this->request->post('id'), $this->UserInfo['role_id']);
-            if (!$has_edit_auth) {
-                return $this->renderJson('您的权限级无法删除该角色，请联系上级删除', 400);
-            }
-            return $this->asJson($roleService->delete($this->request));
+            return $roleService->delete($this->request, $this->UserInfo);
         }
         return $this->renderJson('error', 500);
     }

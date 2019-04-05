@@ -169,7 +169,7 @@ class AuthService
             $auth_tag = $this->generateRequestMenuUrl($request);
         }
 
-        // 读取权限Map并判断
+        // 读取权限Map返回指定查找的权限数据情况
         $user_menu_map = $this->getRoleMenuMapByUserId($user_id);
         // ArrayHelper::group分组帮助函数生成的结构是键名构成的多维数组
         // 方法体前方进行权限判断，此处绝对存在下标为0的元素
@@ -223,7 +223,7 @@ class AuthService
             $user_menu_map2 = ArrayHelper::group($user_menu_map, 'tag');
             $user_menu_map  = array_merge($user_menu_map1, $user_menu_map2);
 
-            // 开发环境 按用户将map缓存
+            // 生产环境 按用户将map缓存
             if (!Config::get('app.app_debug')) {
                 Cache::tag(Role::ROLE_CACHE_TAG)->set($user_menu_cache_Map_key, $user_menu_map, 3600 * 12);
             }
