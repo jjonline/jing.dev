@@ -51,6 +51,21 @@ class SiteConfig extends Model
     }
 
     /**
+     * 读取统一配置界面里可设置配置的配置项
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getSiteConfigListNotHide()
+    {
+        $data = $this->where('is_config_hide', 0)
+            ->order(['flag' => 'ASC','sort'=>'ASC','create_time' => 'DESC'])
+            ->select();
+        return $data->isEmpty() ? [] : $data->toArray();
+    }
+
+    /**
      * 配置项查找配置配置记录
      * @param string $key
      * @return array
