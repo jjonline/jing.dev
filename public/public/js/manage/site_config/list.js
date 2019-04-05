@@ -61,6 +61,7 @@ $(function () {
         $('#sort').val(data.sort);
         $('#select_items').val(parseVal(data.select_items));
         $('#type').val(data.type).trigger('change');
+        $('#is_config_hide').prop("checked", !!data.is_config_hide).trigger('change');
 
         $('#SiteConfigModal').modal('show');
 

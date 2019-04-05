@@ -86,6 +86,7 @@ class SiteConfigService
             }
         }
         $site_config['sort'] = intval($site_config['sort']) ? intval($site_config['sort']) : 0;
+        $site_config['is_config_hide'] = empty($site_config['is_config_hide']) ? 0 : 1;
 
         // 清理配置缓存
         Cache::clear($this->SiteConfig->ConfigCacheTag);

@@ -37,7 +37,7 @@ class ConfigController extends BaseController
         $this->assign($common);
 
         // 仅能分配当前账号所下辖的部门
-        $lists = $siteConfigService->getSiteConfigList();
+        $lists = $siteConfigService->getSiteConfigListNotHide();
         $this->assign('lists', $lists);
 
         return $this->fetch();

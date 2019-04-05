@@ -23,9 +23,10 @@
                         <th data-priority="5">key</th>
                         <th data-priority="6">value</th>
                         <th data-priority="7">类型</th>
-                        <th data-priority="8">说明</th>
-                        <th data-priority="9">默认值</th>
+                        <th data-priority="9">说明</th>
+                        <th data-priority="10">默认值</th>
                         <th data-priority="4">排序</th>
+                        <th data-priority="8" class="text-center">单独配置页面</th>
                         <th data-priority="3" style="text-align: center;">操作</th>
                     </tr>
                     </thead>
@@ -44,6 +45,13 @@
                                 <div class="layui-input-inline">
                                     <input type="text" class="list-sort-input" data-id="<%{$item.id}%>" value="<%{$item.sort}%>">
                                 </div>
+                            </td>
+                            <td class="text-center">
+                                <%{if condition="empty($item.is_config_hide)"}%>
+                                    <label class="label bg-teal">否</label>
+                                <%{else/}%>
+                                    <label class="label bg-olive">是</label>
+                                <%{/if}%>
                             </td>
                             <td class="text-center">
                                 <a href="javascript:;" data-href="<%{:url('site_config/edit')}%>?id=<%{$item.id}%>" class="btn btn-xs btn-primary edit"><i class="fa fa-pencil-square-o"></i> 编辑</a>
@@ -124,6 +132,16 @@
                         <label class="col-sm-3 control-label">配置项说明 <span class="required">*</span></label>
                         <div class="col-sm-8">
                             <textarea id="description" rows=3 class="form-control" name="SiteConfig[description]" placeholder="配置项说明，对该配置项目的中文说明，譬如功能、配置注意事项等"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">单独配置页面 <span class="required">*</span></label>
+                        <div class="col-sm-8">
+                            <div class="js-switch-container">
+                                <input type="checkbox" id="is_config_hide" name="SiteConfig[is_config_hide]" title="是" data-on-text="是" data-off-text="否">
+                                <div class="js-switch-context">是否单独提供配置页面，统一配置页面不显示</div>
+                            </div>
                         </div>
                     </div>
 

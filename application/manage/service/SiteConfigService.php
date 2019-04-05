@@ -38,9 +38,9 @@ class SiteConfigService
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getSiteConfigList()
+    public function getSiteConfigListNotHide()
     {
-        $_result = $this->SiteConfig->getSiteConfigList();
+        $_result = $this->SiteConfig->getSiteConfigListNotHide();
         foreach ($_result as $key => $value) {
             $_result[$key]['value'] = $value['value'] ?: $value['default']; // 没有值的结果集将默认值赋值
             if ($value['type'] == 'select' && !empty($value['select_items'])) {
