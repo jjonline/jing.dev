@@ -24,9 +24,9 @@ class CreateLog extends Migrator
                 'comment'     => '用户操作动作的详细日志，默认每个请求都记录，可配置忽略',
             ]);
             $table->addColumn('id', 'char', [
-                'limit'   => 36,
-                'comment' => 'ID，UUID形式',
-            ])
+                    'limit'   => 36,
+                    'comment' => 'ID，UUID形式',
+                ])
                 ->addColumn('user_id', 'integer', [
                     'default' => '0',
                     'null'    => false,
