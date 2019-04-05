@@ -12,6 +12,22 @@ use think\Model;
 
 class Role extends Model
 {
+    /**
+     * @var string 用户级别的角色菜单权限缓存前缀
+     */
+    const USER_ROLE_CACHE_PREFIX = 'Role.User.Menu_';
+    /**
+     * @var string 角色的菜单tag和url作为键名的Map缓存欠嘴
+     */
+    const ROLE_CACHE_MAP_PREFIX = 'Role.Menu.Map_';
+    /**
+     * @var string 角色级别的角色菜单权限缓存前缀
+     */
+    const ROLE_CACHE_PREFIX = 'Role.Menu.Cache_';
+    /**
+     * @var string 角色菜单权限缓存标签tag
+     */
+    const ROLE_CACHE_TAG = 'RoleAuthTag';
 
     /**
      * 角色ID查找角色信息
