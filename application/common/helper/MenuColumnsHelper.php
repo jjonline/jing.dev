@@ -26,7 +26,7 @@ class MenuColumnsHelper
 
         foreach ($show_columns as $key => $column) {
             // 可排序
-            $sorted = $column['sorted'] ? ' data-orderable="true"' : '';
+            $sorted = $column['sorted'] ? ' data-orderable="true"' : ' data-orderable="false"';
             // 字段居中
             $align  = $column['align'] ? ' class="text-center"' : '';
             // table结构html表头
@@ -37,7 +37,7 @@ class MenuColumnsHelper
             $columns_alias = empty($_column[2]) ? $_column[1] : $_column[2]; // 有设置别名则使用别名，没有别名则就是字段名
 
             // js字段设置数组
-            $_js = [];
+            $_js         = [];
             $_js['data'] = $columns_alias;
             if ($column['align']) {
                 $_js['className'] = 'text-center';

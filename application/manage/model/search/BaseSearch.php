@@ -8,6 +8,7 @@
 
 namespace app\manage\model\search;
 
+use app\common\helper\MenuColumnsHelper;
 use app\common\model\Department;
 use app\common\model\Menu;
 use think\db\Query;
@@ -299,6 +300,52 @@ class BaseSearch
         $search_dept[] = $search_dept_id;
         // 去重+重排数字索引后按部门检索
         $query->where($dept_column, 'IN', array_merge(array_unique($search_dept)));
+    }
+
+    /**
+     * 设置自定义字段功能下的查询字段和排序条件
+     * ++++++++
+     * 1、自动处理查询字段[表名 + 字段名 + 别名自动处理]
+     * 2、自动处理可排序字段的情形
+     * ++++++++
+     * @param Query $query
+     * @param array $act_user_info
+     * @param bool $is_auto_order
+     */
+    protected function setCustomizeColumnsOptions(Query &$query, array $act_user_info, $is_auto_order = true)
+    {
+        list($columns, $sorted) = MenuColumnsHelper::toBackendStructure(
+            $act_user_info['menu_auth']['show_columns']
+        );
+        $query->column($columns);
+
+        // 自动设置排序表、字段条件
+        if (!empty($is_auto_order)) {
+            foreach ($this->order as $order) {
+                if (isset($this->columns[$order['column']]['data'])) {
+                    $columnName = $this->columns[$order['column']]['data'];
+                    if ($columnName == 'operate') {
+                        continue;
+                    }
+
+                    // 在指定的可排序字段范围内检查是否可排序
+                    $sorted_columns = '';
+                    foreach ($sorted as $columns) {
+                        if (false !== strpos($columns, '.'.$columnName)) {
+                            $sorted_columns = $columns;
+                        }
+                    }
+
+                    // 前端指定要排序的字段在后端自定义字段排序属性中未找到
+                    if (empty($sorted_columns)) {
+                        continue;
+                    }
+
+                    $sort = $order['dir'] == 'desc' ? 'DESC' : 'ASC';
+                    $query->order($sorted_columns, $sort);
+                }
+            }
+        }
     }
 
     /**
