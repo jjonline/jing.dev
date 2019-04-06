@@ -8,6 +8,7 @@
 namespace app\manage\controller;
 
 use app\common\controller\BaseController;
+use app\common\helper\MenuColumnsHelper;
 use app\manage\service\CustomerService;
 use app\manage\model\search\CustomerSearch;
 
@@ -36,6 +37,11 @@ class CustomerController extends BaseController
             'load_layout_js'   => true,
         ];
         $this->assign($common);
+
+        // 自定义字段
+        list($html, $js) = MenuColumnsHelper::toFrontendStructure($this->UserInfo['menu_auth']['show_columns']);
+        $this->assign('html', $html);
+        $this->assign('js', $js);
 
         return $this->fetch();
     }

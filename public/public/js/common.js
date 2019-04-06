@@ -620,6 +620,28 @@ $(function () {
     };
 
     /**
+     * 构造可选自选js的dataTable字段选项
+     * @param $columns_array
+     * @returns {*}
+     */
+    utils.setColumns = function ($columns_array) {
+        // 数组头加入checkbox字段
+        var head = {
+            data: function (row,type) {
+                if(type === "display") {
+                    return "<input type=\"checkbox\" id=\""+row.id+"\" class=\"check_item\" value=\""+row.id+"\">";
+                }
+                return "";
+            }
+        };
+        var end = {data:"operate",className:"text-center"};
+        // 数组尾加入operate操作字段
+        $columns_array.unshift(head);
+        $columns_array.push(end);
+        return $columns_array;
+    };
+
+    /**
      * 初始化badge
      */
     function initBadge() {

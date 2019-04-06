@@ -5,6 +5,20 @@ $(function () {
     var searchBeginDate = $("#search_begin_date"); // 时间范围检索开始
     var searchEndDate   = $("#search_end_date");// 时间范围检索结束
 
+    // 检索
+    var adv_enable = $("#adv_enable");
+    var adv_gender = $("#dept_id");
+    var points_effect_begin = $("#points_effect_begin");
+    var points_effect_end = $("#points_effect_end");
+    var points_freeze_begin = $("#points_freeze_begin");
+    var points_freeze_end = $("#points_freeze_end");
+    var points_level_begin = $("#points_level_begin");
+    var points_level_end = $("#points_level_end");
+    var select_province = $("#select_province");
+    var select_city = $("#select_city");
+    var select_district = $("#select_district");
+    var birthday_begin = $("#birthday_begin");
+    var birthday_end = $("#birthday_end");
 
     /**
      * 文本检索和cookie记录检索值
@@ -22,10 +36,15 @@ $(function () {
             refreshTable();
         }, 600);
     });
+
+    // 高级检索省市县
+    $('#select_distpicker').distpicker();
+
     /**
      * 绑定DateTimePicker时间筛选组件动作
      */
     utils.bindDateTimePicker($(".search_date"));
+
     /**
      * 清理检索的开始时间
      */
@@ -74,8 +93,19 @@ $(function () {
     $("#exec_reset").click(function () {
         searchBeginDate.val("");
         searchEndDate.val("");
-
-        // todo 清除高级查询modal上的输入框值等内容，一般先在顶部定义各个输入框的对象，此处直接用
+        adv_enable.val("").trigger("change");
+        adv_gender.val("").trigger("change");
+        points_effect_begin.val("");
+        points_effect_end.val("");
+        points_freeze_begin.val("");
+        points_freeze_end.val("");
+        points_level_begin.val("");
+        points_level_end.val("");
+        select_province.val("");
+        select_city.val("");
+        select_district.val("");
+        birthday_begin.val("");
+        birthday_end.val("");
 
         refreshTable();
         return false;
@@ -331,7 +361,22 @@ $(function () {
                  */
                 data: function (data) {
                     return $.extend({}, data, {
-                        // todo 额外塞入请求体的数据获取方法
+                        keyword:txtSearch.val(),
+                        begin_date:searchBeginDate.val(),
+                        end_date:searchEndDate.val(),
+                        adv_enable:adv_enable.val(),
+                        adv_gender:adv_gender.val(),
+                        points_effect_begin:points_effect_begin.val(),
+                        points_effect_end:points_effect_end.val(),
+                        points_freeze_begin:points_freeze_begin.val(),
+                        points_freeze_end:points_freeze_end.val(),
+                        points_level_begin:points_level_begin.val(),
+                        points_level_end:points_level_end.val(),
+                        select_province:select_province.val(),
+                        select_city:select_city.val(),
+                        select_district:select_district.val(),
+                        birthday_begin:birthday_begin.val(),
+                        birthday_end:birthday_end.val()
                     });
                 },
                 /**
@@ -348,9 +393,6 @@ $(function () {
                             json.data[n].DT_RowClass = "DT_class" + json.data[n].id;
                             json.data[n].DT_RowId    = "DT_" + json.data[n].id;
                             json.data[n].DT_RowAttr  = {"data-id":json.data[n].id,"data-json":JSON.stringify(json.data[n])};
-
-                            // todo 若需添加额外的filter方法，在此添加
-
                         }
                         return JSON.stringify(json);
                     } catch (e) {
@@ -391,32 +433,7 @@ $(function () {
              * +++++++++++++++++++++++++++++++++++++++++++
              * +++++++++++++++++++++++++++++++++++++++++++
              */
-            columns: [
-                {
-                    data: function (row,type) {
-                        if(type === "display") {
-                            return "<input type=\"checkbox\" id=\""+row.id+"\" class=\"check_item\" value=\""+row.id+"\">";
-                        }
-                        return "";
-                    }
-                },
-                {data:"id"},
-                {data:"title"},
-                {data:"article_cat_name",className:"text-center"},
-                {data:"article_author_name",className:"text-center"},
-                {data:"content_type",className:"text-center"},
-                {data:"sort",className:"text-center"},
-                {data:"awesome",className:"text-center"},
-                {data:"click",className:"text-center"},
-                {data:"is_home",className:"text-center"},
-                {data:"is_top",className:"text-center"},
-                {data:"allow_comment",className:"text-center"},
-                {data:"display_time",className:"text-center"},
-                {data:"create_time",className:"text-center"},
-                {data:"update_time",className:"text-center"},
-                {data:"enable",className:"text-center"},
-                {data:"operate",className:"text-center"}
-            ],
+            columns: utils.setColumns(js_columns),
             /**
              * 定义dataTable的一些语言，基本无需改动
              */
