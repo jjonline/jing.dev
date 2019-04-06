@@ -46,10 +46,6 @@ class RoleService
      * @var LogService
      */
     public $LogService;
-    /**
-     * @var string 菜单、权限的缓存tag
-     */
-    public $cache_tag = 'auth';
 
     public function __construct(
         Role $role,
@@ -162,12 +158,15 @@ class RoleService
         // 处理待选字段
         foreach ($role_menu as $key => $_menu) {
             $deal_show_columns = [];
-            foreach ($user_role_menu as $menu) {
-                if (!empty($_menu['show_columns']) && $menu['id'] == $_menu['menu_id']) {
-                    foreach ($_menu['show_columns'] as $column) {
-                        foreach ($menu['show_columns'] as $column_arr) {
-                            if ($column_arr['columns'] == $column) {
-                                $deal_show_columns[] = $column_arr;
+            // 有指定字段，将字段名称替换为对应数组元素
+            if (!empty($_menu['show_columns'])) {
+                foreach ($user_role_menu as $menu) {
+                    if ($menu['id'] == $_menu['menu_id']) {
+                        foreach ($_menu['show_columns'] as $column) {
+                            foreach ($menu['show_columns'] as $column_arr) {
+                                if ($column_arr['columns'] == $column) {
+                                    $deal_show_columns[] = $column_arr;
+                                }
                             }
                         }
                     }
@@ -181,6 +180,7 @@ class RoleService
         $role['name']   = trim($data['name']);
         $role['sort']   = intval($data['sort']) >= 0 ? intval($data['sort']) : 0;
         $role['remark'] = !empty($data['remark']) ? trim($data['remark']) : '';
+
         // 事务开始写入角色数据
         Db::startTrans();
         try {
@@ -199,8 +199,8 @@ class RoleService
             }
             Db::name('role_menu')->insertAll($role_menu);
             $this->LogService->logRecorder([$role,$role_menu], $is_edit ? '编辑角色' : '新增角色');
-            // 编辑角色之后清空缓存
-            Cache::clear($this->cache_tag);
+            // 编辑角色之后按tag清空所有角色缓存数据
+            Cache::clear(Role::ROLE_CACHE_TAG);
             Db::commit();
             return ['error_code' => 0,'error_msg' => '保存成功'];
         } catch (\Throwable $e) {
@@ -231,7 +231,7 @@ class RoleService
         }
         $ret = $this->Role->isUpdate(true)->save(['sort' => intval($sort)], ['id' => $id]);
         // 编辑角色之后清空缓存
-        Cache::clear($this->cache_tag);
+        // Cache::clear(Role::ROLE_CACHE_TAG); // 修改排序并不影响角色菜单数据，不予清理缓存
         return $ret >= 0 ?
             ['error_code' => 0,'error_msg' => '排序调整成功'] :
             ['error_code' => 500,'error_msg' => '排序调整失败：系统异常'];
@@ -278,7 +278,7 @@ class RoleService
             // 日志方式备份保存原始菜单信息
             $this->LogService->logRecorder(array_merge($role, $role_menu));
             // 编辑角色之后清空缓存
-            Cache::clear($this->cache_tag);
+            Cache::clear(Role::ROLE_CACHE_TAG);
             Db::commit();
             return ['error_code' => 0,'error_msg' => '角色删除成功'];
         } catch (\Throwable $e) {
@@ -343,7 +343,7 @@ class RoleService
 
         // 依据是否开发模式将结果集缓存
         if (!Config::get('app.app_debug')) {
-            Cache::tag($this->cache_tag)->set($role_cache_key, $role_menu, 3600 * 12);//缓存12小时
+            Cache::tag(Role::ROLE_CACHE_TAG)->set($role_cache_key, $role_menu, 3600 * 720);
         }
 
         return $role_menu;
@@ -381,7 +381,7 @@ class RoleService
 
         // 依据是否开发模式将结果集缓存
         if (!Config::get('app.app_debug')) {
-            Cache::tag($this->cache_tag)->set($user_menu_cache_key, $user_menu, 3600 * 12);//缓存12小时
+            Cache::tag(Role::ROLE_CACHE_TAG)->set($user_menu_cache_key, $user_menu, 3600 * 720);
         }
 
         return $user_menu;

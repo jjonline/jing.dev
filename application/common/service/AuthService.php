@@ -21,7 +21,6 @@ use think\facade\Cache;
 use think\facade\Config;
 use think\facade\Session;
 use think\facade\Url;
-use think\Request;
 
 class AuthService
 {
@@ -29,10 +28,6 @@ class AuthService
      * @var DepartmentService
      */
     public $RoleService;
-    /**
-     * @var [] 高亮使用的key-value数组
-     */
-    protected $MenuMap = [];
 
     public function __construct(RoleService $roleService)
     {
@@ -55,12 +50,12 @@ class AuthService
         $menu1   = [];
         $menu2   = [];
         $menu3   = [];
+
         // 导航栏高亮、一级导航默认展开标记处理
         $highLight = [];//当前高亮的层级
-        $request   = request();
-        $now_url   = $this->generateRequestMenuUrl($request);
+        $now_url   = $this->generateRequestMenuUrl();
         foreach ($data as $key => $value) {
-            $value['active']    = false;//高亮
+            $value['active']     = false;//高亮
             if ($value['url'] == $now_url) {
                 $value['active'] = true;
                 $highLight       = $value;//当前高亮的菜单
@@ -68,6 +63,22 @@ class AuthService
             if ($value['level'] == 1) {
                 $value['menu_open'] = false;//仅一级导航栏需要标记是否展开，默认不展开后方设置高亮再处理
             }
+
+            // 减少数据量
+            unset(
+                $value['is_required'],
+                $value['is_system'],
+                $value['is_permissions'],
+                $value['is_column'],
+                $value['sort'],
+                $value['remark'],
+                $value['permissions'],
+                $value['create_time'],
+                $value['update_time'],
+                $value['show_columns'],
+                $value['all_columns']
+            );
+
             // 仅处理三级菜单
             switch ($value['level']) {
                 case 1:
@@ -80,10 +91,8 @@ class AuthService
                     $menu3[] = $value;
                     break;
             }
-            if (empty($value['url'])) {
-                $this->MenuMap[$value['url']] = $value;//以url为键名的数组
-            }
         }
+
         // 按层级处理菜单数组--仅到3级
         foreach ($menu1 as $key1 => $value1) {
             // 二级菜单
@@ -106,10 +115,8 @@ class AuthService
             $menu[$key1]['children'] = $_menu2;
         }
 
-        // 设置高亮
-        $menu = $this->setHighLight($menu, $highLight);
-
-        return $menu;
+        // 设置高亮返回
+        return $this->setHighLight($menu, $highLight);
     }
 
     /**
@@ -129,8 +136,7 @@ class AuthService
         try {
             // 如果未传参则拼接当前url
             if (empty($auth_tag)) {
-                $request  = request();
-                $auth_tag = $this->generateRequestMenuUrl($request);
+                $auth_tag = $this->generateRequestMenuUrl();
             }
 
             // 缓存数据的Key
@@ -165,8 +171,7 @@ class AuthService
 
         // 没有显式给要检查的tag或url时自动生成当前页面的tag
         if (empty($auth_tag)) {
-            $request = request();
-            $auth_tag = $this->generateRequestMenuUrl($request);
+            $auth_tag = $this->generateRequestMenuUrl();
         }
 
         // 读取权限Map返回指定查找的权限数据情况
@@ -210,23 +215,27 @@ class AuthService
         // 生产环境优先从缓存中读取
         if (!Config::get('app.app_debug')) {
             $user_menu_map = Cache::get($user_menu_cache_Map_key);
-        } else {
-            $user_menu_map = $this->RoleService->getRoleMenuListByUserId($user_id);
-
-            // 该用户没有任何菜单权限 返回空数组
-            if (empty($user_menu_map)) {
-                return [];
+            if (!empty($user_menu_map)) {
+                return $user_menu_map;
             }
+        }
 
-            // 按url和tag分组，url和tag成为数组的键名
-            $user_menu_map1 = ArrayHelper::group($user_menu_map, 'url');
-            $user_menu_map2 = ArrayHelper::group($user_menu_map, 'tag');
-            $user_menu_map  = array_merge($user_menu_map1, $user_menu_map2);
+        // 缓存不存在或非生产
+        $user_menu_map = $this->RoleService->getRoleMenuListByUserId($user_id);
 
-            // 生产环境 按用户将map缓存
-            if (!Config::get('app.app_debug')) {
-                Cache::tag(Role::ROLE_CACHE_TAG)->set($user_menu_cache_Map_key, $user_menu_map, 3600 * 12);
-            }
+        // 该用户没有任何菜单权限 返回空数组
+        if (empty($user_menu_map)) {
+            return [];
+        }
+
+        // 按url和tag分组，url和tag成为数组的键名
+        $user_menu_map1 = ArrayHelper::group($user_menu_map, 'url');
+        $user_menu_map2 = ArrayHelper::group($user_menu_map, 'tag');
+        $user_menu_map  = array_merge($user_menu_map1, $user_menu_map2);
+
+        // 生产环境 按用户将map缓存
+        if (!Config::get('app.app_debug')) {
+            Cache::tag(Role::ROLE_CACHE_TAG)->set($user_menu_cache_Map_key, $user_menu_map, 3600 * 720);
         }
 
         return $user_menu_map;
@@ -292,11 +301,11 @@ class AuthService
 
     /**
      * 依据当前模块、控制器、操作生成与菜单权限对应的无斜杠前缀、无文件后缀的Url组成部分
-     * @param Request $request
      * @return string
      */
-    private function generateRequestMenuUrl(Request $request)
+    private function generateRequestMenuUrl()
     {
+        $request   = request();
         $component = $request->module().'/'.$request->controller().'/'.$request->action();
         return trim(Url::build($component, '', ''), '/');
     }
