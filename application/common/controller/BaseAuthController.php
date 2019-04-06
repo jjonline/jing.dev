@@ -84,11 +84,8 @@ class BaseAuthController extends BasicController
                 $this->UserInfo['dept_id']
             );
 
-            // 获取管理菜单
-            $UserAuthMenu                = $this->AuthService->getUserAuthMenu();
-            // dump($UserAuthMenu);
-            // 输出管理菜单
-            $this->assign('UserAuthMenu', $UserAuthMenu);
+            // 获取并输出管理菜单
+            $this->assign('UserAuthMenu', $this->AuthService->getUserAuthMenu());
         } catch (\Throwable $e) {
             /**
              * 未登录ajax则ajax返回-1，其他则redirect跳转
