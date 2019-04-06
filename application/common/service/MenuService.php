@@ -308,6 +308,9 @@ class MenuService
                         if ($key == 'create_time' || $key == 'update_time') {
                             $seeds .= "        '" . $key . "'" . ' => $date_time,';
                         } else {
+                            if (is_array($val)) {
+                                $val = json_encode($val, JSON_UNESCAPED_UNICODE);
+                            }
                             $seeds .= "        '" . $key . "' => '" . $val . "',";
                         }
                     }
