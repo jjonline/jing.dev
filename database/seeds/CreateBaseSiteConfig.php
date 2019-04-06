@@ -9,11 +9,6 @@ use app\common\helper\GenerateHelper;
 class CreateBaseSiteConfig extends Seeder
 {
     /**
-     * 创建超级管理员1号用户
-     * ----
-     * 1、表不存在报错
-     * 2、id为1的记录存在报错
-     * ----
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
@@ -23,7 +18,7 @@ class CreateBaseSiteConfig extends Seeder
     {
         // 检查存在表
         if ($this->hasTable('site_config')) {
-            // 检查不存在id为1的记录
+            // 检查是否空表
             $hasSiteConfig = \think\Db::name('site_config')->count();
             if (empty($hasSiteConfig)) {
                 $data = [
