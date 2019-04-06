@@ -43,24 +43,33 @@ $(function () {
             '                       <input type="text" class="form-control columns" name="Columns[columns][]" placeholder="order.order_sn">' +
             '                   </div>' +
             '           </div>' +
-            '           <div class="col-xs-4">' +
+            '           <div class="col-xs-3">' +
             '               <div class="input-group">' +
             '                   <div class="input-group-addon">名称</div>' +
             '                       <input type="text" class="form-control name" name="Columns[name][]" placeholder="字段名称">' +
             '               </div>' +
             '           </div>' +
-            '           <div class="col-xs-2">' +
-            '               <div class="checkbox">' +
-            '                   <label>' +
-            '                       <input type="checkbox" class="sorted" name="Columns[sorted][]"> 可排序' +
-            '                   </label>' +
+            '           <div class="col-xs-5">' +
+            '               <div class="col-sm-4">' +
+            '                   <div class="checkbox">' +
+            '                       <label>' +
+            '                           <input type="checkbox" class="align" name="Columns[align][]"> 居中' +
+            '                       </label>' +
+            '                   </div>' +
             '               </div>' +
-            '           </div>' +
-            '           <div class="col-xs-2">' +
-            '               <div class="checkbox">' +
-            '                   <label>' +
-            '                       <input type="checkbox" class="default" name="Columns[default][]"> 必选' +
-            '                   </label>' +
+            '               <div class="col-sm-4">' +
+            '                   <div class="checkbox">' +
+            '                       <label>' +
+            '                           <input type="checkbox" class="sorted" name="Columns[sorted][]"> 可排序' +
+            '                       </label>' +
+            '                   </div>' +
+            '               </div>' +
+            '               <div class="col-sm-4">' +
+            '                   <div class="checkbox">' +
+            '                       <label>' +
+            '                           <input type="checkbox" class="default" name="Columns[default][]"> 必选' +
+            '                       </label>' +
+            '                   </div>' +
             '               </div>' +
             '           </div>' +
             '</li>';
@@ -163,11 +172,30 @@ $(function () {
                 }).get()
         );
 
+        // 修改居中checkbox
+        var fix_data2 = fix_data1.concat();
+        // 将checkbox值重设成选中true不选false
+        var index2 = 0;
+        $.each(fix_data1,function (i,n) {
+            // 清理掉可排序已选数组元素
+            if (n.name == 'Columns[align][]') {
+                fix_data2.remove(i - index2);
+                index2 ++;
+            }
+        });
+        // 添加自定义按顺序的可排序checkbox数组元素
+        fix_data2 = fix_data2.concat(
+            $(".align").map(
+                function() {
+                    return {"name": this.name, "value": $(this).prop('checked') ? 1 : 0}
+                }).get()
+        );
+
         $('.btn-submit').prop('disabled',true).text('提交中...');
         $.ajax({
             url: $('#menuAdd').attr('action'),
             type: 'POST',
-            data: fix_data1,
+            data: fix_data2,
             success: function (data) {
                 if(data.error_code == 0){
                     utils.alert(data.error_msg,function () {

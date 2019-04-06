@@ -9,6 +9,7 @@
 namespace app\common\service;
 
 use app\common\model\Menu;
+use app\common\model\Role;
 use think\Db;
 use think\facade\Cache;
 use think\Request;
@@ -23,10 +24,6 @@ class MenuService
      * @var LogService
      */
     public $LogService;
-    /**
-     * @var string 菜单、权限的缓存tag
-     */
-    public $cache_tag = 'auth';
 
     public function __construct(Menu $Menu, LogService $logService)
     {
@@ -109,6 +106,8 @@ class MenuService
             $Columns           = $request->post('Columns/a');
             if (empty($Columns)
                 || empty($Columns['columns'])
+                || empty($Columns['align'])
+                || empty($Columns['default'])
                 || empty($Columns['name'])
                 || empty($Columns['sorted'])) {
                 return ['error_code' => 400, 'error_msg' => '待选字段列表不完善'];
@@ -117,19 +116,27 @@ class MenuService
             $name    = array_filter($Columns['name']);
             $sorted  = $Columns['sorted']; // 可排序
             $default = $Columns['default']; // 必选
+            $align   = $Columns['align']; // 居中
             if (count($sorted) != count($name)
                 || count($sorted) != count($columns)
                 || count($sorted) != count($default)
+                || count($sorted) != count($align)
             ) {
                 return ['error_code' => 400, 'error_msg' => '待选字段的信息不完整或存在重复字段'];
             }
             // 处理成json
             $columns_list = [];
             foreach ($sorted as $key => $value) {
+                // 强效验字段构成
+                $explode_col = explode('.', $columns[$key]);
+                if (!(count($explode_col) == 2 || count($explode_col) == 3)) {
+                    return ['error_code' => 400, 'error_msg' => '待选字段列表`字段`('.$columns[$key].')格式有误'];
+                }
                 $item            = [];
                 $item['columns'] = $columns[$key];
                 $item['name']    = $name[$key];
                 $item['sorted']  = empty($value) ? 0 : 1;
+                $item['align']   = empty($align[$key]) ? 0 : 1;
                 $item['default'] = empty($default[$key]) ? 0 : 1;
                 $columns_list[]  = $item;
             }
@@ -172,7 +179,7 @@ class MenuService
             $this->LogService->logRecorder($Menu, '新增菜单');
         }
         // 编辑菜单之后清空缓存
-        Cache::clear($this->cache_tag);
+        Cache::clear(Role::ROLE_CACHE_TAG); // 角色里使用了菜单缓存，菜单变化按角色中设置的tag清理
         return $ret !== false ?
             ['error_code' => 0, 'error_msg' => '保存菜单成功'] :
             ['error_code' => 500, 'error_msg' => '菜单保存失败：系统异常'];
@@ -199,7 +206,7 @@ class MenuService
         }
         $ret = $this->Menu->isUpdate(true)->save(['sort' => intval($sort)], ['id' => $id]);
         // 编辑菜单之后清空缓存
-        Cache::clear($this->cache_tag);
+        Cache::clear(Role::ROLE_CACHE_TAG); // 角色里使用了菜单缓存，菜单变化按角色中设置的tag清理
         return $ret >= 0 ?
             ['error_code' => 0, 'error_msg' => '排序调整成功'] :
             ['error_code' => 500, 'error_msg' => '排序调整失败：系统异常'];
@@ -359,7 +366,7 @@ class MenuService
         }
         $ret = $this->Menu->db()->where('id', $id)->delete();
         // 编辑菜单之后清空缓存
-        Cache::clear($this->cache_tag);
+        Cache::clear(Role::ROLE_CACHE_TAG); // 角色里使用了菜单缓存，菜单变化按角色中设置的tag清理
         // 日志方式备份保存原始菜单信息
         $this->LogService->logRecorder($menu);
         return $ret >= 0 ?
