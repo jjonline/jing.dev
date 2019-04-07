@@ -1,0 +1,105 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-danger">
+            <div class="box-header with-border">
+                <h4 class="box-title">会员等级配置</h4>
+            </div>
+            <form action="<%{:url('article/create')}%>" class="form-horizontal" id="ConfigForm">
+                <div class="box-body">
+                    <div class="col-sm-offset-2 col-sm-8">
+                        <div class="col-xs-12">
+                            <div class="col-xs-offset-1 col-xs-10">
+                                <div class="level_des">
+                                    <h3>填写说明：</h3>
+                                    <ul>
+                                        <li>1、等级从上至下逐级递增；</li>
+                                        <li>2、上一个等级的结束值必须是下一个等级的开始值；</li>
+                                        <li>3、`等级名称`项目填写设定的等级的名称，前台显示；</li>
+                                        <li>4、`等级积分开始值`项目填写该`等级名称`至少需要的等级积分数；</li>
+                                        <li>5、`等级积分结束值`项目填写该`等级名称`最大需要的等级积分数；</li>
+                                        <li>6、可以设置多个等级，最后一个等级的结束值最好设置一个较大值；</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="level">
+                            <%{if condition="empty($level)"}%>
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-trophy"></i>
+                                            </div>
+                                            <input type="text" class="form-control" placeholder="等级名称" name="Config[name][]" data-toggle="tooltip" title="设置该级别的等级名称">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-cny"></i>
+                                            </div>
+                                            <input type="number" class="form-control" placeholder="等级积分开始值" name="Config[begin][]" data-toggle="tooltip" title="该等级所需积分开始值[含]">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-cny"></i>
+                                            </div>
+                                            <input type="number" class="form-control" placeholder="等级积分结束值" name="Config[end][]" data-toggle="tooltip" title="该等级所需积分结束值[不含]">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <%{else/}%>
+                                <%{volist name="level" id="_level"}%>
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <div class="col-sm-4">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-trophy"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control" placeholder="等级名称" name="Config[name][]" data-toggle="tooltip" title="设置该级别的等级名称" value="<%{$_level.name}%>">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-cny"></i>
+                                                    </div>
+                                                    <input type="number" class="form-control" placeholder="等级积分开始值" name="Config[begin][]" data-toggle="tooltip" title="该等级所需积分开始值[含]"  value="<%{$_level.begin}%>">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-cny"></i>
+                                                    </div>
+                                                    <input type="number" class="form-control" placeholder="等级积分结束值" name="Config[end][]" data-toggle="tooltip" title="该等级所需积分结束值[不含]"  value="<%{$_level.end}%>">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <%{/volist}%>
+                            <%{/if}%>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="col-xs-offset-3 col-xs-6">
+                                <button type="button" class="btn btn-block btn-default" id="insert_level">
+                                    <i class="fa fa-plus"></i> 点此新增1个等级
+                                </button>
+                            </div>
+                        </div>
+                </div>
+                </div>
+                <div class="box-footer">
+                    <div class="row">
+                        <div class="col-sm-12 text-center"><button type="submit" class="btn btn-success btn-submit">提交保存</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

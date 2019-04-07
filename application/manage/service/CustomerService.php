@@ -8,6 +8,8 @@
 
 namespace app\manage\service;
 
+use app\common\helper\ArrayHelper;
+use app\common\model\SiteConfig;
 use app\manage\model\Customer;
 use app\common\service\LogService;
 use think\Exception;
@@ -20,13 +22,18 @@ class CustomerService
      */
     public $Customer;
     /**
+     * @var SiteConfig
+     */
+    public $SiteConfig;
+    /**
      * @var LogService
      */
     public $LogService;
 
-    public function __construct(Customer $customer, LogService $logService)
+    public function __construct(Customer $customer, SiteConfig $siteConfig, LogService $logService)
     {
-        $this->Customer = $customer;
+        $this->Customer   = $customer;
+        $this->SiteConfig = $siteConfig;
         $this->LogService = $logService;
     }
 
@@ -101,31 +108,87 @@ class CustomerService
     }
 
     /**
-     * 删除网站会员
+     * 获取前台会员配置
+     * @return array
+     */
+    public function getCustomerLevelConfig()
+    {
+        try {
+            // seed已填充该键名的记录，此处不再累赘检查是否存在该键名的记录
+            $config = $this->SiteConfig->getSiteConfigByKey(SiteConfig::CUSTOMER_LEVEL_CONFIG);
+            if (empty($config['value'])) {
+                return [];
+            }
+            return json_decode($config['value'], true); // 转换为数组返回
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * 保存等级设置
      * @param Request $request
      * @return array
      */
-    public function delete(Request $request)
+    public function configSave(Request $request)
     {
         try {
-            $id = $request->post('id/i');
-            $customer = $this->Customer->getDataById($id);
-            if (empty($customer)) {
-                throw new Exception('拟删除的网站会员数据不存在');
+            $siteConfig = $this->SiteConfig->getSiteConfigByKey(SiteConfig::CUSTOMER_LEVEL_CONFIG);
+            if (empty($siteConfig)) {
+                throw new Exception('站点配项未设置会员等级配置项目：'.SiteConfig::CUSTOMER_LEVEL_CONFIG);
             }
 
-            // todo 删除的其他检查
+            $_config = $request->post('Config/a');
+            if (empty($_config['name']) || empty($_config['begin']) || empty($_config['end'])) {
+                throw new Exception('参数格式有误');
+            }
+            $name  = ArrayHelper::uniqueAndTrimOneDimissionArray($_config['name']); // 等级名称去重去除false等价值
+            $begin = $_config['begin'];
+            $end   = $_config['end'];
 
-            $effect_rows = $this->Customer->db()->where('id', $id)->delete();
+            if (count($name) != count($begin) || count($name) != count($end)) {
+                throw new Exception('等级参数格式设置有误');
+            }
+
+            // 处理积分值，确保是整数
+            foreach ($begin as $key => $value) {
+                $begin[$key] = intval($value);
+                $end[$key]   = intval($end[$key]);
+            }
+
+            // 检查开始值、结束值是否严格衔接
+            foreach ($end as $key => $value) {
+                if (isset($begin[$key + 1])) {
+                    if ($value != $begin[$key + 1]) {
+                        throw new Exception('上一级的结束值不等于下一级的开始值');
+                    }
+                }
+            }
+
+            // 处理配置
+            $config = [];
+            foreach ($name as $key => $value) {
+                $temporary          = [];
+                $temporary['name']  = $value;
+                $temporary['begin'] = $begin[$key];
+                $temporary['end']   = $end[$key];
+                $config[]           = $temporary;
+            }
+
+            $effect_rows = $this->SiteConfig->isUpdate(true)
+                ->save([
+                    'id'    => $siteConfig['id'],
+                    'value' => json_encode($config, JSON_UNESCAPED_UNICODE)
+                ]);
             if (false === $effect_rows) {
-                throw new Exception('删除操作失败：系统异常');
+                throw new Exception('系统异常：保存数据失败');
             }
             // 记录日志
             $this->LogService->logRecorder(
-                $customer,
-                "删除网站会员"
+                [$_config, $config],
+                "会员等级配置"
             );
-            return ['error_code' => 0, 'error_msg' => '已删除'];
+            return ['error_code' => 0, 'error_msg' => '保存成功', 'data' => null];
         } catch (\Throwable $e) {
             return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
         }
