@@ -47,15 +47,16 @@ class __CONTROLLER__Search extends BaseSearch
                    '__CONTROLLER_UNDER_SCORE__.create_time',
                    '__CONTROLLER_UNDER_SCORE__.remark'
                ]);
-               // ->leftJoin('member_level member_level', 'member_level.id = member.member_level_id');
+        // ->leftJoin('member_level member_level', 'member_level.id = member.member_level_id');
 
         // 部门检索 + 权限限制
-        $this->permissionLimitOrDeptSearch(
-            $Query,
-            '__CONTROLLER_UNDER_SCORE__.dept_id',
-            '__CONTROLLER_UNDER_SCORE__.user_id',
-            $act_member_info
-        );
+        // $this->permissionLimitOrDeptSearch(
+        //    $Query,
+        //    '__CONTROLLER_UNDER_SCORE__.dept_id',
+        //    '__CONTROLLER_UNDER_SCORE__.user_id',
+        //    $act_member_info
+        // );
+
 
         /**
          * 检索条件
@@ -74,17 +75,29 @@ class __CONTROLLER__Search extends BaseSearch
         $this->dateTimeSearch($Query, '__CONTROLLER_UNDER_SCORE__.create_time');
 
         // 数字范围检索
-        // $this->rangeSearch($Query, '__CONTROLLER_UNDER_SCORE__.xxx', $begin_range, $end_range);
-
-        // 克隆Query对象读取总记录数
-        $countQuery       = clone $Query;
-        $this->totalCount = $countQuery->count();
+        $xx_begin = $this->request->param('xx_begin');
+        $xx_end   = $this->request->param('xx_end');
+        $this->rangeSearch($Query, '__CONTROLLER_UNDER_SCORE__.xx', $xx_begin, $xx_end);
 
         // 字段排序以及没有排序的情况下设定一个默认排序字段
         $this->orderBy($Query, '__CONTROLLER_UNDER_SCORE__');
         if ($Query->getOptions('order') === null) {
             $Query->order('__CONTROLLER_UNDER_SCORE__.id', 'DESC');
         }
+
+        /**
+         * 1、自动处理查询字段[表名 + 字段名 + 别名自动处理]
+         * 2、自动处理可排序字段的情形
+         */
+        // $this->setCustomizeColumnsOptions($Query, $act_member_info);
+        // 字段排序以及没有排序的情况下设定一个默认排序字段
+        // if ($Query->getOptions('order') === null) {
+        //    $Query->order('customer.id', 'DESC');
+        // }
+
+        // 克隆Query对象读取总记录数
+        $countQuery       = clone $Query;
+        $this->totalCount = $countQuery->count();
 
         // 查询当前分页列表数据
         $this->results    = $Query->limit($this->start, $this->length)->select();

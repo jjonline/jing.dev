@@ -414,12 +414,51 @@ $(function () {
                         for (var n in items) {
                             var data = items[n];
                             items[n].operate = ""; // 操作按钮
+
                             /**
                              * 拥有编辑权限，则显示编辑按钮
                              */
                             if (has_edit_permission) {
-                                items[n].operate += " <a data-href=\"/manage/customer/edit?id="+data.id+"\" class=\"btn btn-xs btn-primary edit\" data-id=\""+data.id+"\"><i class=\"fa fa-pencil-square-o\"></i> 编辑</a>";
+                                items[n].operate += " <a href=\"/manage/article/edit?id="+data.id+"\" class=\"btn btn-xs btn-primary edit\" data-id=\""+data.id+"\"><i class=\"fa fa-pencil-square-o\"></i> 编辑</a>";
                             }
+                            /**
+                             * 调整用户积分权限
+                             */
+                            if (has_detail_permission) {
+                                items[n].operate += " <a data-href=\"/manage/article/detail?id="+data.id+"\" class=\"btn btn-xs btn-success detail\" data-id=\""+data.id+"\"><i class=\"fa fa-search-plus\"></i> 详情</a>";
+                            }
+                            /**
+                             * 分配管理员
+                             */
+                            if (has_allocation_permission) {
+                                items[n].operate += " <a data-href=\"/manage/article/allocation?id="+data.id+"\" class=\"btn btn-xs bg-black allocation\" data-id=\""+data.id+"\"><i class=\"fa fa-search-plus\"></i> 分配</a>";
+                            }
+                            /**
+                             * 调整用户积分权限
+                             */
+                            if (has_adjustment_permission) {
+                                items[n].operate += " <a data-href=\"/manage/article/adjustment?id="+data.id+"\" class=\"btn btn-xs bg-fuchsia adjustment\" data-id=\""+data.id+"\"><i class=\"fa fa-sun-o\"></i> 调整积分</a>";
+                            }
+
+                            // 启用禁用
+                            if (data.enable) {
+                                items[n].enable = "<label class=\"label bg-olive\">启用</label>";
+                            } else {
+                                items[n].enable = "<label class=\"label bg-teal\">禁用</label>";
+                            }
+
+                            // 性别
+                            if (data.gender == "-1") {
+                                items[n].gender = "未知";
+                            } else if (data.gender == "0") {
+                                items[n].gender = "女";
+                            } else {
+                                items[n].gender = "男";
+                            }
+
+                            items[n].sort ="<div class=\"layui-input-inline\">" +
+                                "<input type=\"text\" class=\"list-sort-input\" data-id=\""+data.id+"\" value=\""+data.sort+"\">" +
+                                "</div>";
                         }
                         return items;
                     }
