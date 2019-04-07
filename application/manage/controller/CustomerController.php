@@ -86,14 +86,41 @@ class CustomerController extends BaseController
     }
 
     /**
-     * 网站会员删除
+     * 网站会员等级设置界面
      * @param CustomerService $customerService
      * @return mixed
      */
-    public function deleteAction(CustomerService $customerService)
+    public function configAction(CustomerService $customerService)
+    {
+        $common = [
+            'title'            => '会员等级配置 - ' . config('local.site_name'),
+            'content_title'    => '会员等级配置',
+            'content_subtitle' => '会员等级参数设置',
+            'breadcrumb'       => [
+                ['label' => '会员管理', 'url' => url('customer/list')],
+                ['label' => '会员等级参数设置', 'url' => url('customer/config')],
+            ],
+            'load_layout_css'  => true,
+            'load_layout_js'   => true,
+        ];
+        $this->assign($common);
+
+        // 已有等级配置
+        $level = $customerService->getCustomerLevelConfig();
+        $this->assign('level', $level);
+
+        return $this->fetch();
+    }
+
+    /**
+     * 保存前台会员等级配置
+     * @param CustomerService $customerService
+     * @return array|\think\Response
+     */
+    public function configSaveAction(CustomerService $customerService)
     {
         if ($this->request->isAjax()) {
-            return $customerService->delete($this->request);
+            return $customerService->configSave($this->request);
         }
         return $this->renderJson('error', 500);
     }

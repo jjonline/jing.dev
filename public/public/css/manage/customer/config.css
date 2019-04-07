@@ -1,0 +1,20 @@
+.level_des {
+    background-color: #EEFFBB;
+    border: 1px dashed #eee;
+    border-radius: 5px;
+    margin: 15px auto;
+}
+.level_des h3 {
+    padding:15px 15px 10px 15px;
+    font-size:15px;
+    margin:0;
+}
+.level_des ul {
+    list-style: none;
+    padding:0 25px 10px 25px;
+    margin:0;
+    font-size:13px;
+}
+.level_des ul li {
+    padding:5px 0;
+}

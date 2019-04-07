@@ -14,6 +14,10 @@ use think\Model;
 class SiteConfig extends Model
 {
     /**
+     * @var string 前台会员等级配置key名称
+     */
+    const CUSTOMER_LEVEL_CONFIG = 'customer_level';
+    /**
      * @var string 配置缓存tag
      */
     public $ConfigCacheTag = 'Site.Config.Tag';
