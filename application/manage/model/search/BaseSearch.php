@@ -317,7 +317,7 @@ class BaseSearch
         list($columns, $sorted) = MenuColumnsHelper::toBackendStructure(
             $act_user_info['menu_auth']['show_columns']
         );
-        $query->column($columns);
+        $query->field($columns);
 
         // 自动设置排序表、字段条件
         if (!empty($is_auto_order)) {
