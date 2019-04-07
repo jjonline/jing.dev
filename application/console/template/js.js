@@ -331,6 +331,9 @@ $(function () {
                  */
                 data: function (data) {
                     return $.extend({}, data, {
+                        keyword:txtSearch.val(),
+                        begin_date:searchBeginDate.val(),
+                        end_date:searchEndDate.val()
                         // todo 额外塞入请求体的数据获取方法
                     });
                 },
@@ -402,21 +405,9 @@ $(function () {
                 },
                 {data:"id"},
                 {data:"title"},
-                {data:"article_cat_name",className:"text-center"},
-                {data:"article_author_name",className:"text-center"},
-                {data:"content_type",className:"text-center"},
-                {data:"sort",className:"text-center"},
-                {data:"awesome",className:"text-center"},
-                {data:"click",className:"text-center"},
-                {data:"is_home",className:"text-center"},
-                {data:"is_top",className:"text-center"},
-                {data:"allow_comment",className:"text-center"},
-                {data:"display_time",className:"text-center"},
-                {data:"create_time",className:"text-center"},
-                {data:"update_time",className:"text-center"},
-                {data:"enable",className:"text-center"},
                 {data:"operate",className:"text-center"}
             ],
+            // columns: utils.setColumns(js_columns), // 自定义字段的情况
             /**
              * 定义dataTable的一些语言，基本无需改动
              */
