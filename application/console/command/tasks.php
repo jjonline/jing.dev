@@ -50,13 +50,13 @@ class Tasks extends Command
         RedisServerManager::getInstance()->createServer();
 
         // redis-like server 管理器绑定事件
-        RedisServerManager::getInstance()->getServer()->on('Start', [TaskEvent::class, 'onStart']);
-        RedisServerManager::getInstance()->getServer()->on('WorkerStart', [TaskEvent::class, 'onWorkStart']);
-        RedisServerManager::getInstance()->getServer()->on('Connect', [TaskEvent::class, 'onConnect']);
-        RedisServerManager::getInstance()->getServer()->on('Close', [TaskEvent::class, 'onClose']);
+        RedisServerManager::server()->on('Start', [TaskEvent::class, 'onStart']);
+        RedisServerManager::server()->on('WorkerStart', [TaskEvent::class, 'onWorkStart']);
+        RedisServerManager::server()->on('Connect', [TaskEvent::class, 'onConnect']);
+        RedisServerManager::server()->on('Close', [TaskEvent::class, 'onClose']);
 
         // redis-like server 绑定redis客户端lpush命令
-        RedisServerManager::getInstance()->getServer()->setHandler(
+        RedisServerManager::server()->setHandler(
             'LPUSH',
             [TaskEvent::class, 'lPushReceiver']
         );
