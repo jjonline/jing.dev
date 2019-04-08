@@ -86,6 +86,19 @@ class CustomerController extends BaseController
     }
 
     /**
+     * 快速启用|禁用
+     * @param CustomerService $customerService
+     * @return array|\think\Response
+     */
+    public function enableAction(CustomerService $customerService)
+    {
+        if ($this->request->isAjax()) {
+            return $customerService->enable($this->request);
+        }
+        return $this->renderJson('error', 500);
+    }
+
+    /**
      * 网站会员等级设置界面
      * @param CustomerService $customerService
      * @return mixed

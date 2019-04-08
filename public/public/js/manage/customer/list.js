@@ -441,10 +441,19 @@ $(function () {
                             }
 
                             // 启用禁用
-                            if (data.enable) {
-                                items[n].enable = "<label class=\"label bg-olive\">启用</label>";
+                            // 有权限变更则为按钮，无权限变更仅显示
+                            if (has_enable_permission) {
+                                if (data.enable) {
+                                    items[n].enable = "<button class=\"btn btn-xs bg-olive enable\">启用</button>";
+                                } else {
+                                    items[n].enable = "<button class=\"btn btn-xs bg-teal enable\">禁用</button>";
+                                }
                             } else {
-                                items[n].enable = "<label class=\"label bg-teal\">禁用</label>";
+                                if (data.enable) {
+                                    items[n].enable = "<label class=\"label bg-olive\">启用</label>";
+                                } else {
+                                    items[n].enable = "<label class=\"label bg-teal\">禁用</label>";
+                                }
                             }
 
                             // 性别
