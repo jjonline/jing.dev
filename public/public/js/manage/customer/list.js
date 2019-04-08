@@ -187,7 +187,7 @@ $(function () {
         $("#id").val($(this).data("id")).prop("disabled",false);
         var editData = $(this).parents("tr").data("json"); // 从tr中读取出的待编辑的数据
 
-        $("#SaveModalLabel").text("编辑网站会员");
+        $("#SaveModalLabel").text("编辑会员");
         $(".btn-edit-submit").show();
         $(".btn-create-submit").hide();
 
@@ -199,16 +199,36 @@ $(function () {
         return false;
     });
 
-    // 新增
-    $("#create").on('click',function () {
-        $("#id").val('').prop("disabled",false);
+    // 新增前台会员浮层
+    $("#create").on("click",function () {
+        $("#id").val("").prop("disabled",false);
         $("#SaveModalForm").get(0).reset();
-        $("#SaveModalLabel").text("新增网站会员");
+        $("#SaveModalLabel").text("新增会员");
 
         $(".btn-edit-submit").hide();
         $(".btn-create-submit").show();
 
-        // todo 新增模式需处理的逻辑
+        $("#customer_name").val("").prop("disable", false);
+        $("#real_name").val("").prop("disable", false);
+        $("#reveal_name").val("").prop("disable", false);
+        $("#password").val("").prop("disable", false);
+        $("#mobile").val("").prop("disable", false);
+        $("#email").val("").prop("disable", false);
+        $("#birthday").val("").prop("disable", false);
+        $("#id_card").val("").prop("disable", false);
+
+
+        $("#province").val("").prop("disable", false).trigger("change");
+        $("#city").val("").prop("disable", false).trigger("change");
+        $("#district").val("").prop("disable", false).trigger("change");
+        $("#location").val("").prop("disable", false);
+
+        $("#job_organization").val("").prop("disable", false);
+        $("#job_number").val("").prop("disable", false);
+        $("#job_location").val("").prop("disable", false);
+
+        $("#enable").prop("checked", true).trigger("chagne");
+        $("#remark").val("").prop("disable", false);
 
         $("#SaveModal").modal("show");
         return false;
@@ -274,17 +294,26 @@ $(function () {
         var that = this;
         var form = $("#SaveModalForm");
 
-        /**
-         * sample
-         */
-        var real_time = $("#real_name");
-        if (utils.isEmpty(real_time.val())) {
-            real_time.focus();
+        var customer_name = $("#customer_name");
+        if (utils.isEmpty(customer_name.val())) {
+            customer_name.focus();
+            utils.toast("输入用户名");
+            return false;
+        }
+
+        var real_name = $("#real_name");
+        if (utils.isEmpty(real_name.val())) {
+            real_name.focus();
             utils.toast("输入真实姓名");
             return false;
         }
 
-        // todo 边界效验逻辑
+        var password = $("#password");
+        if (!utils.isPassWord(password.val())) {
+            password.focus();
+            utils.toast("输入密码，同时包含字母和数字，6至18位");
+            return false;
+        }
 
         var data = form.serializeArray();
         $(that).prop("disabled",true).text("提交中...");

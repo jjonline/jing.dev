@@ -9,7 +9,9 @@
 namespace app\manage\service;
 
 use app\common\helper\ArrayHelper;
+use app\common\helper\FilterValidHelper;
 use app\common\model\SiteConfig;
+use app\common\validate\CustomerValidate;
 use app\manage\model\Customer;
 use app\common\service\LogService;
 use think\Exception;
@@ -38,37 +40,88 @@ class CustomerService
     }
 
     /**
-     * 网站会员新增|编辑
+     * 网站会员新增
      * @param Request $request
      * @return array
      */
-    public function save(Request $request)
+    public function create(Request $request)
     {
         try {
-            $_customer = $request->post('customer/a');
-            $is_edit = !empty($_customer['id']);
-            $customer = [];
-            if ($is_edit) {
-                // 编辑模式
-                $exist_data = $this->Customer->getDataById($_customer['id']);
-                if (empty($exist_data)) {
-                    throw new Exception('拟编辑的网站会员数据不存在');
-                }
+            $customer = $request->post('Customer/a');
 
-            } else {
-                // 新增模式
+            $customerValid = new CustomerValidate();
 
+            if (!$customerValid->check($customer)) {
+                throw new Exception($customerValid->getError(), 401);
             }
 
-            $effect_rows = $this->Customer->isUpdate($is_edit)->save($customer);
+            // 用户重复检查
+            $exist_customer = $this->Customer->getCustomerInfoByUserName($customer['customer_name']);
+            if (!empty($exist_customer)) {
+                throw new Exception('用户名'.$customer['customer_name'].'已存在');
+            }
+
+            // 设置有手机号、邮箱的
+            if (!empty($customer['mobile'])) {
+                $exist_customer = $this->Customer->getCustomerInfoByMobile($customer['mobile']);
+                if (!empty($exist_customer)) {
+                    throw new Exception('手机号'.$customer['mobile'].'已存在');
+                }
+            }
+            if (!empty($customer['email'])) {
+                $exist_customer = $this->Customer->getCustomerInfoByEmail($customer['email']);
+                if (!empty($exist_customer)) {
+                    throw new Exception('邮箱'.$customer['mobile'].'已存在');
+                }
+            }
+
+            // 身份证号
+            if (!empty($customer['id_card'])) {
+                if (!FilterValidHelper::is_citizen_id_valid($customer['id_card'])) {
+                    throw new Exception('身份证号'.$customer['id_card'].'格式有误');
+                }
+            }
+
+            // 出生年与日为空转换为null
+            if (empty($customer['birthday'])) {
+                $customer['birthday'] = null;
+            }
+
+            // 工作单位、地址、联系电话
+            $customer['enable'] = empty($_customer['enable']) ? 0 : 1;
+
+            $effect_rows = $this->Customer
+                ->allowField([
+                    'customer_name',
+                    'real_name',
+                    'reveal_name',
+                    'mobile',
+                    'email',
+                    'gender',
+                    'birthday',
+                    'age',
+                    'province',
+                    'city',
+                    'district',
+                    'location',
+                    'job_organization',
+                    'job_number',
+                    'job_location',
+                    'remark',
+                    'motto',
+                    'dept_id',
+                    'user_id',
+                    'enable',
+                    'figure_id',
+                ]) // 允许insert时从表单获取的字段
+                ->isUpdate(false)
+                ->save($customer);
             if (false === $effect_rows) {
                 throw new Exception('系统异常：保存数据失败');
             }
+
             // 记录日志
-            $this->LogService->logRecorder(
-                [$_customer,$customer],
-                ($is_edit ? "编辑" : "新增")."网站会员"
-            );
+            $this->LogService->logRecorder($customer, "新增会员");
             return ['error_code' => 0, 'error_msg' => '保存成功'];
         } catch (\Throwable $e) {
             return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];
