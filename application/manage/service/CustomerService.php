@@ -87,7 +87,7 @@ class CustomerService
                 $customer['birthday'] = null;
             }
 
-            // 工作单位、地址、联系电话
+            // 启用禁用
             $customer['enable'] = empty($_customer['enable']) ? 0 : 1;
 
             $effect_rows = $this->Customer
@@ -113,7 +113,7 @@ class CustomerService
                     'user_id',
                     'enable',
                     'figure_id',
-                ]) // 允许insert时从表单获取的字段
+                ]) // insert时允许从表单获取的字段
                 ->isUpdate(false)
                 ->save($customer);
             if (false === $effect_rows) {
