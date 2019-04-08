@@ -54,7 +54,7 @@ class CustomerController extends BaseController
     public function createAction(CustomerService $customerService)
     {
         if ($this->request->isPost() && $this->request->isAjax()) {
-            return $customerService->save($this->request);
+            return $customerService->create($this->request);
         }
         return $this->renderJson('error', 500);
     }
