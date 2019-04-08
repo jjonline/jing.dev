@@ -1,6 +1,6 @@
 <?php
 /**
- * 后台会员验证器
+ * 会员前后台统一验证器
  * @user Jea杨 (JJonline@JJonline.Cn)
  * @date 2019-04-08 21:58
  * @file CustomerValidate.php

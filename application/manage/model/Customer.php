@@ -14,6 +14,15 @@ use think\Model;
 class Customer extends Model
 {
     /**
+     * @var integer 会员类型标记-消费者
+     */
+    const CUSTOMER_TYPE_CONSUMER = 1;
+    /**
+     * @var integer 会员类型标记-商户
+     */
+    const CUSTOMER_TYPE_MERCHANT = 2;
+
+    /**
      * 主键查询
      * @param $id
      * @return array
