@@ -108,6 +108,41 @@ class CustomerService
     }
 
     /**
+     * 启用|禁用
+     * @param Request $request
+     * @return array
+     */
+    public function enable(Request $request)
+    {
+        try {
+            $id = $request->post('id/i');
+            $_customer = $this->Customer->getDataById($id);
+            if (empty($_customer)) {
+                throw new Exception('拟启用或禁用的用户数据不存在');
+            }
+
+            $effect_rows = $this->Customer->db()->where('id', $id)->update([
+                'enable' => $_customer['enable'] ? 0 : 1
+            ]);
+            if (false == $effect_rows) {
+                throw new Exception($_customer['enable'] ? '禁用失败：系统异常' : '启用失败：系统异常');
+            }
+            // 记录日志
+            $this->LogService->logRecorder(
+                $_customer,
+                $_customer['enable'] ? '禁用用户' : '启用用户'
+            );
+            return [
+                'error_code' => 0,
+                'error_msg'  => $_customer['enable'] ? '已禁用用户' : '已启用用户',
+                'data'       => null
+            ];
+        } catch (\Throwable $e) {
+            return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage(), 'data' => null];
+        }
+    }
+
+    /**
      * 获取前台会员配置
      * @return array
      */
