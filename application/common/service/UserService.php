@@ -230,7 +230,7 @@ class UserService
             if (!empty($repeat)) {
                 return ['error_code' => 400,'error_msg' => '用户名已存在'];
             }
-            $update_user['user_name'] = trim($_user['user_name']);
+            $update_user['user_name'] = strtolower(trim($_user['user_name']));
         }
         // 修改真实姓名
         if ($_user['real_name'] != $exist_user['real_name']) {
@@ -273,7 +273,7 @@ class UserService
                 if (!empty($repeat)) {
                     return ['error_code' => 400,'error_msg' => '邮箱已存在'];
                 }
-                $update_user['email'] = trim($_user['email']);
+                $update_user['email'] = strtolower(trim($_user['email']));
             } else {
                 // 删除邮箱
                 $update_user['email'] = '';
@@ -450,10 +450,10 @@ class UserService
         if (empty($role)) {
             throw new Exception('拟分配用户的角色信息不存在', 500);
         }
-        $_User['user_name'] = trim($User['user_name']);
+        $_User['user_name'] = strtolower(trim($User['user_name']));
         $_User['real_name'] = trim($User['real_name']);
         $_User['mobile']    = !empty($User['mobile']) ? $User['mobile'] : '';
-        $_User['email']     = !empty($User['email'])  ? trim($User['email']) : '';
+        $_User['email']     = !empty($User['email'])  ? strtolower(trim($User['email'])) : '';
         $_User['auth_code'] = GenerateHelper::makeNonceStr(8);
         $_User['password']  = $this->generateUserPassword(trim($User['password']));
         $_User['dept_id']   = $User['dept_id'];
@@ -499,7 +499,7 @@ class UserService
             }
             // 邮箱
             if (FilterValidHelper::is_mail_valid($profile['email']) && $profile['email'] != $user['email']) {
-                $user_update['email'] = trim($profile['email']);
+                $user_update['email'] = strtolower(trim($profile['email']));
             }
             // 性别
             if (in_array($profile['gender'], [-1,0,1]) && $profile['gender'] != $user['gender']) {
