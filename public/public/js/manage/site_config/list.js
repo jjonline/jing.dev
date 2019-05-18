@@ -63,6 +63,10 @@ $(function () {
         $('#type').val(data.type).trigger('change');
         $('#is_config_hide').prop("checked", !!data.is_config_hide).trigger('change');
 
+        if (data.type == 'select') {
+            $("#select_wrap").show();
+        }
+
         $('#SiteConfigModal').modal('show');
 
         return false;
