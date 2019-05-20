@@ -42,7 +42,7 @@ class SiteConfigService
     {
         $_result = $this->SiteConfig->getSiteConfigListNotHide();
         foreach ($_result as $key => $value) {
-            $_result[$key]['value'] = $value['value'] ?: $value['default']; // 没有值的结果集将默认值赋值
+            $_result[$key]['value'] = $value['value'] === "" ? $value['default'] : $value['value']; // 没有值的结果集将默认值赋值
             if ($value['type'] == 'select' && !empty($value['select_items'])) {
                 // select下拉框值转换成数组
                 $_result[$key]['select_items'] = json_decode(json_encode($value['select_items']), true);
