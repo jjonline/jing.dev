@@ -18,9 +18,13 @@ class SiteConfig extends Model
      */
     const CUSTOMER_LEVEL_CONFIG = 'customer_level';
     /**
-     * @var string 配置缓存tag
+     * @var string 站点配置分组缓存tag标签
      */
     public $ConfigCacheTag = 'Site.Config.Tag';
+    /**
+     * @var string 站点配置缓存前缀
+     */
+    public $CachePrefix = 'Site.Config.Prefix';
 
     protected $json = ['select_items'];
 
@@ -97,11 +101,45 @@ class SiteConfig extends Model
         if (empty($key)) {
             return $default_val;
         }
-        $result = Cache::get($key);
+        $cache_key = $this->CachePrefix.$key;
+        $result    = Cache::get($cache_key);
         if (false === $result) {
             $value  = $this->where('key', $key)->value('value');
             $result = is_null($value) ? $default_val : $value;
-            Cache::tag($this->ConfigCacheTag)->set($key, $result);
+            Cache::tag($this->ConfigCacheTag)->set($cache_key, $result);
+        }
+        return $result;
+    }
+
+    /**
+     * 带缓存的按flag分组读取一组配置项
+     * @param string $flag
+     * @return array ['key1' => 'value1','key2' => 'value2'] 形式
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getSiteConfigGroupByFlag($flag)
+    {
+        if (empty($flag)) {
+            return [];
+        }
+        $cache_key = $this->CachePrefix.md5($flag);
+        $result    = Cache::get($cache_key);
+        if (false === $result) {
+            $lists  = $this->where('flag', $flag)->select();
+            if (empty($lists)) {
+                return [];
+            }
+
+            // 循环处理
+            $result = [];
+            foreach ($lists as $item) {
+                $_key          = $item['key'];
+                $result[$_key] = $item['value'] === "" ? $item['default'] : $item['value'];
+            }
+
+            Cache::tag($this->ConfigCacheTag)->set($cache_key, $result);
         }
         return $result;
     }
