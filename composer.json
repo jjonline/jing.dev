@@ -30,9 +30,9 @@
         "jjonline/aliyun-dysms-php-sdk": "2.0",
         "dragonmantank/cron-expression": "^2.0",
         "topthink/think-migration": "2.0.*",
-        "aliyuncs/oss-sdk-php": "^2.3",
-        "qiniu/php-sdk": "^7.2",
-        "upyun/sdk": "^3.3"
+        "aliyuncs/oss-sdk-php": "2.3.0",
+        "qiniu/php-sdk": "7.2.7",
+        "upyun/sdk": "3.3.0"
     },
     "require-dev": {
         "topthink/think-testing": "^2.0"
@@ -51,7 +51,7 @@
     "repositories": {
         "packagist": {
             "type": "composer",
-            "url": "https://packagist.laravel-china.org"
+            "url": "https://mirrors.aliyun.com/composer/"
         }
     }
 }
