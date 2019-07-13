@@ -20,3 +20,14 @@ function user_has_permission($tag = null)
 {
     return app('app\common\service\AuthService')->userHasPermission($tag);
 }
+
+/**
+ * 读取后台模式中设置的站点配置参数
+ * @param string $key 配置key
+ * @param mixed  $default_val 配置默认值
+ * @return mixed
+ */
+function site_config($key, $default_val = null)
+{
+    return app('app\common\model\SiteConfig')->getSitConfigValueByKey($key, $default_val);
+}

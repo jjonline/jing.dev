@@ -54,7 +54,7 @@ class SiteConfig extends Model
      */
     public function getSiteConfigList()
     {
-        $data = $this->order(['sort'=>'ASC', 'flag' => 'ASC', 'create_time' => 'DESC'])->select();
+        $data = $this->order(['flag' => 'ASC', 'sort'=>'ASC', 'create_time' => 'DESC'])->select();
         return $data->isEmpty() ? [] : $data->toArray();
     }
 
