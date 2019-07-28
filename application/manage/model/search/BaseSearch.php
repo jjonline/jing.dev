@@ -303,6 +303,20 @@ class BaseSearch
     }
 
     /**
+     * 指定检索属于某个用户的数据，内部自动判断无检索参数自动跳过
+     * @param Query   $query
+     * @param integer $user_id 需检索的属于用户的id
+     * @param string  $column  需检索的表中的字段，可带别名
+     */
+    protected function specifyUserSearch(Query &$query, $user_id, $column)
+    {
+        // 指定用户检索
+        if (!empty($user_id) && is_numeric($user_id)) {
+            $query->where($column, $user_id);
+        }
+    }
+
+    /**
      * 设置自定义字段功能下的查询字段和排序条件
      * ++++++++
      * 1、自动处理查询字段[表名 + 字段名 + 别名自动处理]
