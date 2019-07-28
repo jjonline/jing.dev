@@ -40,13 +40,13 @@ class __CONTROLLER__Search extends BaseSearch
     {
         // 构造Query对象
         $Query = Db::name('__CONTROLLER_UNDER_SCORE__ __CONTROLLER_UNDER_SCORE__')
-               ->field([
-                   //'CONCAT("DT_Member_",member.id) as DT_RowId',
-                   '__CONTROLLER_UNDER_SCORE__.id',
+            ->field([
+                //'CONCAT("DT_Member_",member.id) as DT_RowId',
+                '__CONTROLLER_UNDER_SCORE__.id',
 
-                   '__CONTROLLER_UNDER_SCORE__.create_time',
-                   '__CONTROLLER_UNDER_SCORE__.remark'
-               ]);
+                '__CONTROLLER_UNDER_SCORE__.create_time',
+                '__CONTROLLER_UNDER_SCORE__.remark'
+            ]);
         // ->leftJoin('member_level member_level', 'member_level.id = member.member_level_id');
 
         // 部门检索 + 权限限制
@@ -57,9 +57,12 @@ class __CONTROLLER__Search extends BaseSearch
         //    $act_member_info
         // );
 
+        // 指定用户检索
+        // $user_id = $this->request->param('user_id');
+        // $this->specifyUserSearch($query, $user_id, 'task_template.user_id');
 
         /**
-         * 检索条件
+         * 关键字检索
          */
         // 关键词搜索--方法体内部自动判断$this->keyword是否有值并执行sql构造
         $search_columns = ['__CONTROLLER_UNDER_SCORE__.remark'];

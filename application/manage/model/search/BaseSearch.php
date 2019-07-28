@@ -305,10 +305,10 @@ class BaseSearch
     /**
      * 指定检索属于某个用户的数据，内部自动判断无检索参数自动跳过
      * @param Query   $query
-     * @param integer $user_id 需检索的属于用户的id
      * @param string  $column  需检索的表中的字段，可带别名
+     * @param integer $user_id 需检索的属于用户的id
      */
-    protected function specifyUserSearch(Query &$query, $user_id, $column)
+    protected function specifyUserSearch(Query &$query, $column, $user_id)
     {
         // 指定用户检索
         if (!empty($user_id) && is_numeric($user_id)) {
