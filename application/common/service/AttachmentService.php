@@ -365,7 +365,8 @@ class AttachmentService
     {
         $attachment['is_image'] = !empty($attachment['image_width']); // 是否图片标记
         try {
-            $attachment['file_path'] = $this->Storage->get($attachment);
+            $attachment['local_path'] = $attachment['file_path']; // 保留本地地址备用
+            $attachment['file_path']  = $this->Storage->get($attachment);
             return true;
         } catch (\Throwable $e) {
             return false;
