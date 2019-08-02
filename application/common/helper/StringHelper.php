@@ -11,6 +11,16 @@ namespace app\common\helper;
 class StringHelper
 {
     /**
+     * 检查一个字符串是否为字母或下划线开头的合法变量标识符
+     * @param string $str
+     * @return bool
+     */
+    public static function isValidVariableIdentifier($str)
+    {
+        return 1 === preg_match('/^[a-zA-Z_]\w*$/', $str);
+    }
+
+    /**
      * 驼峰转小写下划线
      * @param $str
      * @return string

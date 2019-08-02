@@ -69,7 +69,7 @@ class FilterValidHelper
     public static function is_uid_valid($uid, $minLength = 4, $maxLength = 11)
     {
         #正则方式
-        return preg_match('/^[1-9]\d{'.($minLength - 1).','.($maxLengt - 1).'}$/', $uid) === 1;
+        return preg_match('/^[1-9]\d{'.($minLength - 1).','.($maxLength - 1).'}$/', $uid) === 1;
         #函数方式 可能未编译ctype扩展不存在ctype_digit内置函数
         // return strlen($uid)>=$minLength && strlen($uid)<=$maxLength && ctype_digit((string)$uid);
     }
