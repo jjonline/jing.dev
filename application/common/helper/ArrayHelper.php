@@ -34,15 +34,10 @@ class ArrayHelper
      * @param array $origin 一维数组
      * @return array
      */
-    public static function uniqueAndTrimOneDimissionArray($origin)
+    public static function filterArrayThenUnique($origin)
     {
-        // 去除等价false值 去除空值
-        $origin = array_unique(array_filter($origin));
-        // 去除元素两边空白
-        foreach ($origin as $key => $value) {
-            $origin[$key] = trim($value);
-        }
-        return $origin;
+        // 去除等价false值 去除空值 返回唯一值
+        return array_unique(array_filter(array_map('trim', $origin)));
     }
 
     /**
@@ -75,7 +70,7 @@ class ArrayHelper
         }
         return $origin;
     }
-    
+
     /**
      * 二维数组按照二维中某个键指向的值进行制定排序规则的排序
      * @param array $multi_array 二维数组

@@ -80,13 +80,13 @@ class Tag extends Model
         if (empty($tag)) {
             return '';
         }
-        $tags = ArrayHelper::uniqueAndTrimOneDimissionArray(explode('|', $tag));
+        $tags = ArrayHelper::filterArrayThenUnique(explode('|', $tag));
         if (empty($tags)) {
             return '';
         }
 
         // 原始tag_id情况
-        $origin_tags = ArrayHelper::uniqueAndTrimOneDimissionArray(explode(',', $origin_tag_ids));
+        $origin_tags = ArrayHelper::filterArrayThenUnique(explode(',', $origin_tag_ids));
 
         $result = [];
         foreach ($tags as $tag) {
@@ -130,7 +130,7 @@ class Tag extends Model
             return false;
         }
         if (is_string($tag_ids)) {
-            $tags = ArrayHelper::uniqueAndTrimOneDimissionArray(explode(',', $tag_ids));
+            $tags = ArrayHelper::filterArrayThenUnique(explode(',', $tag_ids));
         } else {
             $tags = $tag_ids;
         }
@@ -165,7 +165,7 @@ class Tag extends Model
             return false;
         }
         if (is_string($tag_ids)) {
-            $tags = ArrayHelper::uniqueAndTrimOneDimissionArray(explode(',', $tag_ids));
+            $tags = ArrayHelper::filterArrayThenUnique(explode(',', $tag_ids));
         } else {
             $tags = $tag_ids;
         }

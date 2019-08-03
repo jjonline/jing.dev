@@ -112,8 +112,8 @@ class PageService
 
             // 启用了模板选项
             if (!empty($_config['use_template'])) {
-                $template_name = ArrayHelper::uniqueAndTrimOneDimissionArray($_config['template_options_name']);
-                $template_template = ArrayHelper::uniqueAndTrimOneDimissionArray($_config['template_options_template']);
+                $template_name = ArrayHelper::filterArrayThenUnique($_config['template_options_name']);
+                $template_template = ArrayHelper::filterArrayThenUnique($_config['template_options_template']);
                 if (empty($template_name) || empty($template_template)) {
                     throw new Exception('请完善待选模板下拉项中文名称和模板文件名配置');
                 }
@@ -142,7 +142,7 @@ class PageService
                 if (empty($_contents)) {
                     throw new Exception('请完善正文区块选项');
                 }
-                $content_ids      = ArrayHelper::uniqueAndTrimOneDimissionArray($_contents['id']); // ID单页面内唯一
+                $content_ids      = ArrayHelper::filterArrayThenUnique($_contents['id']); // ID单页面内唯一
                 $content_names    = $_contents['name'];
                 $content_types    = $_contents['type'];
                 $content_lengths  = $_contents['length'];

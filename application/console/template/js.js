@@ -86,6 +86,7 @@ $(function () {
      * 调用初始化dataTable封装方法
      */
     initDataTable();
+    // initTableHeaderManageBtn(); // 添加表头管理按钮并绑定事件
 
     /**
      * +++++++++++++++++++++++++++++++++++++++++++
@@ -119,18 +120,34 @@ $(function () {
         var node     = $("." + td_class);
         if ($(this).prop("checked")) {
             node.addClass("selected");
+            // 启用表头管理按钮
+            toggleHeaderBtn(true);
         } else {
             $(".check_all").prop("checked",false);
             node.find(".check_item").prop("checked",false);
             node.removeClass("selected");
+            // 检查是否取消了全部checkbox后禁用管理按钮
+            var check_inputs = $(".check_item");
+            var isCancelAll  = true;
+            $.each(check_inputs, function (i,n) {
+                if ($(n).prop("checked")) {
+                    isCancelAll = false;
+                }
+            });
+            // 禁用表头管理按钮 -- 依据是否取消了全部取反
+            toggleHeaderBtn(!isCancelAll);
         }
     }).on("click",".check_all",function () {
         // 全选和取消全选
         if($(this).prop("checked"))
         {
             $(".check_item").prop("checked",true).trigger("change");
+            // 启用表头管理按钮
+            toggleHeaderBtn(true);
         }else {
             $(".check_item").prop("checked",false).trigger("change");
+            // 禁用表头管理按钮
+            toggleHeaderBtn(false);
         }
     }).on("click",".enable",function () {
         // 启用禁用
@@ -216,8 +233,8 @@ $(function () {
             success: function (data) {
                 utils.hideLoading();
                 if (data.error_code === 0) {
+                    $("#SaveModal").modal("hide");
                     utils.toast(data.error_msg, 3000,function () {
-                        $("#SaveModal").modal("hide");
                         refreshTable();
                     });
                 } else {
@@ -266,8 +283,8 @@ $(function () {
             success: function (data) {
                 utils.hideLoading();
                 if (data.error_code === 0) {
+                    $("#SaveModal").modal("hide");
                     utils.toast(data.error_msg, 3000,function () {
-                        $("#SaveModal").modal("hide");
                         refreshTable();
                     });
                 } else {
@@ -370,6 +387,10 @@ $(function () {
                 dataSrc: function (json) {
                     // reset checkAll
                     $(".check_all").prop('checked',false);
+
+                    // 启用|禁用表头管理按钮
+                    toggleHeaderBtn(false);
+
                     if (json.data && json.data.length > 0) {
                         var items = json.data;
                         for (var n in items) {
@@ -381,6 +402,22 @@ $(function () {
                             if (has_edit_permission) {
                                 items[n].operate += " <a data-href=\"/manage/__CONTROLLER_UNDER_SCORE__/edit?id="+data.id+"\" class=\"btn btn-xs btn-primary edit\" data-id=\""+data.id+"\"><i class=\"fa fa-pencil-square-o\"></i> 编辑</a>";
                             }
+
+                            // 拥有删除权限，则显示删除按钮
+                            if (has_delete_permission) {
+                                items[n].operate += " <a data-href=\"/manage/__CONTROLLER_UNDER_SCORE__/delete?id="+data.id+"\" class=\"btn btn-xs btn-danger delete\" data-id=\""+data.id+"\"><i class=\"fa fa-trash\"></i> 删除</a>";
+                            }
+
+                            // 启用禁用按钮
+                            if (data.enable) {
+                                items[n].enable = "<button class=\"btn btn-xs bg-olive enable\">启用</button>";
+                            } else {
+                                items[n].enable = "<button class=\"btn btn-xs bg-teal enable\">禁用</button>";
+                            }
+                            // 快速排序输入框
+                            items[n].sort ="<div class=\"layui-input-inline\">" +
+                                "<input type=\"text\" class=\"list-sort-input\" data-id=\""+data.id+"\" value=\""+data.sort+"\">" +
+                                "</div>";
                         }
                         return items;
                     }
@@ -436,5 +473,86 @@ $(function () {
                 }
             }
         });
+    }
+
+    /**
+     * 初始化datatable一页多少条后方的全选功能实现按钮
+     * ---
+     * 1、列表页面html结构中id为table_header_manage的容器完善按钮html代码
+     * 2、方法体中变量html给予按钮样式代码
+     * 3、bindTableHeaderEvent方法中为初始化的按钮绑定各种事件
+     * ---
+     */
+    function initTableHeaderManageBtn() {
+        // 从html页面读取id为table_header_manage的内部html元素执行判断是否需要初始化表头批量控制按钮
+        var tableHeaderHtml = $("#table_header_manage");
+        if (tableHeaderHtml.html()) {
+            var target = $("#table_length").parents(".row").children(".col-sm-6:last");
+
+            var html = '<div id="tableHeaderBtn" class="pull-right">'+ tableHeaderHtml.html() +'</div>';
+            // 延迟300毫秒执行
+            setTimeout(function () {
+                target.html(html);
+                bindTableHeaderEvent();
+            }, 300);
+            tableHeaderHtml.empty().remove();// 清理html中书写的按钮元素
+        }
+    }
+
+    /**
+     * 为table表头塞入的各个管理按钮添加事件
+     */
+    function bindTableHeaderEvent() {
+
+        // 批量删除
+        $("#tableHeaderBtn .table_manage_delete").on("click", function () {
+            var checked_data = getInMultiCheck();
+            if (checked_data[0].length <= 0) {
+                utils.toast("请先勾选需批量操作的数据列");
+                return false;
+            }
+            // 批量提交确认并提交
+            utils.ajaxConfirm(
+                "确认批量删除所勾选的__LIST_NAME__吗？",
+                '/manage/__CONTROLLER_UNDER_SCORE__/delete',
+                {'multi_id': checked_data[0]},
+                function () {
+                    refreshTable(false);
+            });
+        });
+
+        // 启用|禁用表头管理按钮
+        toggleHeaderBtn(false);
+    }
+
+    /**
+     * 获取已选中列表批量主键id数组和每一列的数据对象
+     * @returns {[[], []]}
+     */
+    function getInMultiCheck() {
+        var checkItems = $(".DTFC_LeftWrapper .check_item");
+
+        // 读取主键id数组和每一列的数据对象
+        var multi_id = [];
+        var multi_data = [];
+        $.each(checkItems, function (i,n) {
+            multi_id.push($(n).val());
+            multi_data.push($(n).parents('tr').data('json'));
+        });
+
+        return [multi_id, multi_data];
+    }
+
+    /**
+     * 启用禁用表头批量按钮
+     * @param enable bool真启用假禁用
+     */
+    function toggleHeaderBtn(enable) {
+        var btnItems = $("#tableHeaderBtn button");
+        if (enable) {
+            btnItems.prop("disabled", false);
+        } else {
+            btnItems.prop("disabled", true);
+        }
     }
 });

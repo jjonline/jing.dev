@@ -230,7 +230,7 @@ class CustomerService
             if (empty($_config['name']) || empty($_config['begin']) || empty($_config['end'])) {
                 throw new Exception('参数格式有误');
             }
-            $name  = ArrayHelper::uniqueAndTrimOneDimissionArray($_config['name']); // 等级名称去重去除false等价值
+            $name  = ArrayHelper::filterArrayThenUnique($_config['name']); // 等级名称去重去除false等价值
             $begin = $_config['begin'];
             $end   = $_config['end'];
 

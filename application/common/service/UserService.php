@@ -623,6 +623,36 @@ class UserService
     }
 
     /**
+     * 获取指定用户所属部门及子部门下辖所有用户浪河姓名列表
+     * @return array
+     */
+    public function getAuthUserTreeList($user_id)
+    {
+        try {
+            // 读取指定用户信息获得部门及子部门id数组
+            $user = $this->User->getFullUserInfoById($user_id);
+            if (empty($user)) {
+                throw new Exception('指定用户不存在');
+            }
+
+            // 根用户查看所有
+            if (!empty($user['is_root'])) {
+                return $this->getUserTreeList();
+            }
+
+            // 普通用户按所辖部门id查找
+            $multi_dept_id = $this->DepartmentService->Department->getDeptChildAndSelfIdArrayById($user['dept_id']);
+            if (empty($multi_dept)) {
+                throw new Exception('没有所属部门或下辖部门');
+            }
+
+            return $this->User->getAuthUserTreeList($multi_dept_id);
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
      * 生成客户端加密cookie
      * @param $User []|UserModel 用户模型
      * @return string
