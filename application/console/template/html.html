@@ -49,6 +49,18 @@
 
         <div class="box box-primary">
             <div class="box-body">
+
+                <!--表头批量控制按钮htm容器开始-->
+                <div id="table_header_manage">
+                    <button type="button" class="btn btn-xs btn-primary table_manage_group">
+                        <i class="fa fa-bookmark-o"></i> 批量分组
+                    </button>
+                    <button type="button" class="btn btn-xs btn-danger table_manage_delete">
+                        <i class="fa fa-trash"></i> 批量删除
+                    </button>
+                </div>
+                <!--表头批量控制按钮htm容器结束-->
+
                 <table class="table table-bordered table-striped table-hover display responsive nowrap" cellspacing="0" width="100%" id="table" data-order='[[ 1, "desc" ]]'>
                     <thead>
                     <tr>
@@ -213,4 +225,5 @@
 
 <script>
     var has_edit_permission = <%{:user_has_permission('manage/__CONTROLLER_UNDER_SCORE__/edit') ? 'true' : 'false'}%>;
+    var has_delete_permission = <%{:user_has_permission('manage/__CONTROLLER_UNDER_SCORE__/delete') ? 'true' : 'false'}%>;
 </script>

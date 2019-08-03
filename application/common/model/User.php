@@ -8,6 +8,7 @@
 
 namespace app\common\model;
 
+use app\common\helper\ArrayHelper;
 use app\common\helper\FilterValidHelper;
 use app\common\helper\GenerateHelper;
 use think\Db;
@@ -136,6 +137,29 @@ class User extends Model
     public function getUserTreeList()
     {
         $result = $this->field(['id', 'real_name'])
+            ->order([
+                'update_time' => 'DESC', // 最近登录过的靠前
+                'id'          => 'ASC'
+            ])->select();
+        return $result->isEmpty() ? [] : $result->toArray();
+    }
+
+    /**
+     * 获取指定部门id数组中的用户列表，用于实现指定用户下所属部门和下辖部门中的用户列表
+     * @param array $multi_dept_id 所在部门和所辖部门id数组
+     * @return array
+     * @throws DbException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    public function getAuthUserTreeList(array $multi_dept_id)
+    {
+        if (empty($multi_dept_id)) {
+            return [];
+        }
+
+        $result = $this->field(['id', 'real_name'])
+            ->where('dept_id', 'in', ArrayHelper::filterArrayThenUnique($multi_dept_id))
             ->order([
                 'update_time' => 'DESC', // 最近登录过的靠前
                 'id'          => 'ASC'

@@ -28,6 +28,9 @@ body {
 }
 .alert-tips a {color:#555;}
 
+/*表格批量控制按钮html容器*/
+#table_header_manage {display: none;}
+
 /*侧边栏1级导航下划线*/
 .sidebar-menu>li{border-bottom: 1px solid #141a1d;}
 .treeview-menu {padding-bottom: 4px;}

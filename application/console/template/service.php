@@ -8,6 +8,7 @@
 
 namespace app\manage\service;
 
+use app\common\helper\ArrayHelper;
 use app\manage\model\__CONTROLLER__;
 use app\common\service\LogService;
 use think\Exception;
@@ -101,30 +102,44 @@ class __CONTROLLER__Service
     }
 
     /**
-     * 删除__LIST_NAME__
+     * 删除__LIST_NAME__[单个-->id，批量-->multi_id]
      * @param Request $request
      * @return array
      */
     public function delete(Request $request)
     {
         try {
+            // 单个
             $id = $request->post('id/i');
-            $__CONTROLLER_LOWER__ = $this->__CONTROLLER__->getDataById($id);
-            if (empty($__CONTROLLER_LOWER__)) {
-                throw new Exception('拟删除的__LIST_NAME__数据不存在');
-            }
+            if (!empty($id)) {
+                $__CONTROLLER_LOWER__ = $this->__CONTROLLER__->getDataById($id);
+                if (empty($__CONTROLLER_LOWER__)) {
+                    throw new Exception('拟删除的__LIST_NAME__数据不存在');
+                }
 
-            // todo 删除的其他检查
+                // todo 删除的其他检查
 
-            $effect_rows = $this->__CONTROLLER__->db()->where('id', $id)->delete();
-            if (false === $effect_rows) {
-                throw new Exception('删除操作失败：系统异常');
+                $effect_rows = $this->__CONTROLLER__->db()->where('id', $id)->delete();
+                if (false === $effect_rows) {
+                    throw new Exception('删除操作失败：系统异常');
+                }
+                // 记录日志
+                $this->LogService->logRecorder(
+                    $__CONTROLLER_LOWER__,
+                    "删除__LIST_NAME__"
+                );
+            } else {
+                $multi_id_array = $request->post('multi_id/a');
+                if (empty($multi_id_array)) {
+                    throw new Exception('批量参数有误删除失败');
+                }
+                $effect_rows = $this->__CONTROLLER__->db()
+                    ->where('id', 'in', ArrayHelper::filterArrayThenUnique($multi_id_array))
+                    ->delete();
+                if (false === $effect_rows) {
+                    throw new Exception('删除操作失败：系统异常');
+                }
             }
-            // 记录日志
-            $this->LogService->logRecorder(
-                $__CONTROLLER_LOWER__,
-                "删除__LIST_NAME__"
-            );
             return ['error_code' => 0, 'error_msg' => '已删除'];
         } catch (\Throwable $e) {
             return ['error_code' => $e->getCode() ?: 500, 'error_msg' => $e->getMessage()];

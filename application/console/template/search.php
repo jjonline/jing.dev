@@ -40,13 +40,13 @@ class __CONTROLLER__Search extends BaseSearch
     {
         // 构造Query对象
         $Query = Db::name('__CONTROLLER_UNDER_SCORE__ __CONTROLLER_UNDER_SCORE__')
-            ->field([
-                //'CONCAT("DT_Member_",member.id) as DT_RowId',
-                '__CONTROLLER_UNDER_SCORE__.id',
+               ->field([
+                   //'CONCAT("DT_Member_",member.id) as DT_RowId',
+                   '__CONTROLLER_UNDER_SCORE__.id',
 
-                '__CONTROLLER_UNDER_SCORE__.create_time',
-                '__CONTROLLER_UNDER_SCORE__.remark'
-            ]);
+                   '__CONTROLLER_UNDER_SCORE__.create_time',
+                   '__CONTROLLER_UNDER_SCORE__.remark'
+               ]);
         // ->leftJoin('member_level member_level', 'member_level.id = member.member_level_id');
 
         // 部门检索 + 权限限制
@@ -59,7 +59,7 @@ class __CONTROLLER__Search extends BaseSearch
 
         // 指定用户检索
         // $user_id = $this->request->param('user_id');
-        // $this->specifyUserSearch($Query, $user_id, 'task_template.user_id');
+        // $this->specifyUserSearch($Query, $user_id, '__CONTROLLER_UNDER_SCORE__.user_id');
 
         /**
          * 关键字检索
@@ -89,10 +89,10 @@ class __CONTROLLER__Search extends BaseSearch
         }
 
         /**
-         * 1、自动处理查询字段[表名 + 字段名 + 别名自动处理]
-         * 2、自动处理可排序字段的情形
+         * 自动处理查询字段[表名 + 字段名 + 别名自动处理]
          */
         // $this->setCustomizeColumnsOptions($Query, $act_member_info);
+
         // 字段排序以及没有排序的情况下设定一个默认排序字段
         // if ($Query->getOptions('order') === null) {
         //    $Query->order('customer.id', 'DESC');
