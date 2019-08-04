@@ -95,16 +95,16 @@
                         <div class="form-group">
                             <label class="col-sm-3 control-label">真实姓名 <span class="required">*</span></label>
                             <div class="col-sm-7">
-                                <input type="text" id="real_name" class="form-control" name="Member[real_name]" placeholder="账号使用者的真实姓名，请务必填写真实姓名">
+                                <input type="text" id="real_name" class="form-control" name="__CONTROLLER_LOWER__[real_name]" placeholder="账号使用者的真实姓名，请务必填写真实姓名">
                             </div>
                         </div>
 
-                        <input type="hidden" id="id" name="Member[id]" >
+                        <input type="hidden" id="id" name="_CONTROLLER__[id]" >
 
                         <div class="form-group" id="gender_container">
                             <label class="col-sm-3 control-label">性别 <span class="required">*</span></label>
                             <div class="col-sm-7">
-                                <select name="Member[gender]" id="gender" class="form-control select2" style="width: 100%;">
+                                <select name="__CONTROLLER_LOWER__[gender]" id="gender" class="form-control select2" style="width: 100%;">
                                     <option value="1">男</option>
                                     <option value="0">女</option>
                                     <option value="-1">未知</option>
@@ -116,15 +116,15 @@
                             <label class="col-sm-3 control-label">是否启用 <span class="required">*</span></label>
                             <div class="col-sm-7">
                                 <div class="js-switch-container">
-                                    <input type="checkbox" id="enable" name="Member[enable]" title="是" data-on-text="是" data-off-text="否" checked="checked">
+                                    <input type="checkbox" id="enable" name="__CONTROLLER_LOWER__[enable]" title="是" data-on-text="是" data-off-text="否" checked="checked">
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-sm-3 control-label">备注信息 </label>
+                            <label class="col-sm-3 control-label">备注信息 <span class="not-required">*</span></label>
                             <div class="col-sm-7">
-                                <textarea id="remark" rows=3 class="form-control" name="Member[remark]" placeholder="备注信息，便于管理员识别，可留空"></textarea>
+                                <textarea id="remark" rows=3 class="form-control" name="__CONTROLLER_LOWER__[remark]" placeholder="备注信息，便于管理员识别，可留空"></textarea>
                             </div>
                         </div>
                     </div>
