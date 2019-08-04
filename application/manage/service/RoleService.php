@@ -112,7 +112,7 @@ class RoleService
         }
 
         // 字段控制，解析保存的角色的字段信息
-        $_show_columns = $request->post('show_columns/a');
+        $_show_columns = $request->post('show_columns/a', []);
 
         // 构造提交过来的角色菜单及权限
         $role_menu = [];
