@@ -8,9 +8,12 @@
 
 namespace app\common\service;
 
+use app\common\helper\ArrayHelper;
 use app\common\model\Menu;
 use app\common\model\Role;
+use app\common\model\RoleMenu;
 use think\Db;
+use think\Exception;
 use think\facade\Cache;
 use think\Request;
 
@@ -21,13 +24,18 @@ class MenuService
      */
     public $Menu;
     /**
+     * @var RoleMenu
+     */
+    public $RoleMenu;
+    /**
      * @var LogService
      */
     public $LogService;
 
-    public function __construct(Menu $Menu, LogService $logService)
+    public function __construct(Menu $Menu, RoleMenu $roleMenu, LogService $logService)
     {
         $this->Menu       = $Menu;
+        $this->RoleMenu   = $roleMenu;
         $this->LogService = $logService;
     }
 
@@ -217,6 +225,7 @@ class MenuService
      * ---
      * 1、按层级 + 排序排列所有菜单
      * 2、重新生成递增ID
+     * 3、重新整理角色与菜单对应的数据，即重整菜单后保持现有角色数据不受影响
      * ---
      * @return array
      */
@@ -299,6 +308,29 @@ class MenuService
                 $primary++; // 主键自增
             }
 
+            // 用于同时整理现有角色与菜单的映射关系
+            $new_menu_map   = $reorganize;
+            $old_role_menus = $this->RoleMenu->db()->select(); // 查询出所有角色菜单数据用于替换处理
+            $role_menu      = []; // 整理好的新的角色菜单数据
+            if (!empty($old_role_menus)) {
+                foreach ($old_role_menus as $old_role_menu) {
+                    $_role_menu = $old_role_menu->toArray();
+                    foreach ($new_menu_map as $one_menu) {
+                        // 查找旧菜单id替换为新菜单id 并结束内层循环
+                        if ($one_menu['old_id'] == $old_role_menu['menu_id']) {
+                            $_role_menu['menu_id'] = $one_menu['id'];
+                            break;
+                        }
+                    }
+
+                    // 清空主键id自动重新生成 + 将json字段转换为数组后使用
+                    unset($_role_menu['id']);
+                    $_role_menu['show_columns'] = ArrayHelper::toArray($_role_menu['show_columns']);
+
+                    $role_menu[] = $_role_menu;
+                }
+            }
+
             // 清理old_id生成seed结构
             foreach ($reorganize as $key => $value) {
                 unset($reorganize[$key]['old_id']);
@@ -335,8 +367,24 @@ class MenuService
 
             // 清空menu表后重新插入重排整理后的菜单记录数据
             $this->Menu->db()->query('truncate table ' . $this->Menu->getTable());
-            $this->Menu->db()->insertAll($reorganize);
+            $affect_rows = $this->Menu->db()->insertAll($reorganize);
+            if (false === $affect_rows) {
+                throw new Exception('批量更新重整菜单数据失败');
+            }
+
+            // 角色菜单数据非空则执行替换更新
+            if (!empty($role_menu)) {
+                $this->RoleMenu->db()->query('truncate table ' . $this->RoleMenu->getTable());
+                $affect_rows = $this->RoleMenu->db()->insertAll($role_menu);
+                if (false === $affect_rows) {
+                    throw new Exception('批量更新重整角色所属菜单数据失败');
+                }
+            }
             Db::commit();
+
+            // 此处变更了角色菜单的id，需要全局清理掉已有角色菜单缓存，系统自动重建缓存
+            Cache::clear(Role::ROLE_CACHE_TAG);
+
             return ['error_code' => 0, 'error_msg' => '重整菜单列表并生成seed完成'];
         } catch (\Throwable $e) {
             Db::rollback();
