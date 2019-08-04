@@ -536,8 +536,10 @@ $(function () {
         var multi_id = [];
         var multi_data = [];
         $.each(checkItems, function (i,n) {
-            multi_id.push($(n).val());
-            multi_data.push($(n).parents('tr').data('json'));
+            if ($(n).prop("checked")) {
+                multi_id.push($(n).val());
+                multi_data.push($(n).parents('tr').data('json'));
+            }
         });
 
         return [multi_id, multi_data];
