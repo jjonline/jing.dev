@@ -312,7 +312,7 @@ class MenuService
             $new_menu_map   = $reorganize;
             $old_role_menus = $this->RoleMenu->db()->select(); // 查询出所有角色菜单数据用于替换处理
             $role_menu      = []; // 整理好的新的角色菜单数据
-            if (!empty($old_role_menus)) {
+            if (!$old_role_menus->isEmpty()) {
                 foreach ($old_role_menus as $old_role_menu) {
                     $_role_menu = $old_role_menu->toArray();
                     foreach ($new_menu_map as $one_menu) {
