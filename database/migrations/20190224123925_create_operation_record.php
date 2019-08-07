@@ -16,17 +16,13 @@ class CreateOperationRecord extends Migrator
     {
         if (!$this->hasTable('operation_record')) {
             $table = $this->table('operation_record', [
-                'id'          => false,
-                'primary_key' => 'id',
+                //'id'          => false,
+                //'primary_key' => 'id',
                 'engine'      => 'InnoDB',
                 'collation'   => 'utf8mb4_general_ci',
                 'comment'     => '后台用户操作动作和历史记录表-显式记录的关联业务操作记录',
             ]);
-            $table->addColumn('id', 'char', [
-                    'limit'   => 36,
-                    'comment' => 'ID，UUID形式',
-                ])
-                ->addColumn('operation_type', 'integer', [
+            $table->addColumn('operation_type', 'integer', [
                     'limit'   => MysqlAdapter::INT_TINY, // tinyint类型
                     'default' => '0',
                     'null'    => false,
@@ -80,7 +76,7 @@ class CreateOperationRecord extends Migrator
                     'comment' => '最后修改时间',
                 ])
                 ->addIndex('creator_id', [
-                    'unique' => true
+                    'unique' => false
                 ])
                 ->addIndex(['business_type','business_id'], [
                     'unique' => false

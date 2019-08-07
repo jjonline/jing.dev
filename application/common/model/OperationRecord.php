@@ -20,18 +20,18 @@ class OperationRecord extends Model
      * @return array
      * @throws \think\exception\DbException
      */
-    public function getOperationRecordList($operate_name, $business_id, $order = 'DESC')
+    public function getOperationRecordList($business_type, $business_id, $order = 'DESC')
     {
-        if (empty($operate_name) || empty($business_id)) {
+        if (empty($business_type) || empty($business_id)) {
             return [];
         }
         $order = $order == 'DESC' ? 'DESC' : 'ASC';
-        $data  = $this->where(['operation_name' => $operate_name,'business_id' => $business_id])
+        $data  = $this->where(['business_type' => $business_type, 'business_id' => $business_id])
                ->order('create_time', $order)
                ->paginate(10, false, [
                    'query' => [
-                       'name' => $operate_name,
-                       'id'   => $business_id,
+                       'business_type' => $business_type,
+                       'business_id'   => $business_id,
                    ]
                ]);
         $paginate         = $data->render();
