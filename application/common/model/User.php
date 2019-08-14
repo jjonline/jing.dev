@@ -159,7 +159,7 @@ class User extends Model
         }
 
         $result = $this->field(['id', 'real_name'])
-            ->where('dept_id', 'in', ArrayHelper::filterArrayThenUnique($multi_dept_id))
+            ->where('dept_id', 'in', ArrayHelper::filterByCallableThenUnique($multi_dept_id, 'intval'))
             ->order([
                 'update_time' => 'DESC', // 最近登录过的靠前
                 'id'          => 'ASC'
