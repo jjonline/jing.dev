@@ -57,7 +57,22 @@ class AttachmentService
                 'image' =>  ['gif', 'jpg', 'jpeg', 'png', 'bmp'],
                 'flash' =>  ['swf', 'flv'],
                 'media' =>  ['swf', 'flv', 'mp4'],//媒体类型 仅允许该三种
-                'file'  =>  ['csv','doc', 'docx', 'xls', 'xlsx', 'ppt', 'pdf', 'txt', 'zip', 'rar', 'gz', 'bz2','7z'],
+                'file'  =>  [
+                    'csv',
+                    'doc',
+                    'docx',
+                    'xls',
+                    'xlsx',
+                    'ppt',
+                    'pptx',
+                    'pdf',
+                    'txt',
+                    'zip',
+                    'rar',
+                    'gz',
+                    'bz2',
+                    '7z'
+                ],
                 'music' =>  ['mp3','mp4','m4a','amr'],// 媒体语音音乐类型
             );
 

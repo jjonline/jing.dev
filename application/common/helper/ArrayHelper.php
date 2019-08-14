@@ -30,14 +30,14 @@ class ArrayHelper
     }
 
     /**
-     * 一维数组去除等价false值 + 去重 + 每个元素去除两端空白
-     * @param array $origin 一维数组
-     * @return array
+     * 一维数组通过回调函数过滤然后去除false等价值最后返回不重复的元素
+     * @param array $arr 一维数组
+     * @param string $callback 默认回调处理一维数组每个元素的回调函数方法
+     * @return array 索引数组
      */
-    public static function filterArrayThenUnique($origin)
+    public static function filterByCallableThenUnique(array $arr, $callback = 'trim')
     {
-        // 去除等价false值 去除空值 返回唯一值
-        return array_unique(array_filter(array_map('trim', $origin)));
+        return array_values(array_unique(array_filter(array_map($callback, $arr))));
     }
 
     /**

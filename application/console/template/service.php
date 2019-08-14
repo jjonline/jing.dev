@@ -134,7 +134,7 @@ class __CONTROLLER__Service
                     throw new Exception('批量参数有误删除失败');
                 }
                 $effect_rows = $this->__CONTROLLER__->db()
-                    ->where('id', 'in', ArrayHelper::filterArrayThenUnique($multi_id_array))
+                    ->where('id', 'in', ArrayHelper::filterByCallableThenUnique($multi_id_array, 'intval'))
                     ->delete();
                 if (false === $effect_rows) {
                     throw new Exception('删除操作失败：系统异常');
