@@ -91,6 +91,22 @@ class CreateUser extends Migrator
                     'null'    => false,
                     'comment' => '是否为根用户：1是0不是[根用户不受角色限制永远具备所有菜单的所有权限，只有根用户才能创建根用户]',
                 ])
+                ->addColumn('create_user_id', 'integer', [
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => '创建人用户ID',
+                ])
+                ->addColumn('create_dept_id', 'integer', [
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => '创建人所属部门ID',
+                ])
+                ->addColumn('sort', 'integer', [
+                    'limit'   => MysqlAdapter::INT_BIG,
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => '部门排序，数字越小越靠前',
+                ])
                 ->addColumn('enable', 'boolean', [ // tinyint(1)类型
                     'default' => '0',
                     'null'    => false,

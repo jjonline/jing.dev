@@ -20,9 +20,11 @@
                         <tr>
                             <th data-priority="1">部门名称</th>
                             <th data-priority="3" data-orderable="false" class="text-center">层级</th>
-                            <th data-priority="5" data-orderable="false">备注</th>
-                            <th data-priority="6">创建时间</th>
-                            <th data-priority="9" data-orderable="false">排序</th>
+                            <th data-priority="8" data-orderable="false">备注</th>
+                            <th data-priority="5" data-orderable="false">创建人</th>
+                            <th data-priority="6" data-orderable="false">创建所属部门</th>
+                            <th data-priority="7">创建时间</th>
+                            <th data-priority="4" data-orderable="false">排序</th>
                             <th data-priority="2" data-orderable="false">操作</th>
                         </tr>
                     </thead>
@@ -32,6 +34,8 @@
                             <td><%{$dept.name|raw}%></td>
                             <td class="text-center"><%{$dept.level}%></td>
                             <td><%{$dept.remark}%></td>
+                            <td><%{$dept.real_name}%></td>
+                            <td><%{$dept.dept_name}%></td>
                             <td><%{$dept.create_time}%></td>
                             <td>
                                 <div class="layui-input-inline">

@@ -42,6 +42,16 @@ class CreateDepartment extends Migrator
                     'null'    => false,
                     'comment' => '部门层级：1->2->3逐次降低，最大层级5',
                 ])
+                ->addColumn('user_id', 'integer', [
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => '创建人用户ID',
+                ])
+                ->addColumn('dept_id', 'integer', [
+                    'default' => '0',
+                    'null'    => false,
+                    'comment' => '创建人所属部门ID',
+                ])
                 ->addColumn('sort', 'integer', [
                     'limit'   => MysqlAdapter::INT_BIG,
                     'default' => '0',

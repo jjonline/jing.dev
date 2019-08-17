@@ -13,6 +13,7 @@ use think\Model;
 
 class Department extends Model
 {
+    use PermissionsTrait;
 
     /**
      * 部门ID查找部门信息
@@ -82,6 +83,37 @@ class Department extends Model
             return $dept->toArray();
         }
         return [];
+    }
+
+    /**
+     * 带权限获取部门列表
+     * @param array $act_user
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getAuthFullDeptList(array $act_user)
+    {
+        $query = $this->db()->alias('dept')
+            ->field([
+                'dept.*',
+                'user.real_name',
+                'department.name as dept_name','user.real_name',
+                'department.name as dept_name',
+            ])
+            ->leftJoin('user user', 'user.id = dept.user_id')
+            ->leftJoin('department department', 'department.id = dept.dept_id');
+
+        // 数据权限限定
+        $this->permissionsLimitOrDeptSearch(
+            $query,
+            'dept.dept_id',
+            'dept.user_id',
+            $act_user
+        );
+
+        return $query->select()->toArray();
     }
 
     /**
