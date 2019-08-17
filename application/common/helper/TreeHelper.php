@@ -1,6 +1,6 @@
 <?php
 /**
- * 无线分类树帮助函数
+ * 层级数据分类树帮助函数
  * @user Jea杨 (JJonline@JJonline.Cn)
  * @date 2018-02-28 11:26
  * @file TreeHelper.php
@@ -11,20 +11,50 @@ namespace app\common\helper;
 class TreeHelper
 {
     /**
+     * 二维数组层级结构查找所有子节点
      * @param array $arr    树数组
      * @param int $paren_id 需要查找所有子节点
-     * @return array|mixed
+     * @return array
      */
     public static function child($arr, $paren_id)
     {
-        // $child = [];
+        $child = [];
         foreach ($arr as $key => $value) {
             if ($value['parent_id'] == $paren_id) {
                 $child[$value['id']] = $value;
                 $child              += self::child($arr, $value['id']);
             }
         }
-        return isset($child) ? $child : [];
+        return array_values($child); // 紧凑索引数组
+    }
+
+    /**
+     * 二维数组层级结构查找所有子节点及其所属节点
+     * @param array $arr    树数组
+     * @param int $paren_id 需要查找所有子节点
+     * @return array
+     */
+    public static function childWithSelf($arr, $paren_id)
+    {
+        $_self = [];
+        $child = [];
+        foreach ($arr as $key => $value) {
+            // 收集本身
+            if ($value['id'] == $paren_id) {
+                $_self = $value;
+            }
+            // 递归收集子节点
+            if ($value['parent_id'] == $paren_id) {
+                $child[$value['id']] = $value;
+                $child              += self::childWithSelf($arr, $value['id']);
+            }
+        }
+
+        if (!empty($_self)) {
+            array_unshift($child, $_self);
+        }
+
+        return array_values($child); // 紧凑索引数组
     }
 
     /**

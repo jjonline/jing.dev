@@ -32,7 +32,7 @@ class UserController extends BaseController
         $common = [
             'title'            => '用户管理 - ' . config('local.site_name'),
             'content_title'    => '用户列表',
-            'content_subtitle' => '后台用户列表管理',
+            'content_subtitle' => '后台所有用户列表和管理（特权操作）',
             'breadcrumb'       => [
                 ['label' => '用户管理', 'url' => url('user/list')],
                 ['label' => '用户列表', 'url' => ''],
@@ -43,10 +43,13 @@ class UserController extends BaseController
         $this->assign($common);
 
         // 仅能分配当前账号所下辖的部门
-        $dept_list = $this->DepartmentService->getDeptTreeList();
+        $dept_list = $this->DepartmentService->getAuthDeptTreeList($this->UserInfo['id']);
+        $user_list = $this->UserService->getAuthUserTreeList($this->UserInfo['id']);
         $role_list = $userService->Role->getRoleList(); // 角色显示所有
 
+        // 所辖部门\用户\角色下拉选项
         $this->assign('dept_list', $dept_list);
+        $this->assign('user_list', $user_list);
         $this->assign('role_list', $role_list);
 
         return $this->fetch();
@@ -64,7 +67,7 @@ class UserController extends BaseController
     {
         if ($this->request->isAjax()) {
             // 将当前登录用户信息传递过去
-            $result = $userService->superUserInsertUser($this->request);
+            $result = $userService->superUserInsertUser($this->request, $this->UserInfo);
             return $this->asJson($result);
         }
         return $this->renderJson("error");
@@ -94,10 +97,10 @@ class UserController extends BaseController
      * @return mixed
      * @throws \think\exception\DbException
      */
-    public function enableToggleAction(UserService $userService)
+    public function enableAction(UserService $userService)
     {
         if ($this->request->isPost() && $this->request->isAjax()) {
-            $result = $userService->enableUserToggle($this->request->post('id/i'), $this->UserInfo);
+            $result = $userService->enable($this->request, $this->UserInfo);
             return $this->asJson($result);
         }
         return $this->renderJson('请求失败', 404);

@@ -8,6 +8,7 @@
 
 namespace app\common\service;
 
+use app\common\helper\StringHelper;
 use app\common\helper\TreeHelper;
 use app\common\model\Department;
 use app\common\model\User;
@@ -161,7 +162,51 @@ class DepartmentService
     }
 
     /**
-     * 获取部门树状列表
+     * 用户id读取权限范围内的所有部门数结构
+     * @param integer $user_id
+     * @return array
+     */
+    public function getAuthDeptTreeList($user_id)
+    {
+        try {
+            // 读取指定用户信息获得部门及子部门id数组
+            $user = $this->User->getFullUserInfoById($user_id);
+            if (empty($user)) {
+                throw new Exception('指定用户不存在');
+            }
+
+            // 根用户能查看所有部门
+            if (!empty($user['is_root'])) {
+                return $this->getDeptTreeList();
+            }
+
+            // 非根用户读取后处理
+            $auth_dept   = TreeHelper::childWithSelf($this->getDeptList(), $user['dept_id']);
+            $begin_level = $user['dept_level']; // 用户所属部门的层级
+
+            // 格式化层级名称
+            foreach ($auth_dept as $key => $value) {
+                // 附加部门名称的层级标识
+                $auth_dept[$key]['name_format1'] = StringHelper::leftPadLevel(
+                    $value['name'],
+                    $value['level'],
+                    $begin_level
+                );
+                $auth_dept[$key]['name_format2'] = StringHelper::leftPadSpace(
+                    $value['name'],
+                    $value['level'],
+                    $begin_level
+                );
+            }
+
+            return $auth_dept;
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * 获取所有部门树状列表
      * --
      * 按层级显示竖向数、通过部门名称前加标识符来区分
      * --
@@ -175,10 +220,8 @@ class DepartmentService
                 $dept[$key]['name_format1'] = $value['name'];
                 $dept[$key]['name_format2'] = $value['name'];
                 if ($value['level'] > 1) {
-                    $dept[$key]['name_format1']   = str_repeat('&nbsp;&nbsp;├&nbsp;&nbsp;', $value['level'])
-                        .$value['name'];
-                    $dept[$key]['name_format2']   = str_repeat('&nbsp;', floor(pow(($value['level'] - 1), 1.8) * 2))
-                        .'└─'.$value['name'];
+                    $dept[$key]['name_format1'] = StringHelper::leftPadLevel($value['name'], $value['level'], 1);
+                    $dept[$key]['name_format2'] = StringHelper::leftPadSpace($value['name'], $value['level'], 1);
                 }
             }
             return TreeHelper::vTree($dept);
@@ -251,16 +294,8 @@ class DepartmentService
         }
         foreach ($vector_list as $key => $value) {
             // 附加部门名称的层级标识
-            $value['name_format1']      = str_repeat(
-                '&nbsp;&nbsp;├&nbsp;&nbsp;',
-                $value['level'] - $begin_level
-            ) . $value['name'];
-
-            $value['name_format2']      = str_repeat(
-                '&nbsp;',
-                floor(pow(($value['level'] - $begin_level - 1), 1.8) * 2)
-            ).'└─'.$value['name'];
-
+            $value['name_format1']      = StringHelper::leftPadLevel($value['name'], $value['level'], $begin_level);
+            $value['name_format2']      = StringHelper::leftPadSpace($value['name'], $value['level'], $begin_level);
             $vector['dept_id_vector'][] = $value['id'];
             $vector['dept_list'][]      = $value;
         }
@@ -284,7 +319,7 @@ class DepartmentService
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    protected function getDeptList()
+    private function getDeptList()
     {
         if (Config::get('app.app_debug')) {
             return $this->Department->getDeptList();
