@@ -11,6 +11,40 @@ namespace app\common\helper;
 class StringHelper
 {
     /**
+     * 具备层级的层级名称按所处层级和上一层级填充具备层级数的标识
+     * @param string $name        待填充的具备层级特性的当前层级的名称
+     * @param int    $now_level   当前所处的层级，从0开始
+     * @param int    $begin_level 当前所处层级的上一级的开始层级，从0开始
+     * @return string
+     */
+    public static function leftPadLevel($name, $now_level, $begin_level = 0)
+    {
+        $pad_str = '&nbsp;&nbsp;├&nbsp;&nbsp;';
+        $pad_num = $now_level - $begin_level;
+        if ($pad_num <= 0) {
+            return $name;
+        }
+        return str_repeat($pad_str, $pad_num) . $name;
+    }
+
+    /**
+     * 具备层级的层级名称按所处层级和上一层级填充空白标识
+     * @param string $name        待填充的具备层级特性的当前层级的名称
+     * @param int    $now_level   当前所处的层级，从0开始
+     * @param int    $begin_level 当前所处层级的上一级的开始层级，从0开始
+     * @return string
+     */
+    public static function leftPadSpace($name, $now_level, $begin_level = 0)
+    {
+        $pad_str = '&nbsp;';
+        $pad_num = floor(pow(($now_level - $begin_level - 1), 1.8) * 2);
+        if ($pad_num <= 0) {
+            return $name;
+        }
+        return str_repeat($pad_str, $pad_num) . '└─' . $name;
+    }
+
+    /**
      * 检查一个字符串是否为字母或下划线开头的合法变量标识符
      * @param string $str
      * @return bool

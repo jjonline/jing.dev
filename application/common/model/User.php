@@ -96,17 +96,26 @@ class User extends Model
 
     /**
      * 通过用户主键ID查询包含用户角色、部门的完整信息
-     * ['role' => ['xx1' => '','xx2' => ''],'department' => ['yy1','yy2']]
      * @param string $user_id 用户主键ID
-     * @throws
-     * @return []
+     * @param $user_id
+     * @return array
+     * @throws DbException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
      */
     public function getFullUserInfoById($user_id)
     {
         $data = Db::name('user u')
               ->join('department dept', 'dept.id = u.dept_id')
               ->join('role r', 'r.id = u.role_id')
-              ->field(['u.*','dept.name as dept_name','r.name as role_name'])
+              ->field([
+                  'u.*',
+                  'dept.name as dept_name',
+                  'dept.id as dept_id',
+                  'dept.level as dept_level', // 用户所属部门的层级
+                  'r.id as role_id',
+                  'r.name as role_name',
+              ])
               ->where('u.id', $user_id)
               ->find();
         return $data ? $data : [];
@@ -115,7 +124,7 @@ class User extends Model
     /**
      * 重新生成|更新用户auth_code值并保存
      * @param mixed $user_id
-     * @return bool|static
+     * @return bool
      */
     public function updateUserAuthCode($user_id)
     {
@@ -124,7 +133,7 @@ class User extends Model
         }
         $_user              = [];
         $_user['auth_code'] = GenerateHelper::makeNonceStr(8);
-        return $this->update($_user, ['id' => $user_id]);
+        return false !== $this->update($_user, ['id' => $user_id]);
     }
 
     /**
@@ -138,8 +147,8 @@ class User extends Model
     {
         $result = $this->field(['id', 'real_name'])
             ->order([
-                'update_time' => 'DESC', // 最近登录过的靠前
-                'id'          => 'ASC'
+                'sort' => 'ASC',
+                'id'   => 'DESC'
             ])->select();
         return $result->isEmpty() ? [] : $result->toArray();
     }
@@ -152,7 +161,7 @@ class User extends Model
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    public function getAuthUserTreeList(array $multi_dept_id)
+    public function getUsersByMultiDeptId(array $multi_dept_id)
     {
         if (empty($multi_dept_id)) {
             return [];
@@ -161,8 +170,8 @@ class User extends Model
         $result = $this->field(['id', 'real_name'])
             ->where('dept_id', 'in', ArrayHelper::filterByCallableThenUnique($multi_dept_id, 'intval'))
             ->order([
-                'update_time' => 'DESC', // 最近登录过的靠前
-                'id'          => 'ASC'
+                'sort' => 'ASC', // 按排序字段排序
+                'id'   => 'DESC'
             ])->select();
         return $result->isEmpty() ? [] : $result->toArray();
     }

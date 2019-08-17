@@ -688,6 +688,23 @@ var utils = {
         });
     },
     /**
+     * 绑定datetimepicker日历时间组件
+     * @param $node jquery对象
+     */
+    bindDatePicker:function ($node) {
+        $node.each(function (i,e) {
+            $(e).datetimepicker({
+                language: 'zh-CN',
+                autoclose: true,
+                todayHighlight: true,
+                format: 'yyyy-mm-dd',
+                minView: 'month',
+                startView: 2,
+                viewSelect: 3
+            });
+        });
+    },
+    /**
      * 页面顶部显示进度条
      * @param process_rate 0~100进度条
      */
@@ -1115,8 +1132,8 @@ var utils = {
             segments: a.pathname.replace(/^\//, '').split('/')
         };
     },
-    
-    /*  
+
+    /*
      *  过滤XSS
      *  @param  {String}    str 需要过滤的内容
      *  @return {String}    显示的内容
@@ -1283,6 +1300,33 @@ var utils = {
             return string;
         }
         return string.substring(0,length) + '...';
+    },
+    // 填充左侧0
+    padZero:function(n, c)
+    {
+        if((n = n + "").length < c){
+            return new Array(++c - n.length).join("0") + n;
+        } else {
+            return n;
+        }
+    },
+    /**
+     * 格式化linux时间戳
+     * @param time
+     * @returns {string}
+     */
+    timestampToDate:function (time)
+    {
+        if (utils.isEmpty(time)) {
+            return '-';
+        }
+        var date = new Date(time * 1000);
+        return date.getFullYear()
+            + '-' + pad((date.getMonth() + 1), 2)
+            + '-' + pad(date.getDate(), 2)
+            + ' ' + this.padZero(date.getHours(), 2)
+            + ':' + this.padZero(date.getMinutes(), 2)
+            + ':' + pad(date.getSeconds(), 2);
     }
 };// End utils
 

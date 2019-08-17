@@ -127,6 +127,7 @@ class AttachmentService
 
                 // 处理资源信息成前端可直接使用的信息数组
                 $this->dealAttachmentToFrontend($exist_attachment);
+                $exist_attachment['ext'] = $file_ext; // 添加返回文件后缀
 
                 return ['error_code' => 0,'error_msg' => '上传成功：文件曾上传过','data' => $exist_attachment];
             }
@@ -185,6 +186,7 @@ class AttachmentService
 
             // 处理资源信息成前端可直接使用的信息数组
             $this->dealAttachmentToFrontend($attachment);
+            $attachment['ext'] = $file_ext; // 添加返回文件后缀
 
             // 无论attachment存储至Db是否成功 文件上传完成均返回文件信息数组
             return ['error_code' => 0, 'error_msg' => '上传成功：新增文件', 'data' => $attachment];

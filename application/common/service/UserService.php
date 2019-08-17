@@ -12,6 +12,7 @@
 
 namespace app\common\service;
 
+use app\common\helper\ArrayHelper;
 use app\common\helper\FilterValidHelper;
 use app\common\helper\GenerateHelper;
 use app\common\helper\UtilHelper;
@@ -341,9 +342,10 @@ class UserService
     /**
      * super管理员单独新增后台用户，不涉及职员信息维护和管理
      * @param Request $request
+     * @param array   $act_user
      * @return array
      */
-    public function superUserInsertUser(Request $request)
+    public function superUserInsertUser(Request $request, array $act_user)
     {
         $_user = $request->post('User/a');
         try {
@@ -351,10 +353,12 @@ class UserService
             $user              = $this->generateNewUserInfo($_user);
 
             // 补充座机和是否领导以及是否启用
-            $user['telephone'] = !empty($_user['telephone']) ? $_user['telephone'] : '';
-            $user['is_leader'] = !empty($_user['is_leader']) ? 1 : 0;
-            $user['enable']    = !empty($_user['enable']) ? 1 : 0;
-            $user['auth_code'] = GenerateHelper::makeNonceStr(8);
+            $user['telephone']      = !empty($_user['telephone']) ? $_user['telephone'] : '';
+            $user['is_leader']      = !empty($_user['is_leader']) ? 1 : 0;
+            $user['enable']         = !empty($_user['enable']) ? 1 : 0;
+            $user['auth_code']      = GenerateHelper::makeNonceStr(8);
+            $user['create_user_id'] = $act_user['id']; // 创建人id
+            $user['create_dept_id'] = $act_user['dept_id']; // 创建人所属部门
 
             // 是否创建为根用户判断处理
             if (!empty($_user['is_root'])) {
@@ -581,31 +585,56 @@ class UserService
 
     /**
      * 带部门权限判断的启用|禁用用户
-     * @param mixed|int $user_id
-     * @param array $act_user_info 控制器中的包含菜单、部门权限信息的UserInfo属性数组
+     * @param Request $request
+     * @param array   $act_user_info 控制器中的包含菜单、部门权限信息的UserInfo属性数组
      * @return array
+     * @throws Exception
      * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
      */
-    public function enableUserToggle($user_id, $act_user_info = array())
+    public function enable(Request $request, $act_user_info = array())
     {
-        if (empty($user_id) || empty($act_user_info)) {
+        $user_id       = $request->post('id');
+        $multi_user_id = $request->post('multi_id/a'); // 批量启用禁用
+        $enable        = $request->post('enable');
+        if (empty($user_id) && empty($multi_user_id)) {
             return ['error_code' => 400,'error_msg' => '参数缺失'];
         }
-        $user            = $this->User->getUserInfoById($user_id);
-        $act_dept_vector = $act_user_info['dept_auth']['dept_id_vector'] ?? [];
-        if (!in_array($user['dept_id'], $act_dept_vector)) {
-            return ['error_code' => 500,'error_msg' => '您无权限启用或禁用该用户'];
+
+        // 单个启用禁用
+        if (!empty($user_id) && is_numeric($user_id)) {
+            $user            = $this->User->getUserInfoById($user_id);
+            $act_dept_vector = $act_user_info['dept_auth']['dept_id_vector'] ?? [];
+            if (!in_array($user['dept_id'], $act_dept_vector)) {
+                return ['error_code' => 500,'error_msg' => '您无权限启用或禁用该用户'];
+            }
+
+            // 启用或禁用用户写入
+            $_enable           = [];
+            $_enable['id']     = $user['id'];
+            $_enable['enable'] = $user['enable'] ? 0 : 1;
+            $result            = $this->User->isUpdate(true)->save($_enable);
+
+            if (false !== $result) {
+                $this->LogService->logRecorder($user, '启用或禁用用户');
+                return ['error_code' => 0,'error_msg' => $user['enable'] ? '禁用完成' : '启用完成'];
+            }
         }
 
-        // 启用或禁用用户写入
-        $_enable           = [];
-        $_enable['id']     = $user['id'];
-        $_enable['enable'] = $user['enable'] ? 0 : 1;
-        $result            = $this->User->isUpdate(true)->save($_enable);
-        if (false !== $result) {
-            $this->LogService->logRecorder($user, '启用或禁用用户');
-            return ['error_code' => 0,'error_msg' => $user['enable'] ? '禁用完成' : '启用完成'];
+        // 批量启用禁用--仅根用户可用
+        if (!empty($multi_user_id) && in_array($enable, ['0', '1'])) {
+            if (!$act_user_info['is_root']) {
+                return ['error_code' => 500,'error_msg' => '操作失败：批量操作仅根用户可用'];
+            }
+            $multi_user_id = ArrayHelper::filterByCallableThenUnique($multi_user_id, 'intval');
+            $result = $this->User->where('id', 'IN', $multi_user_id)->update(['enable' => $enable]);
+
+            if (false !== $result) {
+                $this->LogService->logRecorder([$user_id, $multi_user_id, $enable], '批量启用或禁用用户');
+                return ['error_code' => 0,'error_msg' => empty($enable) ? '批量禁用完成' : '批量启用完成'];
+            }
         }
+
         return ['error_code' => 500,'error_msg' => '操作失败：数据库异常'];
     }
 
@@ -623,7 +652,8 @@ class UserService
     }
 
     /**
-     * 获取指定用户所属部门及子部门下辖所有用户浪河姓名列表
+     * 获取指定用户所属部门及子部门下辖所有用户和姓名列表
+     * @param integer $user_id 指定用户的id
      * @return array
      */
     public function getAuthUserTreeList($user_id)
@@ -646,7 +676,7 @@ class UserService
                 throw new Exception('没有所属部门或下辖部门');
             }
 
-            return $this->User->getAuthUserTreeList($multi_dept_id);
+            return $this->User->getUsersByMultiDeptId($multi_dept_id);
         } catch (\Throwable $e) {
             return [];
         }

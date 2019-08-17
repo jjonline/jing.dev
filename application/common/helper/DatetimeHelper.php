@@ -50,8 +50,107 @@ class DatetimeHelper
     }
 
     /**
+     * 精确到分钟的时刻表示法字符串转化为没有年月日的时刻数字
+     * @param string $period_time 譬如：11:30
+     * @return int
+     */
+    public static function periodHourTime2Number($period_time)
+    {
+        $time = strtotime($period_time);
+        return $time - strtotime(date('Y-m-d'));
+    }
+
+    /**
+     * 精确到分钟的没有年月日的时刻数字转化为时刻表示法字符串
+     * @param int $number
+     * @return string
+     */
+    public static function number2PeriodHourTime($number)
+    {
+        return gmdate('H:i', $number);
+    }
+
+    /**
+     * 获取今日凌晨至当前时刻的秒数
+     * @return int
+     */
+    public static function nowTodaySecondsNumber()
+    {
+        return time() - strtotime(date('Y-m-d'));
+    }
+
+    /**
+     * 明日凌晨零点时间戳，明日开始的时间戳
+     * @return int
+     */
+    public static function tomorrowBeginTimeNumber()
+    {
+        return strtotime(date('Y-m-d', strtotime('+1 days')));
+    }
+
+    /**
+     * 明日23点59分59秒时间戳
+     * @return int
+     */
+    public static function tomorrowEndTimeNumber()
+    {
+        return strtotime(date('Y-m-d', strtotime('+1 days')) . ' 23:59:59');
+    }
+
+    /**
+     * 是否Y-m-d格式的日期字符串
+     * @param string $date_str
+     * @return bool
+     */
+    public static function isYearMonthDayTime($date_str)
+    {
+        if (empty($date_str)) {
+            return false;
+        }
+        if ($date_str != date('Y-m-d', strtotime($date_str))) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 是否H:i:s格式的是否买
+     * @param string $time_str
+     * @return bool
+     */
+    public static function isHourMinuteSecondTime($time_str)
+    {
+        if (empty($time_str)) {
+            return false;
+        }
+        if ($time_str != date('H:i:s', strtotime($time_str))) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 是否Y-m-d H:i:s格式的日期时间格式
+     * @param string $datetime_str
+     * @return bool
+     */
+    public static function isYmdHisTime($datetime_str)
+    {
+        if (empty($datetime_str)) {
+            return false;
+        }
+        if ($datetime_str != date('Y-m-d H:i:s', strtotime($datetime_str))) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * 获取日期字符串
      * @param string $input 完整时间字符串
+     * @param int $max
+     * @param int $min
+     * @return false|string
      */
     public static function getDate($input, $max = null, $min = null)
     {
@@ -220,7 +319,7 @@ class DatetimeHelper
     {
         $begin_date = $yearMonth . '-01';
         $end_date   = date('Y-m-d', (strtotime('-1 day', (strtotime("+1 months", (strtotime($yearMonth . '-01')))))));
-        
+
         return [
             'begin_date' => $begin_date ,
             'end_date' => $end_date
