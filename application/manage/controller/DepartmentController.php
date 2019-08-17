@@ -36,7 +36,7 @@ class DepartmentController extends BaseController
         ];
         $this->assign($common);
 
-        $dept_list = $departmentService->getDeptTreeList();
+        $dept_list = $departmentService->lists($this->UserInfo);
 
         $this->assign('dept_list', $dept_list);
 
