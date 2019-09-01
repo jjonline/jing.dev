@@ -57,8 +57,8 @@ class MineController extends BaseController
      */
     public function editAction()
     {
-        if ($this->request->isAjax() && $this->request->post('Profile.id') == $this->UserInfo['id']) {
-            return $this->UserService->userModifyOwnUserInfo($this->request);
+        if ($this->request->isAjax()) {
+            return $this->UserService->userModifyOwnInfo($this->request->post('Profile/a'), $this->UserInfo);
         }
         return $this->renderJson('异常错误', 500);
     }
