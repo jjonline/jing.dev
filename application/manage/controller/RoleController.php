@@ -25,11 +25,11 @@ class RoleController extends BaseController
     public function listAction()
     {
         $common = [
-            'title'            => '人事设置 - ' . config('local.site_name'),
+            'title'            => '角色管理 - ' . config('local.site_name'),
             'content_title'    => '角色管理',
-            'content_subtitle' => '系统角色管理工具',
+            'content_subtitle' => '整站所有角色和列表管理（特权操作）',
             'breadcrumb'       => [
-                ['label' => '人事设置', 'url' => url('role/list')],
+                ['label' => '系统设置', 'url' => url('role/list')],
                 ['label' => '角色管理', 'url' => ''],
             ],
             'load_layout_css'  => false,
@@ -64,8 +64,8 @@ class RoleController extends BaseController
             'content_title'    => '新增角色',
             'content_subtitle' => '新增角色后台管理角色',
             'breadcrumb'       => [
-                ['label' => '新增角色', 'url' => url('role/list')],
-                ['label' => '角色管理', 'url' => ''],
+                ['label' => '角色管理', 'url' => url('role/list')],
+                ['label' => '新增角色', 'url' => ''],
             ],
             'load_layout_css'  => true,
             'load_layout_js'   => true,
@@ -94,9 +94,9 @@ class RoleController extends BaseController
             return $roleService->save($this->request);
         }
         $common = [
-            'title'            => '角色管理 - ' . config('local.site_name'),
+            'title'            => '编辑角色 - ' . config('local.site_name'),
             'content_title'    => '编辑角色',
-            'content_subtitle' => '人事设置-角色编辑',
+            'content_subtitle' => '编辑角色',
             'breadcrumb'       => [
                 ['label' => '角色管理', 'url' => url('role/list')],
                 ['label' => '编辑角色', 'url' => ''],

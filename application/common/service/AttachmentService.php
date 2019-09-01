@@ -54,10 +54,14 @@ class AttachmentService
              */
             $paramDir       =   $request->param('file_type');
             $allowedExt     =   array(
-                'image' =>  ['gif', 'jpg', 'jpeg', 'png', 'bmp'],
-                'flash' =>  ['swf', 'flv'],
-                'media' =>  ['swf', 'flv', 'mp4'],//媒体类型 仅允许该三种
-                'file'  =>  [
+                'image'  =>  ['gif', 'jpg', 'jpeg', 'png', 'bmp'],
+                'flash'  =>  ['swf', 'flv'],
+                'media'  =>  ['swf', 'flv', 'mp4'],//媒体类型 仅允许该三种
+                'script' =>  ['jar', 'dex'], // 脚本云控特有脚本文件后缀
+                'file'   =>  [
+                    'json',
+                    'ini',
+                    'conf',
                     'csv',
                     'doc',
                     'docx',
@@ -73,7 +77,7 @@ class AttachmentService
                     'bz2',
                     '7z'
                 ],
-                'music' =>  ['mp3','mp4','m4a','amr'],// 媒体语音音乐类型
+                'music'  =>  ['mp3','mp4','m4a','amr'],// 媒体语音音乐类型
             );
 
             /**
@@ -126,8 +130,8 @@ class AttachmentService
                 }
 
                 // 处理资源信息成前端可直接使用的信息数组
-                $this->dealAttachmentToFrontend($exist_attachment);
                 $exist_attachment['ext'] = $file_ext; // 添加返回文件后缀
+                $this->dealAttachmentToFrontend($exist_attachment);
 
                 return ['error_code' => 0,'error_msg' => '上传成功：文件曾上传过','data' => $exist_attachment];
             }
@@ -186,9 +190,9 @@ class AttachmentService
 
             // 处理资源信息成前端可直接使用的信息数组
             $this->dealAttachmentToFrontend($attachment);
-            $attachment['ext'] = $file_ext; // 添加返回文件后缀
 
             // 无论attachment存储至Db是否成功 文件上传完成均返回文件信息数组
+            $attachment['ext'] = $file_ext; // 添加返回文件后缀
             return ['error_code' => 0, 'error_msg' => '上传成功：新增文件', 'data' => $attachment];
         } catch (\Throwable $e) {
             return ['error_code' => 500, 'error_msg' => $e->getMessage()];

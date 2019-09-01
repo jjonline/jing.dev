@@ -31,11 +31,11 @@ class UserController extends BaseController
         }
         $common = [
             'title'            => '用户管理 - ' . config('local.site_name'),
-            'content_title'    => '用户列表',
-            'content_subtitle' => '后台所有用户列表和管理（特权操作）',
+            'content_title'    => '系统设置',
+            'content_subtitle' => '整站后台所有用户列表和管理（特权操作）',
             'breadcrumb'       => [
-                ['label' => '用户管理', 'url' => url('user/list')],
-                ['label' => '用户列表', 'url' => ''],
+                ['label' => '系统设置', 'url' => url('user/list')],
+                ['label' => '用户管理', 'url' => ''],
             ],
             'load_layout_css'  => false,
             'load_layout_js'   => true,

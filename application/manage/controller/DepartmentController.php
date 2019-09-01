@@ -26,7 +26,7 @@ class DepartmentController extends BaseController
         $common = [
             'title'            => '部门管理 - ' . config('local.site_name'),
             'content_title'    => '部门管理',
-            'content_subtitle' => '部门管理工具，设置和管理系统部门数据',
+            'content_subtitle' => '整站所有部门和列表管理（特权操作）',
             'breadcrumb'       => [
                 ['label' => '系统管理', 'url' => url('department/list')],
                 ['label' => '部门管理', 'url' => ''],

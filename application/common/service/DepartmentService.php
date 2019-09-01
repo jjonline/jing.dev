@@ -162,6 +162,29 @@ class DepartmentService
     }
 
     /**
+     * 带权限部门列表
+     * @param array $act_user
+     * @return array
+     */
+    public function lists(array $act_user)
+    {
+        try {
+            $dept = $this->Department->getAuthFullDeptList($act_user);
+            foreach ($dept as $key => $value) {
+                $dept[$key]['name_format1'] = $value['name'];
+                $dept[$key]['name_format2'] = $value['name'];
+                if ($value['level'] > 1) {
+                    $dept[$key]['name_format1'] = StringHelper::leftPadLevel($value['name'], $value['level'], 1);
+                    $dept[$key]['name_format2'] = StringHelper::leftPadSpace($value['name'], $value['level'], 1);
+                }
+            }
+            return TreeHelper::vTree($dept);
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
      * 用户id读取权限范围内的所有部门数结构
      * @param integer $user_id
      * @return array
