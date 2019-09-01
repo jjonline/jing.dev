@@ -10,22 +10,22 @@
                 <div class="alert alert-warning alert-dismissible">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                     <h4><i class="icon fa fa-warning"></i> 特别注意</h4>
-                    角色权重表达的层次关系，决定`个人中心` -> `组织账号管理`新建账号时能选的角色，具体而言具备1的只能选1以下（不包括1）权重的角色，以此类推！
+                    角色权重表达的层次关系，决定 <code>组织管理</code> 下新建账号时能选的角色，具体而言具备1的只能选1以下（不包括1）权重的角色，以此类推！
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">角色名称：</label>
+                    <label class="col-sm-2 control-label">角色名称 <span class="required">*</span></label>
                     <div class="col-sm-5"><input type="text" id="name" class="form-control" name="Role[name]" placeholder="角色名称，名称唯一，例如：仓库管理员">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">角色权重：</label>
+                    <label class="col-sm-2 control-label">角色权重 <span class="required">*</span></label>
                     <div class="col-sm-5">
                         <input type="number" id="sort" class="form-control" name="Role[sort]" placeholder="用于确定角色的层次关系，数字越小权重越大，建议从1开始">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">备注信息：</label>
+                    <label class="col-sm-2 control-label">备注信息 <span class="not-required">*</span></label>
                     <div class="col-sm-5">
                         <textarea id="remark" rows=3 class="form-control" name="Role[remark]" placeholder="角色备注信息，便于识别，可选"></textarea>
                     </div>

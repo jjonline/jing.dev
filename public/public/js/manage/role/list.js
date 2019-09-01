@@ -38,7 +38,7 @@ $(function () {
     $('.table').on('change','.list-sort-input',function () {
         var id = $(this).data('id');
         var sort = $(this).val();
-        utils.ajaxConfirm('确认修改该角色的排序？','/manage/role/sort',{'id':id,'sort':sort},function () {
+        utils.ajaxConfirm('确认修改该角色的权重？权重表达的是角色的层级关系，数字越小权重越大','/manage/role/sort',{'id':id,'sort':sort},function () {
             location.reload();
         });
     }).on('click','.delete',function () {

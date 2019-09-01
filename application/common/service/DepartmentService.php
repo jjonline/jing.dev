@@ -19,7 +19,6 @@ use think\Exception;
 use think\facade\Cache;
 use think\facade\Config;
 use think\facade\Session;
-use think\Request;
 
 class DepartmentService extends BaseService
 {

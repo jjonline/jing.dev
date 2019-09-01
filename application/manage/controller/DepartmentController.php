@@ -93,11 +93,6 @@ class DepartmentController extends BaseController
      * 删除部门
      * @param DepartmentService $departmentService
      * @return mixed
-     * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     * @throws \think\exception\PDOException
      */
     public function deleteAction(DepartmentService $departmentService)
     {

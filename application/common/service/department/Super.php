@@ -120,6 +120,10 @@ trait Super
 
             if ($is_edit) {
                 $dept['id'] = $_dept['id'];
+            } else {
+                // 新增模式补充创建人和创建人所属部门
+                $dept['user_id'] = $act_user['id'];
+                $dept['dept_id'] = $act_user['dept_id'];
             }
             $affected_rows = $this->Department->isUpdate($is_edit)->save($dept);
 

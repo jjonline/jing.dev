@@ -1,18 +1,5 @@
 <div class="row">
     <div class="col-md-12">
-        <%{if condition = "user_has_permission('manage/department/create')"}%>
-            <div class="box box-solid">
-                <div class="box-body">
-                    <div class="row">
-                        <div class="col-xs-12 col-sm-2">
-                            <a href="<%{:url('department/create')}%>" class="btn btn-primary dept_create"><i class="fa fa-plus"></i> 新增部门</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <%{/if}%>
-
-
         <div class="box box-primary">
             <div class="box-body">
                 <table id="mainTable" data-order='[[ 3, "asc" ]]' class="table table-bordered table-striped table-hover display responsive nowrap" width="100%">
@@ -23,39 +10,37 @@
                             <th data-priority="4" data-orderable="false" class="text-center">排序</th>
                             <th data-priority="8" data-orderable="false">备注</th>
                             <th data-priority="5" data-orderable="false">创建人</th>
-                            <th data-priority="10" data-orderable="false">创建人所属部门</th>
                             <th data-priority="9">创建时间</th>
                             <th data-priority="2" data-orderable="false">操作</th>
                         </tr>
                     </thead>
                     <tbody>
                     <%{volist name="dept_list" id="dept"}%>
-                        <tr class="treegrid-<%{$dept.id}%> treegrid-parent-<%{$dept.parent_id}%> treegrid-expanded">
-                            <td><%{$dept.name_format2|raw}%></td>
-                            <td class="text-center"><%{$dept.level}%></td>
-                            <td class="text-center">
-                                <div class="layui-input-inline">
-                                    <input type="text" class="list-sort-input" data-id="<%{$dept.id}%>" value="<%{$dept.sort}%>">
-                                </div>
-                            </td>
-                            <td><%{$dept.remark}%></td>
-                            <td><%{$dept.real_name}%></td>
-                            <td><%{$dept.dept_name}%></td>
-                            <td><%{$dept.create_time}%></td>
-                            <td>
-                                <%{if condition = "user_has_permission('manage/department/edit')"}%>
-                                    <a href="<%{:url('department/edit')}%>?id=<%{$dept.id}%>" class="btn btn-xs btn-success edit" data-name="<%{$dept.name}%>" data-sort="<%{$dept.sort}%>" data-remark="<%{$dept.remark}%>" data-parent_id="<%{$dept.parent_id}%>" data-id="<%{$dept.id}%>"><i class="fa fa-pencil-square-o"></i> 编辑</a>
-                                <%{/if}%>
-                                <%{if condition = "user_has_permission('manage/department/delete')"}%>
-                                    <a href="javascript:;" data-href="<%{:url('department/delete',['id' => $dept.id])}%>" class="btn btn-xs btn-danger delete" data-id="<%{$dept.id}%>"><i class="fa fa-trash-o"></i> 删除</a>
-                                <%{/if}%>
-                                <%{if condition = "user_has_permission('manage/department/create')"}%>
-                                    <%{if condition="$dept.level lt 5"}%>
-                                        <a href="<%{:url('department/create')}%>?parent_id=<%{$dept.id}%>" class="btn btn-xs btn-info create" data-id="<%{$dept.id}%>"><i class="fa fa-plus"></i> 新建子部门</a>
-                                    <%{/if}%>
-                                <%{/if}%>
-                            </td>
-                        </tr>
+                    <tr class="treegrid-<%{$dept.id}%> treegrid-parent-<%{$dept.parent_id}%> treegrid-expanded">
+                        <td><%{$dept.name_format2|raw}%></td>
+                        <td class="text-center"><%{$dept.level}%></td>
+                        <td class="text-center">
+                            <div class="layui-input-inline">
+                                <input type="text" class="list-sort-input" data-id="<%{$dept.id}%>" value="<%{$dept.sort}%>">
+                            </div>
+                        </td>
+                        <td><%{$dept.remark}%></td>
+                        <td><%{$dept.real_name}%></td>
+                        <td><%{$dept.create_time}%></td>
+                        <td>
+                            <%{if condition = "user_has_permission('manage/organization/edit')"}%>
+                            <a href="<%{:url('organization/edit')}%>?id=<%{$dept.id}%>" class="btn btn-xs btn-success edit" data-name="<%{$dept.name}%>" data-sort="<%{$dept.sort}%>" data-remark="<%{$dept.remark}%>" data-parent_id="<%{$dept.parent_id}%>" data-id="<%{$dept.id}%>"><i class="fa fa-pencil-square-o"></i> 编辑</a>
+                            <%{/if}%>
+                            <%{if condition = "user_has_permission('manage/organization/delete')"}%>
+                            <a href="javascript:;" data-href="<%{:url('organization/delete',['id' => $dept.id])}%>" class="btn btn-xs btn-danger delete" data-id="<%{$dept.id}%>"><i class="fa fa-trash-o"></i> 删除</a>
+                            <%{/if}%>
+                            <%{if condition = "user_has_permission('manage/organization/create')"}%>
+                            <%{if condition="$dept.level lt 5"}%>
+                            <a href="<%{:url('organization/create')}%>?parent_id=<%{$dept.id}%>" class="btn btn-xs btn-info create" data-id="<%{$dept.id}%>"><i class="fa fa-plus"></i> 新建子部门</a>
+                            <%{/if}%>
+                            <%{/if}%>
+                        </td>
+                    </tr>
                     <%{/volist}%>
                     </tbody>
                 </table>
@@ -75,13 +60,15 @@
                 <h4 class="modal-title" id="DeptModelLabel">编辑部门</h4>
             </div>
             <div class="modal-body">
-                <form action="<%{:url('department/edit')}%>" data-edit="<%{:url('department/edit')}%>" data-create="<%{:url('department/create')}%>" class="form-horizontal" id="DeptForm">
+                <form action="<%{:url('organization/edit')}%>" data-edit="<%{:url('organization/edit')}%>" data-create="<%{:url('organization/create')}%>" class="form-horizontal" id="DeptForm">
                     <div class="form-group">
                         <label class="col-sm-3 control-label">上级部门 <span class="required">*</span></label>
                         <div class="col-sm-8">
                             <select name="Dept[parent_id]" id="parent_id" class="form-control select2" style="width: 100%;">
                                 <option value="-1">--请选择上级部门--</option>
-                                <option value="0">『新建为顶级部门』（无上级部门）</option>
+                                <option value="<%{$parent_dept['id'] ?? 0}%>">
+                                    <%{$parent_dept['name'] ?? '『上级部门』'}%>
+                                </option>
                                 <%{volist name="dept_list" id="dept"}%>
                                     <%{if condition="$dept.level lt 10"}%>
                                         <option value="<%{$dept.id}%>"><%{$dept.name_format1|raw}%></option>
@@ -96,7 +83,7 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">部门名称 <span class="required">*</span></label>
                         <div class="col-sm-8">
-                            <input type="text" id="name" class="form-control" name="Dept[name]" placeholder="公司名、业务部门名、团队名等">
+                            <input type="text" id="name" class="form-control" name="Dept[name]" placeholder="子公司名、业务部门名、团队名等">
                         </div>
                     </div>
 
