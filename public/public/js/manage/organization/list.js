@@ -33,12 +33,12 @@ $(function () {
             }
         }
     });
-    utils.loadCss('/public/plugin/jquery-treegrid/css/jquery.treegrid.css');
-    utils.loadJs('/public/plugin/jquery-treegrid/js/jquery.treegrid.min.js',function () {
-        utils.loadJs('/public/plugin/jquery-treegrid/js/jquery.treegrid.bootstrap3.js',function () {
-            $('#mainTable').treegrid();
-        });
-    });
+    // utils.loadCss('/public/plugin/jquery-treegrid/css/jquery.treegrid.css');
+    // utils.loadJs('/public/plugin/jquery-treegrid/js/jquery.treegrid.min.js',function () {
+    //     utils.loadJs('/public/plugin/jquery-treegrid/js/jquery.treegrid.bootstrap3.js',function () {
+    //         $('#mainTable').treegrid();
+    //     });
+    // });
 
     // insert
     $('.dept_create').on('click',function () {

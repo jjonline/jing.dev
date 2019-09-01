@@ -86,7 +86,11 @@ class Department extends Model
             ])
             ->leftJoin('user user', 'user.id = dept.user_id')
             ->leftJoin('department department', 'department.id = dept.dept_id')
-            ->order(['dept.level' => 'ASC', 'dept.sort' => 'ASC'])
+            ->order([
+                'dept.level' => 'ASC',
+                'dept.sort'  => 'ASC',
+                'dept.id'    => 'DESC',
+            ])
             ->select();
 
         if (!$dept->isEmpty()) {
@@ -113,7 +117,12 @@ class Department extends Model
                 'department.name as dept_name'
             ])
             ->leftJoin('user user', 'user.id = dept.user_id')
-            ->leftJoin('department department', 'department.id = dept.dept_id');
+            ->leftJoin('department department', 'department.id = dept.dept_id')
+            ->order([
+                'dept.level' => 'ASC',
+                'dept.sort'  => 'ASC',
+                'dept.id'    => 'ASC',
+            ]);
 
         // 数据权限限定
         $this->permissionsLimitOrDeptSearch(
