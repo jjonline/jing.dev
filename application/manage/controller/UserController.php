@@ -85,7 +85,7 @@ class UserController extends BaseController
     {
         if ($this->request->isAjax()) {
             // 将当前登录用户信息传递过去
-            $result = $userService->superUserUpdateUser($this->request, $this->UserInfo);
+            $result = $userService->superEditUser($this->request->post('User/a'), $this->UserInfo);
             return $this->asJson($result);
         }
         return $this->renderJson("error");
@@ -100,7 +100,22 @@ class UserController extends BaseController
     public function enableAction(UserService $userService)
     {
         if ($this->request->isPost() && $this->request->isAjax()) {
-            $result = $userService->enable($this->request, $this->UserInfo);
+            $result = $userService->superEnableUser($this->request, $this->UserInfo);
+            return $this->asJson($result);
+        }
+        return $this->renderJson('请求失败', 404);
+    }
+
+    /**
+     * 快速排序
+     * @param UserService $userService
+     * @return mixed
+     * @throws \think\exception\DbException
+     */
+    public function sortAction(UserService $userService)
+    {
+        if ($this->request->isPost() && $this->request->isAjax()) {
+            $result = $userService->superSortUser($this->request, $this->UserInfo);
             return $this->asJson($result);
         }
         return $this->renderJson('请求失败', 404);
