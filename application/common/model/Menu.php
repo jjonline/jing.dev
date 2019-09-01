@@ -10,6 +10,7 @@
 namespace app\common\model;
 
 use app\common\helper\ArrayHelper;
+use app\common\helper\StringHelper;
 use app\common\helper\TreeHelper;
 use think\Model;
 
@@ -99,12 +100,7 @@ class Menu extends Model
         $menu = $this->getMenuList();
         $menu = TreeHelper::vTree($menu);
         foreach ($menu as $key => $value) {
-            if ($value['level'] > 1) {
-                $menu[$key]['name'] = str_repeat(
-                    '&nbsp;',
-                    floor(pow(($value['level'] - 1), 2.5) * 2)
-                ) . '└─' . $menu[$key]['name'];
-            }
+            $menu[$key]['name'] = StringHelper::leftPadSpace($value['name'], $value['level']);
         }
         return $menu;
     }

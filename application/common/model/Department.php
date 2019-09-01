@@ -89,6 +89,7 @@ class Department extends Model
      * 带权限获取部门列表
      * @param array $act_user
      * @return array
+     * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException

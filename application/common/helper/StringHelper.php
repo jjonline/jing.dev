@@ -37,11 +37,11 @@ class StringHelper
     public static function leftPadSpace($name, $now_level, $begin_level = 0)
     {
         $pad_str = '&nbsp;';
-        $pad_num = floor(pow(($now_level - $begin_level - 1), 1.8) * 2);
+        $pad_num = floor(pow(($now_level - $begin_level - 1), 1.9) * 2);
         if ($pad_num <= 0) {
             return $name;
         }
-        return str_repeat($pad_str, $pad_num) . '└─' . $name;
+        return str_repeat($pad_str, $pad_num) . '└─ ' . $name;
     }
 
     /**

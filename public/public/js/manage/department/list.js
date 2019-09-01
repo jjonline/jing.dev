@@ -99,26 +99,26 @@ $(function () {
 
     // 提交编辑/新增
     $('.btn-submit-edit').click(function () {
-        if($('#parent_id').val() == '-1')
-        {
+        var parent_id = $('#parent_id');
+        if(parent_id.val() == '-1') {
             utils.toast('请选择上级部门');
             return false;
         }
-        if(utils.isEmpty($('#name').val()))
-        {
+        if(utils.isEmpty($('#name').val())) {
             $('#name').focus();
             utils.toast('请输入部门名称');
             return false;
         }
         var action = '';
-        if(utils.isEmpty($('#id').val()))
-        {
+        var isDisabledDefault = false;
+        if(utils.isEmpty($('#id').val())) {
             action = $('#DeptForm').data('create');
-        }else
-        {
-            action = $('#DeptForm').data('edit')
+            isDisabledDefault = false;
+        } else {
+            action = $('#DeptForm').data('edit');
+            isDisabledDefault = true;
         }
-        $('#parent_id').select2({'disabled':false});
+        parent_id.select2({'disabled':false});
         var data = $('#DeptForm').serializeArray();
         $('.btn-submit-edit').prop('disabled',true).text('提交中...');
         $.ajax({
@@ -132,13 +132,17 @@ $(function () {
                         location.href = '/manage/department/list';
                     });
                 } else {
-                    $('#parent_id').select2({'disabled':true});
+                    if (isDisabledDefault) {
+                        $('#parent_id').select2({'disabled':true})
+                    }
                     utils.alert(data.error_msg ? data.error_msg : '未知错误');
                 }
                 $('.btn-submit-edit').prop('disabled',false).text('提交');
             },
             error:function () {
-                $('#parent_id').select2({'disabled':true});
+                if (isDisabledDefault) {
+                    $('#parent_id').select2({'disabled':true})
+                }
                 $('.btn-submit-edit').prop('disabled',false).text('提交');
                 utils.alert('网络或服务器异常，请稍后再试');
             }
