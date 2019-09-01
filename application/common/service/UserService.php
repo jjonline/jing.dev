@@ -18,22 +18,32 @@ use app\common\helper\GenerateHelper;
 use app\common\helper\UtilHelper;
 use app\common\model\User;
 use app\common\model\Role;
+use app\common\model\Department;
+use app\common\service\user\Organization;
+use app\common\service\user\Sign;
+use app\common\service\user\Super;
+use app\common\service\user\Utils;
 use think\Exception;
 use think\facade\Config;
 use think\facade\Cookie;
 use think\facade\Session;
 use think\Request;
 
-class UserService
+class UserService extends BaseService
 {
+    use Super;
+    use Sign;
+    use Organization;
+    use Utils;
+
     /**
      * @var User
      */
     public $User;
     /**
-     * @var DepartmentService
+     * @var Department
      */
-    public $DepartmentService;
+    public $Department;
     /**
      * @var Role
      */
@@ -55,133 +65,16 @@ class UserService
         LogService $logService,
         User $User,
         Role $Role,
-        DepartmentService $departmentService,
+        Department $department,
         UserLogService $userLogService,
         UserOpenService $userOpenService
     ) {
-        $this->User              = $User;
-        $this->DepartmentService = $departmentService;
-        $this->Role              = $Role;
-        $this->LogService        = $logService;
-        $this->UserOpenService   = $userOpenService;
-        $this->UserLogService    = $userLogService;
-    }
-
-    /**
-     * 检查用户是否登录
-     * @return bool
-     * @throws
-     */
-    public function isUserLogin()
-    {
-        // 先检查cookie
-        if (Cookie::get('token') && Cookie::get('user_id')) {
-            // 再检查session
-            if (Session::get('user_id') && Session::get('user_info')) {
-                return true;
-            } else {
-                // cookie维持登录状态
-                $User = $this->User->getUserInfoById(Cookie::get('user_id'));
-                if (empty($User) || empty($User['enable'])) {
-                    $this->setUserLogout();
-                    return false;
-                }
-                // 效验cookie合法性通过后设置登录
-                if ($this->generateAuthCookie($User) == Cookie::get('token')) {
-                    return $this->setUserLogin($User, true);
-                }
-                $this->setUserLogout();
-                return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 用户登录效验
-     * ---
-     * 1、效验失败抛出异常，注意try-catch
-     * 2、验证码处理逻辑需在调用该方法之前自主实现
-     * 3、效验成功直接自动给予登录状态和发送cookie
-     * ---
-     * @param array $user
-     * @return bool
-     * @throws Exception
-     * @throws \think\exception\DbException
-     */
-    public function checkUserLogin($user = array())
-    {
-        if (empty($user) || empty($user['user_name']) || empty($user['password'])) {
-            throw new Exception('请输入账号密码', 500);
-        }
-        // 账号是否存在
-        $user_exist = $this->User->getUserInfoAutoByUniqueKey(trim($user['user_name']));
-        if (empty($user_exist)) {
-            throw new Exception('账号不存在', 500);
-        }
-        if (empty($user_exist['enable'])) {
-            throw new Exception('该账号已禁用，若需重新开通请联系平台管理员', 500);
-        }
-        // 防御状态禁止该账号登录
-        if (UtilHelper::isInDefense($user_exist['id'])) {
-            throw new Exception('密码错误次数过多，请15分钟后再试');
-        }
-        // 检查密码是否正确
-        if (!$this->checkUserPassword($user['password'], $user_exist['password'])) {
-            // 登录防御
-            UtilHelper::loginDefense($user_exist['id']);
-            // 密码错误之后不详细提示是账号错误还是密码错误
-            throw new Exception('账号或密码错误', 500);
-        }
-        // 清除登录防御
-        UtilHelper::releaseDefense($user_exist['id']);
-        return $this->setUserLogin($user_exist, true);
-    }
-
-    /**
-     * 设置用户登录状态，给予cookie、session
-     * @param $User []|User 用户模型或用户数组
-     * @param bool $reGenerateAuthToken 是否强制重新生成auth_code并重新生成登录cookie
-     * @return bool
-     * @throws Exception
-     */
-    public function setUserLogin($User, $reGenerateAuthToken = false)
-    {
-        if (empty($User) || empty($User['id']) || empty($User['auth_code'])) {
-            // 调用给予登录状态方法时严格检查参数，否则抛出异常终止
-            throw new Exception('给予登录状态参数错误', 500);
-        }
-        // 重新生成auth_code
-        if (false !== $reGenerateAuthToken) {
-            $this->User->updateUserAuthCode($User['id']);
-        }
-        // 重新获取完整的用户信息
-        $User = $this->User->getFullUserInfoById($User['id']);
-        // 发送cookie 浏览器关闭cookie失效
-        Cookie::set('token', $this->generateAuthCookie($User));
-        Cookie::set('user_id', $User['id']);
-        Cookie::set('device_id', GenerateHelper::guid());
-        // 保存session
-        Session::set('user_id', $User['id']);
-        Session::set('user_info', $User);
-        // 记录底层日志
-        $this->LogService->logRecorder('用户登录');
-        // 记录用户日志
-        $this->UserLogService->insert('登录', $User);
-        return true;
-    }
-
-    /**
-     * 用户退出登录
-     */
-    public function setUserLogout()
-    {
-        // 记录日志--不检查是否登录状态，可能造成检查登录的死循环
-        $this->LogService->logRecorder('用户退出');
-        $this->UserLogService->insert('退出登录', Session::get('user_info'));
-        Cookie::delete('user_id');
-        Cookie::delete('token');
-        Session::clear();
+        $this->User            = $User;
+        $this->Department      = $department;
+        $this->Role            = $Role;
+        $this->LogService      = $logService;
+        $this->UserOpenService = $userOpenService;
+        $this->UserLogService  = $userLogService;
     }
 
     /**
@@ -250,7 +143,7 @@ class UserService
         if ($_user['mobile'] != $exist_user['mobile']) {
             if (!empty($_user['mobile'])) {
                 // 修改手机号
-                if (!FilterValidHelper::is_phone_valid(trim($_user['mobile']))) {
+                if (!FilterValidHelper::isPhoneValid(trim($_user['mobile']))) {
                     return ['error_code' => 400,'error_msg' => '手机号格式有误'];
                 }
                 $repeat = $this->User->getUserInfoByMobile(trim($_user['mobile']));
@@ -267,7 +160,7 @@ class UserService
         if ($_user['email'] != $exist_user['email']) {
             if (!empty($_user['email'])) {
                 // 修改邮箱
-                if (!FilterValidHelper::is_mail_valid(trim($_user['email']))) {
+                if (!FilterValidHelper::isMailValid(trim($_user['email']))) {
                     return ['error_code' => 400,'error_msg' => '邮箱格式有误'];
                 }
                 $repeat = $this->User->getUserInfoByEmail(trim($_user['email']));
@@ -292,7 +185,7 @@ class UserService
         }
         // 修改部门
         if ($_user['dept_id'] != $exist_user['dept_id']) {
-            $exist_dept = $this->DepartmentService->Department->getDeptInfoById($_user['dept_id']);
+            $exist_dept = $this->Department->getDeptInfoById($_user['dept_id']);
             if (empty($exist_dept)) {
                 return ['error_code' => 400,'error_msg' => '拟分配的部门不存在'];
             }
@@ -321,7 +214,7 @@ class UserService
         }
 
         // 修改密码
-        if (!empty($_user['password']) && FilterValidHelper::is_password_valid($_user['password'])) {
+        if (!empty($_user['password']) && FilterValidHelper::isPasswordValid($_user['password'])) {
             $update_user['password'] = $this->generateUserPassword($_user['password']);
         }
 
@@ -402,11 +295,11 @@ class UserService
     {
         $_User = [];
         // 手机号
-        if (!empty($User['mobile']) && !FilterValidHelper::is_phone_valid($User['mobile'])) {
+        if (!empty($User['mobile']) && !FilterValidHelper::isPhoneValid($User['mobile'])) {
             throw new Exception('手机号格式有误', 500);
         }
         // 邮箱
-        if (!empty($User['email']) && !FilterValidHelper::is_mail_valid($User['email'])) {
+        if (!empty($User['email']) && !FilterValidHelper::isMailValid($User['email'])) {
             throw new Exception('邮箱格式有误', 500);
         }
         // 姓名作为识别依据不得为空
@@ -441,11 +334,11 @@ class UserService
             }
         }
         // 验证密码
-        if (empty($User['password']) || !FilterValidHelper::is_password_valid(trim($User['password']))) {
+        if (empty($User['password']) || !FilterValidHelper::isPasswordValid(trim($User['password']))) {
             throw new Exception('密码必须同时包含字母和数字，6至18位', 500);
         }
         // 部门
-        $dept = $this->DepartmentService->Department->getDeptInfoById($User['dept_id']);
+        $dept = $this->Department->getDeptInfoById($User['dept_id']);
         if (empty($dept)) {
             throw new Exception('拟分配用户的部门信息不存在', 500);
         }
@@ -477,13 +370,13 @@ class UserService
         try {
             $this->autoSmartCheckPassword($request->post('Profile.password'));
             // 效验
-            if (!empty($profile['re_password']) && !FilterValidHelper::is_password_valid($profile['re_password'])) {
+            if (!empty($profile['re_password']) && !FilterValidHelper::isPasswordValid($profile['re_password'])) {
                 return ['error_code' => 400,'error_msg' => '新密码格式有误：6至18位同时包含数字和字母'];
             }
-            if (!empty($profile['mobile']) && !FilterValidHelper::is_phone_valid($profile['mobile'])) {
+            if (!empty($profile['mobile']) && !FilterValidHelper::isPhoneValid($profile['mobile'])) {
                 return ['error_code' => 400,'error_msg' => '手机号码格式有误'];
             }
-            if (!empty($profile['email']) && !FilterValidHelper::is_mail_valid($profile['email'])) {
+            if (!empty($profile['email']) && !FilterValidHelper::isMailValid($profile['email'])) {
                 return ['error_code' => 400,'error_msg' => '邮箱格式有误'];
             }
             if (!empty($profile['real_name']) && mb_strlen($profile['real_name'], 'utf8') >= 32) {
@@ -498,11 +391,11 @@ class UserService
                 $user_update['real_name'] = trim($profile['real_name']);
             }
             // 手机号
-            if (FilterValidHelper::is_phone_valid($profile['mobile']) && $profile['mobile'] != $user['mobile']) {
+            if (FilterValidHelper::isPhoneValid($profile['mobile']) && $profile['mobile'] != $user['mobile']) {
                 $user_update['mobile'] = trim($profile['mobile']);
             }
             // 邮箱
-            if (FilterValidHelper::is_mail_valid($profile['email']) && $profile['email'] != $user['email']) {
+            if (FilterValidHelper::isMailValid($profile['email']) && $profile['email'] != $user['email']) {
                 $user_update['email'] = strtolower(trim($profile['email']));
             }
             // 性别
@@ -510,7 +403,7 @@ class UserService
                 $user_update['gender'] = $profile['gender'];
             }
             // 密码
-            if (FilterValidHelper::is_password_valid($profile['re_password'])
+            if (FilterValidHelper::isPasswordValid($profile['re_password'])
                 && $profile['re_password'] != $profile['password']) {
                 $user_update['password'] = $this->generateUserPassword($profile['re_password']);
             }
@@ -671,7 +564,7 @@ class UserService
             }
 
             // 普通用户按所辖部门id查找
-            $multi_dept_id = $this->DepartmentService->Department->getDeptChildAndSelfIdArrayById($user['dept_id']);
+            $multi_dept_id = $this->Department->getDeptChildAndSelfIdArrayById($user['dept_id']);
             if (empty($multi_dept)) {
                 throw new Exception('没有所属部门或下辖部门');
             }
@@ -680,40 +573,5 @@ class UserService
         } catch (\Throwable $e) {
             return [];
         }
-    }
-
-    /**
-     * 生成客户端加密cookie
-     * @param $User []|UserModel 用户模型
-     * @return string
-     * @throws Exception
-     */
-    protected function generateAuthCookie($User)
-    {
-        if (empty($User) || empty($User['id'])) {
-            throw new Exception('致命错误，用户数据异常');
-        }
-        return md5($User['auth_code'].Config::get('local.auth_key').$User['id']);
-    }
-
-    /**
-     * 生成密码密文内容
-     * @param  $pwd_text string 密码明文
-     * @return string
-     */
-    protected function generateUserPassword($pwd_text)
-    {
-        return password_hash(Config::get('local.auth_key').trim($pwd_text), PASSWORD_BCRYPT);
-    }
-
-    /**
-     * 检查用户密码
-     * @param string $pwd_text 用户密码明文
-     * @param string $pwd_hash 保存的密码hash
-     * @return bool
-     */
-    protected function checkUserPassword($pwd_text, $pwd_hash)
-    {
-        return password_verify(Config::get('local.auth_key').trim($pwd_text), $pwd_hash);
     }
 }

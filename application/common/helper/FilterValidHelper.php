@@ -17,7 +17,7 @@ class FilterValidHelper
      * @param  string $mail
      * @return boolean
      */
-    public static function is_mail_valid($mail)
+    public static function isMailValid($mail)
     {
         # PHP内置filter_var方式较为宽泛 不予采用
         /* !"#$%&'*+-/0123456789=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ^_ `abcdefghijklmnopqrstuvwxyz{|}~ 的类型均正确
@@ -34,7 +34,7 @@ class FilterValidHelper
      * @param  mixed $phone
      * @return boolean
      */
-    public static function is_phone_valid($phone)
+    public static function isPhoneValid($phone)
     {
         return preg_match('/^1[\d]{10}$/', $phone) === 1;
     }
@@ -50,7 +50,7 @@ class FilterValidHelper
      * @param  mixed $url
      * @return boolean
      */
-    public static function is_url_valid($url)
+    public static function isUrlValid($url)
     {
         return preg_match('/^http[s]?:\/\/(?:(?:[0-9]{1,3}\.){3}[0-9]{1,3}|(?:[0-9a-z_!~*\'()-]+\.)*(?:[0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\.[a-z]{2,6})(?::[0-9]{1,4})?(?:(?:\/\?)|(?:\/[0-9a-zA-Z_!~\*\'\(?:\)\.;\?:@&=\+\$,%#-\/]*)?)$/i', $url) === 1;
     }
@@ -66,7 +66,7 @@ class FilterValidHelper
      * @param  int   $maxLength 允许的uid最长位数 默认11
      * @return boolean
      */
-    public static function is_uid_valid($uid, $minLength = 4, $maxLength = 11)
+    public static function isUidValid($uid, $minLength = 4, $maxLength = 11)
     {
         #正则方式
         return preg_match('/^[1-9]\d{'.($minLength - 1).','.($maxLength - 1).'}$/', $uid) === 1;
@@ -86,12 +86,13 @@ class FilterValidHelper
      * @param  int $maxLength 允许的账户密码最长位数 默认16
      * @return boolean
      */
-    public static function is_password_valid($password, $minLength = 6, $maxLength = 18)
+    public static function isPasswordValid($password, $minLength = 6, $maxLength = 18)
     {
         if (strlen($password) > $maxLength || strlen($password) < $minLength) {
             return false;
         }
-        return preg_match('/\d{1,'.$maxLength.'}/', $password) === 1 && preg_match('/[a-zA-Z]{1,'.$maxLength.'}/', $password) === 1;
+        return preg_match('/\d{1,'.$maxLength.'}/', $password) === 1
+            && preg_match('/[a-zA-Z]{1,'.$maxLength.'}/', $password) === 1;
     }
 
     /**
@@ -99,7 +100,7 @@ class FilterValidHelper
      * @param  string $string 字符串
      * @return boolean
      */
-    public static function is_chinese_valid($str)
+    public static function isChineseValid($str)
     {
         return preg_match("/[\x{4e00}-\x{9fa5}]+/u", $str) === 1;
     }
@@ -109,7 +110,7 @@ class FilterValidHelper
      * @param  string $string 字符串
      * @return boolean
      */
-    public static function is_utf8_valid($str)
+    public static function isUtf8Valid($str)
     {
         $c    = 0;
         $b    = 0;
@@ -154,7 +155,7 @@ class FilterValidHelper
      * @param  mixed $citizen_id
      * @return bool | array
      */
-    public static function is_citizen_id_valid($citizen_id)
+    public static function isCitizenIdValid($citizen_id)
     {
         $id                 =   strtoupper($citizen_id);
         if (!(preg_match('/^\d{17}(\d|X)$/', $id) || preg_match('/^\d{15}$/', $id))) {
@@ -237,11 +238,21 @@ class FilterValidHelper
             return false;
         }
         # 年月日是否合法
-        $RealDate           =   strtotime($BirthYear.'-'.$BirthMonth.'-'.$BirthDay);
-        if (date('Y', $RealDate) != $BirthYear || date('m', $RealDate) != $BirthMonth || date('d', $RealDate) != $BirthDay) {
+        $RealDate = strtotime($BirthYear.'-'.$BirthMonth.'-'.$BirthDay);
+        if (date('Y', $RealDate) != $BirthYear
+            || date('m', $RealDate) != $BirthMonth
+            || date('d', $RealDate) != $BirthDay
+        ) {
             return false;
         }
         # 效验成功 返回关联数组，便于从身份证号中提取基本信息 boolean判断为true
-        return array('id'=>$id,'location'=>$oProvice[$Province],'Y'=>$BirthYear,'m'=>$BirthMonth,'d'=>$BirthDay,'sex'=>$Sex);
+        return [
+            'id'       => $id,
+            'location' => $oProvice[$Province],
+            'Y'        => $BirthYear,
+            'm'        => $BirthMonth,
+            'd'        => $BirthDay,
+            'sex'      => $Sex
+        ];
     }
 }

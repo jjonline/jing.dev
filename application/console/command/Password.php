@@ -40,7 +40,7 @@ class Password extends Command
             throw new Exception("Usage:`php think password --text=Your Password Text` Generate Password Crypt String.");
         }
         // 检查密码是否符合规范--字符和数字
-        if (!FilterValidHelper::is_password_valid($text)) {
+        if (!FilterValidHelper::isPasswordValid($text)) {
             throw new Exception("Password Text Format Not Allowed.Text Need Word And Number,length at least 8");
         }
         $crypt_text = password_hash(config('local.auth_key').trim($text), PASSWORD_BCRYPT);

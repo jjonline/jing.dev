@@ -28,7 +28,7 @@ class UtilService
      */
     public function getAreaInfoByMobile($mobile)
     {
-        if (empty($mobile) || !FilterValidHelper::is_phone_valid($mobile)) {
+        if (empty($mobile) || !FilterValidHelper::isPhoneValid($mobile)) {
             return ['error_code' => 500,'error_msg' => '手机号格式有误'];
         }
         try {

@@ -67,7 +67,7 @@ class UserController extends BaseController
     {
         if ($this->request->isAjax()) {
             // 将当前登录用户信息传递过去
-            $result = $userService->superUserInsertUser($this->request, $this->UserInfo);
+            $result = $userService->superCreateUser($this->request->post('User/a'), $this->UserInfo);
             return $this->asJson($result);
         }
         return $this->renderJson("error");

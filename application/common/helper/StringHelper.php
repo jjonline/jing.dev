@@ -45,6 +45,27 @@ class StringHelper
     }
 
     /**
+     * 生成随机字符串
+     * @param int $length 随机字符串长度
+     * @param bool $except_confusion 是否去除易混淆字符串，默认不去除
+     * @return string
+     */
+    public static function randString($length, $except_confusion = false)
+    {
+        $chars  = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        if ($except_confusion) {
+            // 默认去掉了容易混淆的字符oOLl和数字01，要添加请使用addChars参数
+            $chars  = 'ABCDEFGHIJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+        }
+        $str    = '';
+        $strLen = strlen($chars) - 1;
+        for ($i = 0; $i < $length; $i++) {
+            $str .= substr($chars, mt_rand(0, $strLen), 1);
+        }
+        return $str;
+    }
+
+    /**
      * 检查一个字符串是否为字母或下划线开头的合法变量标识符
      * @param string $str
      * @return bool
