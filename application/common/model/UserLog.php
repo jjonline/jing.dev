@@ -14,7 +14,8 @@ class UserLog extends Model
 {
     const ACTION_LOGIN  = '登录';
     const ACTION_LOGOUT = '注销';
-    const ACTION_CREATE = '创建账号';
+    const ACTION_CREATE = '创建账号'; // 管理员创建
+    const ACTION_UPDATE = '更新账号'; // 管理员更新
 
     /**
      * @param $user_id
