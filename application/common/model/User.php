@@ -85,10 +85,10 @@ class User extends Model
      */
     public function getUserInfoAutoByUniqueKey($user_unique_key_field_value)
     {
-        if (FilterValidHelper::is_mail_valid($user_unique_key_field_value)) {
+        if (FilterValidHelper::isMailValid($user_unique_key_field_value)) {
             return $this->getUserInfoByEmail($user_unique_key_field_value);
         }
-        if (FilterValidHelper::is_phone_valid($user_unique_key_field_value)) {
+        if (FilterValidHelper::isPhoneValid($user_unique_key_field_value)) {
             return $this->getUserInfoByMobile($user_unique_key_field_value);
         }
         return $this->getUserInfoByUserName($user_unique_key_field_value);

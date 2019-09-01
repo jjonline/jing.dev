@@ -334,7 +334,7 @@ class UtilHelper
     }
 
     /**
-     * 隐藏手机号中间4位\\方法体本身不检测传入参数是否为手机号，请调用静态方法is_phone_valid提前检测
+     * 隐藏手机号中间4位\\方法体本身不检测传入参数是否为手机号，请调用静态方法isPhoneValid提前检测
      * @param $phone
      * @return string
      */

@@ -198,7 +198,7 @@ class CommonController extends BasicController
     public function getAreaInfoByMobileAction(UtilService $utilService)
     {
         $mobile = $this->request->param('mobile');
-        if (!FilterValidHelper::is_phone_valid($mobile)) {
+        if (!FilterValidHelper::isPhoneValid($mobile)) {
             return $this->renderJson('手机号格式有误', 500);
         }
         $result = $utilService->getAreaInfoByMobile($mobile);
