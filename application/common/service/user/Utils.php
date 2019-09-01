@@ -112,7 +112,7 @@ trait Utils
             throw new Exception('用户名不得为空');
         }
 
-        $exist_mobile = $this->User->getUserInfoByEmail($user_name);
+        $exist_mobile = $this->User->getUserInfoByUserName($user_name);
         if (!empty($exist_mobile)) {
             throw new Exception('用户名[' . $user_name . ']已存在');
         }

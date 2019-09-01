@@ -49,8 +49,8 @@ trait PermissionsTrait
                 /**
                  * @var Department $departModel
                  */
-                $departModel   = app(Department::class);
-                $search_dept   = $departModel->getDeptChildAndSelfIdArrayById($search_dept_id);
+                $departModel = app(Department::class);
+                $search_dept = $departModel->getDeptChildAndSelfIdArrayById($search_dept_id);
 
                 // 去重+重排数字索引后按部门检索
                 $query->where($dept_column, 'IN', ArrayHelper::filterByCallableThenUnique($search_dept, 'intval'));

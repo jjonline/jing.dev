@@ -78,7 +78,17 @@ class Department extends Model
      */
     public function getDeptList()
     {
-        $dept = $this->order(['level' => 'ASC','sort' => 'ASC'])->select();
+        $dept = $this->db()->alias('dept')
+            ->field([
+                'dept.*',
+                'user.real_name',
+                'department.name as dept_name'
+            ])
+            ->leftJoin('user user', 'user.id = dept.user_id')
+            ->leftJoin('department department', 'department.id = dept.dept_id')
+            ->order(['dept.level' => 'ASC', 'dept.sort' => 'ASC'])
+            ->select();
+
         if (!$dept->isEmpty()) {
             return $dept->toArray();
         }
@@ -100,8 +110,7 @@ class Department extends Model
             ->field([
                 'dept.*',
                 'user.real_name',
-                'department.name as dept_name','user.real_name',
-                'department.name as dept_name',
+                'department.name as dept_name'
             ])
             ->leftJoin('user user', 'user.id = dept.user_id')
             ->leftJoin('department department', 'department.id = dept.dept_id');
@@ -109,7 +118,7 @@ class Department extends Model
         // 数据权限限定
         $this->permissionsLimitOrDeptSearch(
             $query,
-            'dept.dept_id',
+            'dept.id',
             'dept.user_id',
             $act_user
         );
