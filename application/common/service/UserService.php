@@ -588,54 +588,54 @@ class UserService
      * @param Request $request
      * @param array   $act_user_info 控制器中的包含菜单、部门权限信息的UserInfo属性数组
      * @return array
-     * @throws Exception
-     * @throws \think\exception\DbException
-     * @throws \think\exception\PDOException
      */
     public function enable(Request $request, $act_user_info = array())
     {
-        $user_id       = $request->post('id');
-        $multi_user_id = $request->post('multi_id/a'); // 批量启用禁用
-        $enable        = $request->post('enable');
-        if (empty($user_id) && empty($multi_user_id)) {
-            return ['error_code' => 400,'error_msg' => '参数缺失'];
+        try {
+            $user_id       = $request->post('id');
+            $multi_user_id = $request->post('multi_id/a'); // 批量启用禁用
+            $enable        = $request->post('enable');
+            if (empty($user_id) && empty($multi_user_id)) {
+                throw new Exception('参数缺失');
+            }
+
+            // 单个启用禁用
+            if (!empty($user_id) && is_numeric($user_id)) {
+                $user            = $this->User->getUserInfoById($user_id);
+                $act_dept_vector = $act_user_info['dept_auth']['dept_id_vector'] ?? [];
+                if (!in_array($user['dept_id'], $act_dept_vector)) {
+                    throw new Exception('您无权限启用或禁用该用户');
+                }
+
+                // 启用或禁用用户写入
+                $_enable           = [];
+                $_enable['id']     = $user['id'];
+                $_enable['enable'] = $user['enable'] ? 0 : 1;
+                $result            = $this->User->isUpdate(true)->save($_enable);
+
+                if (false !== $result) {
+                    $this->LogService->logRecorder($user, '启用或禁用用户');
+                    return ['error_code' => 0,'error_msg' => $user['enable'] ? '禁用完成' : '启用完成'];
+                }
+            }
+
+            // 批量启用禁用--仅根用户可用
+            if (!empty($multi_user_id) && in_array($enable, ['0', '1'])) {
+                if (!$act_user_info['is_root']) {
+                    return ['error_code' => 500,'error_msg' => '操作失败：批量操作仅根用户可用'];
+                }
+                $multi_user_id = ArrayHelper::filterByCallableThenUnique($multi_user_id, 'intval');
+                $result = $this->User->where('id', 'IN', $multi_user_id)->update(['enable' => $enable]);
+
+                if (false !== $result) {
+                    $this->LogService->logRecorder([$user_id, $multi_user_id, $enable], '批量启用或禁用用户');
+                    return ['error_code' => 0,'error_msg' => empty($enable) ? '批量禁用完成' : '批量启用完成'];
+                }
+            }
+            throw new Exception('操作失败');
+        } catch (\Throwable $e) {
+            return ['error_code' => 500, 'error_msg' => $e->getMessage()];
         }
-
-        // 单个启用禁用
-        if (!empty($user_id) && is_numeric($user_id)) {
-            $user            = $this->User->getUserInfoById($user_id);
-            $act_dept_vector = $act_user_info['dept_auth']['dept_id_vector'] ?? [];
-            if (!in_array($user['dept_id'], $act_dept_vector)) {
-                return ['error_code' => 500,'error_msg' => '您无权限启用或禁用该用户'];
-            }
-
-            // 启用或禁用用户写入
-            $_enable           = [];
-            $_enable['id']     = $user['id'];
-            $_enable['enable'] = $user['enable'] ? 0 : 1;
-            $result            = $this->User->isUpdate(true)->save($_enable);
-
-            if (false !== $result) {
-                $this->LogService->logRecorder($user, '启用或禁用用户');
-                return ['error_code' => 0,'error_msg' => $user['enable'] ? '禁用完成' : '启用完成'];
-            }
-        }
-
-        // 批量启用禁用--仅根用户可用
-        if (!empty($multi_user_id) && in_array($enable, ['0', '1'])) {
-            if (!$act_user_info['is_root']) {
-                return ['error_code' => 500,'error_msg' => '操作失败：批量操作仅根用户可用'];
-            }
-            $multi_user_id = ArrayHelper::filterByCallableThenUnique($multi_user_id, 'intval');
-            $result = $this->User->where('id', 'IN', $multi_user_id)->update(['enable' => $enable]);
-
-            if (false !== $result) {
-                $this->LogService->logRecorder([$user_id, $multi_user_id, $enable], '批量启用或禁用用户');
-                return ['error_code' => 0,'error_msg' => empty($enable) ? '批量禁用完成' : '批量启用完成'];
-            }
-        }
-
-        return ['error_code' => 500,'error_msg' => '操作失败：数据库异常'];
     }
 
     /**

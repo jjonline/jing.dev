@@ -126,15 +126,12 @@ $(function () {
             type: 'POST',
             data: data,
             success: function (data) {
-                if(data.error_code == 0)
-                {
-                    utils.alert(data.error_msg,function () {
-                        setTimeout(function () {
-                            location.href = '/manage/department/list';
-                        },300);
+                if (data.error_code == 0) {
+                    $('#DeptModal').modal('hide');
+                    utils.toast(data.error_msg, 3000, function () {
+                        location.href = '/manage/department/list';
                     });
-                }
-                else{
+                } else {
                     $('#parent_id').select2({'disabled':true});
                     utils.alert(data.error_msg ? data.error_msg : '未知错误');
                 }
