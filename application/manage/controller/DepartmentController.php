@@ -36,7 +36,7 @@ class DepartmentController extends BaseController
         ];
         $this->assign($common);
 
-        $dept_list = $departmentService->lists($this->UserInfo);
+        $dept_list = $departmentService->superList($this->UserInfo);
 
         $this->assign('dept_list', $dept_list);
 
@@ -54,7 +54,7 @@ class DepartmentController extends BaseController
     public function createAction(DepartmentService $departmentService)
     {
         if ($this->request->isPost() && $this->request->isAjax()) {
-            return $departmentService->save($this->request);
+            return $departmentService->superSave($this->request->post('Dept/a'), $this->UserInfo);
         }
         return $this->renderJson('error', 500);
     }
@@ -70,7 +70,7 @@ class DepartmentController extends BaseController
     public function editAction(DepartmentService $departmentService)
     {
         if ($this->request->isPost() && $this->request->isAjax()) {
-            return $departmentService->save($this->request);
+            return $departmentService->superSave($this->request->post('Dept/a'), $this->UserInfo);
         }
         return $this->renderJson('error', 500);
     }
@@ -79,15 +79,12 @@ class DepartmentController extends BaseController
      * 跳转部门排序字段
      * @param DepartmentService $departmentService
      * @return mixed
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     public function sortAction(DepartmentService $departmentService)
     {
         if ($this->request->isPost() && $this->request->isAjax()) {
             // 编辑menu菜单后端检测和操作
-            return $this->asJson($departmentService->sort($this->request));
+            return $this->asJson($departmentService->superSort($this->request, $this->UserInfo));
         }
         return $this->renderJson('error', 500);
     }
@@ -106,7 +103,7 @@ class DepartmentController extends BaseController
     {
         if ($this->request->isPost() && $this->request->isAjax()) {
             // 编辑menu菜单后端检测和操作
-            return $this->asJson($departmentService->delete($this->request));
+            return $this->asJson($departmentService->superDelete($this->request, $this->UserInfo));
         }
         return $this->renderJson('error', 500);
     }
