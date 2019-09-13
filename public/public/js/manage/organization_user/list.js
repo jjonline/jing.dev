@@ -5,12 +5,16 @@ $(function () {
     var searchBeginDate = $("#search_begin_date"); // 时间范围检索开始
     var searchEndDate   = $("#search_end_date");// 时间范围检索结束
 
+    var enable = $("#adv_enable");
+    var dept_id = $("#search_dept_id");
+    var update_time_begin = $("#update_time_begin");
+    var update_time_end = $("#update_time_end");
 
     /**
      * 文本检索和cookie记录检索值
      * 以及绑定检索输入框的自动提交事件
      */
-    var targetSearch = utils.cookie("txt__CONTROLLER__Search");
+    var targetSearch = utils.cookie("txtOrgUserSearch");
     if (!utils.isEmpty(targetSearch)) {
         txtSearch.val(targetSearch);
         txtSearch.select();
@@ -18,10 +22,11 @@ $(function () {
     txtSearch.on("keyup", function () {
         keyUpHandle && clearTimeout(keyUpHandle);
         keyUpHandle = setTimeout(function () {
-            utils.cookie('txt__CONTROLLER__Search', txtSearch.val());
+            utils.cookie('txtOrgUserSearch', txtSearch.val());
             refreshTable();
         }, 600);
     });
+
     /**
      * 绑定DateTimePicker时间筛选组件动作
      */
@@ -74,8 +79,11 @@ $(function () {
     $("#exec_reset").click(function () {
         searchBeginDate.val("");
         searchEndDate.val("");
+        update_time_end.val("");
+        update_time_begin.val("");
 
-        // todo 清除高级查询modal上的输入框值等内容，一般先在顶部定义各个输入框的对象，此处直接用
+        enable.val("").trigger("change");
+        dept_id.val("").trigger("change");
 
         refreshTable();
         return false;
@@ -150,158 +158,162 @@ $(function () {
             toggleHeaderBtn(false);
         }
     }).on("click",".enable",function () {
+        // 没有权限不提示
+        if (!has_enable_permission) {
+            return false;
+        }
         // 启用禁用
         var data = $(this).parents("tr").data("json");
-        var text = data.enable ? "确认禁用该__LIST_NAME__么？" : "确认启用该__LIST_NAME__么？";
-        utils.ajaxConfirm(text,"/manage/__CONTROLLER_UNDER_SCORE__/enable",{"id":data.id, "enable": data.enable ? 0 : 1},function () {
+        var text = data.enable ? "确认禁用该账号么？" : "确认启用该账号么？";
+        utils.ajaxConfirm(text,"/manage/organization_user/enable",{"id":data.id, "enable": data.enable ? 0 : 1},function () {
             refreshTable();
         });
     }).on("change",".list-sort-input",function () {
         // 快速设置排序
         var id   = $(this).data("id");
         var sort = $(this).val();
-        utils.ajaxConfirm("确认修改排序么？",'/manage/__CONTROLLER_UNDER_SCORE__/sort',{"id":id,"sort":sort},function () {
+        utils.ajaxConfirm("确认修改排序么？",'/manage/organization_user/sort',{"id":id,"sort":sort},function () {
             refreshTable();
         });
-    }).on("click",".delete",function () {
-        // 删除
-        var id   = $(this).data("id");
-        utils.ajaxConfirm("确认删除该__LIST_NAME__么？删除后将无法找回",'/manage/__CONTROLLER_UNDER_SCORE__/delete',{"id":id},function () {
-            refreshTable();
-        });
-    }).on("click",'.edit',function () {
-        // 编辑按钮打开编辑modal
-        $("#id").val($(this).data("id")).prop("disabled",false);
-        var editData = $(this).parents("tr").data("json"); // 从tr中读取出的待编辑的数据
+        // 显示编辑浮层
+    }).on('click','.edit',function () {
+        var data = $(this).parents("tr").data("json");
+        $("#UserModelLabel").text("编辑组织账号");
+        $('#id').val(data.id).prop("disabled", false);
+        $('#real_name').val(data.real_name);
+        $('#user_name').val(data.user_name);
+        $('#mobile').val(data.mobile);
+        $('#email').val(data.email);
+        $('#telephone').val(data.telephone);
+        $('#remark').val(data.remark);
 
-        $("#SaveModalLabel").text("编辑__LIST_NAME__");
-        $(".btn-edit-submit").show();
-        $(".btn-create-submit").hide();
+        $('#gender').val(data.gender).trigger('change');
+        $('#dept_id').val(data.dept_id).trigger('change');
+        $('#role_id').val(data.role_id).trigger('change');
 
-        // todo 编辑模式需处理的逻辑
-        // sample
-        $("#real_name").val(editData.real_name);
+        $('#is_leader').bootstrapSwitch('state',!!data.is_leader);
+        $('#enable').bootstrapSwitch('state',!!data.enable);
+        $('#is_root').bootstrapSwitch('state',!!data.is_root);
 
-        $("#SaveModal").modal("show");
+        $('#UserModal').modal('show');
+    });
+
+    // 浮层新增
+    $("#btn-create").on("click",function () {
+        $("#UserModelLabel").text("新增组织账号");
+        $('#id').val("").prop("disabled", true);
+        $('#real_name').val("");
+        $('#user_name').val("");
+        $('#mobile').val("");
+        $('#email').val("");
+        $('#telephone').val("");
+        $('#remark').val("");
+
+        $('#gender').val("-1").trigger('change');
+        $('#dept_id').val("").trigger('change');
+        $('#role_id').val("").trigger('change');
+
+        $('#is_leader').bootstrapSwitch('state',false);
+        $('#enable').bootstrapSwitch('state',true);
+        $('#is_root').bootstrapSwitch('state',false);
+
+        $('#UserModal').modal('show');
         return false;
     });
 
-    // 新增
-    $("#create").on('click',function () {
-        $("#id").val('').prop("disabled",false);
-        $("#SaveModalForm").get(0).reset();
-        $("#SaveModalLabel").text("新增__LIST_NAME__");
-
-        $(".btn-edit-submit").hide();
-        $(".btn-create-submit").show();
-
-        // todo 新增模式需处理的逻辑
-
-        $("#SaveModal").modal("show");
-        return false;
+    // 真实姓名转拼音
+    $('#real_name').change(function () {
+        if(!utils.isEmpty($(this).val()) && utils.isEmpty($('#user_name').val()))
+        {
+            $.get('/manage/common/chineseToPinyin',{chinese:$(this).val()},function (data) {
+                if(data.error_code == 0)
+                {
+                    $('#user_name').val(data.data);
+                }
+            });
+        }
     });
 
-    /**
-     * ++++编辑记录++++
-     * ——————————
-     * 提交编辑ajax动作
-     * ——————————
-     */
-    $(".btn-edit-submit").on("click",function () {
-        var that = this;
-        var form = $("#SaveModalForm");
-
-        /**
-         * sample
-         */
-        var real_time = $("#real_name");
-        if (utils.isEmpty(real_time.val())) {
-            real_time.focus();
-            utils.toast("输入真实姓名");
+    // 提交新增|编辑
+    $('.btn-submit-edit').click(function () {
+        if(utils.isEmpty($('#real_name').val()))
+        {
+            $('#real_name').focus();
+            utils.toast('输入真实姓名');
             return false;
         }
-
-        // todo 边界效验逻辑
-
-        var data = form.serializeArray();
-        $(that).prop("disabled",true).text("提交中...");
-        utils.showLoading("提交中，请稍后...");
+        if(utils.isEmpty($('#user_name').val()))
+        {
+            $('#user_name').focus();
+            utils.toast('输入用户名');
+            return false;
+        }
+        if(!utils.isEmpty($('#password').val())) {
+            if (!utils.isPassWord($('#password').val())) {
+                $('#password').focus();
+                utils.toast('登录密码必须有字母和数字构成');
+                return false;
+            }
+        }
+        if(!utils.isEmpty($('#mobile').val()))
+        {
+            if(!utils.isPhone($('#mobile').val()))
+            {
+                $('#mobile').focus();
+                utils.toast('手机号格式有误');
+                return false;
+            }
+        }
+        if(!utils.isEmpty($('#email').val()))
+        {
+            if(!utils.isMail($('#email').val()))
+            {
+                $('#email').focus();
+                utils.toast('邮箱格式有误');
+                return false;
+            }
+        }
+        if(utils.isEmpty($('#role_id').val()))
+        {
+            utils.toast('请选择所属角色');
+            return false;
+        }
+        if(utils.isEmpty($('#dept_id').val()))
+        {
+            utils.toast('请选择所属部门');
+            return false;
+        }
+        var action = '';
+        if(utils.isEmpty($('#id').val()))
+        {
+            action = $('#userEdit').data('create');
+        }else
+        {
+            action = $('#userEdit').data('edit')
+        }
+        var data = $('#userEdit').serializeArray();
+        $('.btn-submit').prop('disabled',true).text('提交中...');
         $.ajax({
-            url: form.data("edit"),
-            type: "POST",
+            url: action,
+            type: 'POST',
             data: data,
             success: function (data) {
-                utils.hideLoading();
-                if (data.error_code === 0) {
-                    $("#SaveModal").modal("hide");
-                    utils.toast(data.error_msg, 3000,function () {
+                if (data.error_code == 0) {
+                    $('#UserModal').modal('hide');
+                    utils.alert(data.error_msg, function () {
                         refreshTable();
                     });
                 } else {
-                    utils.alert(data.error_msg ? data.error_msg : "未知错误");
+                    utils.toast(data.error_msg ? data.error_msg : '未知错误');
                 }
-                $(that).prop("disabled",false).text("提交");
             },
             error:function () {
-                utils.hideLoading();
-                $(that).prop("disabled",false).text("提交");
-                utils.alert("网络或服务器异常，请稍后再试");
+                $('.btn-submit').prop('disabled',false).text('提交');
+                utils.alert('网络或服务器异常，请稍后再试');
             }
         });
         return false;
     });
-
-    /**
-     * ++++新增记录++++
-     * ——————————
-     * 提交新增ajax动作
-     * ——————————
-     */
-    $(".btn-create-submit").on("click",function () {
-        var that = this;
-        var form = $("#SaveModalForm");
-
-        /**
-         * sample
-         */
-        var real_time = $("#real_name");
-        if (utils.isEmpty(real_time.val())) {
-            real_time.focus();
-            utils.toast("输入真实姓名");
-            return false;
-        }
-
-        // todo 边界效验逻辑
-
-        var data = form.serializeArray();
-        $(that).prop("disabled",true).text("提交中...");
-        utils.showLoading("提交中，请稍后...");
-        $.ajax({
-            url: form.data("create"),
-            type: "POST",
-            data: data,
-            success: function (data) {
-                utils.hideLoading();
-                if (data.error_code === 0) {
-                    $("#SaveModal").modal("hide");
-                    utils.toast(data.error_msg, 3000,function () {
-                        refreshTable();
-                    });
-                } else {
-                    utils.alert(data.error_msg ? data.error_msg : "未知错误");
-                }
-                $(that).prop("disabled",false).text("提交");
-            },
-            error:function () {
-                utils.hideLoading();
-                $(that).prop("disabled",false).text("提交");
-                utils.alert("网络或服务器异常，请稍后再试");
-            }
-        });
-        return false;
-    });
-
-
 
     /**
      * +++++++++++++++++++++++++++++++
@@ -337,7 +349,7 @@ $(function () {
                 rightColumns: 1
             },
             ajax: {
-                url: "/manage/__CONTROLLER_UNDER_SCORE__/list.html",
+                url: "/manage/organization_user/list.html",
                 type: "POST",
                 /**
                  * +++++++++++++++++++++++++++++++++++++++++++
@@ -350,8 +362,11 @@ $(function () {
                     return $.extend({}, data, {
                         keyword:txtSearch.val(),
                         begin_date:searchBeginDate.val(),
-                        end_date:searchEndDate.val()
-                        // todo 额外塞入请求体的数据获取方法
+                        end_date:searchEndDate.val(),
+                        dept_id:dept_id.val(), // 用户所属部门
+                        enable:enable.val(),
+                        update_time_end:update_time_end.val(),
+                        update_time_begin:update_time_begin.val()
                     });
                 },
                 /**
@@ -368,9 +383,6 @@ $(function () {
                             json.data[n].DT_RowClass = "DT_class" + json.data[n].id;
                             json.data[n].DT_RowId    = "DT_" + json.data[n].id;
                             json.data[n].DT_RowAttr  = {"data-id":json.data[n].id,"data-json":JSON.stringify(json.data[n])};
-
-                            // todo 若需添加额外的filter方法，在此添加
-
                         }
                         return JSON.stringify(json);
                     } catch (e) {
@@ -396,25 +408,20 @@ $(function () {
                         for (var n in items) {
                             var data = items[n];
                             items[n].operate = ""; // 操作按钮
-                            /**
-                             * 拥有编辑权限，则显示编辑按钮
-                             */
+
+                            // 编辑权限
                             if (has_edit_permission) {
-                                items[n].operate += " <a data-href=\"/manage/__CONTROLLER_UNDER_SCORE__/edit?id="+data.id+"\" class=\"btn btn-xs btn-primary edit\" data-id=\""+data.id+"\"><i class=\"fa fa-pencil-square-o\"></i> 编辑</a>";
+                                items[n].operate += ' <a href="javascript:;" data-href="/manage/organization_user/edit" class="btn btn-xs btn-primary edit"><i class="fa fa-pencil-square-o"></i> 编辑</a>';
                             }
 
-                            // 拥有删除权限，则显示删除按钮
-                            if (has_delete_permission) {
-                                items[n].operate += " <a data-href=\"/manage/__CONTROLLER_UNDER_SCORE__/delete?id="+data.id+"\" class=\"btn btn-xs btn-danger delete\" data-id=\""+data.id+"\"><i class=\"fa fa-trash\"></i> 删除</a>";
-                            }
-
-                            // 启用禁用按钮
+                            // 账号状态和启用禁用按钮
                             if (data.enable) {
-                                items[n].enable = "<button class=\"btn btn-xs bg-olive enable\">启用</button>";
+                                items[n].enable = "<button class=\"btn btn-xs bg-olive enable\">已启用</button>";
                             } else {
-                                items[n].enable = "<button class=\"btn btn-xs bg-teal enable\">禁用</button>";
+                                items[n].enable = "<button class=\"btn btn-xs btn-danger enable\">已禁用</button>";
                             }
-                            // 快速排序输入框
+
+                            // 排序
                             items[n].sort ="<div class=\"layui-input-inline\">" +
                                 "<input type=\"text\" class=\"list-sort-input\" data-id=\""+data.id+"\" value=\""+data.sort+"\">" +
                                 "</div>";
@@ -441,8 +448,19 @@ $(function () {
                     }
                 },
                 {data:"id"},
-                {data:"title"},
-                {data:"operate",className:"text-center"}
+                {data: 'user_name'},
+                {data: 'real_name'},
+                {data: 'mobile'},
+                {data: 'enable',className:"text-center"},
+                {data: 'sort',className:"text-center"},
+                {data: 'email'},
+                {data: 'dept_name'},
+                {data: 'role_name'},
+                {data: 'create_user_name'},
+                {data: 'create_time',className:"text-center"},
+                {data: 'update_time',className:"text-center"},
+                {data: 'remark'},
+                {data: 'operate',className:"text-center"}
             ],
             // columns: utils.setColumns(js_columns), // 自定义字段的情况
             /**
@@ -503,9 +521,8 @@ $(function () {
      * 为table表头塞入的各个管理按钮添加事件
      */
     function bindTableHeaderEvent() {
-
-        // 批量删除
-        $("#tableHeaderBtn .table_manage_delete").on("click", function () {
+        // 批量启用
+        $("#tableHeaderBtn .table_manage_enable").on("click", function () {
             var checked_data = getInMultiCheck();
             if (checked_data[0].length <= 0) {
                 utils.toast("请先勾选需批量操作的数据列");
@@ -513,12 +530,29 @@ $(function () {
             }
             // 批量提交确认并提交
             utils.ajaxConfirm(
-                "确认批量删除所勾选的__LIST_NAME__吗？",
-                '/manage/__CONTROLLER_UNDER_SCORE__/delete',
-                {'multi_id': checked_data[0]},
+                "确认批量启用勾选的用户吗？",
+                '/manage/organization_user/enable',
+                {'multi_id': checked_data[0], 'enable': 1},
                 function () {
                     refreshTable(false);
-            });
+                });
+        });
+
+        // 批量禁用
+        $("#tableHeaderBtn .table_manage_disable").on("click", function () {
+            var checked_data = getInMultiCheck();
+            if (checked_data[0].length <= 0) {
+                utils.toast("请先勾选需批量操作的数据列");
+                return false;
+            }
+            // 批量提交确认并提交
+            utils.ajaxConfirm(
+                "确认批量禁用勾选的用户吗？",
+                '/manage/organization_user/enable',
+                {'multi_id': checked_data[0], 'enable': 0},
+                function () {
+                    refreshTable(false);
+                });
         });
 
         // 启用|禁用表头管理按钮

@@ -78,4 +78,20 @@ class Role extends Model
         $data = $this->order(['sort' => 'ASC','create_time' => 'DESC'])->select();
         return $data ? $data->toArray() : [];
     }
+
+    /**
+     * 获取指定角色权重以下的角色列表
+     * @param int $sort 角色权重，即原先的排序字段
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getRoleListGtSort($sort)
+    {
+        $data = $this->order(['sort' => 'ASC','create_time' => 'DESC'])
+            ->where('sort', '>', $sort)
+            ->select();
+        return $data ? $data->toArray() : [];
+    }
 }

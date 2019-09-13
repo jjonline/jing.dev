@@ -56,9 +56,10 @@ class DepartmentService extends BaseService
     /**
      * 用户id读取权限范围内的所有部门数结构
      * @param integer $user_id
+     * @param bool $without_self 是否忽略指定用户所在的部门，默认不忽略
      * @return array
      */
-    public function getAuthDeptTreeList($user_id)
+    public function getAuthDeptTreeList($user_id, $without_self = false)
     {
         try {
             // 读取指定用户信息获得部门及子部门id数组
@@ -73,7 +74,11 @@ class DepartmentService extends BaseService
             }
 
             // 非根用户读取后处理
-            $auth_dept   = TreeHelper::childWithSelf($this->getDeptList(), $user['dept_id']);
+            if ($without_self) {
+                $auth_dept = TreeHelper::child($this->getDeptList(), $user['dept_id']);
+            } else {
+                $auth_dept = TreeHelper::childWithSelf($this->getDeptList(), $user['dept_id']);
+            }
             $begin_level = $user['dept_level']; // 用户所属部门的层级
 
             // 格式化层级名称
@@ -93,6 +98,7 @@ class DepartmentService extends BaseService
 
             return $auth_dept;
         } catch (\Throwable $e) {
+            dump($e);
             return [];
         }
     }
