@@ -25,7 +25,7 @@
                             <th data-priority="5" data-orderable="false">创建人</th>
                             <th data-priority="10" data-orderable="false">创建人所属部门</th>
                             <th data-priority="9">创建时间</th>
-                            <th data-priority="2" data-orderable="false">操作</th>
+                            <th data-priority="2" data-orderable="false" class="text-center">操作</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -42,7 +42,7 @@
                             <td><%{$dept.real_name}%></td>
                             <td><%{$dept.dept_name}%></td>
                             <td><%{$dept.create_time}%></td>
-                            <td>
+                            <td class="text-center">
                                 <%{if condition = "user_has_permission('manage/department/edit')"}%>
                                     <a href="<%{:url('department/edit')}%>?id=<%{$dept.id}%>" class="btn btn-xs btn-success edit" data-name="<%{$dept.name}%>" data-sort="<%{$dept.sort}%>" data-remark="<%{$dept.remark}%>" data-parent_id="<%{$dept.parent_id}%>" data-id="<%{$dept.id}%>"><i class="fa fa-pencil-square-o"></i> 编辑</a>
                                 <%{/if}%>

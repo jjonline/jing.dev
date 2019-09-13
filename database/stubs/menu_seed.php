@@ -2,7 +2,7 @@
 /**
  * 菜单生成的seed数组
  * @user Jea杨 (JJonline@JJonline.Cn)
- * @date 2019-09-01 22:12:15
+ * @date 2019-09-13 20:55:45
  * @file menu_seed.php
  */
 $date_time = date('Y-m-d H:i:s');
@@ -199,25 +199,6 @@ return [
     ],
     [
         'id' => '11',
-        'tag' => 'Org_User_Delete',
-        'name' => '删除组织账号',
-        'icon' => '',
-        'url' => 'manage/organization_user/delete',
-        'parent_id' => '8',
-        'level' => '3',
-        'is_required' => '0',
-        'is_badge' => '0',
-        'is_system' => '1',
-        'is_permissions' => '0',
-        'is_column' => '0',
-        'all_columns' => null,
-        'sort' => '3',
-        'remark' => '删除所属组织下的账号',
-        'create_time' => $date_time,
-        'update_time' => $date_time,
-    ],
-    [
-        'id' => '12',
         'tag' => 'Org_User_Sort',
         'name' => '组织账号排序',
         'icon' => '',
@@ -232,6 +213,25 @@ return [
         'all_columns' => null,
         'sort' => '4',
         'remark' => '所属组织下的账号快速排序',
+        'create_time' => $date_time,
+        'update_time' => $date_time,
+    ],
+    [
+        'id' => '12',
+        'tag' => 'Org_User_Enable',
+        'name' => '启用禁用组织账号',
+        'icon' => '',
+        'url' => 'manage/organization_user/enable',
+        'parent_id' => '8',
+        'level' => '3',
+        'is_required' => '0',
+        'is_badge' => '0',
+        'is_system' => '1',
+        'is_permissions' => '0',
+        'is_column' => '0',
+        'all_columns' => null,
+        'sort' => '5',
+        'remark' => '启用禁用 所属组织下的账号',
         'create_time' => $date_time,
         'update_time' => $date_time,
     ],

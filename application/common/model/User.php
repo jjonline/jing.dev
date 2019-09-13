@@ -11,12 +11,13 @@ namespace app\common\model;
 use app\common\helper\ArrayHelper;
 use app\common\helper\FilterValidHelper;
 use app\common\helper\GenerateHelper;
-use think\Db;
 use think\exception\DbException;
 use think\Model;
 
 class User extends Model
 {
+    use PermissionsTrait;
+
     /**
      * 用户ID查找用户信息
      * @param $user_id
@@ -105,20 +106,20 @@ class User extends Model
      */
     public function getFullUserInfoById($user_id)
     {
-        $data = Db::name('user u')
-              ->join('department dept', 'dept.id = u.dept_id')
-              ->join('role r', 'r.id = u.role_id')
+        $data = $this->db()->alias('user')
+              ->join('department dept', 'dept.id = user.dept_id')
+              ->join('role role', 'role.id = user.role_id')
               ->field([
-                  'u.*',
+                  'user.*',
                   'dept.name as dept_name',
                   'dept.id as dept_id',
                   'dept.level as dept_level', // 用户所属部门的层级
-                  'r.id as role_id',
-                  'r.name as role_name',
+                  'role.id as role_id',
+                  'role.name as role_name',
               ])
-              ->where('u.id', $user_id)
+              ->where('user.id', $user_id)
               ->find();
-        return $data ? $data : [];
+        return $data ? $data->toArray() : [];
     }
 
     /**
@@ -174,6 +175,40 @@ class User extends Model
                 'id'   => 'DESC'
             ])->select();
         return $result->isEmpty() ? [] : $result->toArray();
+    }
+
+    /**
+     * 获取指定用户的权限下用户列表[所属部门和子部门的所有用户列表]
+     * @param array $act_user
+     * @return array
+     * @throws DbException
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    public function getAuthFullUserList(array $act_user)
+    {
+        $query = $this->db()->alias('user')
+            ->join('department dept', 'dept.id = user.dept_id')
+            ->join('role role', 'role.id = user.role_id')
+            ->field([
+                'user.*',
+                'dept.name as dept_name',
+                'dept.id as dept_id',
+                'dept.level as dept_level', // 用户所属部门的层级
+                'role.id as role_id',
+                'role.name as role_name',
+            ]);
+
+        // 数据权限限定
+        $this->permissionsLimitOrDeptSearch(
+            $query,
+            'user.dept_id',
+            'user.id',
+            $act_user
+        );
+
+        return $query->select()->toArray();
     }
 
     /**

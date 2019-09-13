@@ -30,6 +30,17 @@ class ArrayHelper
     }
 
     /**
+     * 从二维数组中拿出
+     * @param array  $array
+     * @param string $column 需要从二维数组中拿出值的下表
+     * @return array
+     */
+    public static function arrayColumnThenUnique(array $array, $column)
+    {
+        return array_values(array_unique(array_column($array, $column)));
+    }
+
+    /**
      * 一维数组通过回调函数过滤然后去除false等价值最后返回不重复的元素
      * @param array $arr 一维数组
      * @param string $callback 默认回调处理一维数组每个元素的回调函数方法
