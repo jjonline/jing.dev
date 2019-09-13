@@ -123,13 +123,11 @@ class BaseAuthController extends BasicController
                     'error_msg'  => '没有操作权限'
                 ], 'json');
             } else {
-                $response = app('response'); // 读取单例构造html响应内容
-                $error    = $this->fetch('../application/common/view/error.html', [
+                // fetch方法直接返回了ViewResponse对象，无需重置Response
+                $response = $this->fetch('../application/common/view/error.html', [
                     'title' => '没有操作权限',
                     'msg'   => $e->getMessage()
                 ]);
-                $response->code(404);
-                $response->data($error);
             }
             // 抛出HttpResponseException异常并输出，终止后续业务代码执行
             throw new HttpResponseException($response);
