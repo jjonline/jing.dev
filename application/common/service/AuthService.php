@@ -25,7 +25,7 @@ use think\facade\Url;
 class AuthService
 {
     /**
-     * @var RoleTrait
+     * @var RoleService
      */
     public $RoleService;
 
