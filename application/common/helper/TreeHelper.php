@@ -37,18 +37,14 @@ class TreeHelper
     public static function childWithSelf($arr, $paren_id)
     {
         $_self = [];
-        $child = [];
         foreach ($arr as $key => $value) {
             // 收集本身
             if ($value['id'] == $paren_id) {
                 $_self = $value;
             }
-            // 递归收集子节点
-            if ($value['parent_id'] == $paren_id) {
-                $child[$value['id']] = $value;
-                $child              += self::childWithSelf($arr, $value['id']);
-            }
         }
+
+        $child = self::child($arr, $paren_id);
 
         if (!empty($_self)) {
             array_unshift($child, $_self);

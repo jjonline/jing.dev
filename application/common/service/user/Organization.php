@@ -346,7 +346,7 @@ trait Organization
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    protected function isOrgUserCanDealUsers(array $users, array $act_user_info)
+    public function isOrgUserCanDealUsers(array $users, array $act_user_info)
     {
         $can_users = $this->User->getAuthFullUserList($act_user_info);
         $can_manage_multi_id = ArrayHelper::arrayColumnThenUnique($can_users, 'id');
@@ -366,7 +366,7 @@ trait Organization
      * @param bool $without_self   检查时是否包含该用户所属的部门
      * @return bool
      */
-    protected function isOrgUserCanDealDept($dept_id, $act_user_id, $without_self = false)
+    public function isOrgUserCanDealDept($dept_id, $act_user_id, $without_self = false)
     {
         $can_manage_dept = app(DepartmentService::class)->getAuthDeptTreeList($act_user_id, $without_self);
         $can_manage_multi_id = ArrayHelper::arrayColumnThenUnique($can_manage_dept, 'id');
@@ -380,7 +380,7 @@ trait Organization
      * @param integer $act_user_id 被检查的用户id
      * @return bool
      */
-    protected function isOrgUserCanDealRole($role_id, $act_user_id)
+    public function isOrgUserCanDealRole($role_id, $act_user_id)
     {
         $can_manage_role = app(RoleService::class)->getOrgRoleListByUserId($act_user_id);
         $can_manage_multi_id = ArrayHelper::arrayColumnThenUnique($can_manage_role, 'id');

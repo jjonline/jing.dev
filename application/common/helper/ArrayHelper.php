@@ -30,6 +30,21 @@ class ArrayHelper
     }
 
     /**
+     * 支持一维数组|二维数组的数组值累加
+     * @param array $need_sum  一维数组或二维索引数组
+     * @param null|string $key 二维数组拟累加的字段key
+     * @return float|int
+     */
+    public static function arraySum($need_sum, $key = null)
+    {
+        if (!empty($key)) {
+            $need_sum = array_column($need_sum, $key);
+        }
+
+        return array_sum($need_sum);
+    }
+
+    /**
      * 从二维数组中拿出
      * @param array  $array
      * @param string $column 需要从二维数组中拿出值的下表
