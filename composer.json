@@ -35,7 +35,8 @@
         "upyun/sdk": "3.3.0"
     },
     "require-dev": {
-        "topthink/think-testing": "^2.0"
+        "topthink/think-testing": "^2.0",
+        "swoole/ide-helper": "4.4.5"
     },
     "autoload": {
         "psr-4": {
