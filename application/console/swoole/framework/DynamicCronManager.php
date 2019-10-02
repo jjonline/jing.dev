@@ -26,6 +26,7 @@ class DynamicCronManager
      *      'param of subClass Method of run',
      *      'cron expression',
      *      'business_id',
+     *      'perhaps exit cron time',
      * ]
      */
 
@@ -41,6 +42,7 @@ class DynamicCronManager
      *                  'param of subClass Method of run',
      *                  'cron expression',
      *                  'business_id',
+     *                  'perhaps exit cron time',
      *            ]
      *      ],
      * ]
@@ -96,14 +98,28 @@ class DynamicCronManager
     {
         // 在迭代完成之前，不返回空值
         self::$Redis->setOption(\Redis::OPT_SCAN, \Redis::SCAN_RETRY);
-        $iterator = null;
-        while($elements = self::$Redis->hscan(self::CRON_HASH_NAME . '*', $iterator)) {
+        $iterator  = null;
+        $is_reload = false;
+        while($elements = self::$Redis->hScan(self::CRON_HASH_NAME, $iterator)) {
             foreach($elements as $key => $value) {
+                $is_reload = true;
                 $hash_one = json_decode($value, true);
                 if (!empty($hash_one) && 2 == count($hash_one)) {
                     self::setOneCronTask($hash_one['task']);
                 }
             }
+        }
+
+        if ($is_reload) {
+            RedisServerManager::getInstance()->logGreen(
+                RedisServerManager::CRON_PROCESS." dynamic cron check and reload",
+                'cron'
+            );
+        } else {
+            RedisServerManager::getInstance()->log(
+                RedisServerManager::CRON_PROCESS." dynamic cron check and do not need reload",
+                'cron'
+            );
         }
     }
 
@@ -166,12 +182,12 @@ class DynamicCronManager
     protected static function setOneCronTask($one_item)
     {
         try {
-            if (empty($one_item) || 4 != count($one_item)) {
+            if (empty($one_item) || 5 != count($one_item)) {
                 return false;
             }
 
             // 拆分队列item
-            list($class_name, $param, $expression, $business_id) = $one_item;
+            list($class_name, $param, $expression, $business_id, $perhaps_exit_time) = $one_item;
             if (empty($class_name)) {
                 return false;
             }
@@ -183,7 +199,7 @@ class DynamicCronManager
              * 2、若任务不需要再次执行则清理该ticker的哈希表记录
              * ---
              */
-            $after_time = self::parseCronExpressionToOnce($expression);
+            $after_time = self::parseCronExpressionToOnce($expression, $perhaps_exit_time);
             if (empty($after_time)) {
                 // 清理该tick循环
                 return self::clearOneCronTask($class_name, $business_id);
@@ -221,13 +237,13 @@ class DynamicCronManager
                 Coroutine::sleep(0.1);
 
                 // tick完毕，通过任务投递形式再次投递尝试执行或销毁，避免不同进程间直接set任务导致tick在不同进程无法准确clear
-                list($class_name, $param, $expression, $business_id) = $task_data['data'];
-                TaskHelper::deliveryCronTask($class_name, $param, $expression, $business_id);
+                list($class_name, $param, $expression, $business_id, $perhaps_exit_time) = $task_data['data'];
+                TaskHelper::deliveryCronTask($class_name, $param, $expression, $business_id, $perhaps_exit_time);
             });
 
             // 维护hash
-            $hash_key  = self::CRON_HASH_NAME . md5($class_name);
-            $hash_item = [
+            $hash_field = md5($class_name) . $business_id;
+            $hash_item  = [
                 'tick_id' => $tick_id,
                 'task'    => $one_item
             ];
@@ -235,7 +251,7 @@ class DynamicCronManager
             // 设置任务
             RedisServerManager::getInstance()->logGreen("set tick with {$class_name} and {$business_id} success");
 
-            return self::$Redis->hSet($hash_key, $business_id, json_encode($hash_item));
+            return self::$Redis->hSet(self::CRON_HASH_NAME, $hash_field, json_encode($hash_item));
         } catch (\Throwable $e) {
             return false;
         }
@@ -243,12 +259,21 @@ class DynamicCronManager
 
     /**
      * 解析日期时间|标准cron表达式出最近1次执行时间剩余的毫秒数
-     * @param string $expression
+     * @param string $expression cron表达式或定时执行的日期时间
+     * @param string $perhaps_exit_time 可能的无限循环的终止时间
      * @return bool|int
      */
-    protected static function parseCronExpressionToOnce($expression)
+    protected static function parseCronExpressionToOnce($expression, $perhaps_exit_time = null)
     {
         try {
+            // 如果有设置终止时刻，切当前时刻已过终止时刻则终止
+            if (!empty($perhaps_exit_time)) {
+                $exit_time = is_numeric($perhaps_exit_time) ? $perhaps_exit_time : strtotime($perhaps_exit_time);
+                if (time() >= $exit_time) {
+                    return false;
+                }
+            }
+
             // 时间戳类型，仅在指定时间执行1次
             if (is_numeric($expression)) {
                 $timer = $expression - time(); // 剩余秒数
@@ -288,22 +313,22 @@ class DynamicCronManager
                 return false;
             }
 
-            $hash_key  = self::CRON_HASH_NAME . md5($class_name); // hash表的key规则
-            $hash_item = self::$Redis->hGet($hash_key, $business_id);
+            $hash_field = md5($class_name) . $business_id;
+            $hash_item  = self::$Redis->hGet(self::CRON_HASH_NAME, $hash_field);
             if (empty($hash_item)) {
                 return false;
             }
 
             // 清理掉该hash的item
-            self::$Redis->hDel($hash_key, $business_id);
+            self::$Redis->hDel(self::CRON_HASH_NAME, $hash_field);
 
             $task_map = json_decode($hash_item, true);
-            if (empty($task_map) || 3 != count($task_map)) {
+            if (empty($task_map) || 2 != count($task_map)) {
                 return false;
             }
 
             // 清理tick
-            $tick_id = $task_map[2]['tick_id'] ?? 0;
+            $tick_id = $task_map['tick_id'] ?? 0;
             if (empty($tick_id)) {
                 return false;
             }

@@ -42,16 +42,17 @@ class TaskHelper
      * @param mixed  $task_data 定时任务被触发执行时的参数
      * @param mixed  $cron_expression 定时规则，可以是cron表达式，也可以是日期时间(日期时间字符串、时间戳均可)
      * @param mixed  $business_id 定时业务id，用于取消定时任务，请自主保证 $task + $business_id 全局唯一
+     * @param mixed  $exit_time 可能的无限循环任务的终止时刻
      * @return bool|string
      */
-    public static function deliveryCronTask($task, $task_param, $cron_expression, $business_id)
+    public static function deliveryCronTask($task, $task_param, $cron_expression, $business_id, $exit_time = null)
     {
         /**
          * @var \Redis $Redis
          */
         $Redis = Cache::handler();
 
-        $task = [$task, $task_param, $cron_expression, $business_id];
+        $task = [$task, $task_param, $cron_expression, $business_id, $exit_time];
         return $Redis->lPush(DynamicCronManager::CRON_QUEUE_NAME, json_encode($task));
     }
 
