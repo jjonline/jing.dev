@@ -12,11 +12,11 @@
  * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  * @user Jea杨 (JJonline@JJonline.Cn)
  * @date 2019-03-25
- * @file CronTaskAbstract.php
+ * @file StaticCronTaskAbstract.php
  */
 namespace app\console\swoole\framework;
 
-abstract class CronTaskAbstract
+abstract class StaticCronTaskAbstract
 {
     /**
      * 设置cron形式的定时规则字符串即可，即在方法中设置定时执行的时间规则并return
