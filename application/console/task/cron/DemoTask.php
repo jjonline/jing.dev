@@ -8,10 +8,10 @@
 
 namespace app\console\task\cron;
 
-use app\console\swoole\framework\CronTaskAbstract;
+use app\console\swoole\framework\StaticCronTaskAbstract;
 use app\console\swoole\RedisServerManager;
 
-class DemoTask extends CronTaskAbstract
+class DemoTask extends StaticCronTaskAbstract
 {
     /**
      * 设定定时规则：这里是每一分钟执行一次
