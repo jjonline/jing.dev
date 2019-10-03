@@ -9,7 +9,8 @@ namespace app\console\swoole;
 
 use app\console\swoole\framework\AsyncTaskAbstract;
 use app\console\swoole\framework\CronProcessRunner;
-use app\console\swoole\framework\CronTaskAbstract;
+use app\console\swoole\framework\DynamicCronTaskAbstract;
+use app\console\swoole\framework\StaticCronTaskAbstract;
 use app\console\swoole\framework\SingletonTrait;
 use Swoole\Process;
 use Swoole\Redis\Server;
@@ -196,14 +197,14 @@ class RedisServerManager
                 $class_name = $data['task'];
                 $reflect    = new \ReflectionClass($class_name);
 
-                // 定时任务
-                if ($reflect->isSubclassOf(CronTaskAbstract::class)) {
+                // 固定时刻定时任务
+                if ($reflect->isSubclassOf(StaticCronTaskAbstract::class)) {
                     // 记录定时任务数据至Db返回任务ID
                     $task_id = TaskEvent::setCronTaskBegin($data);
                     try {
                         if (!empty($task_id)) {
                             /**
-                             * @var CronTaskAbstract $class_name
+                             * @var StaticCronTaskAbstract $class_name
                              */
                             list($status, $result) = $class_name::run();
                             $data['task_id'] = $task_id;
@@ -233,6 +234,40 @@ class RedisServerManager
                             // 抛出了异常同时未生成任务id，定时任务内核逻辑异常
                             $this->logError("{$task_name} Kernel Fail", 'kernel error');
                         }
+                    }
+                }
+
+                // 动态时刻定时任务
+                if ($reflect->isSubclassOf(DynamicCronTaskAbstract::class)) {
+                    try {
+                        /**
+                         * 执行动态定时任务，具体任务逻辑由run方法体自主实现
+                         * @var DynamicCronTaskAbstract $class_name
+                         */
+                        $status = $class_name::run($data['param']);
+                        $param  = json_encode($data['param']);
+                        if ($status) {
+                            $this->logGreen(
+                                "{$task_name} Run async `{$class_name}` With Pram {$param} Success",
+                                'ok'
+                            );
+                        } else {
+                            $this->logWarn(
+                                "{$task_name} Run async `{$class_name}` With Pram {$param} Fail",
+                                'warn'
+                            );
+                        }
+                    } catch (\Throwable $e) {
+                        // 动态定时任务出错，输出出错的详情
+                        $log = [
+                            'worker'     => $worker_name,
+                            'task'       => $task_name,
+                            'error_msg'  => $e->getMessage(),
+                            'error_code' => $e->getCode(),
+                            'data'       => $data
+                        ];
+
+                        $this->logError($log, 'DynamicCronTask Exception');
                     }
                 }
 

@@ -20,6 +20,7 @@ namespace app\console\swoole\framework;
 use app\console\swoole\RedisServerManager;
 use Cron\CronExpression;
 use Swoole\Process;
+use Swoole\Timer;
 
 class CronProcessRunner
 {
@@ -36,9 +37,12 @@ class CronProcessRunner
      */
     public function run(Process $process)
     {
-        // 启动进程时执行一次解析所有定时任务
-        $this->parseCronTask();
-        $this->cronProcess();
+        // 启动进程时执行一次解析所有固定定时任务
+        $this->parseStaticCronTask();
+        $this->staticCronProcess();
+
+        // 启动进程时触发动态定时任务初始化，由动态定时任务管理器进行调度
+        $this->dynamicCronProcess();
 
         RedisServerManager::getInstance()->log(
             RedisServerManager::CRON_PROCESS.' started,pid='.$process->pid
@@ -46,14 +50,23 @@ class CronProcessRunner
 
         // 自定义定时任务经常内每29秒tick执行一次
         swoole_timer_tick(29 * 1000, function () {
-            $this->cronProcess();
+            $this->staticCronProcess();
         });
     }
 
     /**
+     * 动态定时任务init，无需每29秒触发1次
+     */
+    protected function dynamicCronProcess()
+    {
+        DynamicCronManager::init();
+    }
+
+    /**
+     * 静态定时任务，即实现定时抽象类的脚本映射的定时任务
      * 解析定时任务并生成倒计时执行的异步信号
      */
-    protected function cronProcess()
+    protected function staticCronProcess()
     {
         if (empty($this->tasks)) {
             return;
@@ -93,7 +106,7 @@ class CronProcessRunner
      * @return array
      * @throws \Exception
      */
-    protected function parseCronTask()
+    protected function parseStaticCronTask()
     {
         try {
             $cron_task_path = app()->getAppPath().'console/task/cron/';
@@ -102,11 +115,11 @@ class CronProcessRunner
                 if ($iterator->isFile() && $iterator->getExtension() == 'php') {
                     /**
                      * 反射检查定时任务类是否严格继承了CronTaskAbstract抽象类
-                     * @var CronTaskAbstract $cron_task_class
+                     * @var StaticCronTaskAbstract $cron_task_class
                      */
                     $cron_task_class = 'app\console\task\cron\\'.$iterator->getBasename('.php');
                     $reflect         = new \ReflectionClass($cron_task_class);
-                    if (!$reflect->isSubclassOf(CronTaskAbstract::class)) {
+                    if (!$reflect->isSubclassOf(StaticCronTaskAbstract::class)) {
                         throw new \Exception("the cron task class {$cron_task_class} is invalid");
                     }
 
@@ -165,6 +178,7 @@ class CronProcessRunner
         defined('SIGTERM') || define('SIGTERM', 15);
         Process::signal(SIGTERM, function () use ($process) {
             go(function () use ($process) {
+                Timer::clearAll(); // 清理所有定时任务
                 Process::signal(SIGTERM, null);
                 $process->exit(0);
             });
