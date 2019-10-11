@@ -59,7 +59,7 @@ class __CONTROLLER__Search extends BaseSearch
 
         // 指定用户检索
         // $user_id = $this->request->param('user_id');
-        // $this->specifyUserSearch($Query, $user_id, '__CONTROLLER_UNDER_SCORE__.user_id');
+        // $this->specifyUserSearch($Query, '__CONTROLLER_UNDER_SCORE__.user_id', $user_id);
 
         /**
          * 关键字检索
